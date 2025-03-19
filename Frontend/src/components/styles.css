@@ -1,0 +1,161 @@
+/* Clock Component */
+.clock {
+  text-align: right;
+}
+
+.clock .time {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.clock .date {
+  font-size: 1rem;
+}
+
+/* Substitution Plan Component */
+.substitution-plan {
+  margin-bottom: 1rem;
+}
+
+.substitution-date-section {
+  margin-bottom: 1.5rem;
+}
+
+.substitution-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+}
+
+.substitution-table th,
+.substitution-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.substitution-table th {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.substitution-table tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+
+/* Weather Component */
+.weather-panel {
+  text-align: center;
+}
+
+.current-weather {
+  margin-bottom: 1rem;
+}
+
+.weather-location {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.weather-main {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 0.5rem 0;
+}
+
+.weather-icon {
+  font-size: 3rem;
+  margin-right: 1rem;
+}
+
+.weather-temp {
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+.weather-condition {
+  margin-bottom: 0.5rem;
+}
+
+.weather-details {
+  display: flex;
+  justify-content: space-around;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.weather-forecast {
+  display: flex;
+  justify-content: space-around;
+  border-top: 1px solid #eee;
+  padding-top: 1rem;
+}
+
+.forecast-day {
+  text-align: center;
+}
+
+.forecast-icon {
+  font-size: 2rem;
+  margin: 0.5rem 0;
+}
+
+.forecast-temp {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.forecast-temp .high {
+  font-weight: bold;
+}
+
+.forecast-temp .low {
+  color: #666;
+}
+
+/* Transportation Component */
+.transportation-panel {
+  display: flex;
+  flex-direction: column;
+}
+
+.transportation-time {
+  margin-bottom: 0.5rem;
+  font-weight: bold;
+}
+
+.transportation-list {
+  flex-grow: 1;
+  overflow-y: auto;
+}
+
+.transportation-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.transportation-table th,
+.transportation-table td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+.transportation-table th {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.status-on-time {
+  color: green;
+}
+
+.status-delayed {
+  color: orange;
+}
+
+.status-cancelled {
+  color: red;
+}
