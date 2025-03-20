@@ -1,0 +1,69 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+env/
+venv/
+ENV/
+.venv/
+dist/
+build/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# PyInstaller
+#  Usually these files are written into a dist/ folder.
+#  On Windows, dist/ is often mistaken for Python's dist/ directory.
+# See https://github.com/pyinstaller/pyinstaller/blob/develop/docs/spec-files.rst
+*.manifest
+*.spec
+
+# Compiled source #
+*.com
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Logs and databases
+*.log
+*.db
+*.sqlite
+*.sqlite3
+
+# OS generated files #
+.DS_Store
+Thumbs.db
+
+# Editor-related files
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+
+# Uvicorn
+.uvicorn
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# MyPy cache
+.mypy_cache/
+
+# Fastapi specific
+.env
