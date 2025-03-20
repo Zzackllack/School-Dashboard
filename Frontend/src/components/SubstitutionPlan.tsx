@@ -1,5 +1,3 @@
-import React from 'react';
-
 // Mock data - would be replaced with real data in a production environment
 const mockSubstitutions = [
     { id: 1, date: '2023-10-30', className: '10A', period: 1, subject: 'Math', teacher: 'Mrs. Smith', replacement: 'Mr. Johnson', room: '101', notes: 'Bring textbook' },
@@ -56,6 +54,10 @@ const SubstitutionPlan = () => {
             <div className="flex">
                 <iframe src="https://dsbmobile.de/data/ba59f8c2-a3a5-49eb-9b00-c3a61e92cb5f/20eb7be3-dc7a-4101-af34-8123e41831a1/subst_001.htm" className="w-1/2 h-[500px]" sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation" />
                 <iframe src="https://dsbmobile.de/data/ba59f8c2-a3a5-49eb-9b00-c3a61e92cb5f/4aa9d55c-1980-4842-beec-004471479739/subst_001.htm" className="w-1/2 h-[500px]" sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation" />
+            </div>
+
+            <h2> Test with API</h2>
+            <div className="flex">
             </div>
         </div>
     );
