@@ -19,29 +19,29 @@ const mockWeather = {
 
 const Weather = () => {
   return (
-    <div className="dashboard-panel weather-panel">
-      <h2>Weather</h2>
-      <div className="current-weather">
-        <div className="weather-location">{mockWeather.location}</div>
-        <div className="weather-main">
-          <span className="weather-icon">{mockWeather.current.icon}</span>
-          <span className="weather-temp">{mockWeather.current.temp}°C</span>
+    <div className="bg-white rounded-lg shadow p-4 mb-4 text-center">
+      <h2 className="text-xl font-bold text-blue-500 border-b border-gray-200 pb-2 mb-4">Weather</h2>
+      <div className="mb-4">
+        <div className="text-lg font-bold">{mockWeather.location}</div>
+        <div className="flex justify-center items-center my-2">
+          <span className="text-5xl mr-4">{mockWeather.current.icon}</span>
+          <span className="text-4xl font-bold">{mockWeather.current.temp}°C</span>
         </div>
-        <div className="weather-condition">{mockWeather.current.condition}</div>
-        <div className="weather-details">
+        <div className="mb-2">{mockWeather.current.condition}</div>
+        <div className="flex justify-around text-gray-600 text-sm">
           <div>Humidity: {mockWeather.current.humidity}%</div>
           <div>Wind: {mockWeather.current.windSpeed} km/h</div>
         </div>
       </div>
       
-      <div className="weather-forecast">
+      <div className="flex justify-around border-t border-gray-200 pt-4">
         {mockWeather.forecast.map((day, index) => (
-          <div key={index} className="forecast-day">
-            <div className="forecast-name">{day.day}</div>
-            <div className="forecast-icon">{day.condition}</div>
-            <div className="forecast-temp">
-              <span className="high">{day.high}°</span>
-              <span className="low">{day.low}°</span>
+          <div key={index} className="text-center">
+            <div className="font-medium">{day.day}</div>
+            <div className="text-3xl my-2">{day.condition}</div>
+            <div className="flex justify-center gap-2">
+              <span className="font-bold">{day.high}°</span>
+              <span className="text-gray-600">{day.low}°</span>
             </div>
           </div>
         ))}

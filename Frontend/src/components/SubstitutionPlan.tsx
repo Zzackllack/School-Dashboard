@@ -11,47 +11,51 @@ const mockSubstitutions = [
 
 const SubstitutionPlan = () => {
     return (
-        <div className="dashboard-panel substitution-plan">
-            <h2>Mock Data</h2>
+        <div className="mb-4">
+            <h2 className="text-xl font-bold text-blue-500 border-b border-gray-200 pb-2 mb-4">Mock Data</h2>
 
             {['2023-10-30', '2023-10-31'].map(date => (
-                <div key={date} className="substitution-date-section">
-                    <h3>{new Date(date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</h3>
-                    <table className="substitution-table">
-                        <thead>
-                            <tr>
-                                <th>Class</th>
-                                <th>Period</th>
-                                <th>Subject</th>
-                                <th>Regular Teacher</th>
-                                <th>Substitute</th>
-                                <th>Room</th>
-                                <th>Notes</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {mockSubstitutions
-                                .filter(sub => sub.date === date)
-                                .map(sub => (
-                                    <tr key={sub.id}>
-                                        <td>{sub.className}</td>
-                                        <td>{sub.period}</td>
-                                        <td>{sub.subject}</td>
-                                        <td>{sub.teacher}</td>
-                                        <td>{sub.replacement}</td>
-                                        <td>{sub.room}</td>
-                                        <td>{sub.notes}</td>
-                                    </tr>
-                                ))}
-                        </tbody>
-                    </table>
+                <div key={date} className="mb-6">
+                    <h3 className="text-lg font-semibold mb-2">
+                        {new Date(date).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                    </h3>
+                    <div className="overflow-x-auto">
+                        <table className="w-full border-collapse mt-2">
+                            <thead>
+                                <tr>
+                                    <th className="bg-blue-500 text-white border border-gray-300 px-4 py-2 text-left">Class</th>
+                                    <th className="bg-blue-500 text-white border border-gray-300 px-4 py-2 text-left">Period</th>
+                                    <th className="bg-blue-500 text-white border border-gray-300 px-4 py-2 text-left">Subject</th>
+                                    <th className="bg-blue-500 text-white border border-gray-300 px-4 py-2 text-left">Regular Teacher</th>
+                                    <th className="bg-blue-500 text-white border border-gray-300 px-4 py-2 text-left">Substitute</th>
+                                    <th className="bg-blue-500 text-white border border-gray-300 px-4 py-2 text-left">Room</th>
+                                    <th className="bg-blue-500 text-white border border-gray-300 px-4 py-2 text-left">Notes</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {mockSubstitutions
+                                    .filter(sub => sub.date === date)
+                                    .map(sub => (
+                                        <tr key={sub.id} className="even:bg-gray-100">
+                                            <td className="border border-gray-300 px-4 py-2">{sub.className}</td>
+                                            <td className="border border-gray-300 px-4 py-2">{sub.period}</td>
+                                            <td className="border border-gray-300 px-4 py-2">{sub.subject}</td>
+                                            <td className="border border-gray-300 px-4 py-2">{sub.teacher}</td>
+                                            <td className="border border-gray-300 px-4 py-2">{sub.replacement}</td>
+                                            <td className="border border-gray-300 px-4 py-2">{sub.room}</td>
+                                            <td className="border border-gray-300 px-4 py-2">{sub.notes}</td>
+                                        </tr>
+                                    ))}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             ))}
 
-            <h2>Real Data - Implementation later over API </h2>
-            <div style={{ display: 'flex' }}>
-                <iframe src="https://dsbmobile.de/data/ba59f8c2-a3a5-49eb-9b00-c3a61e92cb5f/20eb7be3-dc7a-4101-af34-8123e41831a1/subst_001.htm" width={1000} height={1000} sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation" />
-                <iframe src="https://dsbmobile.de/data/ba59f8c2-a3a5-49eb-9b00-c3a61e92cb5f/4aa9d55c-1980-4842-beec-004471479739/subst_001.htm" width={1000} height={1000} sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation" />
+            <h2 className="text-xl font-bold text-blue-500 border-b border-gray-200 pb-2 mb-4">Real Data - Implementation later over API</h2>
+            <div className="flex">
+                <iframe src="https://dsbmobile.de/data/ba59f8c2-a3a5-49eb-9b00-c3a61e92cb5f/20eb7be3-dc7a-4101-af34-8123e41831a1/subst_001.htm" className="w-1/2 h-[500px]" sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation" />
+                <iframe src="https://dsbmobile.de/data/ba59f8c2-a3a5-49eb-9b00-c3a61e92cb5f/4aa9d55c-1980-4842-beec-004471479739/subst_001.htm" className="w-1/2 h-[500px]" sandbox="allow-forms allow-scripts allow-same-origin allow-top-navigation" />
             </div>
         </div>
     );
