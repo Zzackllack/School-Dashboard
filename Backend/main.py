@@ -2,7 +2,11 @@ import os
 import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from dotenv import load_dotenv
 from dsbix import DSBApi
+
+
+load_dotenv()
 
 # Load credentials from environment
 DSB_USERNAME = os.getenv("DSB_USER")
