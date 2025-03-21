@@ -2,70 +2,94 @@ import os
 import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from bs4 import BeautifulSoup
+import requests
 from dotenv import load_dotenv
-from dsbix import DSBApi
 
-
+# Load environment
 load_dotenv()
+DSB_USER = os.getenv("DSB_USER")
+DSB_PASS = os.getenv("DSB_PASS")
+if not DSB_USER or not DSB_PASS:
+    raise RuntimeError("DSB_USER and DSB_PASS must be set in .env")
 
-# Load credentials from environment
-DSB_USERNAME = os.getenv("DSB_USER")
-DSB_PASSWORD = os.getenv("DSB_PASS")
-if not DSB_USERNAME or not DSB_PASSWORD:
-    raise RuntimeError("Environment variables DSB_USER and DSB_PASS must be set")
-
-# Initialize DSBApi client
-# Adjust tablemapper order if your school’s data columns differ
-client = DSBApi(
-    DSB_USERNAME,
-    DSB_PASSWORD,
-    tablemapper=[
-        "type",
-        "class",
-        "lesson",
-        "room",
-        "new_subject",
-        "subject",
-        "new_teacher",
-        "teacher",
-        "text",
-    ],
+# Constants
+LOGIN_URL = f"https://www.dsbmobile.de/Login.aspx?user={DSB_USER}&password={DSB_PASS}"
+DEFAULT_URL = "https://www.dsbmobile.de/Default.aspx"
+FIRST_GUID = (
+    "ba59f8c2-a3a5-49eb-9b00-c3a61e92cb5f"  # Constant for this school citeturn1file4
 )
 
-app = FastAPI(title="School Dashboard — Substitution Plan API", version="0.1")
+app = FastAPI()
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
-    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+session = requests.Session()
 
-def fetch_for_date(target_date: datetime.date):
-    try:
-        all_entries = client.fetch_entries()
-    except Exception as e:
-        raise HTTPException(status_code=502, detail=f"DSB fetch failed: {e}")
-    date_str = target_date.strftime("%d.%m.%Y")
-    filtered = []
-    for day_list in all_entries:
-        for entry in day_list:
-            if entry.get("date") == date_str:
-                filtered.append(entry)
-    return filtered
+
+def login():
+    resp = session.get(LOGIN_URL)
+    if resp.status_code != 200 or DEFAULT_URL not in resp.url:
+        raise HTTPException(status_code=502, detail="Login failed")
+
+
+def get_uuid(day_title: str) -> str:
+    resp = session.get(DEFAULT_URL)
+    soup = BeautifulSoup(resp.text, "html.parser")
+    for tile in soup.select("div.timetable-element"):
+        title = tile.select_one(".title").text.strip()
+        if title == day_title:
+            return tile.get("data-uuid")
+    raise HTTPException(status_code=404, detail=f"Tile '{day_title}' not found")
+
+
+def fetch_plan_html(uuid: str) -> str:
+    plan_url = f"https://dsbmobile.de/data/{FIRST_GUID}/{uuid}/subst_001.htm"
+    resp = session.get(plan_url)
+    if resp.status_code != 200:
+        raise HTTPException(status_code=502, detail="Failed to fetch plan HTML")
+    return resp.text
+
+
+def parse_plan(html: str):
+    soup = BeautifulSoup(html, "html.parser")
+    entries = []
+    for row in soup.select("table.mon_list tr.list"):
+        cols = [td.get_text(strip=True) for td in row.find_all("td")]
+        entries.append(
+            {
+                "class": cols[0],
+                "lesson": cols[1],
+                "absent": cols[2],
+                "substitute": cols[3],
+                "old_subject": cols[4],
+                "new_subject": cols[5],
+                "room": cols[6],
+                "type": cols[7],
+                "notes": cols[8],
+            }
+        )
+    return entries
 
 
 @app.get("/api/substitution/today")
-def get_today():
-    return {"entries": fetch_for_date(datetime.date.today())}
+def today():
+    login()
+    uuid = get_uuid("Schüler heute")
+    html = fetch_plan_html(uuid)
+    return {"entries": parse_plan(html)}
 
 
 @app.get("/api/substitution/tomorrow")
-def get_tomorrow():
-    return {
-        "entries": fetch_for_date(datetime.date.today() + datetime.timedelta(days=1))
-    }
+def tomorrow():
+    login()
+    uuid = get_uuid("Schüler morgen")
+    html = fetch_plan_html(uuid)
+    return {"entries": parse_plan(html)}
 
 
 if __name__ == "__main__":
