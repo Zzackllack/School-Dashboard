@@ -1,60 +1,70 @@
+import os
+import datetime
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-import datetime
+from dsbix import DSBApi
 
-app = FastAPI()
+# Load credentials from environment
+DSB_USERNAME = os.getenv("DSB_USER")
+DSB_PASSWORD = os.getenv("DSB_PASS")
+if not DSB_USERNAME or not DSB_PASSWORD:
+    raise RuntimeError("Environment variables DSB_USER and DSB_PASS must be set")
 
-# Allow CORS for your frontend (adjust allowed origins for production)
+# Initialize DSBApi client
+# Adjust tablemapper order if your school’s data columns differ
+client = DSBApi(
+    DSB_USERNAME,
+    DSB_PASSWORD,
+    tablemapper=[
+        "type",
+        "class",
+        "lesson",
+        "room",
+        "new_subject",
+        "subject",
+        "new_teacher",
+        "teacher",
+        "text",
+    ],
+)
+
+app = FastAPI(title="School Dashboard — Substitution Plan API", version="0.1")
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Change "*" to your React app's URL in production
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
 
-# Sample in-memory data or function to scrape/substitute data
-def get_substitution_entries():
-    # For example, here you could implement your scraping logic or
-    # process a data file. This is a stub returning mock data.
-    return [
-        {
-            "date": datetime.date.today().strftime("%d.%m.%Y"),
-            "class": "10A",
-            "lesson": 3,
-            "subject": "Math",
-            "new_subject": "Geometry",
-            "teacher": "Mr. Schmidt",
-            "new_teacher": "Ms. Meyer",
-            "room": "101",
-            "notes": "Bring calculator",
-        }
-    ]
-
-
-def filter_entries_by_date(entries, target_date: datetime.date):
-    target_str = target_date.strftime("%d.%m.%Y")
-    return [entry for entry in entries if entry.get("date") == target_str]
+def fetch_for_date(target_date: datetime.date):
+    try:
+        all_entries = client.fetch_entries()
+    except Exception as e:
+        raise HTTPException(status_code=502, detail=f"DSB fetch failed: {e}")
+    date_str = target_date.strftime("%d.%m.%Y")
+    filtered = []
+    for day_list in all_entries:
+        for entry in day_list:
+            if entry.get("date") == date_str:
+                filtered.append(entry)
+    return filtered
 
 
 @app.get("/api/substitution/today")
-async def get_today_substitution():
-    try:
-        entries = get_substitution_entries()
-        today = datetime.date.today()
-        today_entries = filter_entries_by_date(entries, today)
-        return {"entries": today_entries}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def get_today():
+    return {"entries": fetch_for_date(datetime.date.today())}
 
 
 @app.get("/api/substitution/tomorrow")
-async def get_tomorrow_substitution():
-    try:
-        entries = get_substitution_entries()
-        tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-        tomorrow_entries = filter_entries_by_date(entries, tomorrow)
-        return {"entries": tomorrow_entries}
-    except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+def get_tomorrow():
+    return {
+        "entries": fetch_for_date(datetime.date.today() + datetime.timedelta(days=1))
+    }
+
+
+if __name__ == "__main__":
+    import uvicorn
+
+    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
