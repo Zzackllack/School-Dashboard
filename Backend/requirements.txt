@@ -1,4 +1,6 @@
 fastapi
 uvicorn[standard]
 dsbix
+beautifulsoup4
+lxml
 python-dotenv
