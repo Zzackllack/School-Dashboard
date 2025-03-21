@@ -40,10 +40,20 @@ def login():
 def get_uuid(day_title: str) -> str:
     resp = session.get(DEFAULT_URL)
     soup = BeautifulSoup(resp.text, "html.parser")
+    found = []
+
     for tile in soup.select("div.timetable-element"):
-        title = tile.select_one(".title").text.strip()
-        if title == day_title:
-            return tile.get("data-uuid")
+        title = tile.select_one(".title").get_text(strip=True)
+        uuid = tile.get("data-uuid")
+        found.append((title, uuid))
+        print(f"[DEBUG] Found tile → Title: '{title}', UUID: {uuid}")
+
+        if day_title.lower() in title.lower():
+            print(f"[DEBUG] MATCHED '{title}' for requested '{day_title}'")
+            return uuid
+
+    # If we reach here, nothing matched
+    print("[DEBUG] All available tiles:", found)
     raise HTTPException(status_code=404, detail=f"Tile '{day_title}' not found")
 
 
