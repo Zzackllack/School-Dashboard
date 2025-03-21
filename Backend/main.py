@@ -17,7 +17,7 @@ if not DSB_USER or not DSB_PASS:
 LOGIN_URL = f"https://www.dsbmobile.de/Login.aspx?user={DSB_USER}&password={DSB_PASS}"
 DEFAULT_URL = "https://www.dsbmobile.de/Default.aspx"
 FIRST_GUID = (
-    "ba59f8c2-a3a5-49eb-9b00-c3a61e92cb5f"  # Constant for this school citeturn1file4
+    "ba59f8c2-a3a5-49eb-9b00-c3a61e92cb5f"  # Constant for this school
 )
 
 app = FastAPI()
