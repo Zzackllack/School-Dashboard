@@ -16,6 +16,7 @@ Backend/src/main/resources/application.properties
 *.iml
 
 # Ignore context files for AI models
+Context/
 ImplementJavaBackend.md
 ImplementJavaBackendReadMe.md
 ImplementJavaBackendAnalyize.html
