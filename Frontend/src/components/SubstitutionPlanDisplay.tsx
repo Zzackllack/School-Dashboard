@@ -5,6 +5,7 @@ interface SubstitutionEntry {
     period: string;
     absent: string;
     substitute: string;
+    originalSubject: string;
     subject: string;
     newRoom: string;
     type: string;
@@ -12,10 +13,16 @@ interface SubstitutionEntry {
     date: string;
 }
 
+interface DailyNews {
+    date: string;
+    newsItems: string[];
+}
+
 interface SubstitutionPlan {
     date: string;
     title: string;
     entries: SubstitutionEntry[];
+    news: DailyNews;
 }
 
 const SubstitutionPlanDisplay = () => {
@@ -85,6 +92,16 @@ const SubstitutionPlanDisplay = () => {
                     </h3>
                     {plan.title && <p className="mb-2 text-gray-600">{plan.title}</p>}
 
+                    {/* Display Daily News if available */}
+                    {plan.news && plan.news.newsItems && plan.news.newsItems.length > 0 && (
+                        <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+                            <h4 className="text-lg font-medium text-blue-700 mb-2">Nachrichten zum Tag</h4>
+                            {plan.news.newsItems.map((newsItem, idx) => (
+                                <p key={idx} className="mb-2 text-gray-700">{newsItem}</p>
+                            ))}
+                        </div>
+                    )}
+
                     {plan.entries.length > 0 ? (
                         <div className="overflow-x-auto">
                             <table className="w-full border-collapse">
@@ -94,7 +111,8 @@ const SubstitutionPlanDisplay = () => {
                                         <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Period</th>
                                         <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Absent</th>
                                         <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Substitute</th>
-                                        <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Subject</th>
+                                        <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Original Subject</th>
+                                        <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">New Subject</th>
                                         <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Room</th>
                                         <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Type</th>
                                         <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Comments</th>
@@ -107,6 +125,7 @@ const SubstitutionPlanDisplay = () => {
                                             <td className="border border-gray-300 px-3 py-2">{entry.period}</td>
                                             <td className="border border-gray-300 px-3 py-2">{entry.absent}</td>
                                             <td className="border border-gray-300 px-3 py-2">{entry.substitute}</td>
+                                            <td className="border border-gray-300 px-3 py-2">{entry.originalSubject}</td>
                                             <td className="border border-gray-300 px-3 py-2">{entry.subject}</td>
                                             <td className="border border-gray-300 px-3 py-2">{entry.newRoom}</td>
                                             <td className="border border-gray-300 px-3 py-2">{entry.type}</td>

@@ -9,7 +9,8 @@ public class SubstitutionEntry implements Serializable {
     private String period;        // Stunde
     private String absent;        // abwesend
     private String substitute;    // Vertreter
-    private String subject;       // Fach
+    private String originalSubject; // (Fach) - original subject
+    private String subject;       // Fach - new subject
     private String newRoom;       // neuer Raum
     private String type;          // Art
     private String comment;       // Bemerkung
@@ -49,6 +50,14 @@ public class SubstitutionEntry implements Serializable {
 
     public void setSubstitute(String substitute) {
         this.substitute = substitute;
+    }
+
+    public String getOriginalSubject() {
+        return originalSubject;
+    }
+
+    public void setOriginalSubject(String originalSubject) {
+        this.originalSubject = originalSubject;
     }
 
     public String getSubject() {

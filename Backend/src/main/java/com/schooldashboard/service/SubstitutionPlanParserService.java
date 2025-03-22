@@ -10,6 +10,7 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
+import com.schooldashboard.model.DailyNews;
 import com.schooldashboard.model.SubstitutionEntry;
 import com.schooldashboard.model.SubstitutionPlan;
 
@@ -32,7 +33,9 @@ public class SubstitutionPlanParserService {
         // Extract date from the page
         Element titleElement = doc.selectFirst("div.mon_title");
         if (titleElement != null) {
-            plan.setDate(titleElement.text().trim());
+            String dateText = titleElement.text().trim();
+            plan.setDate(dateText);
+            plan.getNews().setDate(dateText);
         }
 
         // Extract any additional information
@@ -48,7 +51,10 @@ public class SubstitutionPlanParserService {
             plan.setTitle(infoBuilder.toString().trim());
         }
 
-        // Extract table data - first get the headers
+        // Extract news for the day - look for elements after "Nachrichten zum Tag" heading
+        extractDailyNews(doc, plan.getNews());
+
+        // Extract table data for substitutions - first get the headers
         Element tableElement = doc.selectFirst("table.mon_list");
         if (tableElement != null) {
             Elements headerElements = tableElement.select("tr.list th");
@@ -66,7 +72,9 @@ public class SubstitutionPlanParserService {
                     columnMap.put(i, "absent");
                 } else if (header.contains("vertreter")) {
                     columnMap.put(i, "substitute");
-                } else if (header.contains("fach")) {
+                } else if (header.contains("(fach)")) {
+                    columnMap.put(i, "originalSubject");
+                } else if (header.contains("fach") && !header.contains("(fach)")) {
                     columnMap.put(i, "subject");
                 } else if (header.contains("raum")) {
                     columnMap.put(i, "room");
@@ -105,6 +113,9 @@ public class SubstitutionPlanParserService {
                                 case "substitute":
                                     entry.setSubstitute(value);
                                     break;
+                                case "originalSubject":
+                                    entry.setOriginalSubject(value);
+                                    break;
                                 case "subject":
                                     entry.setSubject(value);
                                     break;
@@ -127,5 +138,34 @@ public class SubstitutionPlanParserService {
         }
         
         return plan;
+    }
+    
+    private void extractDailyNews(Document doc, DailyNews news) {
+        // Looking for any elements containing "Nachrichten zum Tag"
+        Elements newsHeaders = doc.getElementsContainingOwnText("Nachrichten zum Tag");
+        
+        if (!newsHeaders.isEmpty()) {
+            Element newsHeader = newsHeaders.first();
+            Element parent = newsHeader.parent();
+            
+            // Look for paragraphs or divs after the header
+            if (parent != null) {
+                Elements newsElements = parent.nextElementSiblings();
+                for (Element element : newsElements) {
+                    String text = element.text().trim();
+                    if (text.length() > 0 && !text.contains("Untis Stundenplan")) {
+                        news.addNewsItem(text);
+                    }
+                }
+            }
+            
+            // If no siblings found, try looking for content within a font or p tag
+            if (news.getNewsItems().isEmpty()) {
+                Elements fontElements = doc.select("font[size=4]");
+                for (Element font : fontElements) {
+                    news.addNewsItem(font.text().trim());
+                }
+            }
+        }
     }
 }

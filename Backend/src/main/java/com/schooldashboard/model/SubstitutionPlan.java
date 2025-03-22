@@ -10,15 +10,18 @@ public class SubstitutionPlan implements Serializable {
     private String date;
     private String title;
     private List<SubstitutionEntry> entries;
+    private DailyNews news; // Added field for daily news
     
     public SubstitutionPlan() {
         entries = new ArrayList<>();
+        news = new DailyNews();
     }
     
     public SubstitutionPlan(String date, String title) {
         this();
         this.date = date;
         this.title = title;
+        this.news.setDate(date);
     }
 
     // Getters and setters
@@ -48,5 +51,13 @@ public class SubstitutionPlan implements Serializable {
     
     public void addEntry(SubstitutionEntry entry) {
         this.entries.add(entry);
+    }
+
+    public DailyNews getNews() {
+        return news;
+    }
+
+    public void setNews(DailyNews news) {
+        this.news = news;
     }
 }

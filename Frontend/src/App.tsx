@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import SubstitutionPlan from './components/SubstitutionPlan';
 import Weather from './components/Weather';
 import Transportation from './components/Transportation';
 import Clock from './components/Clock';
@@ -19,28 +18,26 @@ const App = () => {
   }, []);
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <header className="mb-8">
-        <h1 className="text-3xl font-bold text-blue-600">School Dashboard</h1>
-        <p className="text-gray-600">Goethe Gymnasium Lichterfelde</p>
+    <div className="flex flex-col min-h-screen">
+      <header className="bg-slate-800 text-white px-8 py-4 flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Goethe Gymnasium Lichterfelde</h1>
         <Clock currentTime={currentTime} />
       </header>
       
-      <main>
-        <SubstitutionPlanDisplay />
-        <div className="flex flex-grow p-4 gap-4">
-          <div className="flex-grow basis-3/4 bg-white rounded-lg shadow p-4 overflow-y-auto">
-            <SubstitutionPlan />
+      <main className="container mx-auto px-4 py-8 flex-grow">
+        <div className="flex flex-col lg:flex-row gap-4">
+          <div className="lg:w-3/4">
+            <SubstitutionPlanDisplay />
           </div>
-          <div className="flex flex-col basis-1/4 gap-4">
+          <div className="lg:w-1/4 flex flex-col gap-4">
             <Weather />
             <Transportation />
           </div>
         </div>
       </main>
       
-      <footer className="mt-12 pt-4 border-t border-gray-200 text-center text-gray-500 text-sm">
-        <p>© {new Date().getFullYear()} School Dashboard | Goethe Gymnasium Lichterfelde</p>
+      <footer className="bg-slate-800 text-white py-2 px-8 text-center text-sm">
+        <p>© {new Date().getFullYear()} School Dashboard | GGL</p>
         <p>Last updated: {currentTime.toLocaleString()}</p>
       </footer>
     </div>
