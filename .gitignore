@@ -1,0 +1,21 @@
+# Ignore all log files
+*.log
+
+# Ignore the target directory
+*/target/
+
+# Ignore all .class files
+*.class
+
+# Ignore files containing sensitive information
+Backend/src/main/resources/application.properties
+
+# Ignore IDE specific files
+.vscode/
+.idea/
+*.iml
+
+# Ignore context files for AI models
+ImplementJavaBackend.md
+ImplementJavaBackendReadMe.md
+
