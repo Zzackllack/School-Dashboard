@@ -89,7 +89,7 @@ const SubstitutionPlan = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {groupedTimeTables[date].map((table, index) => (
+                                    {groupedTimeTables[date].map((table) => (
                                         <tr key={table.uuid} className="even:bg-gray-100">
                                             <td className="border border-gray-300 px-4 py-2">{table.groupName}</td>
                                             <td className="border border-gray-300 px-4 py-2">{table.title}</td>
