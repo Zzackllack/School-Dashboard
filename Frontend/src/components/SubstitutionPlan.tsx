@@ -26,7 +26,7 @@ const SubstitutionPlan = () => {
         const fetchTimeTables = async () => {
             setLoading(true);
             try {
-                const response = await fetch('http://localhost:8080/api/dsb/timetables');
+                const response = await fetch('http://localhost:8080/api/substitution/plans');
                 if (!response.ok) {
                     throw new Error(`API error: ${response.status}`);
                 }
