@@ -197,9 +197,40 @@ const Weather = () => {
   const getCurrentHumidity = (): number => {
     if (!weatherData?.hourly) return 0;
     
-    const currentTime = weatherData.current_weather.time;
-    const index = weatherData.hourly.time.findIndex(time => time === currentTime);
-    return index !== -1 ? weatherData.hourly.relativehumidity_2m[index] : 0;
+    // Current time format is like "2025-03-23T14:15"
+    const currentTimeString = weatherData.current_weather.time;
+    
+    // Extract just the date and hour part to match hourly data format
+    const currentHour = currentTimeString.substring(0, 13) + ":00"; // Convert "2025-03-23T14:15" to "2025-03-23T14:00"
+    
+    // Find the index of this hour in the hourly data
+    const index = weatherData.hourly.time.findIndex(time => time === currentHour);
+    
+    if (index !== -1) {
+      return weatherData.hourly.relativehumidity_2m[index];
+    } else {
+      // If exact hour not found, find the closest hour
+      console.warn("Exact hour match not found for humidity, using closest available hour");
+      
+      // Get just the current hour as a Date object for comparison
+      const currentTime = new Date(currentTimeString);
+      
+      // Find the closest time by comparing timestamps
+      let closestIndex = 0;
+      let smallestDiff = Infinity;
+      
+      weatherData.hourly.time.forEach((timeString, idx) => {
+        const time = new Date(timeString);
+        const diff = Math.abs(time.getTime() - currentTime.getTime());
+        
+        if (diff < smallestDiff) {
+          smallestDiff = diff;
+          closestIndex = idx;
+        }
+      });
+      
+      return weatherData.hourly.relativehumidity_2m[closestIndex];
+    }
   };
 
   if (loading) {
