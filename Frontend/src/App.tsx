@@ -3,6 +3,7 @@ import Weather from './components/Weather';
 import Transportation from './components/Transportation';
 import Clock from './components/Clock';
 import SubstitutionPlanDisplay from './components/SubstitutionPlanDisplay';
+import Credits from './components/Credits';
 
 const App = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -39,6 +40,9 @@ const App = () => {
             <Transportation />
           </div>
         </div>
+        
+        {/* Credits section */}
+        <Credits />
       </main>
       
       <footer className="bg-[#8C7356] text-white py-2 px-4 text-center text-sm">
