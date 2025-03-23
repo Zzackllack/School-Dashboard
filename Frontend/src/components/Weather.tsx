@@ -1,5 +1,29 @@
 import React, { useState, useEffect } from 'react';
 
+// Import weather icons
+import clearIcon from '../assets/airy/clear@4x.png';
+import densedrizzleIcon from '../assets/airy/dense-drizzle@4x.png';
+import denseFreezeingDrizzleIcon from '../assets/airy/dense-freezing-drizzle@4x.png';
+import fogIcon from '../assets/airy/fog@4x.png';
+import heavyFreezeingRainIcon from '../assets/airy/heavy-freezing-rain@4x.png';
+import heavyRainIcon from '../assets/airy/heavy-rain@4x.png';
+import heavySnowfallIcon from '../assets/airy/heavy-snowfall@4x.png';
+import lightDrizzleIcon from '../assets/airy/light-drizzle@4x.png';
+import lightFreezeingDrizzleIcon from '../assets/airy/light-freezing-drizzle@4x.png';
+import lightFreezeingRainIcon from '../assets/airy/light-freezing-rain@4x.png';
+import lightRainIcon from '../assets/airy/light-rain@4x.png';
+import moderateDrizzleIcon from '../assets/airy/moderate-drizzle@4x.png';
+import moderateRainIcon from '../assets/airy/moderate-rain@4x.png';
+import moderateSnowfallIcon from '../assets/airy/moderate-snowfall@4x.png';
+import mostlyClearIcon from '../assets/airy/mostly-clear@4x.png';
+import overcastIcon from '../assets/airy/overcast@4x.png';
+import partlyCloudyIcon from '../assets/airy/partly-cloudy@4x.png';
+import rimeFogIcon from '../assets/airy/rime-fog@4x.png';
+import slightSnowfallIcon from '../assets/airy/slight-snowfall@4x.png';
+import snowflakeIcon from '../assets/airy/snowflake@4x.png';
+import thunderstormWithHailIcon from '../assets/airy/thunderstorm-with-hail@4x.png';
+import thunderstormIcon from '../assets/airy/thunderstorm@4x.png';
+
 // Define TypeScript interfaces for Open Meteo API responses
 interface WeatherData {
   latitude: number;
@@ -76,28 +100,57 @@ const Weather = () => {
 
   // Function to get weather icon based on weather code
   const getWeatherIcon = (code: number): string => {
-    // WMO weather codes mapping to emojis: https://open-meteo.com/en/docs#:~:text=Code%20Description%200%20Clear%20sky,Slight%2C%20moderate%2C%20and%20heavy%20intensity
     switch (true) {
       case code === 0:
-        return '☀️'; // Clear sky
+        return clearIcon; // Clear sky
       case code === 1:
-        return '🌤️'; // Mainly clear
+        return mostlyClearIcon; // Mainly clear
       case code === 2:
-        return '⛅'; // Partly cloudy
+        return partlyCloudyIcon; // Partly cloudy
       case code === 3:
-        return '☁️'; // Overcast
-      case [45, 48].includes(code):
-        return '🌫️'; // Fog
-      case [51, 53, 55].includes(code):
-        return '🌦️'; // Drizzle
-      case [61, 63, 65, 80, 81, 82].includes(code):
-        return '🌧️'; // Rain
-      case [71, 73, 75, 85, 86].includes(code):
-        return '❄️'; // Snow
-      case [95, 96, 99].includes(code):
-        return '⛈️'; // Thunderstorm
+        return overcastIcon; // Overcast
+      case code === 45:
+        return fogIcon; // Fog
+      case code === 48:
+        return rimeFogIcon; // Rime fog
+      case code === 51:
+        return lightDrizzleIcon; // Light drizzle
+      case code === 53:
+        return moderateDrizzleIcon; // Moderate drizzle
+      case code === 55:
+        return densedrizzleIcon; // Dense drizzle
+      case code === 56:
+        return lightFreezeingDrizzleIcon; // Light freezing drizzle
+      case code === 57:
+        return denseFreezeingDrizzleIcon; // Dense freezing drizzle
+      case code === 61:
+        return lightRainIcon; // Light rain
+      case code === 63:
+        return moderateRainIcon; // Moderate rain
+      case code === 65:
+        return heavyRainIcon; // Heavy rain
+      case code === 66:
+        return lightFreezeingRainIcon; // Light freezing rain
+      case code === 67:
+        return heavyFreezeingRainIcon; // Heavy freezing rain
+      case code === 71:
+        return slightSnowfallIcon; // Slight snowfall
+      case code === 73:
+        return moderateSnowfallIcon; // Moderate snowfall
+      case code === 75:
+        return heavySnowfallIcon; // Heavy snowfall
+      case code === 77:
+        return snowflakeIcon; // Snow grains
+      case code === 85:
+        return slightSnowfallIcon; // Slight snow showers
+      case code === 86:
+        return heavySnowfallIcon; // Heavy snow showers
+      case code === 95:
+        return thunderstormIcon; // Thunderstorm
+      case [96, 99].includes(code):
+        return thunderstormWithHailIcon; // Thunderstorm with hail
       default:
-        return '🌡️'; // Default/unknown
+        return clearIcon; // Default
     }
   };
 
@@ -180,9 +233,11 @@ const Weather = () => {
       <div className="mb-4">
         <div className="text-lg font-bold">Berlin</div>
         <div className="flex justify-center items-center my-2">
-          <span className="text-5xl mr-4">
-            {getWeatherIcon(weatherData.current_weather.weathercode)}
-          </span>
+          <img 
+            src={getWeatherIcon(weatherData.current_weather.weathercode)} 
+            alt={getWeatherCondition(weatherData.current_weather.weathercode)}
+            className="w-16 h-16 mr-4"
+          />
           <span className="text-4xl font-bold">{Math.round(weatherData.current_weather.temperature)}°C</span>
         </div>
         <div className="mb-2">
@@ -198,8 +253,12 @@ const Weather = () => {
         {forecastDays.map((day, index) => (
           <div key={index} className="text-center">
             <div className="font-medium">{formatDay(day, index)}</div>
-            <div className="text-3xl my-2">
-              {getWeatherIcon(weatherData.daily.weathercode[index])}
+            <div className="my-2">
+              <img 
+                src={getWeatherIcon(weatherData.daily.weathercode[index])} 
+                alt={getWeatherCondition(weatherData.daily.weathercode[index])}
+                className="w-12 h-12 mx-auto"
+              />
             </div>
             <div className="flex justify-center gap-2">
               <span className="font-bold">{Math.round(weatherData.daily.temperature_2m_max[index])}°</span>
