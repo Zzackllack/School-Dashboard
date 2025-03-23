@@ -1,7 +1,7 @@
 # 🏫 School Dashboard
 
 ![Status](https://img.shields.io/badge/status-under%20development-yellow)
-![Version](https://img.shields.io/badge/version-1.2.3-blue)
+![Version](https://img.shields.io/badge/version-1.3.3-blue)
 ![License](https://img.shields.io/badge/license-BSD%203--Clause-green)
 
 > A modern, intuitive dashboard designed originally for Goethe Gymnasium Lichterfelde (GGL) to transform the lobby information display into a comprehensive school information hub.
@@ -154,7 +154,7 @@ Our dashboard solves these problems by providing a modern, readable interface th
 
 | Phase | Focus | Status |
 |-------|-------|--------|
-| 1 | Core API Integration & Basic UI | 🔄 In Progress |
+| 1 | Core API Integration & Basic UI | ✅ Done |
 | 2 | Enhanced UI & Additional Features | 🔄 In Progress |
 | 3 | Testing & Performance Optimization | 🔜 Planned |
 | 4 | Deployment & Documentation | 🔜 Planned |
@@ -177,7 +177,10 @@ This project is licensed under the BSD 3-Clause License - see the [LICENSE](LICE
 
 ## 🙏 Acknowledgements
 
-- [DSBmobile-API](https://github.com/Sematre/DSBmobile-API) by Sematre for the Java implementation
+- [DSBmobile-API](https://github.com/Sematre/DSBmobile-API) by [Sematre](https://github.com/Sematre/) for the Java implementation
+- [BVG-API](https://v6.bvg.transport.rest/) for the Berlin transportation data
+- [Open-Meteo](https://open-meteo.com/) for the weather data
+- [Weather-Sense/Icons](https://github.com/Leftium/weather-sense) by [Leftium](https://github.com/Leftium/) for the weather icons
 - All contributors who have invested their time into making this project better
   - Special thanks to [Saloking (Nikolas)](https://github.com/nikolas-bott) for giving me the idea to use the Java API instead of Python ones
 - Goethe Gymnasium Lichterfelde for the opportunity to improve the school's information system
