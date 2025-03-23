@@ -68,36 +68,36 @@ const SubstitutionPlanDisplay = () => {
 
     return (
         <div className="w-full p-4">
-            <h2 className="text-xl font-bold text-blue-500 border-b border-gray-200 pb-2 mb-4">
+            <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">
                 Substitution Plans
                 {loading && <span className="ml-2 text-sm font-normal text-gray-500">(Loading...)</span>}
             </h2>
 
             {error && (
-                <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-4 rounded">
+                <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 mb-4 rounded">
                     {error}
                 </div>
             )}
 
             {!loading && substitutionPlans.length === 0 && !error && (
-                <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+                <div className="bg-[#F5EFD7] border border-[#DDB967] text-[#8C7356] px-4 py-3 rounded">
                     No substitution plans available at the moment.
                 </div>
             )}
 
             {substitutionPlans.map((plan, planIndex) => (
                 <div key={planIndex} className="mb-8 w-full">
-                    <h3 className="text-lg font-semibold mb-2">
+                    <h3 className="text-lg font-semibold mb-2 text-[#3E3128]">
                         {formatDate(plan.date)}
                     </h3>
-                    {plan.title && <p className="mb-2 text-gray-600">{plan.title}</p>}
+                    {plan.title && <p className="mb-2 text-[#5A4635]">{plan.title}</p>}
 
                     {/* Display Daily News if available */}
                     {plan.news && plan.news.newsItems && plan.news.newsItems.length > 0 && (
-                        <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded w-full">
-                            <h4 className="text-lg font-medium text-blue-700 mb-2">Nachrichten zum Tag</h4>
+                        <div className="mb-6 p-4 bg-[#F2E3C6] border-l-4 border-[#D4A76A] rounded w-full">
+                            <h4 className="text-lg font-medium text-[#8C7356] mb-2">Nachrichten zum Tag</h4>
                             {plan.news.newsItems.map((newsItem, idx) => (
-                                <p key={idx} className="mb-2 text-gray-700">{newsItem}</p>
+                                <p key={idx} className="mb-2 text-[#3E3128]">{newsItem}</p>
                             ))}
                         </div>
                     )}
@@ -107,36 +107,36 @@ const SubstitutionPlanDisplay = () => {
                             <table className="min-w-full border-collapse">
                                 <thead>
                                     <tr>
-                                        <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Class</th>
-                                        <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Period</th>
-                                        <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Absent</th>
-                                        <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Substitute</th>
-                                        <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Original Subject</th>
-                                        <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">New Subject</th>
-                                        <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Room</th>
-                                        <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Type</th>
-                                        <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Comments</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Class</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Period</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Absent</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Substitute</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Original Subject</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">New Subject</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Room</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Type</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Comments</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {plan.entries.map((entry, entryIndex) => (
-                                        <tr key={entryIndex} className={entryIndex % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                                            <td className="border border-gray-300 px-3 py-2">{entry.classes}</td>
-                                            <td className="border border-gray-300 px-3 py-2">{entry.period}</td>
-                                            <td className="border border-gray-300 px-3 py-2">{entry.absent}</td>
-                                            <td className="border border-gray-300 px-3 py-2">{entry.substitute}</td>
-                                            <td className="border border-gray-300 px-3 py-2">{entry.originalSubject}</td>
-                                            <td className="border border-gray-300 px-3 py-2">{entry.subject}</td>
-                                            <td className="border border-gray-300 px-3 py-2">{entry.newRoom}</td>
-                                            <td className="border border-gray-300 px-3 py-2">{entry.type}</td>
-                                            <td className="border border-gray-300 px-3 py-2">{entry.comment}</td>
+                                        <tr key={entryIndex} className={entryIndex % 2 === 0 ? 'bg-white' : 'bg-[#F8F4E8]'}>
+                                            <td className="border border-[#E8C897] px-3 py-2">{entry.classes}</td>
+                                            <td className="border border-[#E8C897] px-3 py-2">{entry.period}</td>
+                                            <td className="border border-[#E8C897] px-3 py-2">{entry.absent}</td>
+                                            <td className="border border-[#E8C897] px-3 py-2">{entry.substitute}</td>
+                                            <td className="border border-[#E8C897] px-3 py-2">{entry.originalSubject}</td>
+                                            <td className="border border-[#E8C897] px-3 py-2">{entry.subject}</td>
+                                            <td className="border border-[#E8C897] px-3 py-2">{entry.newRoom}</td>
+                                            <td className="border border-[#E8C897] px-3 py-2">{entry.type}</td>
+                                            <td className="border border-[#E8C897] px-3 py-2">{entry.comment}</td>
                                         </tr>
                                     ))}
                                 </tbody>
                             </table>
                         </div>
                     ) : (
-                        <p className="italic text-gray-500">No substitutions available for this date.</p>
+                        <p className="italic text-[#5A4635]">No substitutions available for this date.</p>
                     )}
                 </div>
             ))}

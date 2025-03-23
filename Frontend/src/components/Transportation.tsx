@@ -145,24 +145,24 @@ const Transportation = () => {
   // Get appropriate color class for delay text
   const getDelayColorClass = (delay: number | null) => {
     if (!delay) return '';
-    return delay > 0 ? 'text-red-600' : 'text-green-600';
+    return delay > 0 ? 'text-[#A45D5D]' : 'text-[#5E8C61]';
   };
 
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-4 w-full">
-      <h2 className="text-xl font-bold text-blue-500 border-b border-gray-200 pb-2 mb-4">
+      <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">
         Public Transportation
         {(isLoadingStops || isLoadingDepartures) && <span className="ml-2 text-sm font-normal text-gray-500">(Loading...)</span>}
       </h2>
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 mb-4 rounded">
+        <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 mb-4 rounded">
           {error}
         </div>
       )}
 
       {!isLoadingStops && !isLoadingDepartures && departures.length === 0 && !error && (
-        <div className="bg-yellow-100 border border-yellow-400 text-yellow-700 px-4 py-3 rounded">
+        <div className="bg-[#F5EFD7] border border-[#DDB967] text-[#8C7356] px-4 py-3 rounded">
           No departures available at the moment.
         </div>
       )}
@@ -170,7 +170,7 @@ const Transportation = () => {
       {departures.length > 0 && (
         <div className="w-full">
           <div className="mb-3">
-            <p className="text-gray-700">
+            <p className="text-[#3E3128]">
               <span className="font-semibold">Station: </span>
               {currentStop?.name || departures[0]?.stop?.name}
               {currentStop?.distance && ` (${currentStop.distance}m from school)`}
@@ -181,15 +181,15 @@ const Transportation = () => {
             <table className="min-w-full">
               <thead>
                 <tr>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Line</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Direction</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Departure</th>
-                  <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-[#5A4635] uppercase tracking-wider">Line</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-[#5A4635] uppercase tracking-wider">Direction</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-[#5A4635] uppercase tracking-wider">Departure</th>
+                  <th className="px-4 py-2 text-left text-xs font-medium text-[#5A4635] uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {departures.map((departure, index) => (
-                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+                  <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-[#F8F4E8]'}>
                     <td className="px-4 py-3">
                       <span className={`inline-flex items-center justify-center h-6 w-12 rounded-md 
                         ${departure.line.product === 'bus' ? 'bg-purple-100 text-purple-800' : 
@@ -202,8 +202,8 @@ const Transportation = () => {
                         {departure.line.name}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-900">{departure.direction}</td>
-                    <td className="px-4 py-3 text-sm text-gray-900">
+                    <td className="px-4 py-3 text-sm text-[#3E3128]">{departure.direction}</td>
+                    <td className="px-4 py-3 text-sm text-[#3E3128]">
                       {formatTime(departure.plannedWhen)}
                     </td>
                     <td className="px-4 py-3 text-sm">
@@ -221,7 +221,7 @@ const Transportation = () => {
             </table>
           </div>
           
-          <div className="mt-4 text-xs text-gray-500">
+          <div className="mt-4 text-xs text-[#5A4635]">
             <p>Data provided by BVG transport API - Last updated: {new Date().toLocaleTimeString()}</p>
           </div>
         </div>

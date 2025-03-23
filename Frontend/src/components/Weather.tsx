@@ -295,7 +295,7 @@ const Weather = () => {
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
-        <h2 className="text-xl font-bold text-blue-500 border-b border-gray-200 pb-2 mb-4">Weather</h2>
+        <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">Weather</h2>
         <div className="flex justify-center items-center h-40">
           <p>Loading weather data...</p>
         </div>
@@ -306,8 +306,8 @@ const Weather = () => {
   if (error || !weatherData) {
     return (
       <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
-        <h2 className="text-xl font-bold text-blue-500 border-b border-gray-200 pb-2 mb-4">Weather</h2>
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">Weather</h2>
+        <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 rounded">
           {error || 'Failed to load weather data'}
         </div>
       </div>
@@ -321,28 +321,28 @@ const Weather = () => {
   
   return (
     <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
-      <h2 className="text-xl font-bold text-blue-500 border-b border-gray-200 pb-2 mb-4">Weather</h2>
+      <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">Weather</h2>
       <div className="mb-4">
-        <div className="text-lg font-bold">Berlin</div>
+        <div className="text-lg font-bold text-[#3E3128]">Berlin</div>
         <div className="flex justify-center items-center my-2">
           <img 
             src={getWeatherIcon(weatherData.current_weather.weathercode)} 
             alt={getWeatherCondition(weatherData.current_weather.weathercode)}
             className="w-16 h-16 mr-4"
           />
-          <span className="text-4xl font-bold">{Math.round(weatherData.current_weather.temperature)}°C</span>
+          <span className="text-4xl font-bold text-[#3E3128]">{Math.round(weatherData.current_weather.temperature)}°C</span>
         </div>
-        <div className="mb-2">
+        <div className="mb-2 text-[#5A4635]">
           {getWeatherCondition(weatherData.current_weather.weathercode)}
         </div>
-        <div className="flex justify-around text-gray-600 text-sm mb-2">
+        <div className="flex justify-around text-[#5A4635] text-sm mb-2">
           <div>Humidity: {getCurrentHumidity()}%</div>
           <div>Wind: {Math.round(weatherData.current_weather.windspeed)} km/h</div>
         </div>
-        <div className="text-gray-600 text-sm">
+        <div className="text-[#5A4635] text-sm">
           <div className="flex items-center justify-center">
             <span className="mr-1">Precipitation:</span>
-            <span className={currentPrecipitation > 0 ? "text-blue-600 font-medium" : ""}>
+            <span className={currentPrecipitation > 0 ? "text-[#8C7356] font-medium" : ""}>
               {formatPrecipitation(currentPrecipitation)}
             </span>
           </div>
@@ -352,7 +352,7 @@ const Weather = () => {
       <div className="flex justify-around border-t border-gray-200 pt-4">
         {forecastDays.map((day, index) => (
           <div key={index} className="text-center">
-            <div className="font-medium">{formatDay(day, index)}</div>
+            <div className="font-medium text-[#3E3128]">{formatDay(day, index)}</div>
             <div className="my-2">
               <img 
                 src={getWeatherIcon(weatherData.daily.weathercode[index])} 
@@ -361,11 +361,11 @@ const Weather = () => {
               />
             </div>
             <div className="flex justify-center gap-2">
-              <span className="font-bold">{Math.round(weatherData.daily.temperature_2m_max[index])}°</span>
-              <span className="text-gray-600">{Math.round(weatherData.daily.temperature_2m_min[index])}°</span>
+              <span className="font-bold text-[#3E3128]">{Math.round(weatherData.daily.temperature_2m_max[index])}°</span>
+              <span className="text-[#5A4635]">{Math.round(weatherData.daily.temperature_2m_min[index])}°</span>
             </div>
-            <div className="text-xs mt-1 text-gray-600">
-              <span className={dailyPrecipitation[index] > 0 ? "text-blue-600" : ""}>
+            <div className="text-xs mt-1 text-[#5A4635]">
+              <span className={dailyPrecipitation[index] > 0 ? "text-[#8C7356]" : ""}>
                 {formatPrecipitation(dailyPrecipitation[index])}
               </span>
             </div>

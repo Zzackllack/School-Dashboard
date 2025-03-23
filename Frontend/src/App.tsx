@@ -18,9 +18,9 @@ const App = () => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen w-full">
-      <header className="bg-slate-800 text-white px-4 py-4 flex justify-between items-center">
-        <h1 className="text-2xl font-bold">Goethe Gymnasium Lichterfelde</h1>
+    <div className="flex flex-col min-h-screen w-full bg-[#FBF8F1]">
+      <header className="bg-[#8C7356] text-white px-4 py-4 flex justify-between items-center">
+        <h1 className="text-2xl font-bold text-center w-full">Goethe Gymnasium Lichterfelde</h1>
         <Clock currentTime={currentTime} />
       </header>
       
@@ -36,7 +36,7 @@ const App = () => {
         </div>
       </main>
       
-      <footer className="bg-slate-800 text-white py-2 px-4 text-center text-sm">
+      <footer className="bg-[#8C7356] text-white py-2 px-4 text-center text-sm">
         <p>© {new Date().getFullYear()} School Dashboard | GGL</p>
         <p>Last updated: {currentTime.toLocaleString()}</p>
       </footer>
