@@ -1,0 +1,33 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: Docker/backend.Dockerfile
+    container_name: school-dashboard-backend
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      # Add any environment variables needed for your app (credentials, etc.)
+      # - DSB_USERNAME=your_username
+      # - DSB_PASSWORD=your_password
+    networks:
+      - app-network
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: Docker/frontend.Dockerfile
+    container_name: school-dashboard-frontend
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
