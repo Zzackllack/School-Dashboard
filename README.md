@@ -1,7 +1,7 @@
 # 🏫 School Dashboard
 
 ![Status](https://img.shields.io/badge/status-under%20development-yellow)
-![Version](https://img.shields.io/badge/version-0.1.0-blue)
+![Version](https://img.shields.io/badge/version-0.7.6-blue)
 ![License](https://img.shields.io/badge/license-BSD%203--Clause-green)
 
 > A modern, intuitive dashboard designed originally for Goethe Gymnasium Lichterfelde (GGL) to transform the lobby information display into a comprehensive school information hub.
