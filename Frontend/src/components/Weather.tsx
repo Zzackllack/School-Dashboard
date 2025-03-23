@@ -233,6 +233,65 @@ const Weather = () => {
     }
   };
 
+  // Get current precipitation from hourly data
+  const getCurrentPrecipitation = (): number => {
+    if (!weatherData?.hourly) return 0;
+    
+    // Use the same approach as getCurrentHumidity to find the current hour
+    const currentTimeString = weatherData.current_weather.time;
+    const currentHour = currentTimeString.substring(0, 13) + ":00";
+    
+    const index = weatherData.hourly.time.findIndex(time => time === currentHour);
+    
+    if (index !== -1) {
+      return weatherData.hourly.precipitation[index];
+    } else {
+      // Find closest hour similar to getCurrentHumidity
+      const currentTime = new Date(currentTimeString);
+      let closestIndex = 0;
+      let smallestDiff = Infinity;
+      
+      weatherData.hourly.time.forEach((timeString, idx) => {
+        const time = new Date(timeString);
+        const diff = Math.abs(time.getTime() - currentTime.getTime());
+        
+        if (diff < smallestDiff) {
+          smallestDiff = diff;
+          closestIndex = idx;
+        }
+      });
+      
+      return weatherData.hourly.precipitation[closestIndex];
+    }
+  };
+
+  // Calculate daily precipitation totals
+  const getDailyPrecipitation = (): number[] => {
+    if (!weatherData?.daily || !weatherData?.hourly) return [0, 0, 0];
+    
+    const dailyTotals = weatherData.daily.time.slice(0, 3).map(date => {
+      const datePrefix = date + "T";
+      const hourlyIndices = weatherData.hourly.time
+        .map((time, index) => time.startsWith(datePrefix) ? index : -1)
+        .filter(index => index !== -1);
+      
+      // Sum precipitation for all hours in this day
+      return hourlyIndices.reduce(
+        (total, index) => total + weatherData.hourly.precipitation[index], 
+        0
+      );
+    });
+    
+    return dailyTotals;
+  };
+
+  // Format precipitation display
+  const formatPrecipitation = (amount: number): string => {
+    if (amount === 0) return "None";
+    if (amount < 0.1) return "Trace";
+    return `${amount.toFixed(1)} mm`;
+  };
+
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-4 mb-4 text-center">
@@ -257,6 +316,8 @@ const Weather = () => {
 
   // Get forecast for next 3 days
   const forecastDays = weatherData.daily.time.slice(0, 3);
+  const dailyPrecipitation = getDailyPrecipitation();
+  const currentPrecipitation = getCurrentPrecipitation();
   
   return (
     <div className="bg-white rounded-lg shadow p-4 mb-4 text-center">
@@ -274,9 +335,17 @@ const Weather = () => {
         <div className="mb-2">
           {getWeatherCondition(weatherData.current_weather.weathercode)}
         </div>
-        <div className="flex justify-around text-gray-600 text-sm">
+        <div className="flex justify-around text-gray-600 text-sm mb-2">
           <div>Humidity: {getCurrentHumidity()}%</div>
           <div>Wind: {Math.round(weatherData.current_weather.windspeed)} km/h</div>
+        </div>
+        <div className="text-gray-600 text-sm">
+          <div className="flex items-center justify-center">
+            <span className="mr-1">Precipitation:</span>
+            <span className={currentPrecipitation > 0 ? "text-blue-600 font-medium" : ""}>
+              {formatPrecipitation(currentPrecipitation)}
+            </span>
+          </div>
         </div>
       </div>
       
@@ -294,6 +363,11 @@ const Weather = () => {
             <div className="flex justify-center gap-2">
               <span className="font-bold">{Math.round(weatherData.daily.temperature_2m_max[index])}°</span>
               <span className="text-gray-600">{Math.round(weatherData.daily.temperature_2m_min[index])}°</span>
+            </div>
+            <div className="text-xs mt-1 text-gray-600">
+              <span className={dailyPrecipitation[index] > 0 ? "text-blue-600" : ""}>
+                {formatPrecipitation(dailyPrecipitation[index])}
+              </span>
             </div>
           </div>
         ))}
