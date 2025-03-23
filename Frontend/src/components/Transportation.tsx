@@ -50,7 +50,6 @@ interface Departure {
   }>;
 }
 
-// Add this new interface for the departures response
 interface DeparturesResponse {
   departures: Departure[];
   realtimeDataUpdatedAt?: number;
@@ -67,7 +66,6 @@ const Transportation = () => {
   const [sBahnError, setSBahnError] = useState<string | null>(null);
   const [currentStop, setCurrentStop] = useState<Stop | null>(null);
   const [currentSBahnStop, setCurrentSBahnStop] = useState<Stop | null>(null);
-  const [activeTab, setActiveTab] = useState<'nearest' | 'sbahn'>('nearest');
   
   // School coordinates
   const schoolLat = 52.43432378391319;
@@ -191,25 +189,43 @@ const Transportation = () => {
   };
 
   // Function to render a departure table
-  const renderDepartureTable = (departures: Departure[], stop: Stop | null, isLoading: boolean, errorMsg: string | null) => {
+  const renderDepartureTable = (departures: Departure[], stop: Stop | null, isLoading: boolean, errorMsg: string | null, title: string) => {
+    if (isLoading) {
+      return (
+        <div className="w-full mb-4">
+          <h3 className="text-lg font-semibold text-[#3E3128] mb-2">{title}</h3>
+          <div className="p-4 text-center">
+            <p>Loading departures...</p>
+          </div>
+        </div>
+      );
+    }
+    
     if (errorMsg) {
       return (
-        <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 mb-4 rounded">
-          {errorMsg}
+        <div className="w-full mb-4">
+          <h3 className="text-lg font-semibold text-[#3E3128] mb-2">{title}</h3>
+          <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 rounded">
+            {errorMsg}
+          </div>
         </div>
       );
     }
 
-    if (!isLoading && departures.length === 0 && !errorMsg) {
+    if (departures.length === 0) {
       return (
-        <div className="bg-[#F5EFD7] border border-[#DDB967] text-[#8C7356] px-4 py-3 rounded">
-          No departures available at the moment.
+        <div className="w-full mb-4">
+          <h3 className="text-lg font-semibold text-[#3E3128] mb-2">{title}</h3>
+          <div className="bg-[#F5EFD7] border border-[#DDB967] text-[#8C7356] px-4 py-3 rounded">
+            No departures available at the moment.
+          </div>
         </div>
       );
     }
 
     return (
-      <div className="w-full">
+      <div className="w-full mb-6">
+        <h3 className="text-lg font-semibold text-[#3E3128] mb-2">{title}</h3>
         {stop && (
           <div className="mb-3">
             <p className="text-[#3E3128]">
@@ -235,10 +251,10 @@ const Transportation = () => {
                 <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-[#F8F4E8]'}>
                   <td className="px-4 py-3">
                     <span className={`inline-flex items-center justify-center h-6 w-12 rounded-md 
-                      ${departure.line.product === 'bus' ? 'bg-[#F2E3C6] text-[#8C7356]' : 
+                      ${departure.line.product === 'bus' ? 'bg-[#a3007c] text-white' : 
                         departure.line.product === 'subway' ? 'bg-[#E8C897] text-[#8C7356]' :
                           departure.line.product === 'tram' ? 'bg-[#F5EFD7] text-[#8C7356]' :
-                            departure.line.product === 'suburban' ? 'bg-[#DDB967] text-white' :
+                            departure.line.product === 'suburban' ? 'bg-[#008D4F] text-white' :
                               'bg-[#F8F4E8] text-[#5A4635]'
                       } font-semibold`}
                     >
@@ -276,30 +292,13 @@ const Transportation = () => {
         }
       </h2>
 
-      {/* Tab navigation */}
-      <div className="flex border-b border-gray-200 mb-4">
-        <button 
-          className={`py-2 px-4 font-medium ${activeTab === 'nearest' 
-            ? 'text-[#8C7356] border-b-2 border-[#8C7356]' 
-            : 'text-[#5A4635] hover:text-[#8C7356]'}`}
-          onClick={() => setActiveTab('nearest')}
-        >
-          Nearest Station
-        </button>
-        <button 
-          className={`py-2 px-4 font-medium ${activeTab === 'sbahn' 
-            ? 'text-[#8C7356] border-b-2 border-[#8C7356]' 
-            : 'text-[#5A4635] hover:text-[#8C7356]'}`}
-          onClick={() => setActiveTab('sbahn')}
-        >
-          S-Bahn
-        </button>
-      </div>
-
-      {/* Tab content */}
-      <div className="tab-content">
-        {activeTab === 'nearest' && renderDepartureTable(departures, currentStop, isLoadingDepartures, error)}
-        {activeTab === 'sbahn' && renderDepartureTable(sBahnDepartures, currentSBahnStop, isLoadingSBahnDepartures, sBahnError)}
+      {/* Content area */}
+      <div>
+        {/* Nearest station departures */}
+        {renderDepartureTable(departures, currentStop, isLoadingDepartures, error, "Nearest Station")}
+        
+        {/* S-Bahn departures */}
+        {renderDepartureTable(sBahnDepartures, currentSBahnStop, isLoadingSBahnDepartures, sBahnError, "S-Bahn Station")}
       </div>
       
       <div className="mt-4 text-xs text-[#5A4635]">
