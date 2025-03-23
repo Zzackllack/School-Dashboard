@@ -1,11 +1,12 @@
 package com.schooldashboard.service;
 
-import com.schooldashboard.util.DSBMobile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import com.schooldashboard.util.DSBMobile;
 
 @Service
 public class DSBService {
