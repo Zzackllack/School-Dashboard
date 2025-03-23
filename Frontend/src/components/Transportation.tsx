@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState, useEffect } from 'react';
 
 // Define interfaces for API responses
@@ -56,7 +55,7 @@ interface DeparturesResponse {
 }
 
 const Transportation = () => {
-  const [nearbyStops, setNearbyStops] = useState<Stop[]>([]);
+  const [, setNearbyStops] = useState<Stop[]>([]);
   const [departures, setDepartures] = useState<Departure[]>([]);
   const [sBahnDepartures, setSBahnDepartures] = useState<Departure[]>([]);
   const [isLoadingStops, setIsLoadingStops] = useState(true);

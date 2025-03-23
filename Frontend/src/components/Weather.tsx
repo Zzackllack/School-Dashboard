@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 
 // Import weather icons
 import clearIcon from '../assets/airy/clear@4x.png';
