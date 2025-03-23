@@ -67,7 +67,7 @@ const SubstitutionPlanDisplay = () => {
     };
 
     return (
-        <div className="mb-8">
+        <div className="w-full p-4">
             <h2 className="text-xl font-bold text-blue-500 border-b border-gray-200 pb-2 mb-4">
                 Substitution Plans
                 {loading && <span className="ml-2 text-sm font-normal text-gray-500">(Loading...)</span>}
@@ -86,7 +86,7 @@ const SubstitutionPlanDisplay = () => {
             )}
 
             {substitutionPlans.map((plan, planIndex) => (
-                <div key={planIndex} className="mb-8">
+                <div key={planIndex} className="mb-8 w-full">
                     <h3 className="text-lg font-semibold mb-2">
                         {formatDate(plan.date)}
                     </h3>
@@ -94,7 +94,7 @@ const SubstitutionPlanDisplay = () => {
 
                     {/* Display Daily News if available */}
                     {plan.news && plan.news.newsItems && plan.news.newsItems.length > 0 && (
-                        <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded">
+                        <div className="mb-6 p-4 bg-blue-50 border-l-4 border-blue-500 rounded w-full">
                             <h4 className="text-lg font-medium text-blue-700 mb-2">Nachrichten zum Tag</h4>
                             {plan.news.newsItems.map((newsItem, idx) => (
                                 <p key={idx} className="mb-2 text-gray-700">{newsItem}</p>
@@ -103,8 +103,8 @@ const SubstitutionPlanDisplay = () => {
                     )}
 
                     {plan.entries.length > 0 ? (
-                        <div className="overflow-x-auto">
-                            <table className="w-full border-collapse">
+                        <div className="overflow-x-auto w-full">
+                            <table className="min-w-full border-collapse">
                                 <thead>
                                     <tr>
                                         <th className="bg-blue-500 text-white border border-gray-300 px-3 py-2 text-left">Class</th>

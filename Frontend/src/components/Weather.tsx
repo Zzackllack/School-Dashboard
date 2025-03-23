@@ -294,7 +294,7 @@ const Weather = () => {
 
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-4 mb-4 text-center">
+      <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
         <h2 className="text-xl font-bold text-blue-500 border-b border-gray-200 pb-2 mb-4">Weather</h2>
         <div className="flex justify-center items-center h-40">
           <p>Loading weather data...</p>
@@ -305,7 +305,7 @@ const Weather = () => {
 
   if (error || !weatherData) {
     return (
-      <div className="bg-white rounded-lg shadow p-4 mb-4 text-center">
+      <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
         <h2 className="text-xl font-bold text-blue-500 border-b border-gray-200 pb-2 mb-4">Weather</h2>
         <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
           {error || 'Failed to load weather data'}
@@ -320,7 +320,7 @@ const Weather = () => {
   const currentPrecipitation = getCurrentPrecipitation();
   
   return (
-    <div className="bg-white rounded-lg shadow p-4 mb-4 text-center">
+    <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
       <h2 className="text-xl font-bold text-blue-500 border-b border-gray-200 pb-2 mb-4">Weather</h2>
       <div className="mb-4">
         <div className="text-lg font-bold">Berlin</div>

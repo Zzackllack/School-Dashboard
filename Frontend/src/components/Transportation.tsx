@@ -149,7 +149,7 @@ const Transportation = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-4">
+    <div className="bg-white rounded-lg shadow-md p-4 mb-4 w-full">
       <h2 className="text-xl font-bold text-blue-500 border-b border-gray-200 pb-2 mb-4">
         Public Transportation
         {(isLoadingStops || isLoadingDepartures) && <span className="ml-2 text-sm font-normal text-gray-500">(Loading...)</span>}
@@ -168,7 +168,7 @@ const Transportation = () => {
       )}
 
       {departures.length > 0 && (
-        <div>
+        <div className="w-full">
           <div className="mb-3">
             <p className="text-gray-700">
               <span className="font-semibold">Station: </span>
@@ -177,7 +177,7 @@ const Transportation = () => {
             </p>
           </div>
           
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto w-full">
             <table className="min-w-full">
               <thead>
                 <tr>
