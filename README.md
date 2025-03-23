@@ -12,7 +12,7 @@ The School Dashboard was created to replace the outdated and clumsy substitution
 
 While developed specifically for GGL, this application is designed to be adaptable for any school using the DSBmobile system for substitution plans.
 
-![Dashboard Preview](https://via.placeholder.com/800x450?text=School+Dashboard+Preview)
+![Dashboard Preview](https://kappa.lol/oVnvD7)
 
 ## ✨ Features
 
