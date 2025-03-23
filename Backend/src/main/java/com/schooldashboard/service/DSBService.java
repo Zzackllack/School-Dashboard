@@ -30,8 +30,8 @@ public class DSBService {
     }
 
     @CacheEvict(allEntries = true, value = {"timetables", "news"})
-    @Scheduled(fixedDelay = 900000) // Clear cache every 15 minutes
+    @Scheduled(fixedRate = 300000) // Clear cache every 5 minutes (300000ms)
     public void clearCache() {
-        System.out.println("Clearing DSBMobile cache");
+        System.out.println("Clearing DSBMobile cache at " + new java.util.Date());
     }
 }
