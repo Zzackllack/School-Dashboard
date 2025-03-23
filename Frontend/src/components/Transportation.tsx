@@ -56,6 +56,7 @@ interface DeparturesResponse {
 }
 
 const Transportation = () => {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [nearbyStops, setNearbyStops] = useState<Stop[]>([]);
   const [departures, setDepartures] = useState<Departure[]>([]);
   const [isLoadingStops, setIsLoadingStops] = useState(true);
