@@ -185,7 +185,10 @@ const Transportation = () => {
   // Get appropriate color class for delay text
   const getDelayColorClass = (delay: number | null) => {
     if (!delay) return '';
-    return delay > 0 ? 'text-[#A45D5D]' : 'text-[#5E8C61]';
+    // Use more vivid colors and bold font for delays
+    return delay > 0 
+      ? 'text-[#E30613] font-bold' // More vivid red for late
+      : 'text-[#009933] font-bold'; // More vivid green for early
   };
 
   // Function to render a departure table

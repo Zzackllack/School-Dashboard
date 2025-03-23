@@ -1,11 +1,12 @@
 package com.schooldashboard.service;
 
-import com.schooldashboard.util.DSBMobile;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
+import com.schooldashboard.util.DSBMobile;
 
 @Service
 public class DSBService {
@@ -29,8 +30,8 @@ public class DSBService {
     }
 
     @CacheEvict(allEntries = true, value = {"timetables", "news"})
-    @Scheduled(fixedDelay = 900000) // Clear cache every 15 minutes
+    @Scheduled(fixedRate = 300000) // Clear cache every 5 minutes (300000ms)
     public void clearCache() {
-        System.out.println("Clearing DSBMobile cache");
+        System.out.println("Clearing DSBMobile cache at " + new java.util.Date());
     }
 }

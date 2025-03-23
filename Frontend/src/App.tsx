@@ -12,8 +12,13 @@ const App = () => {
       setCurrentTime(new Date());
     }, 1000);
 
+    const refreshTimer = setInterval(() => {
+      window.location.reload();
+    }, 300000);
+
     return () => {
       clearInterval(timer);
+      clearInterval(refreshTimer);
     };
   }, []);
 
