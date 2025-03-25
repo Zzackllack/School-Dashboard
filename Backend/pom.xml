@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.schooldashboard</groupId>
     <artifactId>school-dashboard-backend</artifactId>
-    <version>1.0.0</version>
+    <version>3.1.1</version>
     <name>School Dashboard Backend</name>
     <description>Backend for School Dashboard using DSBmobile API</description>
 
