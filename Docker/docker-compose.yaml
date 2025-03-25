@@ -22,7 +22,7 @@ services:
     container_name: school-dashboard-frontend
     restart: unless-stopped
     ports:
-      - "80:80"
+      # - "80:80" Proxy...
     depends_on:
       - backend
     networks:
