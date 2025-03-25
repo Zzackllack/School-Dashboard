@@ -90,7 +90,6 @@ const SubstitutionPlanDisplay = () => {
                     <h3 className="text-lg font-semibold mb-2 text-[#3E3128]">
                         {formatDate(plan.date)}
                     </h3>
-                    {plan.title && <p className="mb-2 text-[#5A4635]">{plan.title}</p>}
 
                     {/* Display Daily News if available */}
                     {plan.news && plan.news.newsItems && plan.news.newsItems.length > 0 && (

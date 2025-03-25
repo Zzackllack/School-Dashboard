@@ -6,7 +6,7 @@ import SubstitutionPlanDisplay from './components/SubstitutionPlanDisplay';
 import Credits from './components/Credits';
 
 // Custom hook for auto-scrolling
-const useAutoScroll = (pauseDuration = 5000, scrollDuration = 3000) => {
+const useAutoScroll = (pauseDuration = 8000, scrollDuration = 20000) => {
   useEffect(() => {
     let isActive = true;
     
@@ -87,8 +87,8 @@ const useAutoScroll = (pauseDuration = 5000, scrollDuration = 3000) => {
 const App = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   
-  // Initialize auto-scrolling with 5 second pauses
-  useAutoScroll(5000, 3000);
+  // Initialize auto-scrolling with 8 second pauses and 20 second scroll duration
+  useAutoScroll(8000, 20000);
 
   useEffect(() => {
     const timer = setInterval(() => {
