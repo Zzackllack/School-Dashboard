@@ -11,6 +11,7 @@ public class SubstitutionPlan implements Serializable {
     private String title;
     private List<SubstitutionEntry> entries;
     private DailyNews news; // Added field for daily news
+    private int sortPriority = Integer.MAX_VALUE; // For ordering plans (1=heute, 2=morgen, etc.)
     
     public SubstitutionPlan() {
         entries = new ArrayList<>();
@@ -59,5 +60,13 @@ public class SubstitutionPlan implements Serializable {
 
     public void setNews(DailyNews news) {
         this.news = news;
+    }
+    
+    public int getSortPriority() {
+        return sortPriority;
+    }
+    
+    public void setSortPriority(int sortPriority) {
+        this.sortPriority = sortPriority;
     }
 }
