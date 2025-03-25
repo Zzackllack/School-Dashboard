@@ -10,10 +10,11 @@ services:
     environment:
       - SPRING_PROFILES_ACTIVE=prod
       # Add any environment variables needed for your app (credentials, etc.)
-      # - DSB_USERNAME=your_username
-      # - DSB_PASSWORD=your_password
+      # - DSB_USERNAME=user
+      # - DSB_PASSWORD=pass
     networks:
       - app-network
+      - coolify  # Add the Coolify network
 
   frontend:
     build:
@@ -21,13 +22,22 @@ services:
       dockerfile: Docker/frontend.Dockerfile
     container_name: school-dashboard-frontend
     restart: unless-stopped
-    ports:
-      # - "80:80" Proxy...
+    # Remove the direct port mapping
+    # ports:
+    #   - "80:80"
     depends_on:
       - backend
     networks:
       - app-network
+      - coolify  # Add the Coolify network
+    labels:
+      # Add HTTPS configuration if needed
+      # - "traefik.http.routers.school-dashboard-secure.rule=Host(`your-domain.com`)"
+      # - "traefik.http.routers.school-dashboard-secure.entrypoints=https"
+      # - "traefik.http.routers.school-dashboard-secure.tls.certresolver=letsencrypt"
 
 networks:
   app-network:
     driver: bridge
+  coolify:
+    external: true  # Use the existing Coolify network
