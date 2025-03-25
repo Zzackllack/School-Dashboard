@@ -8,7 +8,6 @@ import Credits from './components/Credits';
 // Custom hook for auto-scrolling with adaptive duration based on content
 const useAutoScroll = (basePauseDuration = 5000, baseScrollSpeed = 40) => {
   const [documentHeight, setDocumentHeight] = useState(0);
-  const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const resizeObserverRef = useRef<ResizeObserver | null>(null);
 
   // Calculate the appropriate scroll duration based on content height
