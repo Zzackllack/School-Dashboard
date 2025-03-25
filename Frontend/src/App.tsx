@@ -1,26 +1,74 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Weather from './components/Weather';
 import Transportation from './components/Transportation';
 import Clock from './components/Clock';
 import SubstitutionPlanDisplay from './components/SubstitutionPlanDisplay';
 import Credits from './components/Credits';
 
-// Custom hook for auto-scrolling
-const useAutoScroll = (pauseDuration = 8000, scrollDuration = 20000) => {
+// Custom hook for auto-scrolling with adaptive duration based on content
+const useAutoScroll = (basePauseDuration = 5000, baseScrollSpeed = 40) => {
+  const [documentHeight, setDocumentHeight] = useState(0);
+  const scrollIntervalRef = useRef<NodeJS.Timeout | null>(null);
+  const resizeObserverRef = useRef<ResizeObserver | null>(null);
+
+  // Calculate the appropriate scroll duration based on content height
+  // We use pixels-per-second as the base unit so scrolling speed feels consistent
+  const calculateScrollDuration = (height: number, viewportHeight: number) => {
+    const scrollableDistance = Math.max(0, height - viewportHeight);
+    // baseScrollSpeed is pixels per second (e.g., 40px/s)
+    // Min duration of 3000ms, or calculated based on content
+    return Math.max(3000, scrollableDistance * 1000 / baseScrollSpeed);
+  };
+
+  // Update document height when content changes
+  useEffect(() => {
+    const updateDocumentHeight = () => {
+      const height = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight
+      );
+      setDocumentHeight(height);
+      console.log(`[AutoScroll] Document height updated: ${height}px`);
+    };
+
+    // Initial height calculation
+    updateDocumentHeight();
+
+    // Set up resize observer to detect content changes
+    const observer = new ResizeObserver(() => {
+      updateDocumentHeight();
+    });
+    
+    // Observe body for size changes
+    observer.observe(document.body);
+    resizeObserverRef.current = observer;
+
+    return () => {
+      if (resizeObserverRef.current) {
+        resizeObserverRef.current.disconnect();
+      }
+    };
+  }, []);
+
   useEffect(() => {
     let isActive = true;
     
     const scrollToBottom = () => {
       if (!isActive) return;
       
-      const documentHeight = Math.max(
+      const currentDocHeight = Math.max(
         document.body.scrollHeight,
         document.documentElement.scrollHeight
       );
+      const viewportHeight = window.innerHeight;
+      
+      // Calculate scroll duration based on content height
+      const scrollDuration = calculateScrollDuration(currentDocHeight, viewportHeight);
+      console.log(`[AutoScroll] Scrolling down with duration: ${scrollDuration}ms`);
       
       const startTime = performance.now();
       const startPosition = window.scrollY;
-      const targetPosition = documentHeight - window.innerHeight;
+      const targetPosition = currentDocHeight - viewportHeight;
       
       const scrollStep = (timestamp: number) => {
         if (!isActive) return;
@@ -35,9 +83,10 @@ const useAutoScroll = (pauseDuration = 8000, scrollDuration = 20000) => {
           window.requestAnimationFrame(scrollStep);
         } else {
           // Wait at bottom, then scroll up
+          console.log(`[AutoScroll] Reached bottom, pausing for ${basePauseDuration}ms`);
           setTimeout(() => {
             if (isActive) scrollToTop();
-          }, pauseDuration);
+          }, basePauseDuration);
         }
       };
       
@@ -46,6 +95,16 @@ const useAutoScroll = (pauseDuration = 8000, scrollDuration = 20000) => {
     
     const scrollToTop = () => {
       if (!isActive) return;
+      
+      const currentDocHeight = Math.max(
+        document.body.scrollHeight,
+        document.documentElement.scrollHeight
+      );
+      const viewportHeight = window.innerHeight;
+      
+      // Calculate scroll duration based on content height
+      const scrollDuration = calculateScrollDuration(currentDocHeight, viewportHeight);
+      console.log(`[AutoScroll] Scrolling up with duration: ${scrollDuration}ms`);
       
       const startTime = performance.now();
       const startPosition = window.scrollY;
@@ -63,9 +122,10 @@ const useAutoScroll = (pauseDuration = 8000, scrollDuration = 20000) => {
           window.requestAnimationFrame(scrollStep);
         } else {
           // Wait at top, then scroll down
+          console.log(`[AutoScroll] Reached top, pausing for ${basePauseDuration}ms`);
           setTimeout(() => {
             if (isActive) scrollToBottom();
-          }, pauseDuration);
+          }, basePauseDuration);
         }
       };
       
@@ -74,21 +134,27 @@ const useAutoScroll = (pauseDuration = 8000, scrollDuration = 20000) => {
     
     // Start the loop after a short delay to allow initial render
     const initialTimer = setTimeout(() => {
-      if (isActive) scrollToBottom();
+      if (isActive && documentHeight > window.innerHeight) {
+        console.log(`[AutoScroll] Starting initial scroll with document height: ${documentHeight}px`);
+        scrollToBottom();
+      } else if (isActive) {
+        console.log(`[AutoScroll] Content fits in viewport (${documentHeight}px), not scrolling`);
+      }
     }, 2000);
     
     return () => {
       isActive = false;
       clearTimeout(initialTimer);
     };
-  }, [pauseDuration, scrollDuration]);
+  }, [documentHeight, basePauseDuration, baseScrollSpeed]);
 };
 
 const App = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   
-  // Initialize auto-scrolling with 8 second pauses and 20 second scroll duration
-  useAutoScroll(8000, 20000);
+  // Initialize auto-scrolling with 5 second pauses
+  // baseScrollSpeed is pixels per second (80px/s means it takes 12.5 seconds to scroll 1000px)
+  useAutoScroll(5000, 80);
 
   useEffect(() => {
     const timer = setInterval(() => {
