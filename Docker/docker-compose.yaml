@@ -12,6 +12,12 @@ services:
       # Add any environment variables needed for your app (credentials, etc.)
       # - DSB_USERNAME=user
       # - DSB_PASSWORD=pass
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/api/dsb/timetables"] 
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
     networks:
       - app-network
       - coolify  # Add the Coolify network
@@ -27,10 +33,16 @@ services:
     #   - "80:80"
     depends_on:
       - backend
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 10s
     networks:
       - app-network
       - coolify  # Add the Coolify network
-    labels:
+    # labels:
       # Add HTTPS configuration if needed
       # - "traefik.http.routers.school-dashboard-secure.rule=Host(`your-domain.com`)"
       # - "traefik.http.routers.school-dashboard-secure.entrypoints=https"

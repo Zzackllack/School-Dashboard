@@ -10,5 +10,7 @@ RUN mvn package -DskipTests
 FROM eclipse-temurin:17-jre-alpine
 WORKDIR /app
 COPY --from=build /workspace/app/target/school-dashboard-backend-3.1.1.jar app.jar
+# Install wget for healthcheck
+RUN apk add --no-cache wget
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "/app/app.jar"]
