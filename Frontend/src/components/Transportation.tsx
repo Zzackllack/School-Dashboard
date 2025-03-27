@@ -238,7 +238,10 @@ const Transportation = () => {
         </div>
       );
     }
-
+    
+    // This line properly causes known issues in development environment (npm run dev) but works fine in production
+    // I have no idea, but when "No departures available at the moment." is displayed, but you think there should be departures just remove or uncomment the if statement below
+    // I think it has something to do with the way the data is fetched after the component is mounted but no idea
     if (departures.length === 0) {
       return (
         <div className="w-full mb-4">

@@ -115,7 +115,8 @@ This opacity has forced us to rely on reverse-engineered solutions, creating unn
    cd Backend
    # Update application.properties with your DSBmobile credentials
    mvn clean package
-   java -jar target/school-dashboard-backend-1.0.0.jar
+   # Replace X.Y.Z with the current version number
+   java -jar target/school-dashboard-backend-X.Y.Z.jar
    ```
 
 3. **Set up the frontend**
@@ -156,8 +157,8 @@ Our dashboard solves these problems by providing a modern, readable interface th
 |-------|-------|--------|
 | 1 | Core API Integration & Basic UI | ✅ Done |
 | 2 | Enhanced UI & Additional Features | 🔄 In Progress |
-| 3 | Testing & Performance Optimization | 🔜 Planned |
-| 4 | Deployment & Documentation | 🔜 Planned |
+| 3 | Testing & Performance Optimization | 🔄 In Progress |
+| 4 | Deployment & Documentation | 🧩 Partially done |
 | 5 | User Feedback & Iteration | 🔜 Planned |
 | 6 | Final Review & Launch | 🔜 Planned |
 
