@@ -10,7 +10,7 @@ const Credits = () => {
         <div className="flex flex-col md:flex-row items-center justify-center gap-6">
           <div className="text-center max-w-md">
             <p className="text-[#3E3128] mb-4 text-lg">
-              Dieses Dashboard wurde mit Liebe von Cédric und mithilfe des Informatik Leistungskurses gemacht
+              Dieses Dashboard wurde mit Liebe von <strong>Cédric</strong> und mithilfe des Informatik Leistungskurses gemacht
             </p>
           </div>
           
@@ -22,7 +22,7 @@ const Credits = () => {
                   alt="Informatik Leistungskurs" 
                   className="w-full h-full object-cover"
                   onError={(e) => {
-                    e.currentTarget.src = 'https://via.placeholder.com/300x200?text=Informatik+Leistungskurs';
+                    e.currentTarget.src = 'https://kappa.lol/4eRovO';
                   }}
                 />
               </div>
