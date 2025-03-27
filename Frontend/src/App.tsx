@@ -11,7 +11,7 @@ const App = () => {
   
   // Initialize auto-scrolling with 5 second pauses
   // baseScrollSpeed is pixels per second (80px/s means it takes 12.5 seconds to scroll 1000px)
-  useAutoScroll(500, 80);
+  useAutoScroll(3500, 80);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -43,11 +43,9 @@ const App = () => {
           <div className="lg:w-1/4 flex flex-col px-2">
             <Weather />
             <Transportation />
+            <Credits />
           </div>
         </div>
-        
-        {/* Credits section */}
-        <Credits />
       </main>
       
       <footer className="bg-[#8C7356] text-white py-2 px-4 text-center text-sm">

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 // Define interfaces for API responses
 interface Stop {
@@ -65,11 +65,79 @@ const Transportation = () => {
   const [sBahnError, setSBahnError] = useState<string | null>(null);
   const [currentStop, setCurrentStop] = useState<Stop | null>(null);
   const [currentSBahnStop, setCurrentSBahnStop] = useState<Stop | null>(null);
+  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
   
   // School coordinates
   const schoolLat = 52.43432378391319;
   const schoolLng = 13.305375391277634;
 
+  // Create fetchDepartures as a useCallback function so it can be used in useEffect and in the interval
+  const fetchDepartures = useCallback(async (stopId: string) => {
+    setIsLoadingDepartures(true);
+    try {
+      console.log('Fetching departures for stop:', stopId);
+      const response = await fetch(`https://v6.bvg.transport.rest/stops/${stopId}/departures?results=30&duration=60`);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      const data: DeparturesResponse = await response.json();
+      
+      // Check if data has the expected structure
+      if (!data.departures || !Array.isArray(data.departures)) {
+        throw new Error('Unexpected API response format');
+      }
+      
+      setDepartures(data.departures);
+      setError(null);
+    } catch (err) {
+      console.error('Failed to fetch departures:', err);
+      setError('Failed to load departures. Please try again later.');
+    } finally {
+      setIsLoadingDepartures(false);
+    }
+  }, []);
+
+  // Create fetchSBahnDepartures as a useCallback function
+  const fetchSBahnDepartures = useCallback(async (stopId: string) => {
+    setIsLoadingSBahnDepartures(true);
+    try {
+      console.log('Fetching S-Bahn departures for stop:', stopId);
+      const response = await fetch(`https://v6.bvg.transport.rest/stops/${stopId}/departures?results=30&duration=60&suburban=true`);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      const data: DeparturesResponse = await response.json();
+      
+      // Check if data has the expected structure
+      if (!data.departures || !Array.isArray(data.departures)) {
+        throw new Error('Unexpected API response format');
+      }
+      
+      // Filter to only show S-Bahn trains
+      const filteredDepartures = data.departures.filter(dep => dep.line.product === 'suburban');
+      setSBahnDepartures(filteredDepartures);
+      setSBahnError(null);
+    } catch (err) {
+      console.error('Failed to fetch S-Bahn departures:', err);
+      setSBahnError('Failed to load S-Bahn departures. Please try again later.');
+    } finally {
+      setIsLoadingSBahnDepartures(false);
+    }
+  }, []);
+
+  // Create a function to update all data
+  const updateAllData = useCallback(() => {
+    if (currentStop) {
+      fetchDepartures(currentStop.id);
+    }
+    if (currentSBahnStop) {
+      fetchSBahnDepartures(currentSBahnStop.id);
+    }
+    setLastUpdated(new Date());
+    console.log('Transportation data updated at', new Date().toLocaleTimeString());
+  }, [currentStop, currentSBahnStop, fetchDepartures, fetchSBahnDepartures]);
+
+  // Initial data fetch
   useEffect(() => {
     const fetchNearbyStops = async () => {
       setIsLoadingStops(true);
@@ -79,7 +147,6 @@ const Transportation = () => {
           throw new Error(`API error: ${response.status}`);
         }
         const data: Stop[] = await response.json();
-        console.log('Nearby stops:', data); // Debug log
         setNearbyStops(data);
         
         // Set nearest stop (regardless of type)
@@ -103,65 +170,23 @@ const Transportation = () => {
         setError('Failed to load nearby stops. Please try again later.');
       } finally {
         setIsLoadingStops(false);
-      }
-    };
-
-    const fetchDepartures = async (stopId: string) => {
-      setIsLoadingDepartures(true);
-      try {
-        console.log('Fetching departures for stop:', stopId); // Debug log
-        const response = await fetch(`https://v6.bvg.transport.rest/stops/${stopId}/departures?results=10&duration=60`);
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
-        const data: DeparturesResponse = await response.json();
-        console.log('Departures data:', data); // Debug log
-        
-        // Check if data has the expected structure
-        if (!data.departures || !Array.isArray(data.departures)) {
-          throw new Error('Unexpected API response format');
-        }
-        
-        setDepartures(data.departures);
-        setError(null);
-      } catch (err) {
-        console.error('Failed to fetch departures:', err);
-        setError('Failed to load departures. Please try again later.');
-      } finally {
-        setIsLoadingDepartures(false);
-      }
-    };
-
-    const fetchSBahnDepartures = async (stopId: string) => {
-      setIsLoadingSBahnDepartures(true);
-      try {
-        console.log('Fetching S-Bahn departures for stop:', stopId); // Debug log
-        const response = await fetch(`https://v6.bvg.transport.rest/stops/${stopId}/departures?results=10&duration=60&suburban=true`);
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
-        const data: DeparturesResponse = await response.json();
-        console.log('S-Bahn departures data:', data); // Debug log
-        
-        // Check if data has the expected structure
-        if (!data.departures || !Array.isArray(data.departures)) {
-          throw new Error('Unexpected API response format');
-        }
-        
-        // Filter to only show S-Bahn trains
-        const filteredDepartures = data.departures.filter(dep => dep.line.product === 'suburban');
-        setSBahnDepartures(filteredDepartures);
-        setSBahnError(null);
-      } catch (err) {
-        console.error('Failed to fetch S-Bahn departures:', err);
-        setSBahnError('Failed to load S-Bahn departures. Please try again later.');
-      } finally {
-        setIsLoadingSBahnDepartures(false);
+        setLastUpdated(new Date());
       }
     };
 
     fetchNearbyStops();
-  }, []);
+  }, [fetchDepartures, fetchSBahnDepartures]);
+
+  // Set up automatic refresh every 3 minutes
+  useEffect(() => {
+    // Update data every 3 minutes (180000 ms)
+    const intervalId = setInterval(() => {
+      updateAllData();
+    }, 180000);
+    
+    // Clean up interval on component unmount
+    return () => clearInterval(intervalId);
+  }, [updateAllData]);
 
   // Format time to display only hours and minutes
   const formatTime = (timeString: string) => {
@@ -304,7 +329,7 @@ const Transportation = () => {
       </div>
       
       <div className="mt-4 text-xs text-[#5A4635]">
-        <p>Data provided by BVG transport API - Last updated: {new Date().toLocaleTimeString()}</p>
+        <p>Data provided by BVG transport API - Last updated: {lastUpdated.toLocaleTimeString()}</p>
       </div>
     </div>
   );
