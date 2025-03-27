@@ -69,7 +69,7 @@ const SubstitutionPlanDisplay = () => {
     return (
         <div className="w-full p-4">
             <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">
-                Vertretungs Pläne
+                Vertretungspläne
                 {loading && <span className="ml-2 text-sm font-normal text-gray-500">(Ladevorgang...)</span>}
             </h2>
 
