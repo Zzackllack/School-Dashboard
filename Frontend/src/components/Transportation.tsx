@@ -222,7 +222,7 @@ const Transportation = () => {
         <div className="w-full mb-4">
           <h3 className="text-lg font-semibold text-[#3E3128] mb-2">{title}</h3>
           <div className="p-4 text-center">
-            <p>Loading departures...</p>
+            <p>Lade Abfahrten...</p>
           </div>
         </div>
       );
@@ -247,7 +247,7 @@ const Transportation = () => {
         <div className="w-full mb-4">
           <h3 className="text-lg font-semibold text-[#3E3128] mb-2">{title}</h3>
           <div className="bg-[#F5EFD7] border border-[#DDB967] text-[#8C7356] px-4 py-3 rounded">
-            No departures available at the moment.
+            Im Moment keine Abfahrten verfügbar.
           </div>
         </div>
       );
@@ -261,7 +261,7 @@ const Transportation = () => {
             <p className="text-[#3E3128]">
               <span className="font-semibold">Station: </span>
               {stop.name}
-              {stop.distance && ` (${stop.distance}m from school)`}
+              {stop.distance && ` (${stop.distance}m von der Schule entfernt)`}
             </p>
           </div>
         )}
@@ -270,9 +270,9 @@ const Transportation = () => {
           <table className="min-w-full">
             <thead>
               <tr>
-                <th className="px-4 py-2 text-left text-xs font-medium text-[#5A4635] uppercase tracking-wider">Line</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-[#5A4635] uppercase tracking-wider">Direction</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-[#5A4635] uppercase tracking-wider">Departure</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-[#5A4635] uppercase tracking-wider">Linie</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-[#5A4635] uppercase tracking-wider">Richtung</th>
+                <th className="px-4 py-2 text-left text-xs font-medium text-[#5A4635] uppercase tracking-wider">Abfahrt</th>
                 <th className="px-4 py-2 text-left text-xs font-medium text-[#5A4635] uppercase tracking-wider">Status</th>
               </tr>
             </thead>
@@ -301,7 +301,7 @@ const Transportation = () => {
                         {getDelayText(departure.delay)}
                       </span>
                     ) : (
-                      <span className="text-[#5E8C61]">On time</span>
+                      <span className="text-[#5E8C61]">Pünktlich</span>
                     )}
                   </td>
                 </tr>
@@ -316,23 +316,23 @@ const Transportation = () => {
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-4 w-full">
       <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">
-        Public Transportation
+        Öffentliche Verkehrsmittel
         {(isLoadingStops || isLoadingDepartures || isLoadingSBahnDepartures) && 
-          <span className="ml-2 text-sm font-normal text-gray-500">(Loading...)</span>
+          <span className="ml-2 text-sm font-normal text-gray-500">(Ladevorgang...)</span>
         }
       </h2>
 
       {/* Content area */}
       <div>
         {/* Nearest station departures */}
-        {renderDepartureTable(departures, currentStop, isLoadingDepartures, error, "Nearest Station")}
+        {renderDepartureTable(departures, currentStop, isLoadingDepartures, error, "Nächste Station")}
         
         {/* S-Bahn departures */}
         {renderDepartureTable(sBahnDepartures, currentSBahnStop, isLoadingSBahnDepartures, sBahnError, "S-Bahn Station")}
       </div>
       
       <div className="mt-4 text-xs text-[#5A4635]">
-        <p>Data provided by BVG transport API - Last updated: {lastUpdated.toLocaleTimeString()}</p>
+        <p>Daten bereitgestellt von der BVG-Transport-API - Zuletzt aktualisiert: {lastUpdated.toLocaleTimeString()}</p>
       </div>
     </div>
   );
