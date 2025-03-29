@@ -29,18 +29,18 @@ const App = () => {
   }, []);
 
   return (
-    <div className="flex flex-col min-h-screen w-full bg-[#FBF8F1]">
-      <header className="bg-[#8C7356] text-white px-4 py-4 flex justify-between items-center">
+    <div className="flex flex-col min-h-screen w-full bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
+      <header className="bg-gray-800/80 backdrop-blur-md text-white px-6 py-4 flex justify-between items-center shadow-lg border-b border-white/10">
         <h1 className="text-2xl font-bold text-center w-full">Goethe Gymnasium Lichterfelde</h1>
         <Clock currentTime={currentTime} />
       </header>
       
-      <main className="flex-grow flex flex-col">
-        <div className="flex flex-col lg:flex-row w-full">
-          <div className="lg:w-3/4 px-2">
+      <main className="flex-grow flex flex-col px-4 py-6">
+        <div className="flex flex-col lg:flex-row w-full gap-5">
+          <div className="lg:w-3/4">
             <SubstitutionPlanDisplay />
           </div>
-          <div className="lg:w-1/4 flex flex-col px-2">
+          <div className="lg:w-1/4 flex flex-col gap-5">
             <Weather />
             <Transportation />
             <Credits />
@@ -48,7 +48,7 @@ const App = () => {
         </div>
       </main>
       
-      <footer className="bg-[#8C7356] text-white py-2 px-4 text-center text-sm">
+      <footer className="bg-gray-800/80 backdrop-blur-md text-white py-3 px-6 text-center text-sm border-t border-white/10">
         <p>© {new Date().getFullYear()} School Dashboard | GGL</p>
         <p>Last updated: {currentTime.toLocaleString()}</p>
       </footer>

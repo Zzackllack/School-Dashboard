@@ -67,51 +67,50 @@ const SubstitutionPlanDisplay = () => {
         return dateString;
     };
 
-    // Define hardcoded color mapping for each class with greater contrast
+    // Define hardcoded color mapping for each class with modern look
     const getClassColor = (classname: string): string => {
         // Clean up the class name (trim whitespace and convert to lowercase)
         const cleanClassName = classname.trim().toLowerCase();
         
-        // Define specific colors for each class with increased contrast
-        // Using a mix of more distinctive colors and different intensities
+        // Define specific colors for each class with a modern, translucent look
         const classColors: Record<string, string> = {
-            // 7th grade - red spectrum with varied intensities
-            '7a': 'bg-red-100',
-            '7b': 'bg-rose-200',
-            '7c': 'bg-pink-100',
-            '7d': 'bg-fuchsia-200',
+            // 7th grade - warmer tones
+            '7a': 'bg-red-50/80 backdrop-blur-sm',
+            '7b': 'bg-rose-50/80 backdrop-blur-sm',
+            '7c': 'bg-pink-50/80 backdrop-blur-sm',
+            '7d': 'bg-fuchsia-50/80 backdrop-blur-sm',
             
-            // 8th grade - blue spectrum with varied intensities
-            '8a': 'bg-blue-200',
-            '8b': 'bg-sky-100',
-            '8c': 'bg-cyan-200',
-            '8d': 'bg-indigo-100',
+            // 8th grade - cool tones
+            '8a': 'bg-blue-50/80 backdrop-blur-sm',
+            '8b': 'bg-sky-50/80 backdrop-blur-sm',
+            '8c': 'bg-cyan-50/80 backdrop-blur-sm',
+            '8d': 'bg-indigo-50/80 backdrop-blur-sm',
             
-            // 9th grade - green spectrum with varied intensities
-            '9a': 'bg-green-100',
-            '9b': 'bg-emerald-200',
-            '9c': 'bg-teal-100',
-            '9d': 'bg-lime-200',
+            // 9th grade - earthy tones
+            '9a': 'bg-green-50/80 backdrop-blur-sm',
+            '9b': 'bg-emerald-50/80 backdrop-blur-sm',
+            '9c': 'bg-teal-50/80 backdrop-blur-sm',
+            '9d': 'bg-lime-50/80 backdrop-blur-sm',
             
-            // 10th grade - yellow/orange spectrum with varied intensities
-            '10a': 'bg-yellow-100',
-            '10b': 'bg-amber-200',
-            '10c': 'bg-orange-100',
-            '10d': 'bg-yellow-200',
+            // 10th grade - warm neutrals
+            '10a': 'bg-yellow-50/80 backdrop-blur-sm',
+            '10b': 'bg-amber-50/80 backdrop-blur-sm',
+            '10c': 'bg-orange-50/80 backdrop-blur-sm',
+            '10d': 'bg-yellow-50/80 backdrop-blur-sm',
             
-            // Upper grades - distinct colors
-            '11': 'bg-purple-100',
-            '12': 'bg-slate-200'
+            // Upper grades - distinctive
+            '11': 'bg-purple-50/80 backdrop-blur-sm',
+            '12': 'bg-slate-50/80 backdrop-blur-sm'
         };
         
         // Check if this entry has multiple classes (comma or space separated)
         if (cleanClassName.includes(',') || /\s+/.test(cleanClassName)) {
-            // For entries with multiple classes, use a distinctive pattern
-            return 'bg-gradient-to-r from-gray-100 to-gray-200';
+            // For entries with multiple classes, use a distinctive glass effect
+            return 'bg-gradient-to-r from-gray-50/70 to-slate-50/70 backdrop-blur-md';
         }
         
         // Return the color for this class, or a default color if not found
-        return classColors[cleanClassName] || 'bg-gray-100';
+        return classColors[cleanClassName] || 'bg-gray-50/80 backdrop-blur-sm';
     };
 
     // Map to keep track of used classes for each plan
@@ -185,8 +184,8 @@ const SubstitutionPlanDisplay = () => {
 
     return (
         <div className="w-full">
-            <div className="bg-white rounded-lg shadow-md p-4 mb-4 w-full">
-                <h2 className="text-xl font-bold text-[#8C7356]">
+            <div className="bg-white/90 backdrop-blur-md rounded-xl shadow-lg border border-white/20 p-5 mb-5 w-full transition-all duration-300">
+                <h2 className="text-2xl font-bold text-gray-800">
                     Substitution Plans
                     {loading && <span className="ml-2 text-sm font-normal text-gray-500">(Loading...)</span>}
                 </h2>
@@ -206,20 +205,20 @@ const SubstitutionPlanDisplay = () => {
 
             {/* Each day gets its own container */}
             {substitutionPlans.map((plan, planIndex) => (
-                <div key={planIndex} className="bg-white rounded-lg shadow-md p-4 mb-4 w-full">
-                    <h3 className="text-lg font-semibold mb-2 text-[#3E3128]">
+                <div key={planIndex} className="bg-white/90 backdrop-blur-md rounded-xl shadow-lg border border-white/20 p-5 mb-5 w-full transition-all duration-300 hover:shadow-xl">
+                    <h3 className="text-lg font-semibold mb-3 text-gray-800 flex items-center">
                         {formatDate(plan.date)}
                     </h3>
 
                     {/* Display Daily News if available */}
                     {plan.news && plan.news.newsItems && plan.news.newsItems.length > 0 && (
-                        <div className="mb-6 p-4 bg-[#F2E3C6] border-l-4 border-[#D4A76A] rounded w-full">
-                            <h4 className="text-lg font-medium text-[#8C7356] mb-2 flex items-center">
-                                <Info size={20} className="mr-2" /> 
+                        <div className="mb-6 p-4 bg-amber-50/70 backdrop-blur-sm border-l-4 border-amber-300 rounded-lg w-full shadow-sm">
+                            <h4 className="text-lg font-medium text-amber-800 mb-2 flex items-center">
+                                <Info size={20} className="mr-2 text-amber-600" /> 
                                 Nachrichten zum Tag
                             </h4>
                             {plan.news.newsItems.map((newsItem, idx) => (
-                                <p key={idx} className="mb-2 text-[#3E3128]">{newsItem}</p>
+                                <p key={idx} className="mb-2 text-gray-700">{newsItem}</p>
                             ))}
                         </div>
                     )}
@@ -227,11 +226,11 @@ const SubstitutionPlanDisplay = () => {
                     {plan.entries.length > 0 ? (
                         <>
                             {/* Class legend */}
-                            <div className="mb-4 flex flex-wrap gap-2">
+                            <div className="mb-5 flex flex-wrap gap-2">
                                 {getClassesInPlan(plan).map((className, idx) => (
                                     <div 
                                         key={idx} 
-                                        className={`${getClassColor(className)} px-2 py-1 border border-[#E8C897] rounded text-sm`}
+                                        className={`${getClassColor(className)} px-3 py-1.5 border border-white/30 rounded-full text-sm shadow-sm hover:shadow transition duration-300 ease-in-out`}
                                     >
                                         {className}
                                     </div>
@@ -242,15 +241,15 @@ const SubstitutionPlanDisplay = () => {
                                 <table className="min-w-full border-collapse">
                                     <thead>
                                         <tr>
-                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Class</th>
-                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Period</th>
-                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Absent</th>
-                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Substitute</th>
-                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Original Subject</th>
-                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">New Subject</th>
-                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Room</th>
-                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Type</th>
-                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Comments</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left rounded-tl-lg">Class</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Period</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Absent</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Substitute</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Original Subject</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">New Subject</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Room</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Type</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left rounded-tr-lg">Comments</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -261,17 +260,17 @@ const SubstitutionPlanDisplay = () => {
                                             return (
                                                 <tr 
                                                     key={entryIndex} 
-                                                    className={`${classColor} hover:bg-opacity-80`}
+                                                    className={`${classColor} hover:bg-opacity-100 transition duration-300 ease-in-out`}
                                                 >
-                                                    <td className="border border-[#E8C897] px-3 py-2 font-medium">{entry.classes}</td>
-                                                    <td className="border border-[#E8C897] px-3 py-2">{entry.period}</td>
-                                                    <td className="border border-[#E8C897] px-3 py-2">{entry.absent}</td>
-                                                    <td className="border border-[#E8C897] px-3 py-2">{entry.substitute}</td>
-                                                    <td className="border border-[#E8C897] px-3 py-2">{entry.originalSubject}</td>
-                                                    <td className="border border-[#E8C897] px-3 py-2">{entry.subject}</td>
-                                                    <td className="border border-[#E8C897] px-3 py-2">{entry.newRoom}</td>
-                                                    <td className="border border-[#E8C897] px-3 py-2">{renderTypeCell(entry.type)}</td>
-                                                    <td className="border border-[#E8C897] px-3 py-2">{entry.comment}</td>
+                                                    <td className="border-b border-gray-100/30 px-4 py-3 font-medium">{entry.classes}</td>
+                                                    <td className="border-b border-gray-100/30 px-4 py-3">{entry.period}</td>
+                                                    <td className="border-b border-gray-100/30 px-4 py-3">{entry.absent}</td>
+                                                    <td className="border-b border-gray-100/30 px-4 py-3">{entry.substitute}</td>
+                                                    <td className="border-b border-gray-100/30 px-4 py-3">{entry.originalSubject}</td>
+                                                    <td className="border-b border-gray-100/30 px-4 py-3">{entry.subject}</td>
+                                                    <td className="border-b border-gray-100/30 px-4 py-3">{entry.newRoom}</td>
+                                                    <td className="border-b border-gray-100/30 px-4 py-3">{renderTypeCell(entry.type)}</td>
+                                                    <td className="border-b border-gray-100/30 px-4 py-3">{entry.comment}</td>
                                                 </tr>
                                             );
                                         })}
@@ -280,7 +279,7 @@ const SubstitutionPlanDisplay = () => {
                             </div>
                         </>
                     ) : (
-                        <p className="italic text-[#5A4635]">No substitutions available for this date.</p>
+                        <p className="italic text-gray-500">No substitutions available for this date.</p>
                     )}
                 </div>
             ))}
