@@ -46,8 +46,11 @@ public class CustomErrorController implements ErrorController {
         // Generic error
         model.addAttribute("errorTitle", "Unexpected Error");
         model.addAttribute("errorMessage", errorMessage != null ? errorMessage : "An unexpected error occurred");
-        model.addAttribute("statusCode", status != null ? Integer.parseInt(status.toString()) : 500);
-        
+        model.addAttribute("statusCode", status != null ? Integer.valueOf(status.toString()) : 500);
+
+        // Logging
+        System.err.println("Error occurred: " + model.getAttribute("errorMessage") + " (Status code: " + model.getAttribute("statusCode") + ")");
+        System.err.println("Error path: " + model.getAttribute("path") + " (Timestamp: " + model.getAttribute("timestamp") + ")");
         return "error/general";
     }
 }
