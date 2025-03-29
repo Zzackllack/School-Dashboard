@@ -50,7 +50,7 @@ const App = () => {
       
       <footer className="bg-[#8C7356] text-white py-2 px-4 text-center text-sm">
         <p>© {new Date().getFullYear()} School Dashboard | GGL</p>
-        <p>Last updated: {currentTime.toLocaleString()}</p>
+        <p>Zuletzt aktualisiert: {currentTime.toLocaleString('de-DE')}</p>
       </footer>
     </div>
   );

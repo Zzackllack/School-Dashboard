@@ -69,8 +69,8 @@ const SubstitutionPlanDisplay = () => {
     return (
         <div className="w-full p-4">
             <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">
-                Substitution Plans
-                {loading && <span className="ml-2 text-sm font-normal text-gray-500">(Loading...)</span>}
+                Vertretungspläne
+                {loading && <span className="ml-2 text-sm font-normal text-gray-500">(Ladevorgang...)</span>}
             </h2>
 
             {error && (
@@ -81,7 +81,7 @@ const SubstitutionPlanDisplay = () => {
 
             {!loading && substitutionPlans.length === 0 && !error && (
                 <div className="bg-[#F5EFD7] border border-[#DDB967] text-[#8C7356] px-4 py-3 rounded">
-                    No substitution plans available at the moment.
+                    Keine Vertretungen für dieses Datum verfügbar.
                 </div>
             )}
 
@@ -106,15 +106,15 @@ const SubstitutionPlanDisplay = () => {
                             <table className="min-w-full border-collapse">
                                 <thead>
                                     <tr>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Class</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Period</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Absent</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Substitute</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Original Subject</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">New Subject</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Room</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Type</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Comments</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Klasse</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Stunde</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Abwesend</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Vertreter</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Ürsprüngliches Fach</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Neues Fach</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Raum</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Typ</th>
+                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Kommentare</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -135,7 +135,7 @@ const SubstitutionPlanDisplay = () => {
                             </table>
                         </div>
                     ) : (
-                        <p className="italic text-[#5A4635]">No substitutions available for this date.</p>
+                        <p className="italic text-[#5A4635]">Keine Vertretungen für dieses Datum verfügbar.</p>
                     )}
                 </div>
             ))}
