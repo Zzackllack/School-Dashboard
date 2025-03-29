@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Replace, ArrowRightSquare, ArrowDownUp, BookOpen } from 'lucide-react'; // Add BookOpen icon for EVA
+import { X, Replace, ArrowRightSquare, ArrowDownUp, BookOpen, Info } from 'lucide-react'; // Add Info icon for news
 
 interface SubstitutionEntry {
     classes: string;
@@ -211,7 +211,10 @@ const SubstitutionPlanDisplay = () => {
                     {/* Display Daily News if available */}
                     {plan.news && plan.news.newsItems && plan.news.newsItems.length > 0 && (
                         <div className="mb-6 p-4 bg-[#F2E3C6] border-l-4 border-[#D4A76A] rounded w-full">
-                            <h4 className="text-lg font-medium text-[#8C7356] mb-2">Nachrichten zum Tag</h4>
+                            <h4 className="text-lg font-medium text-[#8C7356] mb-2 flex items-center">
+                                <Info size={20} className="mr-2" /> 
+                                Nachrichten zum Tag
+                            </h4>
                             {plan.news.newsItems.map((newsItem, idx) => (
                                 <p key={idx} className="mb-2 text-[#3E3128]">{newsItem}</p>
                             ))}
