@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { X, Replace, ArrowRightSquare, ArrowDownUp, BookOpen } from 'lucide-react'; // Add BookOpen icon for EVA
 
 interface SubstitutionEntry {
     classes: string;
@@ -66,6 +67,56 @@ const SubstitutionPlanDisplay = () => {
         return dateString;
     };
 
+    // Function to render type cell with conditional styling
+    const renderTypeCell = (type: string) => {
+        if (type.toLowerCase() === "entfall" || type.toLowerCase() === "ausfall") {
+            return (
+                <div className="flex items-center text-red-600 font-medium">
+                    <X size={16} className="mr-1" />
+                    {type}
+                </div>
+            );
+        }
+        
+        if (type.toLowerCase() === "vertr." || type.toLowerCase().includes("vertretung") || type.toLowerCase().includes("s. vertr.")) {
+            return (
+                <div className="flex items-center text-amber-600 font-medium">
+                    <Replace size={16} className="mr-1" />
+                    {type}
+                </div>
+            );
+        }
+        
+        if (type.toLowerCase() === "raumänd." || type.toLowerCase().includes("raum") || type.toLowerCase().includes("raumänderung")) {
+            return (
+                <div className="flex items-center text-green-600 font-medium">
+                    <ArrowRightSquare size={16} className="mr-1" />
+                    {type}
+                </div>
+            );
+        }
+
+        if (type.toLowerCase() === "verlegung" || type.toLowerCase().includes("verleg")) {
+            return (
+                <div className="flex items-center text-green-600 font-medium">
+                    <ArrowDownUp size={16} className="mr-1" />
+                    {type}
+                </div>
+            );
+        }
+        
+        if (type.toLowerCase() === "eva" || type.toLowerCase().includes("eigenverantwort")) {
+            return (
+                <div className="flex items-center text-indigo-600 font-medium">
+                    <BookOpen size={16} className="mr-1" />
+                    {type}
+                </div>
+            );
+        }
+        
+        return type;
+    };
+
     return (
         <div className="w-full p-4">
             <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">
@@ -127,7 +178,7 @@ const SubstitutionPlanDisplay = () => {
                                             <td className="border border-[#E8C897] px-3 py-2">{entry.originalSubject}</td>
                                             <td className="border border-[#E8C897] px-3 py-2">{entry.subject}</td>
                                             <td className="border border-[#E8C897] px-3 py-2">{entry.newRoom}</td>
-                                            <td className="border border-[#E8C897] px-3 py-2">{entry.type}</td>
+                                            <td className="border border-[#E8C897] px-3 py-2">{renderTypeCell(entry.type)}</td>
                                             <td className="border border-[#E8C897] px-3 py-2">{entry.comment}</td>
                                         </tr>
                                     ))}
