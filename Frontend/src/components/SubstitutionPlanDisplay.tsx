@@ -67,6 +67,72 @@ const SubstitutionPlanDisplay = () => {
         return dateString;
     };
 
+    // Define hardcoded color mapping for each class with greater contrast
+    const getClassColor = (classname: string): string => {
+        // Clean up the class name (trim whitespace and convert to lowercase)
+        const cleanClassName = classname.trim().toLowerCase();
+        
+        // Define specific colors for each class with increased contrast
+        // Using a mix of more distinctive colors and different intensities
+        const classColors: Record<string, string> = {
+            // 7th grade - red spectrum with varied intensities
+            '7a': 'bg-red-100',
+            '7b': 'bg-rose-200',
+            '7c': 'bg-pink-100',
+            '7d': 'bg-fuchsia-200',
+            
+            // 8th grade - blue spectrum with varied intensities
+            '8a': 'bg-blue-200',
+            '8b': 'bg-sky-100',
+            '8c': 'bg-cyan-200',
+            '8d': 'bg-indigo-100',
+            
+            // 9th grade - green spectrum with varied intensities
+            '9a': 'bg-green-100',
+            '9b': 'bg-emerald-200',
+            '9c': 'bg-teal-100',
+            '9d': 'bg-lime-200',
+            
+            // 10th grade - yellow/orange spectrum with varied intensities
+            '10a': 'bg-yellow-100',
+            '10b': 'bg-amber-200',
+            '10c': 'bg-orange-100',
+            '10d': 'bg-yellow-200',
+            
+            // Upper grades - distinct colors
+            '11': 'bg-purple-100',
+            '12': 'bg-slate-200'
+        };
+        
+        // Check if this entry has multiple classes (comma or space separated)
+        if (cleanClassName.includes(',') || /\s+/.test(cleanClassName)) {
+            // For entries with multiple classes, use a distinctive pattern
+            return 'bg-gradient-to-r from-gray-100 to-gray-200';
+        }
+        
+        // Return the color for this class, or a default color if not found
+        return classColors[cleanClassName] || 'bg-gray-100';
+    };
+
+    // Map to keep track of used classes for each plan
+    const getClassesInPlan = (plan: SubstitutionPlan): string[] => {
+        // Extract unique class names from plan entries
+        const classesSet = new Set<string>();
+        plan.entries.forEach(entry => {
+            // Split multi-class entries (e.g. "10a, 10b" -> ["10a", "10b"])
+            const classes = entry.classes.split(/[,\s]+/).filter(Boolean);
+            classes.forEach(cls => classesSet.add(cls.trim()));
+        });
+        return Array.from(classesSet).sort((a, b) => {
+            // Sort classes: first by grade number, then by section letter
+            const gradeA = parseInt(a.match(/\d+/)?.[0] || '0');
+            const gradeB = parseInt(b.match(/\d+/)?.[0] || '0');
+            
+            if (gradeA !== gradeB) return gradeA - gradeB;
+            return a.localeCompare(b);
+        });
+    };
+
     // Function to render type cell with conditional styling
     const renderTypeCell = (type: string) => {
         if (type.toLowerCase() === "entfall" || type.toLowerCase() === "ausfall") {
@@ -169,24 +235,46 @@ const SubstitutionPlanDisplay = () => {
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {plan.entries.map((entry, entryIndex) => (
-                                        <tr key={entryIndex} className={entryIndex % 2 === 0 ? 'bg-white' : 'bg-[#F8F4E8]'}>
-                                            <td className="border border-[#E8C897] px-3 py-2">{entry.classes}</td>
-                                            <td className="border border-[#E8C897] px-3 py-2">{entry.period}</td>
-                                            <td className="border border-[#E8C897] px-3 py-2">{entry.absent}</td>
-                                            <td className="border border-[#E8C897] px-3 py-2">{entry.substitute}</td>
-                                            <td className="border border-[#E8C897] px-3 py-2">{entry.originalSubject}</td>
-                                            <td className="border border-[#E8C897] px-3 py-2">{entry.subject}</td>
-                                            <td className="border border-[#E8C897] px-3 py-2">{entry.newRoom}</td>
-                                            <td className="border border-[#E8C897] px-3 py-2">{renderTypeCell(entry.type)}</td>
-                                            <td className="border border-[#E8C897] px-3 py-2">{entry.comment}</td>
-                                        </tr>
-                                    ))}
+                                    {plan.entries.map((entry, entryIndex) => {
+                                        // Get class-specific background color
+                                        const classColor = getClassColor(entry.classes);
+                                        
+                                        return (
+                                            <tr 
+                                                key={entryIndex} 
+                                                className={`${classColor} hover:bg-opacity-80`}
+                                            >
+                                                <td className="border border-[#E8C897] px-3 py-2 font-medium">{entry.classes}</td>
+                                                <td className="border border-[#E8C897] px-3 py-2">{entry.period}</td>
+                                                <td className="border border-[#E8C897] px-3 py-2">{entry.absent}</td>
+                                                <td className="border border-[#E8C897] px-3 py-2">{entry.substitute}</td>
+                                                <td className="border border-[#E8C897] px-3 py-2">{entry.originalSubject}</td>
+                                                <td className="border border-[#E8C897] px-3 py-2">{entry.subject}</td>
+                                                <td className="border border-[#E8C897] px-3 py-2">{entry.newRoom}</td>
+                                                <td className="border border-[#E8C897] px-3 py-2">{renderTypeCell(entry.type)}</td>
+                                                <td className="border border-[#E8C897] px-3 py-2">{entry.comment}</td>
+                                            </tr>
+                                        );
+                                    })}
                                 </tbody>
                             </table>
                         </div>
                     ) : (
                         <p className="italic text-[#5A4635]">No substitutions available for this date.</p>
+                    )}
+                    
+                    {/* Add a legend for classes in this plan */}
+                    {plan.entries.length > 0 && (
+                        <div className="mt-4 flex flex-wrap gap-2">
+                            {getClassesInPlan(plan).map((className, idx) => (
+                                <div 
+                                    key={idx} 
+                                    className={`${getClassColor(className)} px-2 py-1 border border-[#E8C897] rounded text-sm`}
+                                >
+                                    {className}
+                                </div>
+                            ))}
+                        </div>
                     )}
                 </div>
             ))}
