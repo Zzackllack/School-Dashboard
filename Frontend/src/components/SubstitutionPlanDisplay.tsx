@@ -179,7 +179,7 @@ const SubstitutionPlanDisplay = () => {
             );
         }
         
-        return type;
+        return <span className="text-gray-800">{type}</span>;
     };
 
     return (
