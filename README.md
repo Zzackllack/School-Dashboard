@@ -1,7 +1,7 @@
 # 🏫 School Dashboard
 
 ![Status](https://img.shields.io/badge/status-under%20development-yellow)
-![Version](https://img.shields.io/badge/version-1.15.4-blue)
+![Version](https://img.shields.io/badge/version-1.15.5-blue)
 ![License](https://img.shields.io/badge/license-BSD%203--Clause-green)
 
 > A modern, intuitive dashboard designed originally for Goethe Gymnasium Lichterfelde (GGL) to transform the lobby information display into a comprehensive school information hub.
@@ -12,7 +12,7 @@ The School Dashboard was created to replace the outdated and clumsy substitution
 
 While developed specifically for GGL, this application is designed to be adaptable for any school using the DSBmobile system for substitution plans.
 
-![Dashboard Preview](https://kappa.lol/oVnvD7)
+![Dashboard Preview](https://kappa.lol/mMUfv5)
 
 ## ✨ Features
 
