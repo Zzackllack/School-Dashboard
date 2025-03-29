@@ -219,62 +219,62 @@ const SubstitutionPlanDisplay = () => {
                     )}
 
                     {plan.entries.length > 0 ? (
-                        <div className="overflow-x-auto w-full">
-                            <table className="min-w-full border-collapse">
-                                <thead>
-                                    <tr>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Class</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Period</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Absent</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Substitute</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Original Subject</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">New Subject</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Room</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Type</th>
-                                        <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Comments</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {plan.entries.map((entry, entryIndex) => {
-                                        // Get class-specific background color
-                                        const classColor = getClassColor(entry.classes);
-                                        
-                                        return (
-                                            <tr 
-                                                key={entryIndex} 
-                                                className={`${classColor} hover:bg-opacity-80`}
-                                            >
-                                                <td className="border border-[#E8C897] px-3 py-2 font-medium">{entry.classes}</td>
-                                                <td className="border border-[#E8C897] px-3 py-2">{entry.period}</td>
-                                                <td className="border border-[#E8C897] px-3 py-2">{entry.absent}</td>
-                                                <td className="border border-[#E8C897] px-3 py-2">{entry.substitute}</td>
-                                                <td className="border border-[#E8C897] px-3 py-2">{entry.originalSubject}</td>
-                                                <td className="border border-[#E8C897] px-3 py-2">{entry.subject}</td>
-                                                <td className="border border-[#E8C897] px-3 py-2">{entry.newRoom}</td>
-                                                <td className="border border-[#E8C897] px-3 py-2">{renderTypeCell(entry.type)}</td>
-                                                <td className="border border-[#E8C897] px-3 py-2">{entry.comment}</td>
-                                            </tr>
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
-                        </div>
+                        <>
+                            {/* Class legend - now positioned above the table */}
+                            <div className="mb-4 flex flex-wrap gap-2">
+                                {getClassesInPlan(plan).map((className, idx) => (
+                                    <div 
+                                        key={idx} 
+                                        className={`${getClassColor(className)} px-2 py-1 border border-[#E8C897] rounded text-sm`}
+                                    >
+                                        {className}
+                                    </div>
+                                ))}
+                            </div>
+                            
+                            <div className="overflow-x-auto w-full">
+                                <table className="min-w-full border-collapse">
+                                    <thead>
+                                        <tr>
+                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Class</th>
+                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Period</th>
+                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Absent</th>
+                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Substitute</th>
+                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Original Subject</th>
+                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">New Subject</th>
+                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Room</th>
+                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Type</th>
+                                            <th className="bg-[#D4A76A] text-white border border-[#E8C897] px-3 py-2 text-left">Comments</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {plan.entries.map((entry, entryIndex) => {
+                                            // Get class-specific background color
+                                            const classColor = getClassColor(entry.classes);
+                                            
+                                            return (
+                                                <tr 
+                                                    key={entryIndex} 
+                                                    className={`${classColor} hover:bg-opacity-80`}
+                                                >
+                                                    <td className="border border-[#E8C897] px-3 py-2 font-medium">{entry.classes}</td>
+                                                    <td className="border border-[#E8C897] px-3 py-2">{entry.period}</td>
+                                                    <td className="border border-[#E8C897] px-3 py-2">{entry.absent}</td>
+                                                    <td className="border border-[#E8C897] px-3 py-2">{entry.substitute}</td>
+                                                    <td className="border border-[#E8C897] px-3 py-2">{entry.originalSubject}</td>
+                                                    <td className="border border-[#E8C897] px-3 py-2">{entry.subject}</td>
+                                                    <td className="border border-[#E8C897] px-3 py-2">{entry.newRoom}</td>
+                                                    <td className="border border-[#E8C897] px-3 py-2">{renderTypeCell(entry.type)}</td>
+                                                    <td className="border border-[#E8C897] px-3 py-2">{entry.comment}</td>
+                                                </tr>
+                                            );
+                                        })}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </>
                     ) : (
                         <p className="italic text-[#5A4635]">No substitutions available for this date.</p>
-                    )}
-                    
-                    {/* Add a legend for classes in this plan */}
-                    {plan.entries.length > 0 && (
-                        <div className="mt-4 flex flex-wrap gap-2">
-                            {getClassesInPlan(plan).map((className, idx) => (
-                                <div 
-                                    key={idx} 
-                                    className={`${getClassColor(className)} px-2 py-1 border border-[#E8C897] rounded text-sm`}
-                                >
-                                    {className}
-                                </div>
-                            ))}
-                        </div>
                     )}
                 </div>
             ))}
