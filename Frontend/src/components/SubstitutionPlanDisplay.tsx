@@ -184,26 +184,29 @@ const SubstitutionPlanDisplay = () => {
     };
 
     return (
-        <div className="w-full p-4">
-            <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">
-                Substitution Plans
-                {loading && <span className="ml-2 text-sm font-normal text-gray-500">(Loading...)</span>}
-            </h2>
+        <div className="w-full">
+            <div className="bg-white rounded-lg shadow-md p-4 mb-4 w-full">
+                <h2 className="text-xl font-bold text-[#8C7356]">
+                    Substitution Plans
+                    {loading && <span className="ml-2 text-sm font-normal text-gray-500">(Loading...)</span>}
+                </h2>
 
-            {error && (
-                <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 mb-4 rounded">
-                    {error}
-                </div>
-            )}
+                {error && (
+                    <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 mb-4 rounded">
+                        {error}
+                    </div>
+                )}
 
-            {!loading && substitutionPlans.length === 0 && !error && (
-                <div className="bg-[#F5EFD7] border border-[#DDB967] text-[#8C7356] px-4 py-3 rounded">
-                    No substitution plans available at the moment.
-                </div>
-            )}
+                {!loading && substitutionPlans.length === 0 && !error && (
+                    <div className="bg-[#F5EFD7] border border-[#DDB967] text-[#8C7356] px-4 py-3 rounded">
+                        No substitution plans available at the moment.
+                    </div>
+                )}
+            </div>
 
+            {/* Each day gets its own container */}
             {substitutionPlans.map((plan, planIndex) => (
-                <div key={planIndex} className="mb-8 w-full">
+                <div key={planIndex} className="bg-white rounded-lg shadow-md p-4 mb-4 w-full">
                     <h3 className="text-lg font-semibold mb-2 text-[#3E3128]">
                         {formatDate(plan.date)}
                     </h3>
@@ -223,7 +226,7 @@ const SubstitutionPlanDisplay = () => {
 
                     {plan.entries.length > 0 ? (
                         <>
-                            {/* Class legend - now positioned above the table */}
+                            {/* Class legend */}
                             <div className="mb-4 flex flex-wrap gap-2">
                                 {getClassesInPlan(plan).map((className, idx) => (
                                     <div 
