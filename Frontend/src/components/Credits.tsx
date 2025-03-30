@@ -9,7 +9,7 @@ const Credits = () => {
       <div className="flex flex-col items-center justify-center gap-4">
         <div className="text-center">
           <p className="text-[#3E3128] mb-2">
-            Dieses Dashboard wurde mit Liebe von <strong>Cédric</strong> und mithilfe des Informatik Leistungskurses gemacht
+            Dieses Dashboard wurde mit ♥️ von <strong>Cédric</strong> und mithilfe des Informatik Leistungskurses gemacht
           </p>
         </div>
         
