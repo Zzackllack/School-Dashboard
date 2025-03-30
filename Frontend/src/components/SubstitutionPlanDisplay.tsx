@@ -179,7 +179,7 @@ const SubstitutionPlanDisplay = () => {
             );
         }
 
-        if (type.toLowerCase() === "veranst." || type.toLowerCase().includes("veranstaltung") || type.toLowerCase().includes("belehrung")) {
+        if (type.toLowerCase() === "veranst." || type.toLowerCase().includes("veranstaltung")){
             return (
                 <div className="flex items-center text-purple-600 font-medium">
                     <Calendar size={16} className="mr-1" />
@@ -288,7 +288,7 @@ const SubstitutionPlanDisplay = () => {
                                                     <td className="border-b border-gray-100/30 px-4 py-3">{entry.subject}</td>
                                                     <td className="border-b border-gray-100/30 px-4 py-3">{entry.newRoom}</td>
                                                     <td className="border-b border-gray-100/30 px-4 py-3">{renderTypeCell(entry.type)}</td>
-                                                    <td className="border-b border-gray-100/30 px-4 py-3">{entry.comment}</td>
+                                                    <td className="border-b border-gray-100/30 px-4 py-3 italic">{entry.comment}</td>
                                                 </tr>
                                             );
                                         })}
