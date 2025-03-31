@@ -89,7 +89,7 @@ const Weather = () => {
         setError(null);
       } catch (err) {
         console.error('Failed to fetch weather data:', err);
-        setError('Failed to load weather data. Please try again later.');
+        setError('Fehler beim laden der Wetterdaten, versuche es später erneut oder kontaktiere Cédric.');
       } finally {
         setLoading(false);
       }
@@ -154,43 +154,43 @@ const Weather = () => {
     }
   };
 
-  // Function to get weather condition text based on weather code
+  // Function to get weather condition text based on weather code in German
   const getWeatherCondition = (code: number): string => {
     switch (true) {
       case code === 0:
-        return 'Clear sky';
+        return 'Klarer Himmel';
       case code === 1:
-        return 'Mainly clear';
+        return 'Überwiegend klar';
       case code === 2:
-        return 'Partly cloudy';
+        return 'Teilweise bewölkt';
       case code === 3:
-        return 'Overcast';
+        return 'Bedeckt';
       case [45, 48].includes(code):
-        return 'Fog';
+        return 'Nebel';
       case [51, 53, 55].includes(code):
-        return 'Drizzle';
+        return 'Nieselregen';
       case [61, 63, 65].includes(code):
-        return 'Rain';
+        return 'Regen';
       case [80, 81, 82].includes(code):
-        return 'Rain showers';
+        return 'Regenschauer';
       case [71, 73, 75].includes(code):
-        return 'Snow fall';
+        return 'Schneefall';
       case [85, 86].includes(code):
-        return 'Snow showers';
+        return 'Schneeschauer';
       case [95, 96, 99].includes(code):
-        return 'Thunderstorm';
+        return 'Gewitter';
       default:
-        return 'Unknown';
+        return 'Unbekannt';
     }
   };
 
-  // Format date to day name (Today, Tomorrow, or day of week)
+  // Format date to day name (Heute, Morgen, or day of week)
   const formatDay = (dateString: string, index: number): string => {
-    if (index === 0) return 'Today';
-    if (index === 1) return 'Tomorrow';
+    if (index === 0) return 'Heute';
+    if (index === 1) return 'Morgen';
     
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { weekday: 'short' });
+    return date.toLocaleDateString('de-DE', { weekday: 'short' });
   };
 
   // Get current humidity from hourly data
@@ -285,19 +285,19 @@ const Weather = () => {
     return dailyTotals;
   };
 
-  // Format precipitation display
+  // Format precipitation display in German
   const formatPrecipitation = (amount: number): string => {
-    if (amount === 0) return "None";
-    if (amount < 0.1) return "Trace";
+    if (amount === 0) return "Kein";
+    if (amount <= 0.3) return "Minimal";
     return `${amount.toFixed(1)} mm`;
   };
 
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
-        <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">Weather</h2>
+        <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">Wetter</h2>
         <div className="flex justify-center items-center h-40">
-          <p>Loading weather data...</p>
+          <p>Wetterdaten werden geladen...</p>
         </div>
       </div>
     );
@@ -306,9 +306,9 @@ const Weather = () => {
   if (error || !weatherData) {
     return (
       <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
-        <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">Weather</h2>
+        <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">Wetter</h2>
         <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 rounded">
-          {error || 'Failed to load weather data'}
+          {error || 'Wetterdaten konnten nicht geladen werden'}
         </div>
       </div>
     );
@@ -321,7 +321,7 @@ const Weather = () => {
   
   return (
     <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
-      <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">Weather</h2>
+      <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">Wetter</h2>
       <div className="mb-4">
         <div className="text-lg font-bold text-[#3E3128]">Berlin</div>
         <div className="flex justify-center items-center my-2">
@@ -336,12 +336,12 @@ const Weather = () => {
           {getWeatherCondition(weatherData.current_weather.weathercode)}
         </div>
         <div className="flex justify-around text-[#5A4635] text-sm mb-2">
-          <div>Humidity: {getCurrentHumidity()}%</div>
+          <div>Luftfeuchtigkeit: {getCurrentHumidity()}%</div>
           <div>Wind: {Math.round(weatherData.current_weather.windspeed)} km/h</div>
         </div>
         <div className="text-[#5A4635] text-sm">
           <div className="flex items-center justify-center">
-            <span className="mr-1">Precipitation:</span>
+            <span className="mr-1">Niederschlag:</span>
             <span className={currentPrecipitation > 0 ? "text-[#8C7356] font-medium" : ""}>
               {formatPrecipitation(currentPrecipitation)}
             </span>

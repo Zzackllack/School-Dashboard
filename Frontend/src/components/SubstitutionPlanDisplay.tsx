@@ -44,7 +44,7 @@ const SubstitutionPlanDisplay = () => {
                 setError(null);
             } catch (err) {
                 console.error('Failed to fetch substitution plans:', err);
-                setError('Failed to load substitution plans.');
+                setError('Vertretungspläne konnten nicht geladen werden. Bitte versuche es später erneut, oder kontaktiere Cédric.');
             } finally {
                 setLoading(false);
             }
@@ -204,7 +204,7 @@ const SubstitutionPlanDisplay = () => {
         <div className="w-full">
             <div className="bg-white/90 backdrop-blur-md rounded-xl shadow-lg border border-white/20 p-5 mb-5 w-full transition-all duration-300">
                 <h2 className="text-2xl font-bold text-gray-800">
-                    Substitution Plans
+                    Vertretungspläne
                     {loading && <span className="ml-2 text-sm font-normal text-gray-500">(Loading...)</span>}
                 </h2>
 
@@ -216,7 +216,7 @@ const SubstitutionPlanDisplay = () => {
 
                 {!loading && substitutionPlans.length === 0 && !error && (
                     <div className="bg-[#F5EFD7] border border-[#DDB967] text-[#8C7356] px-4 py-3 rounded">
-                        No substitution plans available at the moment.
+                        Keine Vertretungspläne verfügbar.
                     </div>
                 )}
             </div>
@@ -259,15 +259,15 @@ const SubstitutionPlanDisplay = () => {
                                 <table className="min-w-full border-collapse">
                                     <thead>
                                         <tr>
-                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left rounded-tl-lg">Class</th>
-                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Period</th>
-                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Absent</th>
-                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Substitute</th>
-                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Original Subject</th>
-                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">New Subject</th>
-                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Room</th>
-                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Type</th>
-                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left rounded-tr-lg">Comments</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left rounded-tl-lg">Klasse</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Stunde</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Fehlenend</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Vertreter</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Originales Fach</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Neues Fach</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Raum</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Typ</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left rounded-tr-lg">Kommentare</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -297,7 +297,7 @@ const SubstitutionPlanDisplay = () => {
                             </div>
                         </>
                     ) : (
-                        <p className="italic text-gray-500">No substitutions available for this date.</p>
+                        <p className="italic text-gray-500">Keine Vertretungen für dieses Datum verfügbar.</p>
                     )}
                 </div>
             ))}

@@ -56,8 +56,8 @@ const App = () => {
       </main>
       
       <footer className="bg-gray-800/80 backdrop-blur-md text-white py-3 px-6 text-center text-sm border-t border-white/10">
-        <p>© {new Date().getFullYear()} School Dashboard | GGL</p>
-        <p>Last updated: {currentTime.toLocaleString()}</p>
+        <p>© {new Date().getFullYear()} Schul Dashboard | GGL</p>
+        <p>Stand: {currentTime.toLocaleString()}</p>
       </footer>
     </div>
   );
