@@ -5,6 +5,7 @@ import Clock from './components/Clock';
 import SubstitutionPlanDisplay from './components/SubstitutionPlanDisplay';
 import Credits from './components/Credits';
 import useAutoScroll from './hooks/useAutoScroll';
+import schoolLogo from './assets/Goethe-Logo.webp'; // Import the school logo
 
 const App = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -30,8 +31,14 @@ const App = () => {
 
   return (
     <div className="flex flex-col min-h-screen w-full bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
-      <header className="bg-gray-800/80 backdrop-blur-md text-white px-6 py-4 flex justify-between items-center shadow-lg border-b border-white/10">
-        <h1 className="text-2xl font-bold text-center w-full">Goethe Gymnasium Lichterfelde</h1>
+      <header className="bg-gray-800/80 backdrop-blur-md text-white px-6 py-2 flex justify-between items-center shadow-lg border-b border-white/10">
+        <div className="flex items-center">
+          <img 
+            src={schoolLogo} 
+            alt="Goethe Gymnasium Lichterfelde Logo" 
+            className="h-16 mr-4"
+          />
+        </div>
         <Clock currentTime={currentTime} />
       </header>
       
