@@ -6,6 +6,7 @@ import SubstitutionPlanDisplay from './components/SubstitutionPlanDisplay';
 import Credits from './components/Credits';
 import useAutoScroll from './hooks/useAutoScroll';
 import schoolLogo from './assets/Goethe-Logo.webp'; // Import the school logo
+import Holidays from './components/Holidays';
 
 const App = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
@@ -51,6 +52,7 @@ const App = () => {
             <Weather />
             <Transportation />
             <Credits />
+            <Holidays />
           </div>
         </div>
       </main>
