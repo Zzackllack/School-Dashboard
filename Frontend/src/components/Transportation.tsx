@@ -250,6 +250,9 @@ const Transportation = () => {
       );
     }
 
+    // Show only the next 4 departures
+    const limitedDepartures = departures.slice(0, 4);
+
     return (
       <div className="w-full mb-6">
         <h3 className="text-lg font-semibold text-[#3E3128] mb-2">{title}</h3>
@@ -274,7 +277,7 @@ const Transportation = () => {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {departures.map((departure, index) => (
+              {limitedDepartures.map((departure, index) => (
                 <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-[#F8F4E8]'}>
                   <td className="px-4 py-3">
                     <span className={`inline-flex items-center justify-center h-6 w-12 rounded-md 
