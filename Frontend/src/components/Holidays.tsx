@@ -75,8 +75,11 @@ const Holidays = () => {
   
   // Format holiday name to be more user-friendly
   const formatHolidayName = (name: string) => {
+    // Remove location information if present (like "berlin" at the end)
+    const formattedName = name.replace(/\s+berlin$/i, '').trim();
+    
     // Convert the first letter to uppercase and the rest remains lowercase
-    return name.charAt(0).toUpperCase() + name.slice(1).toLowerCase();
+    return formattedName.charAt(0).toUpperCase() + formattedName.slice(1).toLowerCase();
   };
   
   // Calculate days until holiday starts
@@ -132,7 +135,7 @@ const Holidays = () => {
               <Calendar size={24} className={`mr-3 mt-1 ${index === 0 ? 'text-[#8C7356]' : 'text-gray-400'}`} />
               <div>
                 <h3 className="font-semibold text-[#3E3128]">
-                  {formatHolidayName(holiday.name)} {holiday.year}
+                  {formatHolidayName(holiday.name)}
                 </h3>
                 <p className="text-[#5A4635]">
                   {formatDate(holiday.start)} - {formatDate(holiday.end)}
@@ -147,7 +150,7 @@ const Holidays = () => {
       </div>
       
       <div className="mt-4 text-xs text-[#5A4635] text-right">
-        <p>Daten bereitgestellt von ferien-api.de</p>
+        <p>Es wird keine Haftung für die Richtigkeit übernommen, Daten bereitgestellt von <code>ferien-api.de</code></p>
       </div>
     </div>
   );

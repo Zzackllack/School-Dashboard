@@ -332,7 +332,7 @@ const Transportation = () => {
       </div>
       
       <div className="mt-4 text-xs text-[#5A4635]">
-        <p>Daten bereitgestellt von <code>v6.bvg.transport.rest</code> - Zuletzt aktualisiert: {lastUpdated.toLocaleTimeString()}</p>
+        <p>Es wird keine Haftung für die Richtigkeit übernommen, Daten bereitgestellt von <code>v6.bvg.transport.rest</code> - Zuletzt aktualisiert: {lastUpdated.toLocaleTimeString()}</p>
       </div>
     </div>
   );

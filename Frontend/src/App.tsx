@@ -51,8 +51,8 @@ const App = () => {
           <div className="lg:w-1/4 flex flex-col gap-5">
             <Weather />
             <Transportation />
-            <Credits />
             <Holidays />
+            <Credits />
           </div>
         </div>
       </main>
