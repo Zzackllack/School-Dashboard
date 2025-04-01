@@ -13,7 +13,7 @@ const App = () => {
   
   // Initialize auto-scrolling with 5 second pauses
   // baseScrollSpeed is pixels per second (80px/s means it takes 12.5 seconds to scroll 1000px)
-  useAutoScroll(3500, 80);
+  useAutoScroll(5, 80);
 
   useEffect(() => {
     const timer = setInterval(() => {
