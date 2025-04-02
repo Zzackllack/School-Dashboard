@@ -1,0 +1,736 @@
+{
+  "2025": [
+    {
+      "name": "Neujahr",
+      "start": "2025-01-01",
+      "end": "2025-01-01",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Winterferien",
+      "start": "2025-02-03",
+      "end": "2025-02-08",
+      "type": "Ferien"
+    },
+    {
+      "name": "Internationaler Frauentag",
+      "start": "2025-03-08",
+      "end": "2025-03-08",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Osterferien",
+      "start": "2025-04-14",
+      "end": "2025-04-25",
+      "type": "Ferien"
+    },
+    {
+      "name": "Karfreitag",
+      "start": "2025-04-18",
+      "end": "2025-04-18",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Ostermontag",
+      "start": "2025-04-21",
+      "end": "2025-04-21",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Unterrichtsfreier Tag (Brückentag zu 1. Mai)",
+      "start": "2025-04-30",
+      "end": "2025-04-30",
+      "type": "unterrichtsfrei"
+    },
+    {
+      "name": "Tag der Arbeit",
+      "start": "2025-05-01",
+      "end": "2025-05-01",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Unterrichtsfreier Tag (Brückentag zu 1. Mai)",
+      "start": "2025-05-02",
+      "end": "2025-05-02",
+      "type": "unterrichtsfrei"
+    },
+    {
+      "name": "Unterrichtsfreier Tag (Brückentag zu 1. Mai)",
+      "start": "2025-05-05",
+      "end": "2025-05-05",
+      "type": "unterrichtsfrei"
+    },
+    {
+      "name": "80. Jahrestag der Befreiung (einmalig)",
+      "start": "2025-05-08",
+      "end": "2025-05-08",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Christi Himmelfahrt",
+      "start": "2025-05-29",
+      "end": "2025-05-29",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Unterrichtsfreier Tag (Brückentag zu Himmelfahrt)",
+      "start": "2025-05-30",
+      "end": "2025-05-30",
+      "type": "unterrichtsfrei"
+    },
+    {
+      "name": "Pfingstmontag",
+      "start": "2025-06-09",
+      "end": "2025-06-09",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Pfingstferien",
+      "start": "2025-06-10",
+      "end": "2025-06-10",
+      "type": "Ferien"
+    },
+    {
+      "name": "Sommerferien",
+      "start": "2025-07-24",
+      "end": "2025-09-06",
+      "type": "Ferien"
+    },
+    {
+      "name": "Tag der Deutschen Einheit",
+      "start": "2025-10-03",
+      "end": "2025-10-03",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Herbstferien",
+      "start": "2025-10-20",
+      "end": "2025-11-01",
+      "type": "Ferien"
+    },
+    {
+      "name": "Weihnachtsferien",
+      "start": "2025-12-22",
+      "end": "2026-01-02",
+      "type": "Ferien"
+    },
+    {
+      "name": "1. Weihnachtsfeiertag",
+      "start": "2025-12-25",
+      "end": "2025-12-25",
+      "type": "Feiertag"
+    },
+    {
+      "name": "2. Weihnachtsfeiertag",
+      "start": "2025-12-26",
+      "end": "2025-12-26",
+      "type": "Feiertag"
+    }
+  ],
+  "2026": [
+    {
+      "name": "Neujahr",
+      "start": "2026-01-01",
+      "end": "2026-01-01",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Winterferien",
+      "start": "2026-02-02",
+      "end": "2026-02-07",
+      "type": "Ferien"
+    },
+    {
+      "name": "Internationaler Frauentag",
+      "start": "2026-03-08",
+      "end": "2026-03-08",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Karfreitag",
+      "start": "2026-04-03",
+      "end": "2026-04-03",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Ostermontag",
+      "start": "2026-04-06",
+      "end": "2026-04-06",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Osterferien",
+      "start": "2026-03-30",
+      "end": "2026-04-10",
+      "type": "Ferien"
+    },
+    {
+      "name": "Tag der Arbeit",
+      "start": "2026-05-01",
+      "end": "2026-05-01",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Christi Himmelfahrt",
+      "start": "2026-05-14",
+      "end": "2026-05-14",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Unterrichtsfreier Tag (Brückentag zu Himmelfahrt)",
+      "start": "2026-05-15",
+      "end": "2026-05-15",
+      "type": "unterrichtsfrei"
+    },
+    {
+      "name": "Pfingstmontag",
+      "start": "2026-05-25",
+      "end": "2026-05-25",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Pfingstferien",
+      "start": "2026-05-26",
+      "end": "2026-05-26",
+      "type": "Ferien"
+    },
+    {
+      "name": "Tag der Deutschen Einheit",
+      "start": "2026-10-03",
+      "end": "2026-10-03",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Herbstferien",
+      "start": "2026-10-19",
+      "end": "2026-10-31",
+      "type": "Ferien"
+    },
+    {
+      "name": "Weihnachtsferien",
+      "start": "2026-12-23",
+      "end": "2027-01-02",
+      "type": "Ferien"
+    },
+    {
+      "name": "1. Weihnachtsfeiertag",
+      "start": "2026-12-25",
+      "end": "2026-12-25",
+      "type": "Feiertag"
+    },
+    {
+      "name": "2. Weihnachtsfeiertag",
+      "start": "2026-12-26",
+      "end": "2026-12-26",
+      "type": "Feiertag"
+    }
+  ],
+  "2027": [
+    {
+      "name": "Neujahr",
+      "start": "2027-01-01",
+      "end": "2027-01-01",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Winterferien",
+      "start": "2027-02-01",
+      "end": "2027-02-06",
+      "type": "Ferien"
+    },
+    {
+      "name": "Internationaler Frauentag",
+      "start": "2027-03-08",
+      "end": "2027-03-08",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Karfreitag",
+      "start": "2027-03-26",
+      "end": "2027-03-26",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Ostermontag",
+      "start": "2027-03-29",
+      "end": "2027-03-29",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Osterferien",
+      "start": "2027-03-22",
+      "end": "2027-04-02",
+      "type": "Ferien"
+    },
+    {
+      "name": "Tag der Arbeit",
+      "start": "2027-05-01",
+      "end": "2027-05-01",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Christi Himmelfahrt",
+      "start": "2027-05-06",
+      "end": "2027-05-06",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Unterrichtsfreier Tag (Brückentag zu Himmelfahrt)",
+      "start": "2027-05-07",
+      "end": "2027-05-07",
+      "type": "unterrichtsfrei"
+    },
+    {
+      "name": "Pfingstmontag",
+      "start": "2027-05-17",
+      "end": "2027-05-17",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Pfingstferien",
+      "start": "2027-05-18",
+      "end": "2027-05-19",
+      "type": "Ferien"
+    },
+    {
+      "name": "Tag der Deutschen Einheit",
+      "start": "2027-10-03",
+      "end": "2027-10-03",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Herbstferien",
+      "start": "2027-10-11",
+      "end": "2027-10-23",
+      "type": "Ferien"
+    },
+    {
+      "name": "Weihnachtsferien",
+      "start": "2027-12-22",
+      "end": "2027-12-31",
+      "type": "Ferien"
+    },
+    {
+      "name": "1. Weihnachtsfeiertag",
+      "start": "2027-12-25",
+      "end": "2027-12-25",
+      "type": "Feiertag"
+    },
+    {
+      "name": "2. Weihnachtsfeiertag",
+      "start": "2027-12-26",
+      "end": "2027-12-26",
+      "type": "Feiertag"
+    }
+  ],
+  "2028": [
+    {
+      "name": "Neujahr",
+      "start": "2028-01-01",
+      "end": "2028-01-01",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Winterferien",
+      "start": "2028-01-31",
+      "end": "2028-02-05",
+      "type": "Ferien"
+    },
+    {
+      "name": "Internationaler Frauentag",
+      "start": "2028-03-08",
+      "end": "2028-03-08",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Karfreitag",
+      "start": "2028-04-14",
+      "end": "2028-04-14",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Ostermontag",
+      "start": "2028-04-17",
+      "end": "2028-04-17",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Osterferien",
+      "start": "2028-04-10",
+      "end": "2028-04-22",
+      "type": "Ferien"
+    },
+    {
+      "name": "Tag der Arbeit",
+      "start": "2028-05-01",
+      "end": "2028-05-01",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Christi Himmelfahrt",
+      "start": "2028-05-25",
+      "end": "2028-05-25",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Unterrichtsfreier Tag (Brückentag zu Himmelfahrt)",
+      "start": "2028-05-26",
+      "end": "2028-05-26",
+      "type": "unterrichtsfrei"
+    },
+    {
+      "name": "Pfingstmontag",
+      "start": "2028-06-05",
+      "end": "2028-06-05",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Pfingstferien",
+      "start": "2028-06-01",
+      "end": "2028-06-02",
+      "type": "Ferien"
+    },
+    {
+      "name": "75. Jahrestag des Volksaufstandes (einmalig)",
+      "start": "2028-06-17",
+      "end": "2028-06-17",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Tag der Deutschen Einheit",
+      "start": "2028-10-03",
+      "end": "2028-10-03",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Herbstferien",
+      "start": "2028-10-02",
+      "end": "2028-10-14",
+      "type": "Ferien"
+    },
+    {
+      "name": "Weihnachtsferien",
+      "start": "2028-12-22",
+      "end": "2029-01-02",
+      "type": "Ferien"
+    },
+    {
+      "name": "1. Weihnachtsfeiertag",
+      "start": "2028-12-25",
+      "end": "2028-12-25",
+      "type": "Feiertag"
+    },
+    {
+      "name": "2. Weihnachtsfeiertag",
+      "start": "2028-12-26",
+      "end": "2028-12-26",
+      "type": "Feiertag"
+    }
+  ],
+  "2029": [
+    {
+      "name": "Neujahr",
+      "start": "2029-01-01",
+      "end": "2029-01-01",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Winterferien",
+      "start": "2029-01-29",
+      "end": "2029-02-03",
+      "type": "Ferien"
+    },
+    {
+      "name": "Internationaler Frauentag",
+      "start": "2029-03-08",
+      "end": "2029-03-08",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Unterrichtsfreier Tag (vorgeschaltet zum Frauentag)",
+      "start": "2029-03-07",
+      "end": "2029-03-07",
+      "type": "unterrichtsfrei"
+    },
+    {
+      "name": "Unterrichtsfreier Tag (nach Frauentag)",
+      "start": "2029-03-09",
+      "end": "2029-03-09",
+      "type": "unterrichtsfrei"
+    },
+    {
+      "name": "Unterrichtsfreier Tag (verlängert Frauentag-Wochenende)",
+      "start": "2029-03-12",
+      "end": "2029-03-12",
+      "type": "unterrichtsfrei"
+    },
+    {
+      "name": "Karfreitag",
+      "start": "2029-03-30",
+      "end": "2029-03-30",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Ostermontag",
+      "start": "2029-04-02",
+      "end": "2029-04-02",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Osterferien",
+      "start": "2029-03-26",
+      "end": "2029-04-06",
+      "type": "Ferien"
+    },
+    {
+      "name": "Unterrichtsfreier Tag (Brückentag zu 1. Mai)",
+      "start": "2029-04-27",
+      "end": "2029-04-27",
+      "type": "unterrichtsfrei"
+    },
+    {
+      "name": "Tag der Arbeit",
+      "start": "2029-05-01",
+      "end": "2029-05-01",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Unterrichtsfreier Tag (Brückentag zu 1. Mai)",
+      "start": "2029-04-30",
+      "end": "2029-04-30",
+      "type": "unterrichtsfrei"
+    },
+    {
+      "name": "Unterrichtsfreier Tag (Brückentag zu 1. Mai)",
+      "start": "2029-05-02",
+      "end": "2029-05-02",
+      "type": "unterrichtsfrei"
+    },
+    {
+      "name": "Christi Himmelfahrt",
+      "start": "2029-05-10",
+      "end": "2029-05-10",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Unterrichtsfreier Tag (Brückentag zu Himmelfahrt)",
+      "start": "2029-05-11",
+      "end": "2029-05-11",
+      "type": "unterrichtsfrei"
+    },
+    {
+      "name": "Pfingstmontag",
+      "start": "2029-05-21",
+      "end": "2029-05-21",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Pfingstferien",
+      "start": "2029-05-22",
+      "end": "2029-05-25",
+      "type": "Ferien"
+    },
+    {
+      "name": "Sommerferien",
+      "start": "2029-07-01",
+      "end": "2029-08-11",
+      "type": "Ferien"
+    },
+    {
+      "name": "Tag der Deutschen Einheit",
+      "start": "2029-10-03",
+      "end": "2029-10-03",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Herbstferien",
+      "start": "2029-10-01",
+      "end": "2029-10-12",
+      "type": "Ferien"
+    },
+    {
+      "name": "Weihnachtsferien",
+      "start": "2029-12-21",
+      "end": "2030-01-04",
+      "type": "Ferien"
+    },
+    {
+      "name": "1. Weihnachtsfeiertag",
+      "start": "2029-12-25",
+      "end": "2029-12-25",
+      "type": "Feiertag"
+    },
+    {
+      "name": "2. Weihnachtsfeiertag",
+      "start": "2029-12-26",
+      "end": "2029-12-26",
+      "type": "Feiertag"
+    }
+  ],
+  "2030": [
+    {
+      "name": "Neujahr",
+      "start": "2030-01-01",
+      "end": "2030-01-01",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Winterferien",
+      "start": "2030-02-04",
+      "end": "2030-02-09",
+      "type": "Ferien"
+    },
+    {
+      "name": "Internationaler Frauentag",
+      "start": "2030-03-08",
+      "end": "2030-03-08",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Karfreitag",
+      "start": "2030-04-19",
+      "end": "2030-04-19",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Ostermontag",
+      "start": "2030-04-22",
+      "end": "2030-04-22",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Osterferien",
+      "start": "2030-04-15",
+      "end": "2030-04-26",
+      "type": "Ferien"
+    },
+    {
+      "name": "Tag der Arbeit",
+      "start": "2030-05-01",
+      "end": "2030-05-01",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Christi Himmelfahrt",
+      "start": "2030-05-30",
+      "end": "2030-05-30",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Unterrichtsfreier Tag (Brückentag zu Himmelfahrt)",
+      "start": "2030-05-31",
+      "end": "2030-05-31",
+      "type": "unterrichtsfrei"
+    },
+    {
+      "name": "Pfingstferien",
+      "start": "2030-06-07",
+      "end": "2030-06-07",
+      "type": "Ferien"
+    },
+    {
+      "name": "Pfingstmontag",
+      "start": "2030-06-10",
+      "end": "2030-06-10",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Sommerferien",
+      "start": "2030-07-04",
+      "end": "2030-08-17",
+      "type": "Ferien"
+    },
+    {
+      "name": "Tag der Deutschen Einheit",
+      "start": "2030-10-03",
+      "end": "2030-10-03",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Herbstferien",
+      "start": "",
+      "end": "",
+      "type": "Ferien"
+    },
+    {
+      "name": "Weihnachtsferien",
+      "start": "",
+      "end": "",
+      "type": "Ferien"
+    },
+    {
+      "name": "1. Weihnachtsfeiertag",
+      "start": "2030-12-25",
+      "end": "2030-12-25",
+      "type": "Feiertag"
+    },
+    {
+      "name": "2. Weihnachtsfeiertag",
+      "start": "2030-12-26",
+      "end": "2030-12-26",
+      "type": "Feiertag"
+    }
+  ],
+  "2031": [
+    {
+      "name": "Neujahr",
+      "start": "2031-01-01",
+      "end": "2031-01-01",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Internationaler Frauentag",
+      "start": "2031-03-08",
+      "end": "2031-03-08",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Karfreitag",
+      "start": "2031-04-11",
+      "end": "2031-04-11",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Ostermontag",
+      "start": "2031-04-14",
+      "end": "2031-04-14",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Tag der Arbeit",
+      "start": "2031-05-01",
+      "end": "2031-05-01",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Christi Himmelfahrt",
+      "start": "2031-05-22",
+      "end": "2031-05-22",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Pfingstmontag",
+      "start": "2031-06-02",
+      "end": "2031-06-02",
+      "type": "Feiertag"
+    },
+    {
+      "name": "Tag der Deutschen Einheit",
+      "start": "2031-10-03",
+      "end": "2031-10-03",
+      "type": "Feiertag"
+    },
+    {
+      "name": "1. Weihnachtsfeiertag",
+      "start": "2031-12-25",
+      "end": "2031-12-25",
+      "type": "Feiertag"
+    },
+    {
+      "name": "2. Weihnachtsfeiertag",
+      "start": "2031-12-26",
+      "end": "2031-12-26",
+      "type": "Feiertag"
+    }
+  ]
+}
