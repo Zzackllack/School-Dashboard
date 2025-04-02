@@ -12,6 +12,7 @@ Backend/src/main/resources/application.properties
 der-andere-fotograf_JOB00841_x_P1128956_Original.JPEG
 IMG_0380.JPEG
 Frontend/src/components/Credits.tsx
+Schuljahreskalender.ics
 
 # Ignore IDE specific files
 .vscode/
@@ -20,9 +21,6 @@ Frontend/src/components/Credits.tsx
 
 # Ignore context files for AI models
 Context/
-ImplementJavaBackend.md
-ImplementJavaBackendReadMe.md
-ImplementJavaBackendAnalyize.html
 
 # Logs
 logs

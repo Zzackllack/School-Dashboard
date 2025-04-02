@@ -225,7 +225,7 @@ const SubstitutionPlanDisplay = () => {
 
                 {!loading && substitutionPlans.length === 0 && !error && (
                     <div className="bg-[#F5EFD7] border border-[#DDB967] text-[#8C7356] px-4 py-3 rounded">
-                        Keine Vertretungspläne verfügbar.
+                        Keine Vertretungspläne verfügbar. Ist DSBmobile offline oder hat DSBMobile ihre API geändert?
                     </div>
                 )}
             </div>

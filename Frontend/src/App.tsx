@@ -4,15 +4,15 @@ import Transportation from './components/Transportation';
 import Clock from './components/Clock';
 import SubstitutionPlanDisplay from './components/SubstitutionPlanDisplay';
 import Credits from './components/Credits';
-import useAutoScroll from './hooks/useAutoScroll';
-import schoolLogo from './assets/Goethe-Logo.webp'; // Import the school logo
 import Holidays from './components/Holidays';
+import CalendarEvents from './components/CalendarEvents'; // Import the new component
+import useAutoScroll from './hooks/useAutoScroll';
+import schoolLogo from './assets/Goethe-Logo.webp';
 
 const App = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   
   // Initialize auto-scrolling with 5 second pauses
-  // baseScrollSpeed is pixels per second (80px/s means it takes 12.5 seconds to scroll 1000px)
   useAutoScroll(5, 80);
 
   useEffect(() => {
@@ -51,6 +51,7 @@ const App = () => {
           <div className="lg:w-1/4 flex flex-col gap-5">
             <Weather />
             <Transportation />
+            <CalendarEvents />
             <Holidays />
             <Credits />
           </div>

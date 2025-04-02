@@ -192,6 +192,10 @@ const Holidays = () => {
           </div>
         ))}
       </div>
+      
+      <div className="mt-4 text-xs text-[#5A4635] text-right">
+        <p>Es wird keine Haftung für die Richtigkeit übernommen. Daten bereitgestellt von der Senatsverwaltung für Bildung, Jugend und Familie Berlin.</p>
+      </div>
     </div>
   );
 };
