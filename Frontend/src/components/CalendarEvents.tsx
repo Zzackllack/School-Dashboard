@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Calendar, Clock } from 'lucide-react';
-import ICAL from 'ical.js'; // You'll need to install this: npm install ical.js
+import ICAL from 'ical.js'; 
 
 interface CalendarEvent {
   summary: string;

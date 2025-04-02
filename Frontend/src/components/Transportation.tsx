@@ -91,7 +91,7 @@ const Transportation = () => {
       setError(null);
     } catch (err) {
       console.error('Failed to fetch departures:', err);
-      setError('Failed to load departures. Please try again later.');
+      setError('Problem beim Laden der Abfahrten. Bitte später erneut versuchen, oder Cédric kontaktieren.');
     } finally {
       setIsLoadingDepartures(false);
     }

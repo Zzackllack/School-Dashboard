@@ -372,6 +372,9 @@ const Weather = () => {
           </div>
         ))}
       </div>
+      <p className="text-xs text-gray-500 mt-4">
+        Es wird keine Haftung für die Richtigkeit übernommen, Wetterdaten von <code>Open-Meteo</code>.
+      </p>
     </div>
   );
 };
