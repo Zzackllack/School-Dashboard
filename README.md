@@ -12,8 +12,38 @@ The School Dashboard was created to replace the outdated and clumsy substitution
 
 While developed specifically for GGL, this application is designed to be adaptable for any school using the DSBmobile system for substitution plans.
 
-![Dashboard Preview](https://kappa.lol/mMUfv5)
+---
 
+## 📸 Screenshots
+
+<div align="center">
+  <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px;">
+    <div style="flex-basis: 100%;">
+      <h3>Overview</h3>
+      <img src="https://kappa.lol/VeqG8o" alt="Dashboard Preview" style="max-width: 100%; height: auto;">
+    </div>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0px;">
+    <div style="flex-basis: 25%;">
+      <h3>Holiday Module</h3>
+      <img src="https://kappa.lol/sDf_cE" alt="Transportation Preview" style="max-width: 100%; height: auto;">
+    </div>
+    <div style="flex-basis: 25%;">
+      <h3>Calendar Module</h3>
+      <img src="https://kappa.lol/mRVurJ" alt="Calendar Preview" style="max-width: 100%; height: auto;">
+    </div>
+    <div style="flex-basis: 25%;">
+      <h3>Transportation Module</h3>
+      <img src="https://kappa.lol/rl0-yq" alt="Holiday Preview" style="max-width: 100%; height: auto;">
+    </div>
+    <div style="flex-basis: 25%;">
+      <h3>Weather Module</h3>
+      <img src="https://kappa.lol/941Ejj" alt="Weather Preview" style="max-width: 100%; height: auto;">
+    </div>
+  </div>
+</div>
+
+---
 ## ✨ Features
 
 ### Current Features
@@ -43,7 +73,7 @@ While developed specifically for GGL, this application is designed to be adaptab
   - Important dates and deadlines
   - Integration of any iCal calendar
 
-  - **🏖️ Upcoming Holiday display**
+- **🏖️ Upcoming Holiday display**
   - Display of upcoming holidays for Berlin
   - Data provided by "Senatsverwaltung für Bildung, Jugend und Familie Berlin"
 
@@ -60,6 +90,8 @@ While developed specifically for GGL, this application is designed to be adaptab
 - **🎨 Customizable Themes**
   - Light/dark mode toggle
   - School color integration
+
+---
 
 ## 🛠️ Technical Implementation
 
@@ -96,6 +128,8 @@ Working with DSBmobile has been an exercise in frustration due to heinekingmedia
 - **Artificial Barriers**: Simple data that should be easily accessible is obscured behind proprietary interfaces
 
 This opacity has forced us to rely on reverse-engineered solutions, creating unnecessary technical debt and development delays for what should be a straightforward integration.
+
+---
 
 ## 🚀 Getting Started
 
@@ -146,24 +180,24 @@ This opacity has forced us to rely on reverse-engineered solutions, creating unn
 
 ### Configuration
 
-1.  **Configure the Backend**:
+1. **Configure the Backend**:
 
-  *   Set the `SPRING_PROFILES_ACTIVE` environment variable to `prod` in your `docker-compose.yaml` file.
-  *   Ensure all necessary environment variables (e.g., database credentials, API keys) are properly configured for the production environment.
+- Set the `SPRING_PROFILES_ACTIVE` environment variable to `prod` in your `docker-compose.yaml` file.
+- Ensure all necessary environment variables (e.g., database credentials, API keys) are properly configured for the production environment.
 
-2.  **Configure the Frontend**:
+2. **Configure the Frontend**:
 
-  *   Ensure the frontend is configured to point to the correct backend URL. In the Dockerfile, the `sed` command replaces `http://localhost:8080` with `/api`. This assumes that your Nginx configuration correctly proxies `/api` requests to the backend service.
+- Ensure the frontend is configured to point to the correct backend URL. In the Dockerfile, the `sed` command replaces `http://localhost:8080` with `/api`. This assumes that your Nginx configuration correctly proxies `/api` requests to the backend service.
 
 ### Deployment Steps
 
-1.  **Build the Docker Images**:
+1. **Build the Docker Images**:
 
   ```bash
   docker-compose build
   ```
 
-2.  **Run the Application with Docker Compose**:
+2. **Run the Application with Docker Compose**:
 
   ```bash
   docker-compose up -d
@@ -173,7 +207,7 @@ This opacity has forced us to rely on reverse-engineered solutions, creating unn
 
 ### Verification
 
-1.  **Check Container Status**:
+1. **Check Container Status**:
 
   ```bash
   docker-compose ps
@@ -181,7 +215,7 @@ This opacity has forced us to rely on reverse-engineered solutions, creating unn
 
   Verify that both the frontend and backend containers are running without issues.
 
-2.  **Access the Application**:
+2. **Access the Application**:
 
   Open your browser and navigate to the domain or IP address where your application is deployed.
 
@@ -201,6 +235,7 @@ frontend:
 
 Make sure Traefik is properly configured to use Let's Encrypt for SSL certificate generation.
 
+---
 
 ## 📝 Development Status
 
@@ -232,6 +267,8 @@ Our dashboard solves these problems by providing a modern, readable interface th
 | 4 | Deployment & Documentation | 🧩 Partially done |
 | 5 | User Feedback & Iteration | 🔜 Planned |
 | 6 | Final Review & Launch | 🔜 Planned |
+
+---
 
 ## 🤝 Contributing
 
