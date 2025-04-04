@@ -22,7 +22,7 @@ const CalendarEvents = () => {
       try {
         // Replace with the ICS feed URL for your public calendar
         // Typically it's the public calendar URL with ?export added
-        const calendarUrl = 'src/data/Schuljahreskalender.ics';
+        const calendarUrl = 'src/data/jh637-di34k-dsad4.ics';
         console.debug('Fetching calendar data from:', calendarUrl);
         
         const response = await fetch(calendarUrl);
@@ -116,14 +116,22 @@ const CalendarEvents = () => {
   };
 
   // Calculate how many days until the event
-  const getDaysUntil = (date: Date): string => {
+  const getDaysUntil = (startDate: Date, endDate: Date): string => {
     const now = new Date();
     now.setHours(0, 0, 0, 0);
     
-    const eventDate = new Date(date);
-    eventDate.setHours(0, 0, 0, 0);
+    const eventStartDate = new Date(startDate);
+    eventStartDate.setHours(0, 0, 0, 0);
     
-    const diffTime = eventDate.getTime() - now.getTime();
+    const eventEndDate = new Date(endDate);
+    eventEndDate.setHours(0, 0, 0, 0);
+    
+    // Check if the event is currently ongoing
+    if (now >= eventStartDate && now <= eventEndDate) {
+      return "Läuft bereits";
+    }
+    
+    const diffTime = eventStartDate.getTime() - now.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     
     if (diffDays === 0) return "Heute";
@@ -131,9 +139,23 @@ const CalendarEvents = () => {
     return `In ${diffDays} Tagen`;
   };
 
+  // Check if an event is currently running
+  const isEventRunning = (startDate: Date, endDate: Date): boolean => {
+    const now = new Date();
+    now.setHours(0, 0, 0, 0);
+    
+    const eventStartDate = new Date(startDate);
+    eventStartDate.setHours(0, 0, 0, 0);
+    
+    const eventEndDate = new Date(endDate);
+    eventEndDate.setHours(0, 0, 0, 0);
+    
+    return now >= eventStartDate && now <= eventEndDate;
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-4 w-full">
-      <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">
+      <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">
         Kommende Termine
         {loading && <span className="ml-2 text-sm font-normal text-gray-500">(Laden...)</span>}
       </h2>
@@ -145,46 +167,59 @@ const CalendarEvents = () => {
       )}
 
       {!loading && events.length === 0 && !error && (
-        <div className="bg-[#F5EFD7] border border-[#DDB967] text-[#8C7356] px-4 py-3 rounded">
+        <div className="bg-[#F5EFD7] border border-[#DDB967] text-gray-800 px-4 py-3 rounded">
           Keine anstehenden Termine gefunden.
         </div>
       )}
 
       <div className="space-y-4">
-        {events.map((event, index) => (
-          <div 
-            key={index} 
-            className="p-3 rounded-lg border bg-blue-50/50 border-blue-200 hover:bg-blue-100/50 transition-colors"
-          >
-            <div className="flex items-start">
-              <div className="flex-shrink-0 mr-3 mt-1">
-                {event.isAllDay ? (
-                  <Calendar size={24} className={`${index === 0 ? 'text-[#8C7356]' : 'text-blue-500'}`} />
-                ) : (
-                  <Clock size={24} className={`${index === 0 ? 'text-[#8C7356]' : 'text-blue-500'}`} />
-                )}
-              </div>
-              <div className="flex-1">
-                <h3 className="font-semibold text-[#3E3128]">{event.summary}</h3>
-                <p className="text-[#5A4635]">
-                  {formatEventDate(event.startDate, event.endDate, event.isAllDay)}
-                </p>
-                {event.location && (
-                  <p className="text-sm text-gray-600">{event.location}</p>
-                )}
-                {event.description && (
-                  <p className="text-sm text-gray-600 line-clamp-2">{event.description}</p>
-                )}
-                <p className={`text-sm font-medium ${index === 0 ? 'text-[#8C7356]' : 'text-gray-500'} mt-1`}>
-                  {getDaysUntil(event.startDate)}
-                </p>
+        {events.map((event, index) => {
+          const eventRunning = isEventRunning(event.startDate, event.endDate);
+          return (
+            <div 
+              key={index} 
+              className={`p-3 rounded-lg border transition-colors ${
+                eventRunning 
+                  ? "bg-amber-50 border-amber-300 border-l-4 shadow-md" 
+                  : "bg-blue-50/50 border-blue-200 hover:bg-blue-100/50"
+              }`}
+            >
+              <div className="flex items-start">
+                <div className="flex-shrink-0 mr-3 mt-1">
+                  {event.isAllDay ? (
+                    <Calendar size={24} className={`${eventRunning ? 'text-amber-600' : index === 0 ? 'text-[#8C7356]' : 'text-blue-500'}`} />
+                  ) : (
+                    <Clock size={24} className={`${eventRunning ? 'text-amber-600' : index === 0 ? 'text-[#8C7356]' : 'text-blue-500'}`} />
+                  )}
+                </div>
+                <div className="flex-1">
+                  <h3 className={`font-semibold ${eventRunning ? 'text-amber-800' : 'text-[#3E3128]'}`}>
+                    {event.summary}
+                  </h3>
+                  <p className={`${eventRunning ? 'text-amber-700' : 'text-[#5A4635]'}`}>
+                    {formatEventDate(event.startDate, event.endDate, event.isAllDay)}
+                  </p>
+                  {event.location && (
+                    <p className="text-sm text-gray-600">{event.location}</p>
+                  )}
+                  {event.description && (
+                    <p className="text-sm text-gray-600 line-clamp-2">{event.description}</p>
+                  )}
+                  <p className={`text-sm font-medium mt-1 ${
+                    eventRunning 
+                      ? 'text-amber-600 font-bold' 
+                      : index === 0 ? 'text-[#8C7356]' : 'text-gray-500'
+                  }`}>
+                    {getDaysUntil(event.startDate, event.endDate)}
+                  </p>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
       
-      <div className="mt-4 text-xs text-[#5A4635] text-right">
+      <div className="mt-4 text-xs text-gray-500 text-center">
         <p>Es wird keine Haftung für die Richtigkeit übernommen. Daten aus dem Schuljahreskalender der Nextcloud Instanz, letzte Aktualisierung am 2.4.2025</p>
       </div>
     </div>

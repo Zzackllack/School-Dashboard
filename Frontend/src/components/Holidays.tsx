@@ -143,7 +143,7 @@ const Holidays = () => {
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow-md p-4 mb-4 text-center w-full">
-        <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">Nächste Schulferien</h2>
+        <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Nächste Schulferien</h2>
         <div className="flex justify-center items-center h-40">
           <p>Feriendaten werden geladen...</p>
         </div>
@@ -154,7 +154,7 @@ const Holidays = () => {
   if (error || holidays.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-4 mb-4 text-center w-full">
-        <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">Nächste Schulferien</h2>
+        <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Nächste Schulferien</h2>
         <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 rounded">
           {error || 'Keine Feriendaten verfügbar.'}
         </div>
@@ -164,7 +164,7 @@ const Holidays = () => {
   
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-4 w-full">
-      <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">Nächste Schulferien</h2>
+      <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Nächste Schulferien</h2>
       
       <div className="space-y-4">
         {holidays.slice(0, 4).map((holiday, index) => (
@@ -193,7 +193,7 @@ const Holidays = () => {
         ))}
       </div>
       
-      <div className="mt-4 text-xs text-[#5A4635] text-right">
+      <div className="mt-4 text-xs text-gray-500 text-center">
         <p>Es wird keine Haftung für die Richtigkeit übernommen. Daten bereitgestellt von der Senatsverwaltung für Bildung, Jugend und Familie Berlin.</p>
       </div>
     </div>

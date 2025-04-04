@@ -295,7 +295,7 @@ const Weather = () => {
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
-        <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">Wetter</h2>
+        <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Wetter</h2>
         <div className="flex justify-center items-center h-40">
           <p>Wetterdaten werden geladen...</p>
         </div>
@@ -306,7 +306,7 @@ const Weather = () => {
   if (error || !weatherData) {
     return (
       <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
-        <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">Wetter</h2>
+        <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Wetter</h2>
         <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 rounded">
           {error || 'Wetterdaten konnten nicht geladen werden'}
         </div>
@@ -321,7 +321,7 @@ const Weather = () => {
   
   return (
     <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
-      <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">Wetter</h2>
+      <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Wetter</h2>
       <div className="mb-4">
         <div className="text-lg font-bold text-[#3E3128]">Berlin</div>
         <div className="flex justify-center items-center my-2">
@@ -365,14 +365,14 @@ const Weather = () => {
               <span className="text-[#5A4635]">{Math.round(weatherData.daily.temperature_2m_min[index])}°</span>
             </div>
             <div className="text-xs mt-1 text-[#5A4635]">
-              <span className={dailyPrecipitation[index] > 0 ? "text-[#8C7356]" : ""}>
+              <span className={dailyPrecipitation[index] > 0 ? "text-gray-800" : ""}>
                 {formatPrecipitation(dailyPrecipitation[index])}
               </span>
             </div>
           </div>
         ))}
       </div>
-      <p className="text-xs text-gray-500 mt-4">
+      <p className="text-xs text-gray-500 mt-4 text-center">
         Es wird keine Haftung für die Richtigkeit übernommen, Wetterdaten von <code>Open-Meteo</code>.
       </p>
     </div>
