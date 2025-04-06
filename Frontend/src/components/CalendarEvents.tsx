@@ -22,7 +22,7 @@ const CalendarEvents = () => {
       try {
         // Replace with the ICS feed URL for your public calendar
         // Typically it's the public calendar URL with ?export added
-        const calendarUrl = 'src/data/jh637-di34k-dsad4.ics';
+        const calendarUrl = '/data/jh637-di34k-dsad4.ics';
         console.debug('Fetching calendar data from:', calendarUrl);
         
         const response = await fetch(calendarUrl);

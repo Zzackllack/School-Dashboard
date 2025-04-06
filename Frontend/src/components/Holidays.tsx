@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
-import holidaysData from '../data/holidays.json';
+import holidaysData from '../assets/holidays.json'; // Import the holidays data from JSON file
 
 // Define TypeScript interface for Holiday data
 interface Holiday {
