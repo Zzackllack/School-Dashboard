@@ -15,7 +15,6 @@ Frontend/src/components/Credits.tsx
 Schuljahreskalender.ics
 
 # Ignore IDE specific files
-.vscode/
 .idea/
 *.iml
 
