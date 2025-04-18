@@ -20,7 +20,6 @@ services:
       start_period: 40s
     networks:
       - app-network
-      - coolify  # Add the Coolify network
 
   frontend:
     build:
@@ -41,7 +40,6 @@ services:
       start_period: 10s
     networks:
       - app-network
-      - coolify  # Add the Coolify network
     # labels:
       # Add HTTPS configuration if needed
       # - "traefik.http.routers.school-dashboard-secure.rule=Host(`your-domain.com`)"
@@ -51,5 +49,3 @@ services:
 networks:
   app-network:
     driver: bridge
-  coolify:
-    external: true  # Use the existing Coolify network
