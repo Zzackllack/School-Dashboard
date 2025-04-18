@@ -35,7 +35,8 @@ const SubstitutionPlanDisplay = () => {
         const fetchSubstitutionPlans = async () => {
             setLoading(true);
             try {
-                const response = await fetch('http://localhost:8080/api/substitution/plans');
+                const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
+                const response = await fetch(`${backendUrl}/api/substitution/plans`); // Assuming the endpoint is without a trailing slash
                 if (!response.ok) {
                     throw new Error(`API error: ${response.status}`);
                 }

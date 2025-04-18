@@ -13,6 +13,7 @@ der-andere-fotograf_JOB00841_x_P1128956_Original.JPEG
 IMG_0380.JPEG
 Frontend/src/components/Credits.tsx
 Schuljahreskalender.ics
+.env
 
 # Ignore IDE specific files
 .idea/
