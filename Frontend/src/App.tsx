@@ -48,7 +48,7 @@ const App = () => {
           <div className="lg:w-3/4">
             <SubstitutionPlanDisplay />
           </div>
-          <div className="lg:w-1/4 flex flex-col gap-5">
+          <div className="lg:w-1/4 flex flex-col gap-5 overflow-y-auto">
             <Weather />
             <Transportation />
             <CalendarEvents />
