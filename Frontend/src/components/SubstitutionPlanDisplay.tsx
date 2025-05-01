@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Replace, ArrowRightSquare, ArrowDownUp, BookOpen, Info, Calendar, PenLine, Users } from 'lucide-react'; // Add Calendar icon for events
+import { X, Replace, ArrowRightSquare, ArrowDownUp, BookOpen, Info, Calendar, PenLine, Users, Book } from 'lucide-react'; // Add Calendar icon for events
 
 interface SubstitutionEntry {
     classes: string;
@@ -57,14 +57,14 @@ const SubstitutionPlanDisplay = () => {
     // Format date from "DD.MM.YYYY Day" to a more readable format
     const formatDate = (dateString: string) => {
         if (!dateString) return '';
-        
+
         // Extract and parse components if it matches the expected format
         const match = dateString.match(/(\d+\.\d+\.\d+)\s+(\w+)/);
         if (match) {
             const [, date, day] = match;
             return `${day}, ${date}`;
         }
-        
+
         return dateString;
     };
 
@@ -72,7 +72,7 @@ const SubstitutionPlanDisplay = () => {
     const getClassColor = (classname: string): string => {
         // Clean up the class name (trim whitespace and convert to lowercase)
         const cleanClassName = classname.trim().toLowerCase();
-        
+
         // Define specific colors for each class with a modern, translucent look
         const classColors: Record<string, string> = {
             // 7th grade - warmer tones
@@ -80,36 +80,36 @@ const SubstitutionPlanDisplay = () => {
             '7b': 'bg-rose-50/80 backdrop-blur-sm',
             '7c': 'bg-pink-50/80 backdrop-blur-sm',
             '7d': 'bg-fuchsia-50/80 backdrop-blur-sm',
-            
+
             // 8th grade - cool tones
             '8a': 'bg-blue-50/80 backdrop-blur-sm',
             '8b': 'bg-sky-50/80 backdrop-blur-sm',
             '8c': 'bg-cyan-50/80 backdrop-blur-sm',
             '8d': 'bg-indigo-50/80 backdrop-blur-sm',
-            
+
             // 9th grade - earthy tones
             '9a': 'bg-green-50/80 backdrop-blur-sm',
             '9b': 'bg-emerald-50/80 backdrop-blur-sm',
             '9c': 'bg-teal-50/80 backdrop-blur-sm',
             '9d': 'bg-lime-50/80 backdrop-blur-sm',
-            
+
             // 10th grade - warm neutrals
             '10a': 'bg-yellow-50/80 backdrop-blur-sm',
             '10b': 'bg-amber-50/80 backdrop-blur-sm',
             '10c': 'bg-orange-50/80 backdrop-blur-sm',
             '10d': 'bg-yellow-50/80 backdrop-blur-sm',
-            
+
             // Upper grades - distinctive
             '11': 'bg-purple-50/80 backdrop-blur-sm',
             '12': 'bg-slate-50/80 backdrop-blur-sm'
         };
-        
+
         // Check if this entry has multiple classes (comma or space separated)
         if (cleanClassName.includes(',') || /\s+/.test(cleanClassName)) {
             // For entries with multiple classes, use a distinctive glass effect
             return 'bg-gradient-to-r from-gray-50/70 to-slate-50/70 backdrop-blur-md';
         }
-        
+
         // Return the color for this class, or a default color if not found
         return classColors[cleanClassName] || 'bg-gray-50/80 backdrop-blur-sm';
     };
@@ -127,7 +127,7 @@ const SubstitutionPlanDisplay = () => {
             // Sort classes: first by grade number, then by section letter
             const gradeA = parseInt(a.match(/\d+/)?.[0] || '0');
             const gradeB = parseInt(b.match(/\d+/)?.[0] || '0');
-            
+
             if (gradeA !== gradeB) return gradeA - gradeB;
             return a.localeCompare(b);
         });
@@ -143,7 +143,7 @@ const SubstitutionPlanDisplay = () => {
                 </div>
             );
         }
-        
+
         if (type.toLowerCase() === "vertr." || type.toLowerCase().includes("vertretung") || type.toLowerCase().includes("s. vertr.")) {
             return (
                 <div className="flex items-center text-amber-600 font-medium">
@@ -152,7 +152,7 @@ const SubstitutionPlanDisplay = () => {
                 </div>
             );
         }
-        
+
         if (type.toLowerCase() === "raumänd." || type.toLowerCase().includes("raum") || type.toLowerCase().includes("raumänderung")) {
             return (
                 <div className="flex items-center text-green-600 font-medium">
@@ -170,7 +170,7 @@ const SubstitutionPlanDisplay = () => {
                 </div>
             );
         }
-        
+
         if (type.toLowerCase() === "eva" || type.toLowerCase().includes("eigenverantwort")) {
             return (
                 <div className="flex items-center text-indigo-600 font-medium">
@@ -180,7 +180,7 @@ const SubstitutionPlanDisplay = () => {
             );
         }
 
-        if (type.toLowerCase() === "veranst." || type.toLowerCase().includes("veranstaltung")){
+        if (type.toLowerCase() === "veranst." || type.toLowerCase().includes("veranstaltung")) {
             return (
                 <div className="flex items-center text-purple-600 font-medium">
                     <Calendar size={16} className="mr-1" />
@@ -205,8 +205,16 @@ const SubstitutionPlanDisplay = () => {
                     {type}
                 </div>
             );
-        }  
-        
+        }
+
+        if (type.toLowerCase() === "klausur" || type.toLowerCase().includes("klausur") || type.toLowerCase().includes("abitur")) {
+            return (
+                <div className="flex items-center text-gray-700 font-medium">
+                    <Book size={16} className="mr-1" />
+                    {type}
+                </div>
+            );
+        }
         return <span className="text-gray-800">{type}</span>;
     };
 
@@ -242,7 +250,7 @@ const SubstitutionPlanDisplay = () => {
                     {plan.news && plan.news.newsItems && plan.news.newsItems.length > 0 && (
                         <div className="mb-6 p-4 bg-amber-50/70 backdrop-blur-sm border-l-4 border-amber-300 rounded-lg w-full shadow-sm">
                             <h4 className="text-lg font-medium text-amber-800 mb-2 flex items-center">
-                                <Info size={20} className="mr-2 text-amber-600" /> 
+                                <Info size={20} className="mr-2 text-amber-600" />
                                 Nachrichten zum Tag
                             </h4>
                             {plan.news.newsItems.map((newsItem, idx) => (
@@ -256,15 +264,15 @@ const SubstitutionPlanDisplay = () => {
                             {/* Class legend */}
                             <div className="mb-5 flex flex-wrap gap-2">
                                 {getClassesInPlan(plan).map((className, idx) => (
-                                    <div 
-                                        key={idx} 
+                                    <div
+                                        key={idx}
                                         className={`${getClassColor(className)} px-3 py-1.5 border border-white/30 rounded-full text-sm shadow-sm hover:shadow transition duration-300 ease-in-out`}
                                     >
                                         {className}
                                     </div>
                                 ))}
                             </div>
-                            
+
                             <div className="overflow-x-auto w-full">
                                 <table className="min-w-full border-collapse">
                                     <thead>
@@ -284,10 +292,10 @@ const SubstitutionPlanDisplay = () => {
                                         {plan.entries.map((entry, entryIndex) => {
                                             // Get class-specific background color
                                             const classColor = getClassColor(entry.classes);
-                                            
+
                                             return (
-                                                <tr 
-                                                    key={entryIndex} 
+                                                <tr
+                                                    key={entryIndex}
                                                     className={`${classColor} hover:bg-opacity-100 transition duration-300 ease-in-out`}
                                                 >
                                                     <td className="border-b border-gray-100/30 px-4 py-3 font-medium">{entry.classes}</td>
