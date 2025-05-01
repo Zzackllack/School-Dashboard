@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import Weather from "./components/Weather";
 import Transportation from "./components/Transportation";
 import Clock from "./components/Clock";
@@ -15,9 +15,10 @@ const App = () => {
   const planRef = useRef<HTMLDivElement | null>(null);
   const rightColumnRef = useRef<HTMLDivElement | null>(null);
   const mainContainerRef = useRef<HTMLDivElement | null>(null);
+  const [isLoadingPlans, setIsLoadingPlans] = useState(false);
 
   useAutoScroll(rightColumnRef, 600, 40);
-  useAutoScroll(planRef, 1500, 30);
+  useAutoScroll(planRef, 300, 80);
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -43,6 +44,12 @@ const App = () => {
     return () => resizeObserver.disconnect();
   }, []);
 
+  // Function to handle loading state update from SubstitutionPlanDisplay
+  // Memoize the callback to prevent it from changing on every render
+  const handleLoadingStateChange = useCallback((isLoading: boolean) => {
+    setIsLoadingPlans(isLoading);
+  }, []);
+
   return (
     <div
       ref={mainContainerRef}
@@ -61,13 +68,24 @@ const App = () => {
 
       <main className="flex flex-col px-4 py-6 max-h-[87vh] overflow-y-hidden">
         <div className="flex flex-col lg:flex-row w-full gap-5 max-h-[90vh]">
-          <div className="lg:w-3/4 col-span-2 rounded-xl overflow-hidden shadow-md bg-white dark:bg-gray-800">
+          <div className="lg:w-3/4 col-span-2 rounded-xl overflow-hidden shadow-md bg-white dark:bg-gray-800 flex flex-col">
+            {/* Fixed headline for substitution plans */}
+            <div className="bg-white/90 backdrop-blur-md p-5 border-b border-gray-100">
+              <h2 className="text-2xl font-bold text-gray-800">
+                Vertretungspläne
+                {isLoadingPlans && <span className="ml-2 text-sm font-normal text-gray-500">(Loading...)</span>}
+              </h2>
+            </div>
+            
+            {/* Scrollable content area */}
             <div
               ref={planRef}
-              className="h-full overflow-y-auto"
-              style={{ maxHeight: "calc(90vh - 2rem)" }}
+              className="overflow-y-auto flex-1"
+              style={{ maxHeight: "calc(90vh - 6rem)" }}
             >
-              <SubstitutionPlanDisplay />
+              <div className="p-5 pt-0">
+                <SubstitutionPlanDisplay onLoadingChange={handleLoadingStateChange} />
+              </div>
             </div>
           </div>
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { X, Replace, ArrowRightSquare, ArrowDownUp, BookOpen, Info, Calendar, PenLine, Users, Book, Check } from 'lucide-react'; // Add Calendar icon for events
 
 interface SubstitutionEntry {
@@ -26,17 +26,27 @@ interface SubstitutionPlan {
     news: DailyNews;
 }
 
-const SubstitutionPlanDisplay = () => {
+interface SubstitutionPlanDisplayProps {
+    onLoadingChange?: (isLoading: boolean) => void;
+}
+
+const SubstitutionPlanDisplay = ({ onLoadingChange }: SubstitutionPlanDisplayProps) => {
     const [substitutionPlans, setSubstitutionPlans] = useState<SubstitutionPlan[]>([]);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
+    const loadingUpdatedRef = useRef(false);
 
     useEffect(() => {
         const fetchSubstitutionPlans = async () => {
-            setLoading(true);
+            if (!loadingUpdatedRef.current) {
+                setLoading(true);
+                if (onLoadingChange) onLoadingChange(true);
+                loadingUpdatedRef.current = true;
+            }
+            
             try {
                 const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080';
-                const response = await fetch(`${backendUrl}/api/substitution/plans`); // Assuming the endpoint is without a trailing slash
+                const response = await fetch(`${backendUrl}/api/substitution/plans`);
                 if (!response.ok) {
                     throw new Error(`API error: ${response.status}`);
                 }
@@ -48,11 +58,12 @@ const SubstitutionPlanDisplay = () => {
                 setError('Vertretungspläne konnten nicht geladen werden. Bitte versuche es später erneut, oder kontaktiere Cédric.');
             } finally {
                 setLoading(false);
+                if (onLoadingChange) onLoadingChange(false);
             }
         };
 
         fetchSubstitutionPlans();
-    }, []);
+    }, [onLoadingChange]);
 
     // Format date from "DD.MM.YYYY Day" to a more readable format
     const formatDate = (dateString: string) => {
@@ -230,24 +241,18 @@ const SubstitutionPlanDisplay = () => {
 
     return (
         <div className="w-full">
-            <div className="bg-white/90 backdrop-blur-md rounded-xl shadow-lg border border-white/20 p-5 mb-5 w-full transition-all duration-300">
-                <h2 className="text-2xl font-bold text-gray-800">
-                    Vertretungspläne
-                    {loading && <span className="ml-2 text-sm font-normal text-gray-500">(Loading...)</span>}
-                </h2>
+            {/* Error and empty state notifications */}
+            {error && (
+                <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 mb-4 rounded">
+                    {error}
+                </div>
+            )}
 
-                {error && (
-                    <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 mb-4 rounded">
-                        {error}
-                    </div>
-                )}
-
-                {!loading && substitutionPlans.length === 0 && !error && (
-                    <div className="bg-[#F5EFD7] border border-[#DDB967] text-[#8C7356] px-4 py-3 rounded">
-                        Keine Vertretungspläne verfügbar. Ist DSBmobile offline oder hat DSBMobile ihre API geändert?
-                    </div>
-                )}
-            </div>
+            {!loading && substitutionPlans.length === 0 && !error && (
+                <div className="bg-[#F5EFD7] border border-[#DDB967] text-[#8C7356] px-4 py-3 rounded">
+                    Keine Vertretungspläne verfügbar. Ist DSBmobile offline oder hat DSBMobile ihre API geändert?
+                </div>
+            )}
 
             {/* Each day gets its own container */}
             {substitutionPlans.map((plan, planIndex) => (
