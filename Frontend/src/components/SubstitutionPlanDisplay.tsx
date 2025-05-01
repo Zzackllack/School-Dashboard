@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Replace, ArrowRightSquare, ArrowDownUp, BookOpen, Info, Calendar, PenLine, Users, Book } from 'lucide-react'; // Add Calendar icon for events
+import { X, Replace, ArrowRightSquare, ArrowDownUp, BookOpen, Info, Calendar, PenLine, Users, Book, Check } from 'lucide-react'; // Add Calendar icon for events
 
 interface SubstitutionEntry {
     classes: string;
@@ -215,6 +215,16 @@ const SubstitutionPlanDisplay = () => {
                 </div>
             );
         }
+
+        if (type.toLowerCase() === "findet statt" || type.toLowerCase().includes("findet statt")) {
+            return (
+                <div className="flex items-center text-green-600 font-medium">
+                    <Check size={16} className="mr-1" />
+                    {type}
+                </div>
+            );
+        }
+
         return <span className="text-gray-800">{type}</span>;
     };
 
