@@ -305,7 +305,7 @@ const Transportation = () => {
                         {getDelayText(departure.delay)}
                       </span>
                     ) : (
-                      <><span className="text-[#5E8C61]">Pünktlich</span><span className="text-[#5E8C61]">Pünktlich</span></>
+                      <><span className="text-[#5E8C61]">Pünktlich</span></>
                     )}
                   </td>
                 </tr>
