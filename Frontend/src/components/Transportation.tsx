@@ -91,7 +91,7 @@ const Transportation = () => {
       setError(null);
     } catch (err) {
       console.error('Failed to fetch departures:', err);
-      setError('Failed to load departures. Please try again later.');
+      setError('Problem beim Laden der Abfahrten. Bitte später erneut versuchen, oder Cédric kontaktieren.');
     } finally {
       setIsLoadingDepartures(false);
     }
@@ -223,6 +223,7 @@ const Transportation = () => {
           <h3 className="text-lg font-semibold text-[#3E3128] mb-2">{title}</h3>
           <div className="p-4 text-center">
             <p>Lade Abfahrten...</p>
+            <p>Lade Abfahrten...</p>
           </div>
         </div>
       );
@@ -232,7 +233,7 @@ const Transportation = () => {
       return (
         <div className="w-full mb-4">
           <h3 className="text-lg font-semibold text-[#3E3128] mb-2">{title}</h3>
-          <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 rounded">
+          <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 rounded-lg">
             {errorMsg}
           </div>
         </div>
@@ -246,12 +247,15 @@ const Transportation = () => {
       return (
         <div className="w-full mb-4">
           <h3 className="text-lg font-semibold text-[#3E3128] mb-2">{title}</h3>
-          <div className="bg-[#F5EFD7] border border-[#DDB967] text-[#8C7356] px-4 py-3 rounded">
-            Im Moment keine Abfahrten verfügbar.
+          <div className="bg-[#F5EFD7] border border-[#DDB967] text-[#8C7356] px-4 py-3 rounded-lg">
+            Momentan keine Abfahrten verfügbar.
           </div>
         </div>
       );
     }
+
+    // Show only the next 4 departures
+    const limitedDepartures = departures.slice(0, 4);
 
     return (
       <div className="w-full mb-6">
@@ -261,25 +265,25 @@ const Transportation = () => {
             <p className="text-[#3E3128]">
               <span className="font-semibold">Station: </span>
               {stop.name}
-              {stop.distance && ` (${stop.distance}m von der Schule entfernt)`}
+              {stop.distance && ` (${stop.distance}m entfernt)`}
             </p>
           </div>
         )}
         
-        <div className="overflow-x-auto w-full">
-          <table className="min-w-full">
+        <div className="overflow-x-auto w-full rounded-lg">
+          <table className="min-w-full border-collapse">
             <thead>
-              <tr>
-                <th className="px-4 py-2 text-left text-xs font-medium text-[#5A4635] uppercase tracking-wider">Linie</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-[#5A4635] uppercase tracking-wider">Richtung</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-[#5A4635] uppercase tracking-wider">Abfahrt</th>
-                <th className="px-4 py-2 text-left text-xs font-medium text-[#5A4635] uppercase tracking-wider">Status</th>
+              <tr className="bg-gray-700/90 text-white backdrop-blur-md">
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tl-lg">Linie</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Richtung</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider">Abfahrt</th>
+                <th className="px-4 py-3 text-left text-xs font-medium uppercase tracking-wider rounded-tr-lg">Status</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {departures.map((departure, index) => (
-                <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-[#F8F4E8]'}>
-                  <td className="px-4 py-3">
+            <tbody>
+              {limitedDepartures.map((departure, index) => (
+                <tr key={index} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-50/80'} backdrop-blur-sm`}>
+                  <td className="px-4 py-3 border-b border-gray-100/30">
                     <span className={`inline-flex items-center justify-center h-6 w-12 rounded-md 
                       ${departure.line.product === 'bus' ? 'bg-[#a3007c] text-white' : 
                         departure.line.product === 'subway' ? 'bg-[#E8C897] text-[#8C7356]' :
@@ -291,17 +295,17 @@ const Transportation = () => {
                       {departure.line.name}
                     </span>
                   </td>
-                  <td className="px-4 py-3 text-sm text-[#3E3128]">{departure.direction}</td>
-                  <td className="px-4 py-3 text-sm text-[#3E3128]">
+                  <td className="px-4 py-3 text-sm text-[#3E3128] border-b border-gray-100/30">{departure.direction}</td>
+                  <td className="px-4 py-3 text-sm text-[#3E3128] border-b border-gray-100/30">
                     {formatTime(departure.plannedWhen)}
                   </td>
-                  <td className="px-4 py-3 text-sm">
+                  <td className="px-4 py-3 text-sm border-b border-gray-100/30">
                     {departure.delay ? (
                       <span className={`${getDelayColorClass(departure.delay)}`}>
                         {getDelayText(departure.delay)}
                       </span>
                     ) : (
-                      <span className="text-[#5E8C61]">Pünktlich</span>
+                      <><span className="text-[#5E8C61]">Pünktlich</span></>
                     )}
                   </td>
                 </tr>
@@ -314,8 +318,8 @@ const Transportation = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-4 w-full">
-      <h2 className="text-xl font-bold text-[#8C7356] border-b border-gray-200 pb-2 mb-4">
+    <div className="bg-white backdrop-blur-md rounded-xl shadow-lg border border-white/20 p-5 mb-5 w-full transition-all duration-300">
+      <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">
         Öffentliche Verkehrsmittel
         {(isLoadingStops || isLoadingDepartures || isLoadingSBahnDepartures) && 
           <span className="ml-2 text-sm font-normal text-gray-500">(Ladevorgang...)</span>
@@ -325,14 +329,14 @@ const Transportation = () => {
       {/* Content area */}
       <div>
         {/* Nearest station departures */}
-        {renderDepartureTable(departures, currentStop, isLoadingDepartures, error, "Nächste Station")}
+        {renderDepartureTable(departures, currentStop, isLoadingDepartures, error, "Nächster Bahnhof")}
         
         {/* S-Bahn departures */}
         {renderDepartureTable(sBahnDepartures, currentSBahnStop, isLoadingSBahnDepartures, sBahnError, "S-Bahn Station")}
       </div>
       
-      <div className="mt-4 text-xs text-[#5A4635]">
-        <p>Daten bereitgestellt von der BVG-Transport-API - Zuletzt aktualisiert: {lastUpdated.toLocaleTimeString()}</p>
+      <div className="mt-4 text-xs text-gray-500 text-center">
+        <p>Es wird keine Haftung für die Richtigkeit übernommen, Daten bereitgestellt von <code className="bg-gray-100/80 px-1 rounded">v6.bvg.transport.rest</code> - Zuletzt aktualisiert: {lastUpdated.toLocaleTimeString()}</p>
       </div>
     </div>
   );

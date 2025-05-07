@@ -1,7 +1,7 @@
 # 🏫 School Dashboard
 
 ![Status](https://img.shields.io/badge/status-under%20development-yellow)
-![Version](https://img.shields.io/badge/version-1.9.4-blue)
+![Version](https://img.shields.io/badge/version-1.19.17-blue)
 ![License](https://img.shields.io/badge/license-BSD%203--Clause-green)
 
 > A modern, intuitive dashboard designed originally for Goethe Gymnasium Lichterfelde (GGL) to transform the lobby information display into a comprehensive school information hub.
@@ -12,8 +12,38 @@ The School Dashboard was created to replace the outdated and clumsy substitution
 
 While developed specifically for GGL, this application is designed to be adaptable for any school using the DSBmobile system for substitution plans.
 
-![Dashboard Preview](https://kappa.lol/oVnvD7)
+---
 
+## 📸 Screenshots
+
+<div align="center">
+  <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px;">
+    <div style="flex-basis: 100%;">
+      <h3>Overview</h3>
+      <img src="https://kappa.lol/VeqG8o" alt="Dashboard Preview" style="max-width: 100%; height: auto;">
+    </div>
+  </div>
+  <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0px;">
+    <div style="flex-basis: 25%;">
+      <h3>Holiday Module</h3>
+      <img src="https://kappa.lol/sDf_cE" alt="Transportation Preview" style="max-width: 100%; height: auto;">
+    </div>
+    <div style="flex-basis: 25%;">
+      <h3>Calendar Module</h3>
+      <img src="https://kappa.lol/mRVurJ" alt="Calendar Preview" style="max-width: 100%; height: auto;">
+    </div>
+    <div style="flex-basis: 25%;">
+      <h3>Transportation Module</h3>
+      <img src="https://kappa.lol/rl0-yq" alt="Holiday Preview" style="max-width: 100%; height: auto;">
+    </div>
+    <div style="flex-basis: 25%;">
+      <h3>Weather Module</h3>
+      <img src="https://kappa.lol/941Ejj" alt="Weather Preview" style="max-width: 100%; height: auto;">
+    </div>
+  </div>
+</div>
+
+---
 ## ✨ Features
 
 ### Current Features
@@ -26,16 +56,26 @@ While developed specifically for GGL, this application is designed to be adaptab
 - **🌤️ Weather Forecasts**
   - Current conditions and temperature
   - Daily forecast visualization
-  - Important weather alerts
+  - Open-Meteo API integration for accurate data
 
 - **🚌 Transportation Schedules**
   - Real-time bus and train departures
   - Route information and delays
   - Nearest stop information
+  - BVG API integration for Berlin transportation data
 
 - **⏰ Live Clock**
   - Current time and date display
   - Visual time tracking
+
+- **📊 School Event Calendar**
+  - Upcoming events visualization
+  - Important dates and deadlines
+  - Integration of any iCal calendar
+
+- **🏖️ Upcoming Holiday display**
+  - Display of upcoming holidays for Berlin
+  - Data provided by "Senatsverwaltung für Bildung, Jugend und Familie Berlin"
 
 ### 🔄 Planned Features
 
@@ -51,9 +91,7 @@ While developed specifically for GGL, this application is designed to be adaptab
   - Light/dark mode toggle
   - School color integration
 
-- **📊 School Event Calendar**
-  - Upcoming events visualization
-  - Important dates and deadlines
+---
 
 ## 🛠️ Technical Implementation
 
@@ -61,7 +99,7 @@ While developed specifically for GGL, this application is designed to be adaptab
 
 - React 19 with TypeScript
 - Tailwind CSS for styling
-- Modern component architecture
+- Vite for fast development and build process
 
 ### Backend
 
@@ -79,20 +117,23 @@ The integration with DSBmobile API was a significant challenge in this project. 
 
 After these frustrations, we discovered and implemented a 6-year-old Java library that perfectly handles the DSBmobile integration. This discovery was a breakthrough moment for our project, enabling us to finally move forward with the core functionality.
 
-> 💡 **Lesson Learned**: Sometimes the best solution isn't the newest one. The robust Java implementation from 2018 outperformed modern alternatives because it was built with a deeper understanding of the DSBmobile system architecture.
+> 💡 **Lesson Learned**: Sometimes the best solution isn't the newest one. The robust Java implementation from 2018 outperformed modern alternatives.
 
 ### 😤 The DSBmobile Struggle
 
 Working with DSBmobile has been an exercise in frustration due to heinekingmedia's approach to their platform:
 
 - **No Public API**: Despite being used by thousands of schools, there's no official, documented API for developers
-- **Outdated Technology**: The system relies on ASP.NET (.aspx files) in 2025, making modern integration unnecessarily complex
 - **Zero Transparency**: Changes to the backend occur without warning, breaking third-party integrations
 - **Artificial Barriers**: Simple data that should be easily accessible is obscured behind proprietary interfaces
 
 This opacity has forced us to rely on reverse-engineered solutions, creating unnecessary technical debt and development delays for what should be a straightforward integration.
 
+---
+
 ## 🚀 Getting Started
+
+## Development
 
 ### Prerequisites
 
@@ -131,6 +172,72 @@ This opacity has forced us to rely on reverse-engineered solutions, creating unn
    - Frontend: <http://localhost:5173>
    - Backend API: <http://localhost:8080>
 
+## Production
+
+### Prerequisites
+
+- Docker
+- Docker Compose
+
+### Configuration
+
+1. **Configure the Backend**:
+
+- Set the `SPRING_PROFILES_ACTIVE` environment variable to `prod` in your `docker-compose.yaml` file.
+- Ensure all necessary environment variables (e.g., database credentials, API keys) are properly configured for the production environment.
+
+2. **Configure the Frontend**:
+
+- Ensure the frontend is configured to point to the correct backend URL. In the Dockerfile, the `sed` command replaces `http://localhost:8080` with `/api`. This assumes that your Nginx configuration correctly proxies `/api` requests to the backend service.
+
+### Deployment Steps
+
+1. **Build the Docker Images**:
+
+  ```bash
+  docker-compose build
+  ```
+
+2. **Run the Application with Docker Compose**:
+
+  ```bash
+  docker-compose up -d
+  ```
+
+  This command builds the images and starts the containers in detached mode.
+
+### Verification
+
+1. **Check Container Status**:
+
+  ```bash
+  docker-compose ps
+  ```
+
+  Verify that both the frontend and backend containers are running without issues.
+
+2. **Access the Application**:
+
+  Open your browser and navigate to the domain or IP address where your application is deployed.
+
+### HTTPS Configuration (Optional)
+
+If you need HTTPS, you can configure Traefik (or another reverse proxy) to handle SSL termination. Here’s an example using Traefik labels in your `docker-compose.yaml`:
+
+```yaml
+frontend:
+  # ... other configurations ...
+  labels:
+  - "traefik.enable=true"
+  - "traefik.http.routers.school-dashboard-secure.rule=Host(`your-domain.com`)"
+  - "traefik.http.routers.school-dashboard-secure.entrypoints=https"
+  - "traefik.http.routers.school-dashboard-secure.tls.certresolver=letsencrypt"
+```
+
+Make sure Traefik is properly configured to use Let's Encrypt for SSL certificate generation.
+
+---
+
 ## 📝 Development Status
 
 This project is currently under active development. The core functionality is implemented, but we're working on:
@@ -161,6 +268,8 @@ Our dashboard solves these problems by providing a modern, readable interface th
 | 4 | Deployment & Documentation | 🧩 Partially done |
 | 5 | User Feedback & Iteration | 🔜 Planned |
 | 6 | Final Review & Launch | 🔜 Planned |
+
+---
 
 ## 🤝 Contributing
 

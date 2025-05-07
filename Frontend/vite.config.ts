@@ -9,4 +9,7 @@ export default defineConfig({
     tailwindcss()
   ],
   assetsInclude: ['**/*.JPEG'], // Add support for JPEG files
+  define: {
+    'process.env.BACKEND_URL': JSON.stringify(process.env.BACKEND_URL),
+  }
 })

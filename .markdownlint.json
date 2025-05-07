@@ -1,0 +1,10 @@
+{
+    "MD033": {
+        "allowed_elements": ["p", "h3", "div", "img", "a", "code", "pre", "blockquote", "hr", "ul", "ol", "li"]
+    },
+    "MD047": false,
+    "MD013": false,
+    "MD022": false,
+    "MD029": false,
+    "MD024": false
+}

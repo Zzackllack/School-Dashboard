@@ -1,0 +1,20 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ..
+      dockerfile: Docker/backend.Dockerfile
+    container_name: school-dashboard-backend
+    restart: unless-stopped
+    environment:
+      - SPRING_PROFILES_ACTIVE=prod
+      # Add any environment variables needed for your app (credentials, etc.)
+      # - DSB_USERNAME=user
+      # - DSB_PASSWORD=pass
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/api/dsb/timetables"] 
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
