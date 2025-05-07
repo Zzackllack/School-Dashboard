@@ -156,7 +156,8 @@ This opacity has forced us to rely on reverse-engineered solutions, creating unn
    cd Backend
    # Update application.properties with your DSBmobile credentials
    mvn clean package
-   java -jar target/school-dashboard-backend-1.0.0.jar
+   # Replace X.Y.Z with the current version number
+   java -jar target/school-dashboard-backend-X.Y.Z.jar
    ```
 
 3. **Set up the frontend**

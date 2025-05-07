@@ -223,6 +223,7 @@ const Transportation = () => {
           <h3 className="text-lg font-semibold text-[#3E3128] mb-2">{title}</h3>
           <div className="p-4 text-center">
             <p>Lade Abfahrten...</p>
+            <p>Lade Abfahrten...</p>
           </div>
         </div>
       );
@@ -238,7 +239,10 @@ const Transportation = () => {
         </div>
       );
     }
-
+    
+    // This line properly causes known issues in development environment (npm run dev) but works fine in production
+    // I have no idea, but when "No departures available at the moment." is displayed, but you think there should be departures just remove or uncomment the if statement below
+    // I think it has something to do with the way the data is fetched after the component is mounted but no idea
     if (departures.length === 0) {
       return (
         <div className="w-full mb-4">
@@ -301,6 +305,7 @@ const Transportation = () => {
                         {getDelayText(departure.delay)}
                       </span>
                     ) : (
+                      <span className="text-[#5E8C61]">Pünktlich</span>
                       <span className="text-[#5E8C61]">Pünktlich</span>
                     )}
                   </td>

@@ -159,27 +159,39 @@ const Weather = () => {
     switch (true) {
       case code === 0:
         return 'Klarer Himmel';
+        return 'Klarer Himmel';
       case code === 1:
+        return 'Überwiegend klar';
         return 'Überwiegend klar';
       case code === 2:
         return 'Teilweise bewölkt';
+        return 'Teilweise bewölkt';
       case code === 3:
+        return 'Bedeckt';
         return 'Bedeckt';
       case [45, 48].includes(code):
         return 'Nebel';
+        return 'Nebel';
       case [51, 53, 55].includes(code):
+        return 'Nieselregen';
         return 'Nieselregen';
       case [61, 63, 65].includes(code):
         return 'Regen';
+        return 'Regen';
       case [80, 81, 82].includes(code):
+        return 'Regenschauer';
         return 'Regenschauer';
       case [71, 73, 75].includes(code):
         return 'Schneefall';
+        return 'Schneefall';
       case [85, 86].includes(code):
+        return 'Schneeschauer';
         return 'Schneeschauer';
       case [95, 96, 99].includes(code):
         return 'Gewitter';
+        return 'Gewitter';
       default:
+        return 'Unbekannt';
         return 'Unbekannt';
     }
   };
@@ -188,8 +200,11 @@ const Weather = () => {
   const formatDay = (dateString: string, index: number): string => {
     if (index === 0) return 'Heute';
     if (index === 1) return 'Morgen';
+    if (index === 0) return 'Heute';
+    if (index === 1) return 'Morgen';
     
     const date = new Date(dateString);
+    return date.toLocaleDateString('de-DE', { weekday: 'short' });
     return date.toLocaleDateString('de-DE', { weekday: 'short' });
   };
 
@@ -341,6 +356,7 @@ const Weather = () => {
         </div>
         <div className="text-[#5A4635] text-sm">
           <div className="flex items-center justify-center">
+            <span className="mr-1">Niederschlag:</span>
             <span className="mr-1">Niederschlag:</span>
             <span className={currentPrecipitation > 0 ? "text-[#8C7356] font-medium" : ""}>
               {formatPrecipitation(currentPrecipitation)}
