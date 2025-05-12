@@ -389,7 +389,7 @@ const Weather = () => {
         ))}
       </div>
       <p className="text-xs text-gray-500 mt-4 text-center">
-        Es wird keine Haftung für die Richtigkeit übernommen, Wetterdaten von <code>Open-Meteo</code>.
+        Es wird keine Haftung für die Richtigkeit der Daten übernommen. <br></br> Datenquelle: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700">Open-Meteo</a>, lizenziert unter <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700">CC BY 4.0</a>
       </p>
     </div>
   );
