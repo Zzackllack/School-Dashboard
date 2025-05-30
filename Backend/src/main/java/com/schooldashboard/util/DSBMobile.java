@@ -26,7 +26,7 @@ public class DSBMobile implements Serializable {
     private static final long serialVersionUID = -5265820858352981519L;
     private static final Gson gson = new Gson();
     
-    private HashMap<String, Object> args = new HashMap<String, Object>();
+    private final HashMap<String, Object> args = new HashMap<>();
     
     public DSBMobile(String username, String password) {
         args.put("UserId", username);
@@ -106,6 +106,7 @@ public class DSBMobile implements Serializable {
         return news;
     }
 
+    @SuppressWarnings("deprecation")
     public JsonObject pullData() {
         try {
             HttpsURLConnection connection = (HttpsURLConnection) new URL("https://www.dsbmobile.de/JsonHandler.ashx/GetData").openConnection();
@@ -134,11 +135,11 @@ public class DSBMobile implements Serializable {
         args.put("Date", date);
         args.put("LastUpdate", date);
 
-        HashMap<String, Object> innerArgs = new HashMap<String, Object>();
+        HashMap<String, Object> innerArgs = new HashMap<>();
         innerArgs.put("Data", Base64.encode(unescapeString(gson.toJson(args)))); 
         innerArgs.put("DataType", 1);
 
-        HashMap<String, Object> outerArgs = new HashMap<String, Object>();
+        HashMap<String, Object> outerArgs = new HashMap<>();
         outerArgs.put("req", innerArgs);
         return unescapeString(gson.toJson(outerArgs));
     }

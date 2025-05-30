@@ -41,6 +41,7 @@ public class SubstitutionPlanService {
      */
     @Scheduled(fixedRate = 300000) // Run every 5 minutes (300000 ms)
     @CacheEvict(value = "substitutionPlans", allEntries = true)
+    @SuppressWarnings("CallToPrintStackTrace")
     public void updateSubstitutionPlans() {
         System.out.println("===============================================================");
         System.out.println("[SubstitutionPlanService] Starting plan update at " + new java.util.Date());
@@ -49,6 +50,7 @@ public class SubstitutionPlanService {
         try {
             // Get fresh timetables from DSB service
             System.out.println("[SubstitutionPlanService] Fetching timetables from DSB service...");
+            @SuppressWarnings("unchecked")
             List<TimeTable> timeTables = (List<TimeTable>) dsbService.getTimeTables();
             System.out.println("[SubstitutionPlanService] Received " + timeTables.size() + " timetables from DSB");
             
@@ -105,7 +107,6 @@ public class SubstitutionPlanService {
                         } else {
                             // For subsequent plans, merge their entries and news into the combined plan
                             System.out.println("[SubstitutionPlanService]     Combining with existing plan");
-                            int beforeEntries = combinedPlan.getEntries().size();
                             combinedPlan.getEntries().addAll(plan.getEntries());
                             totalEntries += plan.getEntries().size();
                             
