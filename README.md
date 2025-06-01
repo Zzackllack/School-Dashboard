@@ -1,7 +1,7 @@
 # 🏫 School Dashboard
 
 ![Status](https://img.shields.io/badge/status-under%20development-yellow)
-![Version](https://img.shields.io/badge/version-1.19.17-blue)
+![Version](https://img.shields.io/badge/version-1.19.19-blue)
 ![License](https://img.shields.io/badge/license-BSD%203--Clause-green)
 
 > A modern, intuitive dashboard designed originally for Goethe Gymnasium Lichterfelde (GGL) to transform the lobby information display into a comprehensive school information hub.
@@ -146,7 +146,7 @@ This opacity has forced us to rely on reverse-engineered solutions, creating unn
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/yourusername/school-dashboard.git
+   git clone https://github.com/Zzacklack/school-dashboard.git
    cd school-dashboard
    ```
 

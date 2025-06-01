@@ -1,5 +1,7 @@
 package com.schooldashboard.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
@@ -10,6 +12,8 @@ import com.schooldashboard.util.DSBMobile;
 
 @Service
 public class DSBService {
+
+    private static final Logger logger = LoggerFactory.getLogger(DSBService.class);
 
     @Value("${dsb.username}")
     private String username;
@@ -32,6 +36,6 @@ public class DSBService {
     @CacheEvict(allEntries = true, value = {"timetables", "news"})
     @Scheduled(fixedRate = 300000) // Clear cache every 5 minutes (300000ms)
     public void clearCache() {
-        System.out.println("Clearing DSBMobile cache at " + new java.util.Date());
+        logger.info("Clearing DSBMobile cache at {}", new java.util.Date());
     }
 }

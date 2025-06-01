@@ -3,6 +3,8 @@ package com.schooldashboard.controller;
 import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -11,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 @Controller
 public class CustomErrorController implements ErrorController {
+
+    private static final Logger logger = LoggerFactory.getLogger(CustomErrorController.class);
 
     @RequestMapping("/error")
     public String handleError(HttpServletRequest request, Model model) {
@@ -49,8 +53,8 @@ public class CustomErrorController implements ErrorController {
         model.addAttribute("statusCode", status != null ? Integer.valueOf(status.toString()) : 500);
 
         // Logging
-        System.err.println("Error occurred: " + model.getAttribute("errorMessage") + " (Status code: " + model.getAttribute("statusCode") + ")");
-        System.err.println("Error path: " + model.getAttribute("path") + " (Timestamp: " + model.getAttribute("timestamp") + ")");
+        logger.error("Error occurred: {} (Status code: {})", model.getAttribute("errorMessage"), model.getAttribute("statusCode"));
+        logger.error("Error path: {} (Timestamp: {})", model.getAttribute("path"), model.getAttribute("timestamp"));
         return "error/general";
     }
 }

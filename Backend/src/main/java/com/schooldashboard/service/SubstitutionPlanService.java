@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -17,6 +19,8 @@ import com.schooldashboard.util.DSBMobile.TimeTable;
 
 @Service
 public class SubstitutionPlanService {
+
+    private static final Logger logger = LoggerFactory.getLogger(SubstitutionPlanService.class);
 
     private final DSBService dsbService;
     private final SubstitutionPlanParserService parserService;
@@ -43,16 +47,16 @@ public class SubstitutionPlanService {
     @CacheEvict(value = "substitutionPlans", allEntries = true)
     @SuppressWarnings("CallToPrintStackTrace")
     public void updateSubstitutionPlans() {
-        System.out.println("===============================================================");
-        System.out.println("[SubstitutionPlanService] Starting plan update at " + new java.util.Date());
+        logger.info("===============================================================");
+        logger.info("[SubstitutionPlanService] Starting plan update at {}", new java.util.Date());
         long startTime = System.currentTimeMillis();
         
         try {
             // Get fresh timetables from DSB service
-            System.out.println("[SubstitutionPlanService] Fetching timetables from DSB service...");
+            logger.info("[SubstitutionPlanService] Fetching timetables from DSB service...");
             @SuppressWarnings("unchecked")
             List<TimeTable> timeTables = (List<TimeTable>) dsbService.getTimeTables();
-            System.out.println("[SubstitutionPlanService] Received " + timeTables.size() + " timetables from DSB");
+            logger.info("[SubstitutionPlanService] Received {} timetables from DSB", timeTables.size());
             
             // Group timetables by UUID (same UUID = same day plan)
             Map<UUID, List<TimeTable>> timeTablesByUuid = new HashMap<>();
@@ -60,16 +64,14 @@ public class SubstitutionPlanService {
             int validTables = 0;
             for (TimeTable table : timeTables) {
                 if (table.getDetail() != null && !table.getDetail().isEmpty()) {
-                    System.out.println("[SubstitutionPlanService] Found timetable: UUID=" + table.getUUID() + 
-                        ", Group=" + table.getGroupName() + ", Detail URL=" + table.getDetail());
+                    logger.info("[SubstitutionPlanService] Found timetable: UUID={} , Group={} , Detail URL={}", table.getUUID(), table.getGroupName(), table.getDetail());
                     timeTablesByUuid.computeIfAbsent(table.getUUID(), k -> new ArrayList<>()).add(table);
                     validTables++;
                 } else {
-                    System.out.println("[SubstitutionPlanService] Skipping timetable with empty detail URL: " + table.getTitle());
+                    logger.info("[SubstitutionPlanService] Skipping timetable with empty detail URL: {}", table.getTitle());
                 }
             }
-            System.out.println("[SubstitutionPlanService] Found " + validTables + " valid timetables in " + 
-                timeTablesByUuid.size() + " distinct groups");
+            logger.info("[SubstitutionPlanService] Found {} valid timetables in {} distinct groups", validTables, timeTablesByUuid.size());
             
             List<SubstitutionPlan> combinedPlans = new ArrayList<>();
             
@@ -80,8 +82,7 @@ public class SubstitutionPlanService {
                 
                 // All tables in this group should have the same groupName
                 String groupName = tables.get(0).getGroupName();
-                System.out.println("[SubstitutionPlanService] Processing group: " + groupName + 
-                    " with " + tables.size() + " tables (UUID: " + uuid + ")");
+                logger.info("[SubstitutionPlanService] Processing group: {} with {} tables (UUID: {})", groupName, tables.size(), uuid);
                 
                 // Create a combined plan for this UUID
                 SubstitutionPlan combinedPlan = null;
@@ -90,28 +91,25 @@ public class SubstitutionPlanService {
                 
                 for (TimeTable table : tables) {
                     try {
-                        System.out.println("[SubstitutionPlanService]   - Processing detail URL: " + table.getDetail());
+                        logger.info("[SubstitutionPlanService]   - Processing detail URL: {}", table.getDetail());
                         SubstitutionPlan plan = parserService.parseSubstitutionPlanFromUrl(table.getDetail());
                         
                         // Log details about the parsed plan
-                        System.out.println("[SubstitutionPlanService]     Date: " + plan.getDate() + 
-                            ", Entries: " + plan.getEntries().size() + 
-                            ", News items: " + plan.getNews().getNewsItems().size());
+                        logger.info("[SubstitutionPlanService]     Date: {} , Entries: {} , News items: {}", plan.getDate(), plan.getEntries().size(), plan.getNews().getNewsItems().size());
                         
                         // For the first plan, initialize the combined plan
                         if (combinedPlan == null) {
-                            System.out.println("[SubstitutionPlanService]     Initializing combined plan with first page");
+                            logger.info("[SubstitutionPlanService]     Initializing combined plan with first page");
                             combinedPlan = plan;
                             totalEntries = plan.getEntries().size();
                             totalNewsItems = plan.getNews().getNewsItems().size();
                         } else {
                             // For subsequent plans, merge their entries and news into the combined plan
-                            System.out.println("[SubstitutionPlanService]     Combining with existing plan");
+                            logger.info("[SubstitutionPlanService]     Combining with existing plan");
                             combinedPlan.getEntries().addAll(plan.getEntries());
                             totalEntries += plan.getEntries().size();
                             
-                            System.out.println("[SubstitutionPlanService]     Added " + plan.getEntries().size() + 
-                                " entries. Total now: " + combinedPlan.getEntries().size());
+                            logger.info("[SubstitutionPlanService]     Added {} entries. Total now: {}", plan.getEntries().size(), combinedPlan.getEntries().size());
                             
                             // Merge news items without duplicates
                             int newNewsItems = 0;
@@ -122,12 +120,10 @@ public class SubstitutionPlanService {
                                     totalNewsItems++;
                                 }
                             }
-                            System.out.println("[SubstitutionPlanService]     Added " + newNewsItems + 
-                                " unique news items. Total now: " + combinedPlan.getNews().getNewsItems().size());
+                            logger.info("[SubstitutionPlanService]     Added {} unique news items. Total now: {}", newNewsItems, combinedPlan.getNews().getNewsItems().size());
                         }
                     } catch (Exception e) {
-                        System.err.println("[SubstitutionPlanService] ERROR parsing plan from URL " + table.getDetail() + 
-                            ": " + e.getMessage());
+                        logger.error("[SubstitutionPlanService] ERROR parsing plan from URL {}: {}", table.getDetail(), e.getMessage());
                         e.printStackTrace();
                     }
                 }
@@ -143,19 +139,15 @@ public class SubstitutionPlanService {
                     int priority = isToday ? 1 : (isTomorrow ? 2 : 3);
                     combinedPlan.setSortPriority(priority);
                     
-                    System.out.println("[SubstitutionPlanService] Finished combined plan for " + groupName + 
-                        " (priority " + priority + "): " + 
-                        "Date=" + combinedPlan.getDate() + 
-                        ", Total entries=" + totalEntries + 
-                        ", Total news items=" + totalNewsItems);
+                    logger.info("[SubstitutionPlanService] Finished combined plan for {} (priority {}): Date={} , Total entries={} , Total news items={}", groupName, priority, combinedPlan.getDate(), totalEntries, totalNewsItems);
                     
                     combinedPlans.add(combinedPlan);
                 } else {
-                    System.err.println("[SubstitutionPlanService] WARNING: Failed to create combined plan for UUID " + uuid);
+                    logger.error("[SubstitutionPlanService] WARNING: Failed to create combined plan for UUID {}", uuid);
                 }
             }
             
-            System.out.println("[SubstitutionPlanService] Created " + combinedPlans.size() + " combined plans, now sorting...");
+            logger.info("[SubstitutionPlanService] Created {} combined plans, now sorting...", combinedPlans.size());
             
             // Sort plans by priority (heute first, then morgen, then others)
             // Then by date if available
@@ -168,25 +160,21 @@ public class SubstitutionPlanService {
                     }));
             
             // Log the final sorted order
-            System.out.println("[SubstitutionPlanService] Final plan order:");
+            logger.info("[SubstitutionPlanService] Final plan order:");
             for (int i = 0; i < combinedPlans.size(); i++) {
                 SubstitutionPlan plan = combinedPlans.get(i);
-                System.out.println("[SubstitutionPlanService]   " + (i+1) + ". " + 
-                    "Priority=" + plan.getSortPriority() + 
-                    ", Date=" + plan.getDate() + 
-                    ", Entries=" + plan.getEntries().size());
+                logger.info("[SubstitutionPlanService]   {}. Priority={} , Date={} , Entries={}", i+1, plan.getSortPriority(), plan.getDate(), plan.getEntries().size());
             }
             
             this.latestPlans = combinedPlans;
             long duration = System.currentTimeMillis() - startTime;
-            System.out.println("[SubstitutionPlanService] Updated substitution plans at " + new java.util.Date() + 
-                    ", found " + combinedPlans.size() + " plans in " + duration + "ms");
+            logger.info("[SubstitutionPlanService] Updated substitution plans at {} , found {} plans in {}ms", new java.util.Date(), combinedPlans.size(), duration);
             
         } catch (Exception e) {
-            System.err.println("[SubstitutionPlanService] CRITICAL ERROR updating substitution plans: " + e.getMessage());
+            logger.error("[SubstitutionPlanService] CRITICAL ERROR updating substitution plans: {}", e.getMessage());
             e.printStackTrace();
         }
-        System.out.println("===============================================================");
+        logger.info("===============================================================");
     }
 
     /**
