@@ -10,7 +10,7 @@ This policy applies to all code, infrastructure-as-code, configuration files, an
 
 If you discover a potential security issue, please:
 
-1. **Do not open a public issue.** Instead, send an email to our private security inbox at [security@zaclack.de](mailto:security@zaclack.de).
+1. **Do not open a public issue.** Instead, send an email to our private security inbox at [security@zacklack.de](mailto:security@zacklack.de).
 2. **Provide detailed information**: steps to reproduce, affected versions, severity assessment, proof-of-concept, and any suggested remediation.
 
 We commit to:

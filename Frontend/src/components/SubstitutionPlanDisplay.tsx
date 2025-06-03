@@ -271,7 +271,7 @@ const SubstitutionPlanDisplay = () => {
                                         <tr>
                                             <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left rounded-tl-lg">Klasse</th>
                                             <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Stunde</th>
-                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Fehlenend</th>
+                                            <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Fehlend</th>
                                             <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Vertreter</th>
                                             <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Originales Fach</th>
                                             <th className="bg-gray-700/90 text-white backdrop-blur-md border-b border-white/10 px-4 py-3 text-left">Neues Fach</th>
