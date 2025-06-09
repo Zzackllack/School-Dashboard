@@ -22,8 +22,26 @@ These instructions apply to the entire repository `School-Dashboard` and are int
 - Do not commit credentials or secrets. Use environment variables as described in the README.
 - Reference any files you changed in your pull request description.
 
-## Testing
-No automated tests are currently present. Use the build commands above to verify compilation before submitting.
+## Testing & Coverage
+Every code change must include automated tests covering the unit, integration, and web layers.
+
+### Tools
+- **JUnit 5** for all test cases.
+- **Mockito** for mocking dependencies.
+- **Spring Boot Test** utilities with `@SpringBootTest`.
+- **TestRestTemplate** or **MockMvc** for exercising HTTP endpoints.
+- Embedded HTTP servers for parser tests.
+
+### Guidelines
+- Mock external dependencies such as DSBMobile network requests and Jsoup HTML fetches.
+- Start lightweight web servers when testing HTML parsing logic.
+
+### Edge Cases
+- Missing HTML elements or malformed structures.
+- Malformed JSON payloads.
+- Cache eviction logic.
+- Presence of CORS headers.
+- Serving static resources correctly.
 
 ## License
 This project is released under the BSD 3-Clause license. By contributing you agree your code may be distributed under this license.
