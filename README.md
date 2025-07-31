@@ -20,25 +20,25 @@ While developed specifically for GGL, this application is designed to be adaptab
   <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-bottom: 20px;">
     <div style="flex-basis: 100%;">
       <h3>Overview</h3>
-      <img src="https://kappa.lol/VeqG8o" alt="Dashboard Preview" style="max-width: 100%; height: auto;">
+      <img src="images/dashboard-preview.png" alt="Dashboard Preview" style="max-width: 100%; height: auto;">
     </div>
   </div>
   <div style="display: flex; flex-wrap: wrap; justify-content: center; gap: 0px;">
     <div style="flex-basis: 25%;">
       <h3>Holiday Module</h3>
-      <img src="https://kappa.lol/sDf_cE" alt="Transportation Preview" style="max-width: 100%; height: auto;">
+      <img src="images/holidays.png" alt="Transportation Preview" style="max-width: 100%; height: auto;">
     </div>
     <div style="flex-basis: 25%;">
       <h3>Calendar Module</h3>
-      <img src="https://kappa.lol/mRVurJ" alt="Calendar Preview" style="max-width: 100%; height: auto;">
+      <img src="images/calendar.png" alt="Calendar Preview" style="max-width: 100%; height: auto;">
     </div>
     <div style="flex-basis: 25%;">
       <h3>Transportation Module</h3>
-      <img src="https://kappa.lol/rl0-yq" alt="Holiday Preview" style="max-width: 100%; height: auto;">
+      <img src="images/navigation.png" alt="Transportation Preview" style="max-width: 100%; height: auto;">
     </div>
     <div style="flex-basis: 25%;">
       <h3>Weather Module</h3>
-      <img src="https://kappa.lol/941Ejj" alt="Weather Preview" style="max-width: 100%; height: auto;">
+      <img src="images/weather.png" alt="Weather Preview" style="max-width: 100%; height: auto;">
     </div>
   </div>
 </div>
