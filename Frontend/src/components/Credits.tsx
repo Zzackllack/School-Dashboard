@@ -14,14 +14,16 @@ const Credits = () => {
         </div>
 
         <div className="w-full">
-          <div className="h-40 overflow-hidden rounded-lg shadow-md max-w-xs mx-auto">
-            <img
-              src="/images/LK.JPEG"
-              alt="Informatik Leistungskurs"
-              className="w-full h-full object-cover"
-            />
+          <div className="mx-auto max-w-[18rem]">
+            <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-gray-200 shadow-md">
+              <img
+                src="/images/LK.JPEG"
+                alt="Informatik Leistungskurs"
+                className="absolute inset-0 h-full w-full object-cover"
+              />
+            </div>
           </div>
-          <p className="mt-2 text-sm text-[#5A4635] text-center">
+          <p className="mt-2 text-center text-sm text-[#5A4635]">
             Informatik Leistungskurs
           </p>
         </div>
