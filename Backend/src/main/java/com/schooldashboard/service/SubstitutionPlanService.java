@@ -14,6 +14,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import com.schooldashboard.model.ParsedPlanDocument;
 import com.schooldashboard.model.SubstitutionPlan;
 import com.schooldashboard.util.DSBMobile.TimeTable;
 
@@ -24,12 +25,15 @@ public class SubstitutionPlanService {
 
     private final DSBService dsbService;
     private final SubstitutionPlanParserService parserService;
+    private final SubstitutionPlanPersistenceService persistenceService;
     private List<SubstitutionPlan> latestPlans = new ArrayList<>();
 
     @Autowired
-    public SubstitutionPlanService(DSBService dsbService, SubstitutionPlanParserService parserService) {
+    public SubstitutionPlanService(DSBService dsbService, SubstitutionPlanParserService parserService,
+            SubstitutionPlanPersistenceService persistenceService) {
         this.dsbService = dsbService;
         this.parserService = parserService;
+        this.persistenceService = persistenceService;
     }
 
     /**
@@ -92,7 +96,9 @@ public class SubstitutionPlanService {
                 for (TimeTable table : tables) {
                     try {
                         logger.info("[SubstitutionPlanService]   - Processing detail URL: {}", table.getDetail());
-                        SubstitutionPlan plan = parserService.parseSubstitutionPlanFromUrl(table.getDetail());
+                        ParsedPlanDocument parsedDocument = parserService.parsePlanDocumentFromUrl(table.getDetail());
+                        persistenceService.store(table, parsedDocument.getRawHtml());
+                        SubstitutionPlan plan = parsedDocument.getPlan();
                         
                         // Log details about the parsed plan
                         logger.info("[SubstitutionPlanService]     Date: {} , Entries: {} , News items: {}", plan.getDate(), plan.getEntries().size(), plan.getNews().getNewsItems().size());

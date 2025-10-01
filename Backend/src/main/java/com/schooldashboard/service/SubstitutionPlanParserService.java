@@ -11,6 +11,7 @@ import org.jsoup.select.Elements;
 import org.springframework.stereotype.Service;
 
 import com.schooldashboard.model.DailyNews;
+import com.schooldashboard.model.ParsedPlanDocument;
 import com.schooldashboard.model.SubstitutionEntry;
 import com.schooldashboard.model.SubstitutionPlan;
 
@@ -18,10 +19,15 @@ import com.schooldashboard.model.SubstitutionPlan;
 public class SubstitutionPlanParserService {
 
     public SubstitutionPlan parseSubstitutionPlanFromUrl(String url) {
+        return parsePlanDocumentFromUrl(url).getPlan();
+    }
+
+    public ParsedPlanDocument parsePlanDocumentFromUrl(String url) {
         try {
             // Connect to the URL and get the document
             Document doc = Jsoup.connect(url).get();
-            return parseDocument(doc);
+            SubstitutionPlan plan = parseDocument(doc);
+            return new ParsedPlanDocument(plan, doc.outerHtml());
         } catch (IOException e) {
             throw new RuntimeException("Error fetching or parsing substitution plan", e);
         }
@@ -146,7 +152,7 @@ public class SubstitutionPlanParserService {
         
         if (!newsHeaders.isEmpty()) {
             Element newsHeader = newsHeaders.first();
-            Element parent = newsHeader.parent();
+            Element parent = (newsHeader == null) ? null : newsHeader.parent();
             
             // Look for paragraphs or divs after the header
             if (parent != null) {

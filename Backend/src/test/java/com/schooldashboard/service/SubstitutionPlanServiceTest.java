@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import com.schooldashboard.model.ParsedPlanDocument;
 import com.schooldashboard.model.SubstitutionPlan;
 import com.schooldashboard.util.DSBMobile;
 import com.schooldashboard.util.DSBMobile.TimeTable;
@@ -19,13 +20,15 @@ public class SubstitutionPlanServiceTest {
 
     private DSBService dsbService;
     private SubstitutionPlanParserService parser;
+    private SubstitutionPlanPersistenceService persistence;
     private SubstitutionPlanService service;
 
     @BeforeEach
     public void setup() {
         dsbService = mock(DSBService.class);
         parser = mock(SubstitutionPlanParserService.class);
-        service = new SubstitutionPlanService(dsbService, parser);
+        persistence = mock(SubstitutionPlanPersistenceService.class);
+        service = new SubstitutionPlanService(dsbService, parser, persistence);
     }
 
     private TimeTable tt(UUID uuid, String group, String detail) {
@@ -53,9 +56,9 @@ public class SubstitutionPlanServiceTest {
         SubstitutionPlan p3 = new SubstitutionPlan("d2","t3");
         p3.addEntry(new com.schooldashboard.model.SubstitutionEntry());
 
-        when(parser.parseSubstitutionPlanFromUrl("u1-1")).thenReturn(p1);
-        when(parser.parseSubstitutionPlanFromUrl("u1-2")).thenReturn(p2);
-        when(parser.parseSubstitutionPlanFromUrl("u2")).thenReturn(p3);
+        when(parser.parsePlanDocumentFromUrl("u1-1")).thenReturn(parsed(p1));
+        when(parser.parsePlanDocumentFromUrl("u1-2")).thenReturn(parsed(p2));
+        when(parser.parsePlanDocumentFromUrl("u2")).thenReturn(parsed(p3));
 
         service.updateSubstitutionPlans();
 
@@ -73,8 +76,12 @@ public class SubstitutionPlanServiceTest {
     public void updateContinuesOnParserError() {
         UUID u1 = UUID.randomUUID();
         when(dsbService.getTimeTables()).thenReturn(List.of(tt(u1, "heute", "u")));
-        when(parser.parseSubstitutionPlanFromUrl("u")).thenThrow(new RuntimeException("err"));
+        when(parser.parsePlanDocumentFromUrl("u")).thenThrow(new RuntimeException("err"));
         service.updateSubstitutionPlans();
         assertTrue(service.getSubstitutionPlans().isEmpty());
+    }
+
+    private ParsedPlanDocument parsed(SubstitutionPlan plan) {
+        return new ParsedPlanDocument(plan, "<html></html>");
     }
 }
