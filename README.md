@@ -143,34 +143,68 @@ This opacity has forced us to rely on reverse-engineered solutions, creating unn
 
 ### Installation
 
-1. **Clone the repository**
+```bash
+git clone https://github.com/Zzacklack/school-dashboard.git
+cd school-dashboard
+```
 
-   ```bash
-   git clone https://github.com/Zzacklack/school-dashboard.git
-   cd school-dashboard
-   ```
+### Backend (Spring Boot)
 
-2. **Set up the backend**
+- **Install dependencies**
 
-   ```bash
-   cd Backend
-   # Update application.properties with your DSBmobile credentials
-   mvn clean package
-   # Replace X.Y.Z with the current version number
-   java -jar target/school-dashboard-backend-X.Y.Z.jar
-   ```
+  ```bash
+  cd Backend
+  mvn dependency:go-offline
+  ```
 
-3. **Set up the frontend**
+  Copy `src/main/resources/application.properties.example` to `application.properties` and set your DSBmobile credentials before starting the service.
 
-   ```bash
-   cd ../Frontend
-   npm install
-   npm run dev
-   ```
+- **Start the dev server** (hot reload, no jar required)
 
-4. **Access the application**
-   - Frontend: <http://localhost:5173>
-   - Backend API: <http://localhost:8080>
+  ```bash
+  mvn spring-boot:run
+  ```
+
+- **Run tests**
+
+  ```bash
+  mvn test
+  ```
+
+- **Build an executable jar** (skips tests for faster iteration)
+
+  ```bash
+  mvn clean package -DskipTests
+  ```
+
+  The H2 database persists plan snapshots under `Backend/data/`.
+
+### Frontend (React + Vite)
+
+- **Install dependencies**
+
+  ```bash
+  cd ../Frontend
+  npm install
+  ```
+
+- **Start the dev server**
+
+  ```bash
+  npm run dev
+  ```
+
+- **Run checks**
+
+  ```bash
+  npm run build   # type check + production bundle
+  npm run lint    # optional lint pass
+  ```
+
+### Access the application
+
+- Frontend: <http://localhost:5173>
+- Backend API: <http://localhost:8080>
 
 ## Production
 
