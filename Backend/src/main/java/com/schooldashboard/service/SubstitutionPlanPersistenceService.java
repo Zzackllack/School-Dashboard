@@ -5,6 +5,8 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Optional;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,6 +67,13 @@ public class SubstitutionPlanPersistenceService {
                 return repository.save(document);
             }
 
+            boolean metadataChanged = applyMetadata(document, table, plan);
+            if (metadataChanged) {
+                logger.info("[SubstitutionPlanPersistenceService] Metadata changed for plan {}, updating record", document.getId());
+                document.setUpdatedAt(Instant.now());
+                return repository.save(document);
+            }
+
             logger.debug("[SubstitutionPlanPersistenceService] Stored plan {} unchanged, skipping update", document.getId());
             return document;
         }
@@ -91,34 +100,52 @@ public class SubstitutionPlanPersistenceService {
         }
     }
 
-    private void applyMetadata(SubstitutionPlanDocument document, TimeTable table, SubstitutionPlan plan) {
-        document.setGroupName(table.getGroupName());
-        document.setSourceDate(table.getDate());
-        document.setSourceTitle(table.getTitle());
-        document.setTitle(resolveFileName(document.getDetailUrl()));
+    private boolean applyMetadata(SubstitutionPlanDocument document, TimeTable table, SubstitutionPlan plan) {
+        boolean changed = false;
 
-        String planDate = plan != null ? plan.getDate() : null;
+        changed |= updateIfChanged(document::getGroupName, document::setGroupName, table.getGroupName());
+        changed |= updateIfChanged(document::getSourceDate, document::setSourceDate, table.getDate());
+        changed |= updateIfChanged(document::getSourceTitle, document::setSourceTitle, table.getTitle());
+
+        String resolvedTitle = resolveFileName(document.getDetailUrl());
+        changed |= updateIfChanged(document::getTitle, document::setTitle, resolvedTitle);
+
+        String planDate = null;
+        if (plan != null && plan.getDate() != null && !plan.getDate().isBlank()) {
+            planDate = plan.getDate();
+        }
+        if (planDate == null || planDate.isBlank()) {
+            planDate = table.getDate();
+        }
+        changed |= updateIfChanged(document::getPlanDate, document::setPlanDate, planDate);
+
+        Integer pageNumber = null;
+        Integer pageCount = null;
         if (planDate != null && !planDate.isBlank()) {
-            document.setPlanDate(planDate);
             Matcher matcher = PAGE_PATTERN.matcher(planDate);
             if (matcher.find()) {
-                document.setPageNumber(parseIntSafe(matcher.group(1)));
-                document.setPageCount(parseIntSafe(matcher.group(2)));
-            } else {
-                document.setPageNumber(null);
-                document.setPageCount(null);
+                pageNumber = parseIntSafe(matcher.group(1));
+                pageCount = parseIntSafe(matcher.group(2));
             }
-        } else {
-            document.setPageNumber(null);
-            document.setPageCount(null);
         }
 
-        if (document.getPageNumber() == null) {
-            Integer fromFile = pageFromFileName(document.getTitle());
-            if (fromFile != null) {
-                document.setPageNumber(fromFile);
-            }
+        if (pageNumber == null) {
+            pageNumber = pageFromFileName(resolvedTitle);
         }
+
+        changed |= updateIfChanged(document::getPageNumber, document::setPageNumber, pageNumber);
+        changed |= updateIfChanged(document::getPageCount, document::setPageCount, pageCount);
+
+        return changed;
+    }
+
+    private <T> boolean updateIfChanged(java.util.function.Supplier<T> getter, java.util.function.Consumer<T> setter, T newValue) {
+        T current = getter.get();
+        if (current == null ? newValue != null : !current.equals(newValue)) {
+            setter.accept(newValue);
+            return true;
+        }
+        return false;
     }
 
     private Integer parseIntSafe(String value) {
