@@ -8,12 +8,18 @@ services:
     container_name: school-dashboard-backend
     restart: unless-stopped
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      # Add any environment variables needed for your app (credentials, etc.)
-      # - DSB_USERNAME=user
-      # - DSB_PASSWORD=pass
+      # Provide credentials at runtime (e.g. via .env or secrets)
+      # DSB_USERNAME and DSB_PASSWORD override values in application.properties
+      # - DSB_USERNAME=your-user
+      # - DSB_PASSWORD=your-pass
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: ""
+    volumes:
+      - backend-data:/data
+    ports:
+      - "8080:8080"
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/api/dsb/timetables"] 
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/api/dsb/timetables || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -27,25 +33,22 @@ services:
       dockerfile: Docker/frontend.Dockerfile
     container_name: school-dashboard-frontend
     restart: unless-stopped
-    # Remove the direct port mapping
-    # ports:
-    #   - "80:80"
     depends_on:
       - backend
+    ports:
+      - "80:80"
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:80"]
+      test: ["CMD-SHELL", "curl -f http://localhost || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 10s
     networks:
       - app-network
-    # labels:
-      # Add HTTPS configuration if needed
-      # - "traefik.http.routers.school-dashboard-secure.rule=Host(`your-domain.com`)"
-      # - "traefik.http.routers.school-dashboard-secure.entrypoints=https"
-      # - "traefik.http.routers.school-dashboard-secure.tls.certresolver=letsencrypt"
 
 networks:
   app-network:
     driver: bridge
+
+volumes:
+  backend-data:

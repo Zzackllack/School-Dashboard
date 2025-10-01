@@ -8,13 +8,21 @@ services:
     container_name: school-dashboard-backend
     restart: unless-stopped
     environment:
-      - SPRING_PROFILES_ACTIVE=prod
-      # Add any environment variables needed for your app (credentials, etc.)
-      # - DSB_USERNAME=user
-      # - DSB_PASSWORD=pass
+      SPRING_DATASOURCE_USERNAME: sa
+      SPRING_DATASOURCE_PASSWORD: ""
+      # Uncomment and supply credentials for production use
+      # DSB_USERNAME: your-user
+      # DSB_PASSWORD: your-pass
+    ports:
+      - "8080:8080"
+    volumes:
+      - backend-data:/data
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8080/api/dsb/timetables"] 
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/api/dsb/timetables || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 40s
+
+volumes:
+  backend-data:

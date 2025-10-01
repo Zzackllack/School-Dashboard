@@ -219,8 +219,8 @@ cd school-dashboard
 
 1. **Configure the Backend**:
 
-- Set the `SPRING_PROFILES_ACTIVE` environment variable to `prod` in your `docker-compose.yaml` file.
-- Ensure all necessary environment variables (e.g., database credentials, API keys) are properly configured for the production environment.
+- Provide required credentials through environment variables (e.g. add a `.env` file in the `Docker/` directory or inject values in your CI/CD system). Typical variables include `DSB_USERNAME`, `DSB_PASSWORD`, and any optional Spring overrides.
+- Persistent storage for the H2 database is already wired via the `backend-data` volume (mounted at `/data`). Create regular backups of this volume if the substitution history is important for you.
 
 2. **Configure the Frontend**:
 
@@ -231,13 +231,14 @@ cd school-dashboard
 1. **Build the Docker Images**:
 
   ```bash
-  docker-compose build
+  cd Docker
+  docker compose -f docker-compose.yaml build
   ```
 
 2. **Run the Application with Docker Compose**:
 
   ```bash
-  docker-compose up -d
+  docker compose -f docker-compose.yaml up -d
   ```
 
   This command builds the images and starts the containers in detached mode.
@@ -247,7 +248,7 @@ cd school-dashboard
 1. **Check Container Status**:
 
   ```bash
-  docker-compose ps
+  docker compose -f docker-compose.yaml ps
   ```
 
   Verify that both the frontend and backend containers are running without issues.
