@@ -11,6 +11,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.schooldashboard.model.SubstitutionPlan;
 import com.schooldashboard.persistence.entity.SubstitutionPlanDocument;
 import com.schooldashboard.persistence.repository.SubstitutionPlanDocumentRepository;
 import com.schooldashboard.util.DSBMobile.TimeTable;
@@ -27,7 +31,9 @@ public class SubstitutionPlanPersistenceService {
         this.repository = repository;
     }
 
-    public SubstitutionPlanDocument store(TimeTable table, String rawHtml) {
+    private static final Pattern PAGE_PATTERN = Pattern.compile("(?i)seite\\s+(\\d+)\\s*/\\s*(\\d+)");
+
+    public SubstitutionPlanDocument store(TimeTable table, SubstitutionPlan plan, String rawHtml) {
         if (table == null || rawHtml == null || rawHtml.isBlank()) {
             logger.warn("[SubstitutionPlanPersistenceService] Skipping storage due to missing data (table={}, hasHtml={})",
                     table, rawHtml != null && !rawHtml.isBlank());
@@ -54,9 +60,7 @@ public class SubstitutionPlanPersistenceService {
                 logger.info("[SubstitutionPlanPersistenceService] Updating stored plan {} due to content change", document.getId());
                 document.setRawHtml(rawHtml);
                 document.setContentHash(contentHash);
-                document.setGroupName(table.getGroupName());
-                document.setPlanDate(table.getDate());
-                document.setTitle(table.getTitle());
+                applyMetadata(document, table, plan);
                 document.setUpdatedAt(Instant.now());
                 return repository.save(document);
             }
@@ -68,12 +72,13 @@ public class SubstitutionPlanPersistenceService {
         SubstitutionPlanDocument document = new SubstitutionPlanDocument(
                 planUuid,
                 table.getGroupName(),
-                table.getDate(),
-                table.getTitle(),
+                plan != null ? plan.getDate() : table.getDate(),
+                resolveFileName(detailUrl),
                 detailUrl,
                 rawHtml,
                 contentHash,
                 Instant.now());
+        applyMetadata(document, table, plan);
 
         logger.info("[SubstitutionPlanPersistenceService] Persisting new substitution plan for UUID {}", table.getUUID());
         try {
@@ -84,6 +89,67 @@ public class SubstitutionPlanPersistenceService {
                     .or(() -> repository.findByDetailUrl(detailUrl))
                     .orElseThrow(() -> ex);
         }
+    }
+
+    private void applyMetadata(SubstitutionPlanDocument document, TimeTable table, SubstitutionPlan plan) {
+        document.setGroupName(table.getGroupName());
+        document.setSourceDate(table.getDate());
+        document.setSourceTitle(table.getTitle());
+        document.setTitle(resolveFileName(document.getDetailUrl()));
+
+        String planDate = plan != null ? plan.getDate() : null;
+        if (planDate != null && !planDate.isBlank()) {
+            document.setPlanDate(planDate);
+            Matcher matcher = PAGE_PATTERN.matcher(planDate);
+            if (matcher.find()) {
+                document.setPageNumber(parseIntSafe(matcher.group(1)));
+                document.setPageCount(parseIntSafe(matcher.group(2)));
+            } else {
+                document.setPageNumber(null);
+                document.setPageCount(null);
+            }
+        } else {
+            document.setPageNumber(null);
+            document.setPageCount(null);
+        }
+
+        if (document.getPageNumber() == null) {
+            Integer fromFile = pageFromFileName(document.getTitle());
+            if (fromFile != null) {
+                document.setPageNumber(fromFile);
+            }
+        }
+    }
+
+    private Integer parseIntSafe(String value) {
+        try {
+            return Integer.parseInt(value);
+        } catch (NumberFormatException ex) {
+            logger.debug("[SubstitutionPlanPersistenceService] Unable to parse integer from '{}': {}", value, ex.getMessage());
+            return null;
+        }
+    }
+
+    private String resolveFileName(String detailUrl) {
+        if (detailUrl == null || detailUrl.isBlank()) {
+            return null;
+        }
+        int lastSlash = detailUrl.lastIndexOf('/') + 1;
+        if (lastSlash <= 0 || lastSlash >= detailUrl.length()) {
+            return detailUrl;
+        }
+        return detailUrl.substring(lastSlash);
+    }
+
+    private Integer pageFromFileName(String fileName) {
+        if (fileName == null) {
+            return null;
+        }
+        Matcher matcher = Pattern.compile(".*?(\\d+)(?=\\.html?|$)").matcher(fileName);
+        if (matcher.find()) {
+            return parseIntSafe(matcher.group(1));
+        }
+        return null;
     }
 
     private String hashContent(String content) {

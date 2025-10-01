@@ -97,8 +97,8 @@ public class SubstitutionPlanService {
                     try {
                         logger.info("[SubstitutionPlanService]   - Processing detail URL: {}", table.getDetail());
                         ParsedPlanDocument parsedDocument = parserService.parsePlanDocumentFromUrl(table.getDetail());
-                        persistenceService.store(table, parsedDocument.getRawHtml());
                         SubstitutionPlan plan = parsedDocument.getPlan();
+                        persistenceService.store(table, plan, parsedDocument.getRawHtml());
                         
                         // Log details about the parsed plan
                         logger.info("[SubstitutionPlanService]     Date: {} , Entries: {} , News items: {}", plan.getDate(), plan.getEntries().size(), plan.getNews().getNewsItems().size());

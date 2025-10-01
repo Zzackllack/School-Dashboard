@@ -34,6 +34,12 @@ public class SubstitutionPlanDocument {
     @Column(name = "title")
     private String title;
 
+    @Column(name = "source_date")
+    private String sourceDate;
+
+    @Column(name = "source_title")
+    private String sourceTitle;
+
     @Column(name = "detail_url", nullable = false, length = 1024)
     private String detailUrl;
 
@@ -49,6 +55,12 @@ public class SubstitutionPlanDocument {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    @Column(name = "page_number")
+    private Integer pageNumber;
+
+    @Column(name = "page_count")
+    private Integer pageCount;
 
     protected SubstitutionPlanDocument() {
         // JPA requires a no-args constructor
@@ -119,6 +131,22 @@ public class SubstitutionPlanDocument {
         this.title = title;
     }
 
+    public String getSourceDate() {
+        return sourceDate;
+    }
+
+    public void setSourceDate(String sourceDate) {
+        this.sourceDate = sourceDate;
+    }
+
+    public String getSourceTitle() {
+        return sourceTitle;
+    }
+
+    public void setSourceTitle(String sourceTitle) {
+        this.sourceTitle = sourceTitle;
+    }
+
     public String getDetailUrl() {
         return detailUrl;
     }
@@ -157,5 +185,21 @@ public class SubstitutionPlanDocument {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public Integer getPageNumber() {
+        return pageNumber;
+    }
+
+    public void setPageNumber(Integer pageNumber) {
+        this.pageNumber = pageNumber;
+    }
+
+    public Integer getPageCount() {
+        return pageCount;
+    }
+
+    public void setPageCount(Integer pageCount) {
+        this.pageCount = pageCount;
     }
 }
