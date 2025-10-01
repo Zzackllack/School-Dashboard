@@ -13,8 +13,8 @@ services:
       # Uncomment and supply credentials for production use
       # DSB_USERNAME: your-user
       # DSB_PASSWORD: your-pass
-    ports:
-      - "8080:8080"
+    # ports: - Uncomment to expose the backend service (not needed if using a reverse proxy)
+    #  - "8080:8080"
     volumes:
       - backend-data:/data
     healthcheck:
