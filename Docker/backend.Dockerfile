@@ -17,7 +17,12 @@ RUN addgroup -S app && adduser -S app -G app
 
 COPY --from=build /workspace/app.jar /app/app.jar
 
-RUN apk add --no-cache curl
+RUN apk add --no-cache curl su-exec \
+    && mkdir -p /data \
+    && chown app:app /data
+
+COPY Docker/backend-entrypoint.sh /entrypoint.sh
+RUN chmod +x /entrypoint.sh
 
 VOLUME /data
 EXPOSE 8080
@@ -26,6 +31,5 @@ ENV SPRING_DATASOURCE_URL=jdbc:h2:file:/data/substitution-plans;AUTO_SERVER=TRUE
     SPRING_PROFILES_ACTIVE=prod \
     JAVA_OPTS=""
 
-USER app
-
-ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar /app/app.jar"]
+ENTRYPOINT ["/entrypoint.sh"]
+CMD ["java", "-jar", "/app/app.jar"]
