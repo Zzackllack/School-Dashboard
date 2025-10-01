@@ -58,3 +58,6 @@ dist-ssr
 /bin/
 /out/
 
+# H2 Database
+*.db
+
