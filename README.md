@@ -159,6 +159,8 @@ cd school-dashboard
 
   Copy `src/main/resources/application.properties.example` to `application.properties` and set your DSBmobile credentials before starting the service.
 
+- **Database migrations** – Flyway runs automatically on startup. Migration scripts live under `Backend/src/main/resources/db/migration`. To apply new schema changes, add a `V{next}__description.sql` file and restart the backend.
+
 - **Start the dev server** (hot reload, no jar required)
 
   ```bash
