@@ -1,5 +1,9 @@
 {
-    "recommendations": [
-        "bradlc.vscode-tailwindcss"
-    ]
+  "recommendations": [
+    "bradlc.vscode-tailwindcss",
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "ms-azuretools.vscode-docker",
+    "ms-vscode-remote.remote-containers"
+  ]
 }
