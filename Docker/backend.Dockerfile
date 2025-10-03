@@ -33,3 +33,6 @@ ENV SPRING_DATASOURCE_URL=jdbc:h2:file:/data/substitution-plans;AUTO_SERVER=TRUE
 
 ENTRYPOINT ["/entrypoint.sh"]
 CMD ["java", "-jar", "/app/app.jar"]
+
+
+codex resume 0199a19a-3449-75e1-ad4c-efce932aa5b5.
