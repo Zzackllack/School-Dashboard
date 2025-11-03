@@ -12,3 +12,12 @@ spring.datasource.username=sa
 spring.datasource.password=
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=false
+
+# Actuator / health configuration
+management.endpoints.web.exposure.include=health,info,metrics,env
+
+# Show health details in responses (use 'never' or secure this in production)
+management.endpoint.health.show-details=always
+
+# Application metadata available to health/info
+app.version=3.2.5
