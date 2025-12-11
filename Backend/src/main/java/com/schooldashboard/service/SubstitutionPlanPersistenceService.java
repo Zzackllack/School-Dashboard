@@ -1,25 +1,20 @@
 package com.schooldashboard.service;
 
+import com.schooldashboard.model.SubstitutionPlan;
+import com.schooldashboard.persistence.entity.SubstitutionPlanDocument;
+import com.schooldashboard.persistence.repository.SubstitutionPlanDocumentRepository;
+import com.schooldashboard.util.DSBMobile.TimeTable;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.Optional;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
-
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import com.schooldashboard.model.SubstitutionPlan;
-import com.schooldashboard.persistence.entity.SubstitutionPlanDocument;
-import com.schooldashboard.persistence.repository.SubstitutionPlanDocumentRepository;
-import com.schooldashboard.util.DSBMobile.TimeTable;
 
 @Service
 public class SubstitutionPlanPersistenceService {
@@ -37,7 +32,8 @@ public class SubstitutionPlanPersistenceService {
 
     public SubstitutionPlanDocument store(TimeTable table, SubstitutionPlan plan, String rawHtml) {
         if (table == null || rawHtml == null || rawHtml.isBlank()) {
-            logger.warn("[SubstitutionPlanPersistenceService] Skipping storage due to missing data (table={}, hasHtml={})",
+            logger.warn(
+                    "[SubstitutionPlanPersistenceService] Skipping storage due to missing data (table={}, hasHtml={})",
                     table, rawHtml != null && !rawHtml.isBlank());
             return null;
         }
@@ -46,7 +42,8 @@ public class SubstitutionPlanPersistenceService {
         String planUuid = table.getUUID() != null ? table.getUUID().toString() : null;
 
         if (planUuid == null || detailUrl == null || detailUrl.isBlank()) {
-            logger.warn("[SubstitutionPlanPersistenceService] Skipping storage due to missing identifiers (uuid={}, detail={})",
+            logger.warn(
+                    "[SubstitutionPlanPersistenceService] Skipping storage due to missing identifiers (uuid={}, detail={})",
                     planUuid, detailUrl);
             return null;
         }
@@ -59,7 +56,8 @@ public class SubstitutionPlanPersistenceService {
         if (existing.isPresent()) {
             SubstitutionPlanDocument document = existing.get();
             if (!contentHash.equals(document.getContentHash())) {
-                logger.info("[SubstitutionPlanPersistenceService] Updating stored plan {} due to content change", document.getId());
+                logger.info("[SubstitutionPlanPersistenceService] Updating stored plan {} due to content change",
+                        document.getId());
                 document.setRawHtml(rawHtml);
                 document.setContentHash(contentHash);
                 applyMetadata(document, table, plan);
@@ -69,12 +67,14 @@ public class SubstitutionPlanPersistenceService {
 
             boolean metadataChanged = applyMetadata(document, table, plan);
             if (metadataChanged) {
-                logger.info("[SubstitutionPlanPersistenceService] Metadata changed for plan {}, updating record", document.getId());
+                logger.info("[SubstitutionPlanPersistenceService] Metadata changed for plan {}, updating record",
+                        document.getId());
                 document.setUpdatedAt(Instant.now());
                 return repository.save(document);
             }
 
-            logger.debug("[SubstitutionPlanPersistenceService] Stored plan {} unchanged, skipping update", document.getId());
+            logger.debug("[SubstitutionPlanPersistenceService] Stored plan {} unchanged, skipping update",
+                    document.getId());
             return document;
         }
 
@@ -89,11 +89,14 @@ public class SubstitutionPlanPersistenceService {
                 Instant.now());
         applyMetadata(document, table, plan);
 
-        logger.info("[SubstitutionPlanPersistenceService] Persisting new substitution plan for UUID {}", table.getUUID());
+        logger.info("[SubstitutionPlanPersistenceService] Persisting new substitution plan for UUID {}",
+                table.getUUID());
         try {
             return repository.save(document);
         } catch (DataIntegrityViolationException ex) {
-            logger.debug("[SubstitutionPlanPersistenceService] Concurrent insert detected for {} - reusing existing entry", detailUrl);
+            logger.debug(
+                    "[SubstitutionPlanPersistenceService] Concurrent insert detected for {} - reusing existing entry",
+                    detailUrl);
             return repository.findByPlanUuidAndDetailUrl(planUuid, detailUrl)
                     .or(() -> repository.findByDetailUrl(detailUrl))
                     .orElseThrow(() -> ex);
@@ -139,7 +142,8 @@ public class SubstitutionPlanPersistenceService {
         return changed;
     }
 
-    private <T> boolean updateIfChanged(java.util.function.Supplier<T> getter, java.util.function.Consumer<T> setter, T newValue) {
+    private <T> boolean updateIfChanged(java.util.function.Supplier<T> getter, java.util.function.Consumer<T> setter,
+            T newValue) {
         T current = getter.get();
         if (current == null ? newValue != null : !current.equals(newValue)) {
             setter.accept(newValue);
@@ -150,9 +154,10 @@ public class SubstitutionPlanPersistenceService {
 
     private Integer parseIntSafe(String value) {
         try {
-            return Integer.parseInt(value);
+            return Integer.valueOf(value);
         } catch (NumberFormatException ex) {
-            logger.debug("[SubstitutionPlanPersistenceService] Unable to parse integer from '{}': {}", value, ex.getMessage());
+            logger.debug("[SubstitutionPlanPersistenceService] Unable to parse integer from '{}': {}", value,
+                    ex.getMessage());
             return null;
         }
     }
