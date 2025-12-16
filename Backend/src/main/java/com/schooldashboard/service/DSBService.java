@@ -9,6 +9,8 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.schooldashboard.util.DSBMobile;
+import com.schooldashboard.util.DSBMobile.TimeTable;
+import java.util.List;
 
 @Service
 public class DSBService {
@@ -21,10 +23,20 @@ public class DSBService {
     @Value("${dsb.password}")
     private String password;
 
+    private final ApiResponseCacheService cacheService;
+
+    public DSBService(ApiResponseCacheService cacheService) {
+        this.cacheService = cacheService;
+    }
+
     @Cacheable("timetables")
-    public Object getTimeTables() {
+    public List<TimeTable> getTimeTables() {
         DSBMobile dsbMobile = new DSBMobile(username, password);
-        return dsbMobile.getTimeTables();
+        List<TimeTable> tables = dsbMobile.getTimeTables();
+        if (tables != null && !tables.isEmpty()) {
+            cacheService.store(ApiResponseCacheKeys.DSB_TIMETABLES, tables);
+        }
+        return tables;
     }
 
     @Cacheable("news")

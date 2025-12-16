@@ -21,6 +21,7 @@ public class SubstitutionPlanServiceTest {
     private DSBService dsbService;
     private SubstitutionPlanParserService parser;
     private SubstitutionPlanPersistenceService persistence;
+    private ApiResponseCacheService cacheService;
     private SubstitutionPlanService service;
 
     @BeforeEach
@@ -28,7 +29,8 @@ public class SubstitutionPlanServiceTest {
         dsbService = mock(DSBService.class);
         parser = mock(SubstitutionPlanParserService.class);
         persistence = mock(SubstitutionPlanPersistenceService.class);
-        service = new SubstitutionPlanService(dsbService, parser, persistence);
+        cacheService = mock(ApiResponseCacheService.class);
+        service = new SubstitutionPlanService(dsbService, parser, persistence, cacheService);
     }
 
     private TimeTable tt(UUID uuid, String group, String detail) {
@@ -70,6 +72,8 @@ public class SubstitutionPlanServiceTest {
         assertEquals(2, first.getNews().getNewsItems().size());
         SubstitutionPlan second = result.get(1);
         assertEquals(2, second.getSortPriority());
+
+        verify(cacheService).store(eq(ApiResponseCacheKeys.SUBSTITUTION_PLANS), any());
     }
 
     @Test
@@ -79,6 +83,7 @@ public class SubstitutionPlanServiceTest {
         when(parser.parsePlanDocumentFromUrl("u")).thenThrow(new RuntimeException("err"));
         service.updateSubstitutionPlans();
         assertTrue(service.getSubstitutionPlans().isEmpty());
+        verify(cacheService, never()).store(eq(ApiResponseCacheKeys.SUBSTITUTION_PLANS), any());
     }
 
     private ParsedPlanDocument parsed(SubstitutionPlan plan) {

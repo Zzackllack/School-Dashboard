@@ -80,3 +80,5 @@ dist-ssr
 
 # ───── VSCode ─────
 .vscode/
+
+application.properties

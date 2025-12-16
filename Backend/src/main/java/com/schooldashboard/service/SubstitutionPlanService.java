@@ -23,13 +23,15 @@ public class SubstitutionPlanService {
     private final DSBService dsbService;
     private final SubstitutionPlanParserService parserService;
     private final SubstitutionPlanPersistenceService persistenceService;
+    private final ApiResponseCacheService cacheService;
     private List<SubstitutionPlan> latestPlans = new ArrayList<>();
 
     public SubstitutionPlanService(DSBService dsbService, SubstitutionPlanParserService parserService,
-            SubstitutionPlanPersistenceService persistenceService) {
+            SubstitutionPlanPersistenceService persistenceService, ApiResponseCacheService cacheService) {
         this.dsbService = dsbService;
         this.parserService = parserService;
         this.persistenceService = persistenceService;
+        this.cacheService = cacheService;
     }
 
     /**
@@ -54,8 +56,7 @@ public class SubstitutionPlanService {
         try {
             // Get fresh timetables from DSB service
             logger.info("[SubstitutionPlanService] Fetching timetables from DSB service...");
-            @SuppressWarnings("unchecked")
-            List<TimeTable> timeTables = (List<TimeTable>) dsbService.getTimeTables();
+            List<TimeTable> timeTables = dsbService.getTimeTables();
             logger.info("[SubstitutionPlanService] Received {} timetables from DSB", timeTables.size());
 
             // Group timetables by UUID (same UUID = same day plan)
@@ -183,7 +184,12 @@ public class SubstitutionPlanService {
                         plan.getSortPriority(), plan.getDate(), plan.getEntries().size());
             }
 
-            this.latestPlans = combinedPlans;
+            if (!combinedPlans.isEmpty()) {
+                this.latestPlans = combinedPlans;
+                cacheService.store(ApiResponseCacheKeys.SUBSTITUTION_PLANS, combinedPlans);
+            } else {
+                logger.warn("[SubstitutionPlanService] No plans parsed; keeping previously stored plans");
+            }
             long duration = System.currentTimeMillis() - startTime;
             logger.info("[SubstitutionPlanService] Updated substitution plans at {} , found {} plans in {}ms",
                     new java.util.Date(), combinedPlans.size(), duration);
