@@ -1,6 +1,34 @@
-const lk_bild = "/images/lk-exkursion-hamburg.jpeg";
+import { useMemo, useState } from "react";
+
+const LK_BILD_PUBLIC_SRC = "/images/lk-exkursion-hamburg.jpeg";
+
+function toWsrvUrl(publicSrc: string) {
+  if (typeof window === "undefined") return null;
+  const absoluteSrc = new URL(publicSrc, window.location.origin).toString();
+  const wsrv = new URL("https://wsrv.nl/");
+  const wsrv_string = wsrv.toString();
+  wsrv.searchParams.set("url", absoluteSrc);
+  wsrv.searchParams.set("output", "webp");
+  wsrv.searchParams.set("q", "80");
+  wsrv.searchParams.set("w", "720");
+  console.log("[Image Optimization] " + wsrv_string);
+  return wsrv_string;
+}
 
 const Credits = () => {
+  const lkBildWsrvSrc = useMemo(() => {
+    if (!import.meta.env.PROD) {
+      console.log("[Image Optimization] Skipping WSRV in development mode");
+      return null;
+    }
+    console.log("[Image Optimization] Using WSRV for image optimization");
+    return toWsrvUrl(LK_BILD_PUBLIC_SRC);
+  }, []);
+
+  const [lkBildSrc, setLkBildSrc] = useState(
+    lkBildWsrvSrc ?? LK_BILD_PUBLIC_SRC,
+  );
+
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-4 w-full">
       <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">
@@ -19,9 +47,17 @@ const Credits = () => {
           <div className="mx-auto max-w-[18rem]">
             <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-gray-200 shadow-md">
               <img
-                src={lk_bild}
+                src={lkBildSrc}
                 alt="Informatik Leistungskurs"
                 className="absolute inset-0 h-full w-full object-cover"
+                onError={() => {
+                  if (lkBildSrc !== LK_BILD_PUBLIC_SRC) {
+                    console.warn(
+                      `[Image Optimization] Failed to load optimized image from WSRV, falling back to public source: ${lkBildSrc}`,
+                    );
+                    setLkBildSrc(LK_BILD_PUBLIC_SRC);
+                  }
+                }}
               />
             </div>
           </div>
