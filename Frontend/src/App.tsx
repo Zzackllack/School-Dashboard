@@ -5,7 +5,7 @@ import Clock from './components/Clock';
 import SubstitutionPlanDisplay from './components/SubstitutionPlanDisplay';
 import Credits from './components/Credits';
 import Holidays from './components/Holidays';
-import CalendarEvents from './components/CalendarEvents'; // Import the new component
+import CalendarEvents from './components/CalendarEvents';
 import useAutoScroll from './hooks/useAutoScroll';
 import schoolLogo from './assets/Goethe-Logo.webp';
 
@@ -59,7 +59,7 @@ const App = () => {
       </main>
       
       <footer className="bg-gray-800/80 backdrop-blur-md text-white py-3 px-6 text-center text-sm border-t border-white/10">
-        <p>© {new Date().getFullYear()} Schul Dashboard | GGL</p>
+        <p>© 2025 - {new Date().getFullYear()} Cédric, Nikolas, Informatik LK 24/26 | GGL</p>
         <p>Stand: {currentTime.toLocaleString()}</p>
       </footer>
     </div>

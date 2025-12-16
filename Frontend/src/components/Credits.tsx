@@ -1,3 +1,5 @@
+const lk_bild = "/images/lk-exkursion-hamburg.jpeg";
+
 const Credits = () => {
   return (
     <div className="bg-white rounded-lg shadow-md p-4 mb-4 w-full">
@@ -9,7 +11,7 @@ const Credits = () => {
         <div className="text-center">
           <p className="text-[#3E3128] mb-2">
             Dieses Dashboard wurde mit ♥️ von <strong>Cédric</strong> und
-            mithilfe des Informatik Leistungskurses gemacht
+            mithilfe des Informatik Leistungskurses 24/26 gemacht
           </p>
         </div>
 
@@ -17,7 +19,7 @@ const Credits = () => {
           <div className="mx-auto max-w-[18rem]">
             <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-gray-200 shadow-md">
               <img
-                src="/images/LK.JPEG"
+                src={lk_bild}
                 alt="Informatik Leistungskurs"
                 className="absolute inset-0 h-full w-full object-cover"
               />

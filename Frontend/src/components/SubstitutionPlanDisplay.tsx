@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { X, Replace, ArrowRightSquare, ArrowDownUp, BookOpen, Info, Calendar, PenLine, Users } from 'lucide-react'; // Add Calendar icon for events
+import { ArrowDownUp, ArrowRightSquare, BookOpen, Calendar, Info, PenLine, Replace, Users, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface SubstitutionEntry {
     classes: string;
