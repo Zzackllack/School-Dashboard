@@ -44,6 +44,14 @@ public class DSBControllerTest {
     }
 
     @Test
+    public void getTimeTablesEmptyListReturnsOk() throws Exception {
+        when(dsbService.getTimeTables()).thenReturn(Collections.emptyList());
+        mockMvc.perform(get("/api/dsb/timetables"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("[]"));
+    }
+
+    @Test
     public void getTimeTablesFailure() throws Exception {
         when(dsbService.getTimeTables()).thenThrow(new RuntimeException("fail"));
         when(cacheService.getRawJson("api/dsb/timetables")).thenReturn(java.util.Optional.empty());
