@@ -6,6 +6,7 @@ import SubstitutionPlanDisplay from './components/SubstitutionPlanDisplay';
 import Credits from './components/Credits';
 import Holidays from './components/Holidays';
 import CalendarEvents from './components/CalendarEvents';
+import LessonProgress from './components/LessonProgress';
 import useAutoScroll from './hooks/useAutoScroll';
 import schoolLogo from './assets/Goethe-Logo.webp';
 
@@ -49,6 +50,7 @@ const App = () => {
             <SubstitutionPlanDisplay />
           </div>
           <div className="lg:w-1/4 flex flex-col gap-5">
+            <LessonProgress />
             <Weather />
             <Transportation />
             <CalendarEvents />
