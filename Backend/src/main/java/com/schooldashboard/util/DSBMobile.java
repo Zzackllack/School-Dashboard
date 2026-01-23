@@ -1,5 +1,21 @@
 package com.schooldashboard.util;
 
+/**
+ * Unofficial DSBmobile API client used by School-Dashboard.
+ *
+ * <p>
+ * Attribution: The request/response extraction logic in this class is based on (and adapted from)
+ * Sematre's open-source project "DSBmobile-API":
+ * https://github.com/Sematre/DSBmobile-API
+ * </p>
+ *
+ * <p>
+ * Original work: © Sematre 2019, distributed under the MIT License (see upstream repository LICENSE).
+ * This project includes a modified copy for integration into this backend.
+ * </p>
+ *
+ * @author Sematre
+ */
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
