@@ -186,122 +186,6 @@ const Weather = () => {
     }
   };
 
-  // Format date to day name (Heute, Morgen, or day of week)
-  const formatDay = (dateString: string, index: number): string => {
-    if (index === 0) return "Heute";
-    if (index === 1) return "Morgen";
-    if (index === 0) return "Heute";
-    if (index === 1) return "Morgen";
-
-    const date = new Date(dateString);
-    return date.toLocaleDateString("de-DE", { weekday: "short" });
-  };
-
-  // Get current humidity from hourly data
-  const getCurrentHumidity = (): number => {
-    if (!weatherData?.hourly) return 0;
-
-    // Current time format is like "2025-03-23T14:15"
-    const currentTimeString = weatherData.current_weather.time;
-
-    // Extract just the date and hour part to match hourly data format
-    const currentHour = currentTimeString.substring(0, 13) + ":00"; // Convert "2025-03-23T14:15" to "2025-03-23T14:00"
-
-    // Find the index of this hour in the hourly data
-    const index = weatherData.hourly.time.findIndex(
-      (time) => time === currentHour,
-    );
-
-    if (index !== -1) {
-      return weatherData.hourly.relativehumidity_2m[index];
-    } else {
-      // If exact hour not found, find the closest hour
-      console.warn(
-        "Exact hour match not found for humidity, using closest available hour",
-      );
-
-      // Get just the current hour as a Date object for comparison
-      const currentTime = new Date(currentTimeString);
-
-      // Find the closest time by comparing timestamps
-      let closestIndex = 0;
-      let smallestDiff = Infinity;
-
-      weatherData.hourly.time.forEach((timeString, idx) => {
-        const time = new Date(timeString);
-        const diff = Math.abs(time.getTime() - currentTime.getTime());
-
-        if (diff < smallestDiff) {
-          smallestDiff = diff;
-          closestIndex = idx;
-        }
-      });
-
-      return weatherData.hourly.relativehumidity_2m[closestIndex];
-    }
-  };
-
-  // Get current precipitation from hourly data
-  const getCurrentPrecipitation = (): number => {
-    if (!weatherData?.hourly) return 0;
-
-    // Use the same approach as getCurrentHumidity to find the current hour
-    const currentTimeString = weatherData.current_weather.time;
-    const currentHour = currentTimeString.substring(0, 13) + ":00";
-
-    const index = weatherData.hourly.time.findIndex(
-      (time) => time === currentHour,
-    );
-
-    if (index !== -1) {
-      return weatherData.hourly.precipitation[index];
-    } else {
-      // Find closest hour similar to getCurrentHumidity
-      const currentTime = new Date(currentTimeString);
-      let closestIndex = 0;
-      let smallestDiff = Infinity;
-
-      weatherData.hourly.time.forEach((timeString, idx) => {
-        const time = new Date(timeString);
-        const diff = Math.abs(time.getTime() - currentTime.getTime());
-
-        if (diff < smallestDiff) {
-          smallestDiff = diff;
-          closestIndex = idx;
-        }
-      });
-
-      return weatherData.hourly.precipitation[closestIndex];
-    }
-  };
-
-  // Calculate daily precipitation totals
-  const getDailyPrecipitation = (): number[] => {
-    if (!weatherData?.daily || !weatherData?.hourly) return [0, 0, 0];
-
-    const dailyTotals = weatherData.daily.time.slice(0, 3).map((date) => {
-      const datePrefix = date + "T";
-      const hourlyIndices = weatherData.hourly.time
-        .map((time, index) => (time.startsWith(datePrefix) ? index : -1))
-        .filter((index) => index !== -1);
-
-      // Sum precipitation for all hours in this day
-      return hourlyIndices.reduce(
-        (total, index) => total + weatherData.hourly.precipitation[index],
-        0,
-      );
-    });
-
-    return dailyTotals;
-  };
-
-  // Format precipitation display in German
-  const formatPrecipitation = (amount: number): string => {
-    if (amount === 0) return "Kein";
-    if (amount <= 0.3) return "Minimal";
-    return `${amount.toFixed(1)} mm`;
-  };
-
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
@@ -327,11 +211,6 @@ const Weather = () => {
       </div>
     );
   }
-
-  // Get forecast for next 3 days
-  const forecastDays = weatherData.daily.time.slice(0, 3);
-  const dailyPrecipitation = getDailyPrecipitation();
-  const currentPrecipitation = getCurrentPrecipitation();
 
   return (
     <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
