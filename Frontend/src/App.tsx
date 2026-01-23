@@ -14,11 +14,11 @@ const App = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  useAutoScrollContainer(
-    sidebarRef as React.RefObject<HTMLDivElement>,
-    5000,
-    40,
-  );
+  // useAutoScrollContainer(
+  //   sidebarRef as React.RefObject<HTMLDivElement>,
+  //   5000,
+  //   40,
+  // );
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -68,14 +68,6 @@ const App = () => {
           </div>
         </div>
       </main>
-
-      <footer className="bg-gray-800/80 backdrop-blur-md text-white py-3 px-6 text-center text-sm border-t border-white/10">
-        <p>
-          © 2025 - {new Date().getFullYear()} Cédric, Nikolas, Informatik LK
-          24/26 | GGL
-        </p>
-        <p>Stand: {currentTime.toLocaleString()}</p>
-      </footer>
     </div>
   );
 };

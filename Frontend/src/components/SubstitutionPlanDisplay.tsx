@@ -54,7 +54,7 @@ const gradeStyles: Record<
 > = {
   "7": {
     label: "7. Jahrgang",
-    container: "bg-rose-50/70 border-rose-200",
+    container: "bg-rose-50/70",
     heading: "text-rose-900",
     badge: "text-rose-700 bg-rose-100",
     tableHeader: "bg-rose-700/90",
@@ -63,7 +63,7 @@ const gradeStyles: Record<
   "8": {
     label: "8. Jahrgang",
 
-    container: "bg-sky-50/70 border-sky-200",
+    container: "bg-sky-50/70",
     heading: "text-sky-900",
     badge: "text-sky-700 bg-sky-100",
     tableHeader: "bg-sky-700/90",
@@ -71,7 +71,7 @@ const gradeStyles: Record<
   },
   "9": {
     label: "9. Jahrgang",
-    container: "bg-amber-50/70 border-amber-200",
+    container: "bg-amber-50/70",
     heading: "text-amber-900",
     badge: "text-amber-700 bg-amber-100",
     tableHeader: "bg-amber-700/90",
@@ -79,7 +79,7 @@ const gradeStyles: Record<
   },
   "10": {
     label: "10. Jahrgang",
-    container: "bg-teal-50/70 border-teal-200",
+    container: "bg-teal-50/70",
     heading: "text-teal-900",
     badge: "text-teal-700 bg-teal-100",
     tableHeader: "bg-teal-700/90",
@@ -87,7 +87,7 @@ const gradeStyles: Record<
   },
   "11": {
     label: "11. Jahrgang",
-    container: "bg-emerald-50/70 border-emerald-200",
+    container: "bg-emerald-50/70",
     heading: "text-emerald-900",
     badge: "text-emerald-700 bg-emerald-100",
     tableHeader: "bg-emerald-700/90",
@@ -95,7 +95,7 @@ const gradeStyles: Record<
   },
   "12": {
     label: "12. Jahrgang",
-    container: "bg-slate-50/70 border-slate-200",
+    container: "bg-slate-50/70",
     heading: "text-slate-900",
     badge: "text-slate-700 bg-slate-100",
     tableHeader: "bg-slate-700/90",
@@ -372,7 +372,7 @@ const SubstitutionPlanDisplay = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 flex-1 min-h-0 overflow-hidden items-start">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 flex-1 min-h-0 overflow-hidden ">
         {" "}
         {gradeOrder.map((grade) => {
           const entries = groupedEntries[grade];
@@ -381,7 +381,7 @@ const SubstitutionPlanDisplay = () => {
           return (
             <div
               key={grade}
-              className={`rounded-xl border shadow-md p-3 flex flex-col min-h-0 max-h-full overflow-hidden self-start ${styles.container}`}
+              className={`rounded-xl border shadow-md p-3 flex flex-col min-h-0 max-h-full overflow-hidden ${styles.container}`}
             >
               <div className="flex items-center justify-between mb-2 gap-2">
                 <h3 className={`text-lg font-semibold ${styles.heading}`}>
@@ -424,7 +424,7 @@ const SubstitutionPlanDisplay = () => {
                         <th
                           className={`${styles.tableHeader} text-white backdrop-blur-md border-b border-white/10 px-2 py-2 text-left`}
                         >
-                          Fort
+                          Fehlt
                         </th>
                         <th
                           className={`${styles.tableHeader} text-white backdrop-blur-md border-b border-white/10 px-2 py-2 text-left`}
@@ -454,7 +454,7 @@ const SubstitutionPlanDisplay = () => {
                         <th
                           className={`${styles.tableHeader} text-white backdrop-blur-md border-b border-white/10 px-2 py-2 text-left rounded-tr-lg`}
                         >
-                          Kommentare
+                          Infos
                         </th>
                       </tr>
                     </thead>
@@ -490,7 +490,7 @@ const SubstitutionPlanDisplay = () => {
                           <td className="border-b border-gray-100/30 px-2 py-2">
                             {renderTypeCell(entry.type)}
                           </td>
-                          <td className="border-b border-gray-100/30 px-2 py-2 italic">
+                          <td className="border-b border-gray-100/30 px-2 py-2 italic ">
                             {entry.comment || "-"}
                           </td>
                         </tr>
