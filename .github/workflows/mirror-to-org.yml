@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-  # Wenn du später weitere Branches spiegeln willst:
-  #   - dev
-  #   - feature/*
 
 jobs:
   mirror:
@@ -17,15 +14,30 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
+          # wichtig: Standard-GITHUB_TOKEN nicht als Credential behalten
+          persist-credentials: false
 
-      - name: Push to org mirror
+      - name: Configure Git user
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      - name: Remove default GitHub Actions auth header
+        run: |
+          git config --unset-all http.https://github.com/.extraheader || true
+
+      - name: Fail early if PAT secret is missing
+        run: |
+          if [ -z "${{ secrets.ORG_DASHBOARD_TOKEN }}" ]; then
+            echo "ERROR: Secret ORG_DASHBOARD_TOKEN is not set or empty."
+            exit 1
+          fi
+
+      - name: Add org remote and push
+        run: |
           git remote add mirror https://x-access-token:${{ secrets.ORG_DASHBOARD_TOKEN }}@github.com/Goethe-Gymnasium-Lichterfelde/Dashboard.git
 
           # Branch main 1:1 nach Org-Repo spiegeln
           git push mirror main --force
-          # Optional: Tags mitnehmen
+          # Optional Tags mitnehmen:
           # git push mirror --tags
