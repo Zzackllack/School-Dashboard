@@ -14,11 +14,11 @@ const App = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const sidebarRef = useRef<HTMLDivElement>(null);
 
-  // useAutoScrollContainer(
-  //   sidebarRef as React.RefObject<HTMLDivElement>,
-  //   5000,
-  //   40,
-  // );
+  useAutoScrollContainer(
+    sidebarRef as React.RefObject<HTMLDivElement>,
+    5000,
+    40,
+  );
 
   useEffect(() => {
     const timer = setInterval(() => {
