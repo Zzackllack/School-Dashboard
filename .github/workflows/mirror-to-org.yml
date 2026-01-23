@@ -1,0 +1,31 @@
+name: Mirror to Goethe-Gymnasium-Lichterfelde/Dashboard
+
+on:
+  push:
+    branches:
+      - main
+  # Wenn du später weitere Branches spiegeln willst:
+  #   - dev
+  #   - feature/*
+
+jobs:
+  mirror:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout full history
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Push to org mirror
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git remote add mirror https://x-access-token:${{ secrets.ORG_DASHBOARD_TOKEN }}@github.com/Goethe-Gymnasium-Lichterfelde/Dashboard.git
+
+          # Branch main 1:1 nach Org-Repo spiegeln
+          git push mirror main --force
+          # Optional: Tags mitnehmen
+          # git push mirror --tags
