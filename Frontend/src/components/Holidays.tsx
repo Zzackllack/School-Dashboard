@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Calendar } from 'lucide-react';
-import holidaysData from '../assets/holidays.json'; // Import the holidays data from JSON file
+import holidaysData from '../assets/holidays.json';
 
-// Define TypeScript interface for Holiday data
 interface Holiday {
   name: string;
   start: string;
@@ -18,185 +17,159 @@ const Holidays = () => {
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   useEffect(() => {
     const loadHolidays = () => {
       setLoading(true);
       try {
-        // Get current year 
         const currentYear = new Date().getFullYear();
         const typedHolidaysData = holidaysData as HolidaysData;
-        
-        // Get holidays for current year, and possibly next year
+
         const currentYearStr = currentYear.toString();
         const nextYearStr = (currentYear + 1).toString();
-        
+
         let allRelevantHolidays: Holiday[] = [];
-        
-        // Add current year holidays if available
+
         if (typedHolidaysData[currentYearStr]) {
           allRelevantHolidays = [...typedHolidaysData[currentYearStr]];
         }
-        
-        // Add next year holidays if available
+
         if (typedHolidaysData[nextYearStr]) {
           allRelevantHolidays = [...allRelevantHolidays, ...typedHolidaysData[nextYearStr]];
         }
-        
-        // Filter to only show upcoming holidays
+
         const currentDate = new Date();
         const upcomingHolidays = allRelevantHolidays.filter(holiday => {
-          // Skip entries with empty dates
           if (!holiday.end) return false;
           return new Date(holiday.end) >= currentDate;
         });
-        
-        // Sort holidays by start date
+
         upcomingHolidays.sort((a, b) => {
           return new Date(a.start).getTime() - new Date(b.start).getTime();
         });
-        
-        setHolidays(upcomingHolidays);
+
+        setHolidays(upcomingHolidays.slice(0, 4));
         setError(null);
       } catch (err) {
         console.error('Failed to load holidays data:', err);
-        setError('Fehler beim Laden der Feriendaten. Bitte kontaktiere Cédric.');
+        setError('Fehler beim Laden der Feriendaten');
       } finally {
         setLoading(false);
       }
     };
-    
+
     loadHolidays();
   }, []);
-  
-  // Format date from ISO string to readable format
+
   const formatDate = (dateString: string) => {
     if (!dateString) return '';
-    
+
     const date = new Date(dateString);
     return date.toLocaleDateString('de-DE', {
       day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
+      month: '2-digit'
     });
   };
-  
-  // Format holiday name to be more user-friendly
+
   const formatHolidayName = (name: string) => {
-    // Remove location information if present (like "berlin" at the end)
     const formattedName = name.replace(/\s+berlin$/i, '').trim();
-    
-    // Convert the first letter to uppercase and the rest remains lowercase
     return formattedName.charAt(0).toUpperCase() + formattedName.slice(1);
   };
-  
-  // Calculate days until holiday starts
+
   const calculateDaysUntil = (startDateString: string) => {
     if (!startDateString) return '';
-    
+
     const startDate = new Date(startDateString);
     const currentDate = new Date();
-    
-    // Set both dates to midnight for accurate day count
+
     currentDate.setHours(0, 0, 0, 0);
     startDate.setHours(0, 0, 0, 0);
-    
+
     const timeDiff = startDate.getTime() - currentDate.getTime();
     const dayDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
-    
-    if (dayDiff < 0) return "Bereits begonnen";
+
+    if (dayDiff < 0) return "Begonnen";
     if (dayDiff === 0) return "Heute";
-    if (dayDiff === 1) return "Beginnen morgen";
-    return `In ${dayDiff} Tagen`;
+    if (dayDiff === 1) return "Morgen";
+    return `${dayDiff} Tage`;
   };
-  
-  // Get highlight class based on event type
+
   const getEventHighlightClass = (type: string) => {
     switch(type.toLowerCase()) {
       case 'ferien':
-        return 'bg-[#F5EFD7]/50 border-[#DDB967]';
+        return 'bg-yellow-100/70 dark:bg-yellow-900/40 border-yellow-400 dark:border-yellow-600';
       case 'feiertag':
-        return 'bg-blue-50/50 border-blue-200';
+        return 'bg-blue-100/70 dark:bg-blue-900/40 border-blue-400 dark:border-blue-600';
       case 'unterrichtsfrei':
-        return 'bg-green-50/50 border-green-200';
+        return 'bg-green-100/70 dark:bg-green-900/40 border-green-400 dark:border-green-600';
       default:
-        return 'bg-white border-gray-200';
+        return 'bg-gray-100/70 dark:bg-gray-700/40 border-gray-400 dark:border-gray-600';
     }
   };
-  
-  // Get icon color based on event type
-  const getEventIconColor = (type: string, isFirst: boolean) => {
-    if (isFirst) return 'text-[#8C7356]';
-    
+
+  const getEventIconColor = (type: string) => {
     switch(type.toLowerCase()) {
       case 'ferien':
-        return 'text-[#DDB967]';
+        return 'text-yellow-600 dark:text-yellow-400';
       case 'feiertag':
-        return 'text-blue-500';
+        return 'text-blue-600 dark:text-blue-400';
       case 'unterrichtsfrei':
-        return 'text-green-500';
+        return 'text-green-600 dark:text-green-400';
       default:
-        return 'text-gray-400';
+        return 'text-gray-600 dark:text-gray-400';
     }
   };
-  
+
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-4 mb-4 text-center w-full">
-        <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Nächste Schulferien</h2>
-        <div className="flex justify-center items-center h-40">
-          <p>Feriendaten werden geladen...</p>
+        <div className="h-full flex flex-col">
+          <h2 className="text-4xl font-bold text-gray-900 dark:text-white mb-8 text-center">Nächste Schulferien</h2>
+          <div className="flex-1 flex justify-center items-center">
+            <p className="text-3xl text-gray-700 dark:text-gray-300">Laden...</p>
+          </div>
         </div>
-      </div>
     );
   }
-  
+
   if (error || holidays.length === 0) {
     return (
-      <div className="bg-white rounded-lg shadow-md p-4 mb-4 text-center w-full">
-        <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Nächste Schulferien</h2>
-        <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 rounded">
-          {error || 'Keine Feriendaten verfügbar.'}
+        <div className="h-full flex flex-col">
+          <h2 className="text-4xl font-medium text-gray-900 dark:text-white mb-8 text-center">Nächste Schulferien</h2>
+          <div className="flex-1 flex justify-center items-center">
+            <div className="bg-red-100/80 dark:bg-red-900/40 border-2 border-red-400 dark:border-red-600 text-red-800 dark:text-red-200 px-8 py-6 rounded-xl text-2xl text-center">
+              {error || 'Keine Feriendaten verfügbar'}
+            </div>
+          </div>
         </div>
-      </div>
     );
   }
-  
+
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-4 w-full">
-      <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Nächste Schulferien</h2>
-      
-      <div className="space-y-4">
-        {holidays.slice(0, 4).map((holiday, index) => (
-          <div 
-            key={index} 
-            className={`p-3 rounded-lg border ${getEventHighlightClass(holiday.type)}`}
-          >
-            <div className="flex items-start">
-              <Calendar size={24} className={`mr-3 mt-1 ${getEventIconColor(holiday.type, index === 0)}`} />
-              <div>
-                <h3 className="font-semibold text-[#3E3128]">
-                  {formatHolidayName(holiday.name)}
-                  <span className="ml-2 text-xs font-normal px-2 py-0.5 rounded-full bg-gray-100 text-gray-600">
-                    {holiday.type}
-                  </span>
-                </h3>
-                <p className="text-[#5A4635]">
+      <div className="h-full flex flex-col">
+        <h2 className="text-4xl font-medium text-gray-900 dark:text-white mb-8 text-center">Nächste Schulferien</h2>
+
+        <div className="flex-1 grid grid-cols-2 grid-rows-2 gap-6">
+          {holidays.map((holiday, index) => (
+              <div
+                  key={index}
+                  className={`p-6 rounded-xl border-2 flex flex-col ${getEventHighlightClass(holiday.type)}`}
+              >
+                <div className="flex items-start mb-3">
+                  <Calendar size={32} className={`mr-4 ${getEventIconColor(holiday.type)}`} />
+                  <h3 className="text-xl font-bold text-gray-900 dark:text-white flex-1 line-clamp-2">
+                    {formatHolidayName(holiday.name)}
+                  </h3>
+                </div>
+                <p className="text-lg text-gray-800 dark:text-gray-200 mb-2">
                   {formatDate(holiday.start)} - {formatDate(holiday.end)}
                 </p>
-                <p className={`text-sm font-medium ${index === 0 ? 'text-[#8C7356]' : 'text-gray-500'} mt-1`}>
+                <p className={`text-xl font-bold mt-auto ${getEventIconColor(holiday.type)}`}>
                   {calculateDaysUntil(holiday.start)}
                 </p>
               </div>
-            </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
-      
-      <div className="mt-4 text-xs text-gray-500 text-center">
-        <p>Es wird keine Haftung für die Richtigkeit übernommen. Daten bereitgestellt von der Senatsverwaltung für Bildung, Jugend und Familie Berlin.</p>
-      </div>
-    </div>
   );
 };
 

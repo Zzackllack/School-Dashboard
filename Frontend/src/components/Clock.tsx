@@ -6,9 +6,9 @@ interface ClockProps {
 
 const Clock: React.FC<ClockProps> = ({ currentTime }) => {
   return (
-    <div className="text-right">
-      <div className="text-2xl font-bold">{currentTime.toLocaleTimeString()}</div>
-      <div className="text-base">{currentTime.toLocaleDateString()}</div>
+    <div className="text-center text-white">
+      <div className="text-7xl font-bold">{currentTime.toLocaleTimeString()}</div>
+      <div className="text-6xl font-medium">{currentTime.toLocaleDateString()}</div>
     </div>
   );
 };

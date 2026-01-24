@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
 
-// Import weather icons
 import clearIcon from '../assets/airy/clear@4x.png';
 import densedrizzleIcon from '../assets/airy/dense-drizzle@4x.png';
 import denseFreezeingDrizzleIcon from '../assets/airy/dense-freezing-drizzle@4x.png';
@@ -24,7 +23,6 @@ import snowflakeIcon from '../assets/airy/snowflake@4x.png';
 import thunderstormWithHailIcon from '../assets/airy/thunderstorm-with-hail@4x.png';
 import thunderstormIcon from '../assets/airy/thunderstorm@4x.png';
 
-// Define TypeScript interfaces for Open Meteo API responses
 interface WeatherData {
   latitude: number;
   longitude: number;
@@ -61,8 +59,7 @@ const Weather = () => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  
-  // School coordinates - same as in Transportation.tsx
+
   const schoolLat = 52.43432378391319;
   const schoolLng = 13.305375391277634;
 
@@ -71,12 +68,12 @@ const Weather = () => {
       setLoading(true);
       try {
         const response = await fetch(
-          `https://api.open-meteo.com/v1/forecast?` +
-          `latitude=${schoolLat}&longitude=${schoolLng}` +
-          `&current_weather=true` +
-          `&hourly=temperature_2m,relativehumidity_2m,precipitation,weathercode` +
-          `&daily=weathercode,temperature_2m_max,temperature_2m_min` +
-          `&timezone=Europe/Berlin`
+            `https://api.open-meteo.com/v1/forecast?` +
+            `latitude=${schoolLat}&longitude=${schoolLng}` +
+            `&current_weather=true` +
+            `&hourly=temperature_2m,relativehumidity_2m,precipitation,weathercode` +
+            `&daily=weathercode,temperature_2m_max,temperature_2m_min` +
+            `&timezone=Europe/Berlin`
         );
 
         if (!response.ok) {
@@ -84,12 +81,11 @@ const Weather = () => {
         }
 
         const data: WeatherData = await response.json();
-        console.log('Weather data:', data); // Debug log
         setWeatherData(data);
         setError(null);
       } catch (err) {
         console.error('Failed to fetch weather data:', err);
-        setError('Fehler beim laden der Wetterdaten, versuche es später erneut oder kontaktiere Cédric.');
+        setError('Fehler beim Laden der Wetterdaten');
       } finally {
         setLoading(false);
       }
@@ -98,287 +94,160 @@ const Weather = () => {
     fetchWeatherData();
   }, [schoolLat, schoolLng]);
 
-  // Function to get weather icon based on weather code
   const getWeatherIcon = (code: number): string => {
     switch (true) {
-      case code === 0:
-        return clearIcon; // Clear sky
-      case code === 1:
-        return mostlyClearIcon; // Mainly clear
-      case code === 2:
-        return partlyCloudyIcon; // Partly cloudy
-      case code === 3:
-        return overcastIcon; // Overcast
-      case code === 45:
-        return fogIcon; // Fog
-      case code === 48:
-        return rimeFogIcon; // Rime fog
-      case code === 51:
-        return lightDrizzleIcon; // Light drizzle
-      case code === 53:
-        return moderateDrizzleIcon; // Moderate drizzle
-      case code === 55:
-        return densedrizzleIcon; // Dense drizzle
-      case code === 56:
-        return lightFreezeingDrizzleIcon; // Light freezing drizzle
-      case code === 57:
-        return denseFreezeingDrizzleIcon; // Dense freezing drizzle
-      case code === 61:
-        return lightRainIcon; // Light rain
-      case code === 63:
-        return moderateRainIcon; // Moderate rain
-      case code === 65:
-        return heavyRainIcon; // Heavy rain
-      case code === 66:
-        return lightFreezeingRainIcon; // Light freezing rain
-      case code === 67:
-        return heavyFreezeingRainIcon; // Heavy freezing rain
-      case code === 71:
-        return slightSnowfallIcon; // Slight snowfall
-      case code === 73:
-        return moderateSnowfallIcon; // Moderate snowfall
-      case code === 75:
-        return heavySnowfallIcon; // Heavy snowfall
-      case code === 77:
-        return snowflakeIcon; // Snow grains
-      case code === 85:
-        return slightSnowfallIcon; // Slight snow showers
-      case code === 86:
-        return heavySnowfallIcon; // Heavy snow showers
-      case code === 95:
-        return thunderstormIcon; // Thunderstorm
-      case [96, 99].includes(code):
-        return thunderstormWithHailIcon; // Thunderstorm with hail
-      default:
-        return clearIcon; // Default
+      case code === 0: return clearIcon;
+      case code === 1: return mostlyClearIcon;
+      case code === 2: return partlyCloudyIcon;
+      case code === 3: return overcastIcon;
+      case code === 45: return fogIcon;
+      case code === 48: return rimeFogIcon;
+      case code === 51: return lightDrizzleIcon;
+      case code === 53: return moderateDrizzleIcon;
+      case code === 55: return densedrizzleIcon;
+      case code === 56: return lightFreezeingDrizzleIcon;
+      case code === 57: return denseFreezeingDrizzleIcon;
+      case code === 61: return lightRainIcon;
+      case code === 63: return moderateRainIcon;
+      case code === 65: return heavyRainIcon;
+      case code === 66: return lightFreezeingRainIcon;
+      case code === 67: return heavyFreezeingRainIcon;
+      case code === 71: return slightSnowfallIcon;
+      case code === 73: return moderateSnowfallIcon;
+      case code === 75: return heavySnowfallIcon;
+      case code === 77: return snowflakeIcon;
+      case code === 80: return lightRainIcon;
+      case code === 81: return moderateRainIcon;
+      case code === 82: return heavyRainIcon;
+      case code === 85: return slightSnowfallIcon;
+      case code === 86: return heavySnowfallIcon;
+      case code === 95: return thunderstormIcon;
+      case code === 96: return thunderstormWithHailIcon;
+      case code === 99: return thunderstormWithHailIcon;
+      default: return clearIcon;
     }
   };
 
-  // Function to get weather condition text based on weather code in German
   const getWeatherCondition = (code: number): string => {
     switch (true) {
-      case code === 0:
-        return 'Klarer Himmel';
-      case code === 1:
-        return 'Überwiegend klar';
-      case code === 2:
-        return 'Teilweise bewölkt';
-      case code === 3:
-        return 'Bedeckt';
-      case [45, 48].includes(code):
-        return 'Nebel';
-      case [51, 53, 55].includes(code):
-        return 'Nieselregen';
-      case [61, 63, 65].includes(code):
-        return 'Regen';
-      case [80, 81, 82].includes(code):
-        return 'Regenschauer';
-      case [71, 73, 75].includes(code):
-        return 'Schneefall';
-      case [85, 86].includes(code):
-        return 'Schneeschauer';
-      case [95, 96, 99].includes(code):
-        return 'Gewitter';
-      default:
-        return 'Unbekannt';
+      case code === 0: return 'Klarer Himmel';
+      case code === 1: return 'Überwiegend klar';
+      case code === 2: return 'Teilweise bewölkt';
+      case code === 3: return 'Bedeckt';
+      case [45, 48].includes(code): return 'Nebel';
+      case [51, 53, 55].includes(code): return 'Nieselregen';
+      case [61, 63, 65].includes(code): return 'Regen';
+      case [80, 81, 82].includes(code): return 'Regenschauer';
+      case [71, 73, 75].includes(code): return 'Schneefall';
+      case [85, 86].includes(code): return 'Schneeschauer';
+      case [95, 96, 99].includes(code): return 'Gewitter';
+      default: return 'Unbekannt';
     }
   };
 
-  // Format date to day name (Heute, Morgen, or day of week)
   const formatDay = (dateString: string, index: number): string => {
     if (index === 0) return 'Heute';
     if (index === 1) return 'Morgen';
-    if (index === 0) return 'Heute';
-    if (index === 1) return 'Morgen';
-    
     const date = new Date(dateString);
     return date.toLocaleDateString('de-DE', { weekday: 'short' });
   };
 
-  // Get current humidity from hourly data
-  const getCurrentHumidity = (): number => {
-    if (!weatherData?.hourly) return 0;
-    
-    // Current time format is like "2025-03-23T14:15"
-    const currentTimeString = weatherData.current_weather.time;
-    
-    // Extract just the date and hour part to match hourly data format
-    const currentHour = currentTimeString.substring(0, 13) + ":00"; // Convert "2025-03-23T14:15" to "2025-03-23T14:00"
-    
-    // Find the index of this hour in the hourly data
-    const index = weatherData.hourly.time.findIndex(time => time === currentHour);
-    
-    if (index !== -1) {
-      return weatherData.hourly.relativehumidity_2m[index];
-    } else {
-      // If exact hour not found, find the closest hour
-      console.warn("Exact hour match not found for humidity, using closest available hour");
-      
-      // Get just the current hour as a Date object for comparison
-      const currentTime = new Date(currentTimeString);
-      
-      // Find the closest time by comparing timestamps
-      let closestIndex = 0;
-      let smallestDiff = Infinity;
-      
-      weatherData.hourly.time.forEach((timeString, idx) => {
-        const time = new Date(timeString);
-        const diff = Math.abs(time.getTime() - currentTime.getTime());
-        
-        if (diff < smallestDiff) {
-          smallestDiff = diff;
-          closestIndex = idx;
-        }
-      });
-      
-      return weatherData.hourly.relativehumidity_2m[closestIndex];
-    }
-  };
-
-  // Get current precipitation from hourly data
-  const getCurrentPrecipitation = (): number => {
-    if (!weatherData?.hourly) return 0;
-    
-    // Use the same approach as getCurrentHumidity to find the current hour
-    const currentTimeString = weatherData.current_weather.time;
-    const currentHour = currentTimeString.substring(0, 13) + ":00";
-    
-    const index = weatherData.hourly.time.findIndex(time => time === currentHour);
-    
-    if (index !== -1) {
-      return weatherData.hourly.precipitation[index];
-    } else {
-      // Find closest hour similar to getCurrentHumidity
-      const currentTime = new Date(currentTimeString);
-      let closestIndex = 0;
-      let smallestDiff = Infinity;
-      
-      weatherData.hourly.time.forEach((timeString, idx) => {
-        const time = new Date(timeString);
-        const diff = Math.abs(time.getTime() - currentTime.getTime());
-        
-        if (diff < smallestDiff) {
-          smallestDiff = diff;
-          closestIndex = idx;
-        }
-      });
-      
-      return weatherData.hourly.precipitation[closestIndex];
-    }
-  };
-
-  // Calculate daily precipitation totals
-  const getDailyPrecipitation = (): number[] => {
-    if (!weatherData?.daily || !weatherData?.hourly) return [0, 0, 0];
-    
-    const dailyTotals = weatherData.daily.time.slice(0, 3).map(date => {
-      const datePrefix = date + "T";
-      const hourlyIndices = weatherData.hourly.time
-        .map((time, index) => time.startsWith(datePrefix) ? index : -1)
-        .filter(index => index !== -1);
-      
-      // Sum precipitation for all hours in this day
-      return hourlyIndices.reduce(
-        (total, index) => total + weatherData.hourly.precipitation[index], 
-        0
-      );
-    });
-    
-    return dailyTotals;
-  };
-
-  // Format precipitation display in German
-  const formatPrecipitation = (amount: number): string => {
-    if (amount === 0) return "Kein";
-    if (amount <= 0.3) return "Minimal";
-    return `${amount.toFixed(1)} mm`;
-  };
-
   if (loading) {
     return (
-      <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
-        <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Wetter</h2>
-        <div className="flex justify-center items-center h-40">
-          <p>Wetterdaten werden geladen...</p>
+        <div className="flex justify-center items-center h-full">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-16 h-16 border-4 border-blue-400 border-t-transparent rounded-full animate-spin"></div>
+            <p className="text-2xl text-gray-600 dark:text-gray-400">Lade Wetterdaten...</p>
+          </div>
         </div>
-      </div>
     );
   }
 
   if (error || !weatherData) {
     return (
-      <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
-        <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Wetter</h2>
-        <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 rounded">
-          {error || 'Wetterdaten konnten nicht geladen werden'}
+        <div className="flex justify-center items-center h-full">
+          <div className="bg-red-100/90 dark:bg-red-900/50 border-2 border-red-400 dark:border-red-600 text-red-800 dark:text-red-200 px-8 py-6 rounded-2xl text-2xl text-center backdrop-blur-sm">
+            {error || 'Wetterdaten nicht verfügbar'}
+          </div>
         </div>
-      </div>
     );
   }
 
-  // Get forecast for next 3 days
   const forecastDays = weatherData.daily.time.slice(0, 3);
-  const dailyPrecipitation = getDailyPrecipitation();
-  const currentPrecipitation = getCurrentPrecipitation();
-  
+
   return (
-    <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
-      <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Wetter</h2>
-      <div className="mb-4">
-        <div className="text-lg font-bold text-[#3E3128]">Berlin</div>
-        <div className="flex justify-center items-center my-2">
-          <img 
-            src={getWeatherIcon(weatherData.current_weather.weathercode)} 
-            alt={getWeatherCondition(weatherData.current_weather.weathercode)}
-            className="w-16 h-16 mr-4"
-          />
-          <span className="text-4xl font-bold text-[#3E3128]">{Math.round(weatherData.current_weather.temperature)}°C</span>
-        </div>
-        <div className="mb-2 text-[#5A4635]">
-          {getWeatherCondition(weatherData.current_weather.weathercode)}
-        </div>
-        <div className="flex justify-around text-[#5A4635] text-sm mb-2">
-          <div>Luftfeuchtigkeit: {getCurrentHumidity()}%</div>
-          <div>Wind: {Math.round(weatherData.current_weather.windspeed)} km/h</div>
-        </div>
-        <div className="text-[#5A4635] text-sm">
-          <div className="flex items-center justify-center">
-            <span className="mr-1">Niederschlag:</span>
-            <span className="mr-1">Niederschlag:</span>
-            <span className={currentPrecipitation > 0 ? "text-[#8C7356] font-medium" : ""}>
-              {formatPrecipitation(currentPrecipitation)}
-            </span>
-          </div>
-        </div>
-      </div>
-      
-      <div className="flex justify-around border-t border-gray-200 pt-4">
-        {forecastDays.map((day, index) => (
-          <div key={index} className="text-center">
-            <div className="font-medium text-[#3E3128]">{formatDay(day, index)}</div>
-            <div className="my-2">
-              <img 
-                src={getWeatherIcon(weatherData.daily.weathercode[index])} 
-                alt={getWeatherCondition(weatherData.daily.weathercode[index])}
-                className="w-12 h-12 mx-auto"
+      <div className="h-full flex flex-col gap-4 p-1">
+        {/* Hauptwetter-Card */}
+        <div className="relative bg-gradient-to-br from-blue-400/30 via-blue-500/20 to-blue-600/30 dark:from-blue-600/40 dark:via-blue-700/30 dark:to-blue-800/40 rounded-3xl p-6 shadow-2xl backdrop-blur-md border border-white/30 dark:border-white/10 overflow-hidden flex-shrink-0">
+          {/* Dekorativer Hintergrund */}
+          <div className="absolute top-0 right-0 w-48 h-48 bg-white/10 rounded-full blur-3xl -mr-24 -mt-24"></div>
+          <div className="absolute bottom-0 left-0 w-40 h-40 bg-blue-300/20 rounded-full blur-3xl -ml-20 -mb-20"></div>
+
+          <div className="relative flex items-center justify-between">
+            {/* Linke Seite: Ort & Temperatur */}
+            <div className="flex-1">
+              <div className="flex items-center gap-2 mb-1">
+                <svg className="w-5 h-5 text-gray-700 dark:text-gray-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+                <h2 className="text-2xl font-bold text-gray-800 dark:text-white">Berlin</h2>
+              </div>
+              <div className="flex items-baseline gap-1">
+                <span className="text-7xl font-extrabold text-gray-900 dark:text-white tracking-tight leading-none">
+                  {Math.round(weatherData.current_weather.temperature)}°
+                </span>
+                <span className="text-2xl text-gray-700 dark:text-gray-300 mb-1">C</span>
+              </div>
+              <p className="text-xl text-gray-700 dark:text-gray-300 font-medium mt-1">
+                {getWeatherCondition(weatherData.current_weather.weathercode)}
+              </p>
+            </div>
+
+            <div className="flex flex-col items-center gap-2">
+              <img
+                  src={getWeatherIcon(weatherData.current_weather.weathercode)}
+                  alt={getWeatherCondition(weatherData.current_weather.weathercode)}
+                  className="w-28 h-28 drop-shadow-2xl"
               />
-            </div>
-            <div className="flex justify-center gap-2">
-              <span className="font-bold text-[#3E3128]">{Math.round(weatherData.daily.temperature_2m_max[index])}°</span>
-              <span className="text-[#5A4635]">{Math.round(weatherData.daily.temperature_2m_min[index])}°</span>
-            </div>
-            <div className="text-xs mt-1 text-[#5A4635]">
-              <span className={dailyPrecipitation[index] > 0 ? "text-gray-800" : ""}>
-                {formatPrecipitation(dailyPrecipitation[index])}
-              </span>
+              <div className="flex gap-4 text-gray-700 dark:text-gray-300">
+                <div className="flex items-center gap-2">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                  <span className="text-base font-medium">{Math.round(weatherData.current_weather.windspeed)} km/h</span>
+                </div>
+              </div>
             </div>
           </div>
-        ))}
+        </div>
+
+        <div className="grid grid-cols-3 gap-3 flex-1 min-h-0">
+          {forecastDays.map((day, index) => (
+              <div
+                  key={index}
+                  className="bg-white/50 dark:bg-gray-800/50 rounded-2xl p-3 shadow-lg backdrop-blur-sm border border-white/40 dark:border-gray-700/40 hover:scale-105 transition-transform duration-200 flex flex-col justify-center"
+              >
+                <p className="text-lg font-bold text-gray-800 dark:text-white text-center mb-2">
+                  {formatDay(day, index)}
+                </p>
+                <img
+                    src={getWeatherIcon(weatherData.daily.weathercode[index])}
+                    alt={getWeatherCondition(weatherData.daily.weathercode[index])}
+                    className="w-16 h-16 mx-auto mb-2 drop-shadow-lg"
+                />
+                <div className="flex justify-center items-center gap-2">
+                  <span className="text-xl font-bold text-gray-900 dark:text-white">
+                    {Math.round(weatherData.daily.temperature_2m_max[index])}°
+                  </span>
+                  <span className="text-lg text-gray-500 dark:text-gray-400">
+                    {Math.round(weatherData.daily.temperature_2m_min[index])}°
+                  </span>
+                </div>
+              </div>
+          ))}
+        </div>
       </div>
-      <p className="text-xs text-gray-500 mt-4 text-center">
-        Es wird keine Haftung für die Richtigkeit der Daten übernommen. <br></br> Datenquelle: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700">Open-Meteo</a>, lizenziert unter <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700">CC BY 4.0</a>
-      </p>
-    </div>
   );
 };
 
