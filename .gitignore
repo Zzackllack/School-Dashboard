@@ -81,4 +81,10 @@ dist-ssr
 # ───── VSCode ─────
 .vscode/
 
+# ───── Java Spring Boot ─────
 application.properties
+
+# ───── Eclipse ─────
+.settings/
+.classpath
+.project

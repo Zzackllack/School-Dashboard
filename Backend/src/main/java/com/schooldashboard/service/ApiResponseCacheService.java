@@ -9,6 +9,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -35,19 +37,34 @@ public class ApiResponseCacheService {
         }
 
         String contentHash = hashContent(json);
-        Optional<ApiResponseCache> existing = repository.findById(cacheKey);
-        if (existing.isPresent()) {
-            ApiResponseCache entry = existing.get();
-            if (contentHash.equals(entry.getContentHash())) {
-                return;
+        for (int attempt = 0; attempt < 2; attempt++) {
+            Optional<ApiResponseCache> existing = repository.findById(cacheKey);
+            if (existing.isPresent()) {
+                ApiResponseCache entry = existing.get();
+                if (contentHash.equals(entry.getContentHash())) {
+                    return;
+                }
+                entry.setJsonBody(json);
+                entry.setContentHash(contentHash);
+                try {
+                    repository.save(entry);
+                    return;
+                } catch (OptimisticLockingFailureException ex) {
+                    if (attempt == 1) {
+                        throw ex;
+                    }
+                }
+            } else {
+                try {
+                    repository.save(new ApiResponseCache(cacheKey, json, contentHash));
+                    return;
+                } catch (DataIntegrityViolationException ex) {
+                    if (attempt == 1) {
+                        throw ex;
+                    }
+                }
             }
-            entry.setJsonBody(json);
-            entry.setContentHash(contentHash);
-            repository.save(entry);
-            return;
         }
-
-        repository.save(new ApiResponseCache(cacheKey, json, contentHash));
     }
 
     public Optional<String> getRawJson(String cacheKey) {
@@ -97,4 +114,3 @@ public class ApiResponseCacheService {
         return new String(hexChars);
     }
 }
-

@@ -18,8 +18,10 @@ RUN addgroup -S app && adduser -S app -G app
 COPY --from=build /workspace/app.jar /app/app.jar
 
 RUN apk add --no-cache curl su-exec \
-    && mkdir -p /data \
-    && chown app:app /data
+    && mkdir -p /data /opt/h2 \
+    && chown app:app /data \
+    && curl -fsSL -o /opt/h2/h2-old.jar https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar \
+    && curl -fsSL -o /opt/h2/h2-new.jar https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
 
 COPY Docker/backend-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
@@ -27,7 +29,7 @@ RUN chmod +x /entrypoint.sh
 VOLUME /data
 EXPOSE 8080
 
-ENV SPRING_DATASOURCE_URL=jdbc:h2:file:/data/substitution-plans;AUTO_SERVER=TRUE;DB_CLOSE_DELAY=-1 \
+ENV SPRING_DATASOURCE_URL=jdbc:h2:file:/data/substitution-plans;DB_CLOSE_DELAY=-1 \
     SPRING_PROFILES_ACTIVE=prod \
     JAVA_OPTS=""
 

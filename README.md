@@ -103,7 +103,7 @@ While developed specifically for GGL, this application is designed to be adaptab
 
 ### Backend
 
-- Spring Boot 2.7 Java backend
+- Spring Boot 3.2 Java backend
 - RESTful API design
 - Caching for performance optimization
 
@@ -137,7 +137,7 @@ This opacity has forced us to rely on reverse-engineered solutions, creating unn
 
 ### Prerequisites
 
-- JDK 11
+- JDK 21
 - Node.js 18+ and npm
 - Maven
 
@@ -158,6 +158,13 @@ cd school-dashboard
   ```
 
   Copy `src/main/resources/application.properties.example` to `application.properties` and set your DSBmobile credentials before starting the service.
+
+  You can override any Spring property using environment variables (Spring Boot relaxed binding).
+  Examples:
+  - `DSB_USERNAME` -> `dsb.username`
+  - `DSB_PASSWORD` -> `dsb.password`
+  - `CALENDAR_ICS_URL` -> `calendar.ics-url`
+  - `SPRING_DATASOURCE_URL` -> `spring.datasource.url`
 
 - **Database migrations** – Flyway runs automatically on startup. Migration scripts live under `Backend/src/main/resources/db/migration`. To apply new schema changes, add a `V{next}__description.sql` file and restart the backend.
 
@@ -180,6 +187,24 @@ cd school-dashboard
   ```
 
   The H2 database persists plan snapshots under `Backend/data/`.
+
+### Backend API Endpoints
+
+All endpoints are served from the backend base URL (default: `http://localhost:8080`).
+
+- `GET /health` - Lightweight health response with status + timestamp.
+- `GET /api/substitution/plans` - Substitution plan data (cached fallback on errors).
+- `GET /api/dsb/timetables` - Raw DSBmobile timetables list.
+- `GET /api/dsb/news` - DSBmobile news payload.
+- `GET /api/calendar/events?limit=5` - Parsed calendar events (epoch millis + `allDay`).
+- `GET /error` - Error page handler (HTML).
+
+If actuator endpoints are enabled (see `management.endpoints.web.exposure.include`), you can also use:
+
+- `GET /actuator/health`
+- `GET /actuator/info`
+- `GET /actuator/metrics`
+- `GET /actuator/env`
 
 ### Frontend (React + Vite)
 
@@ -221,6 +246,7 @@ cd school-dashboard
 
 - Provide required credentials through environment variables (e.g. add a `.env` file in the `Docker/` directory or inject values in your CI/CD system). Typical variables include `DSB_USERNAME`, `DSB_PASSWORD`, and any optional Spring overrides.
 - Persistent storage for the H2 database is already wired via the `backend-data` volume (mounted at `/data`). Create regular backups of this volume if the substitution history is important for you.
+- If you upgraded from Spring Boot 2.x to 3.x, H2 requires a one-time file format migration. Set `H2_MIGRATE_ON_STARTUP=true` for the backend container to auto-migrate the file on startup (creates a `.bak` and `.sql` export in `/data`).
 
 2. **Configure the Frontend**:
 

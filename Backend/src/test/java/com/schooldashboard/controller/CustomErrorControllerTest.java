@@ -2,7 +2,7 @@ package com.schooldashboard.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import javax.servlet.RequestDispatcher;
+import jakarta.servlet.RequestDispatcher;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

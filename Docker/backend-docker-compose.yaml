@@ -10,6 +10,7 @@ services:
     environment:
       SPRING_DATASOURCE_USERNAME: sa
       SPRING_DATASOURCE_PASSWORD: ""
+      H2_MIGRATE_ON_STARTUP: "true"
       # Uncomment and supply credentials for production use
       # DSB_USERNAME: your-user
       # DSB_PASSWORD: your-pass
