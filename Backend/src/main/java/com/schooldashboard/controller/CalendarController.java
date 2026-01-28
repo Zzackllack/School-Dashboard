@@ -1,5 +1,8 @@
 package com.schooldashboard.controller;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.schooldashboard.service.ApiResponseCacheKeys;
 import com.schooldashboard.service.ApiResponseCacheService;
 import com.schooldashboard.service.CalendarService;
@@ -22,10 +25,12 @@ public class CalendarController {
 
     private final CalendarService calendarService;
     private final ApiResponseCacheService cacheService;
+    private final ObjectMapper objectMapper;
 
-    public CalendarController(CalendarService calendarService, ApiResponseCacheService cacheService) {
+    public CalendarController(CalendarService calendarService, ApiResponseCacheService cacheService, ObjectMapper objectMapper) {
         this.calendarService = calendarService;
         this.cacheService = cacheService;
+        this.objectMapper = objectMapper;
     }
 
     @GetMapping("/events")
@@ -39,14 +44,40 @@ public class CalendarController {
             logger.warn("Failed to fetch calendar events", e);
             Optional<String> cached = cacheService.getRawJson(ApiResponseCacheKeys.CALENDAR_EVENTS);
             if (cached.isPresent()) {
-                return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(cached.get());
+                String limitedJson = limitCachedEvents(cached.get(), limit);
+                return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(limitedJson);
             }
             if (e instanceof IllegalStateException && e.getMessage() != null
                     && e.getMessage().contains("not configured")) {
                 return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
-                        .body("Error fetching calendar events: " + e.getMessage());
+                        .body("Error fetching calendar events");
             }
-            return ResponseEntity.badRequest().body("Error fetching calendar events: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error fetching calendar events");
+        }
+    }
+
+    private String limitCachedEvents(String cachedJson, int limit) {
+        if (cachedJson == null || cachedJson.isBlank()) {
+            return "[]";
+        }
+        try {
+            JsonNode node = objectMapper.readTree(cachedJson);
+            if (!node.isArray()) {
+                return cachedJson;
+            }
+            ArrayNode array = (ArrayNode) node;
+            if (array.size() <= limit) {
+                return cachedJson;
+            }
+            ArrayNode truncated = objectMapper.createArrayNode();
+            for (int i = 0; i < limit; i++) {
+                truncated.add(array.get(i));
+            }
+            return objectMapper.writeValueAsString(truncated);
+        } catch (Exception ex) {
+            logger.warn("Failed to parse cached calendar events", ex);
+            return cachedJson;
         }
     }
 }

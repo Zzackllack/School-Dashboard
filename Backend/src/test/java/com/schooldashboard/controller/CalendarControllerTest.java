@@ -46,8 +46,8 @@ public class CalendarControllerTest {
         when(cacheService.getRawJson(ApiResponseCacheKeys.CALENDAR_EVENTS)).thenReturn(Optional.empty());
 
         mockMvc.perform(get("/api/calendar/events"))
-                .andExpect(status().isBadRequest())
-                .andExpect(content().string(Matchers.containsString("fail")));
+                .andExpect(status().isInternalServerError())
+                .andExpect(content().string(Matchers.containsString("Error fetching calendar events")));
     }
 
     @Test
@@ -57,7 +57,7 @@ public class CalendarControllerTest {
 
         mockMvc.perform(get("/api/calendar/events"))
                 .andExpect(status().isServiceUnavailable())
-                .andExpect(content().string(Matchers.containsString("not configured")));
+                .andExpect(content().string(Matchers.containsString("Error fetching calendar events")));
     }
 
     @Test
@@ -70,6 +70,18 @@ public class CalendarControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType("application/json"))
                 .andExpect(content().string("[{\"summary\":\"Cached\"}]"));
+    }
+
+    @Test
+    public void getEventsCacheRespectsLimit() throws Exception {
+        when(calendarService.getUpcomingEvents(1)).thenThrow(new RuntimeException("fail"));
+        when(cacheService.getRawJson(ApiResponseCacheKeys.CALENDAR_EVENTS))
+                .thenReturn(Optional.of("[{\"summary\":\"A\"},{\"summary\":\"B\"}]"));
+
+        mockMvc.perform(get("/api/calendar/events").param("limit", "1"))
+                .andExpect(status().isOk())
+                .andExpect(content().contentType("application/json"))
+                .andExpect(content().string("[{\"summary\":\"A\"}]"));
     }
 
     @Test
