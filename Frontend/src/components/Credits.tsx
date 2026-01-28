@@ -45,11 +45,11 @@ const Credits = () => {
 
         <div className="w-full">
           <div className="mx-auto max-w-[18rem]">
-            <div className="relative aspect-[4/3] overflow-hidden rounded-lg border border-gray-200 shadow-md">
+            <div className="aspect-[4/3] overflow-hidden rounded-lg border border-gray-200 shadow-md">
               <img
                 src={lkBildSrc}
                 alt="Informatik Leistungskurs"
-                className="absolute inset-0 h-full w-full object-cover"
+                className="inset-0 h-full w-full object-cover"
                 onError={() => {
                   if (lkBildSrc !== LK_BILD_PUBLIC_SRC) {
                     console.warn(
@@ -64,6 +64,12 @@ const Credits = () => {
           <p className="mt-2 text-center text-sm text-[#5A4635]">
             Informatik Leistungskurs
           </p>
+          <div className="text-[#5A4635] py-2 px-6 text-center text-sm">
+            <p>
+              © 2025 - {new Date().getFullYear()} Cédric, Nikolas, Informatik LK
+              24/26 | GGL
+            </p>
+          </div>
         </div>
       </div>
     </div>
