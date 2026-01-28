@@ -222,10 +222,12 @@ const SubstitutionPlanDisplay = () => {
   const renderTypeCell = (type: string) => {
     if (type.toLowerCase() === "entfall" || type.toLowerCase() === "ausfall") {
       return (
-        <div className="flex items-center text-red-600 font-medium">
-          <X size={16} className="mr-1" />
-          {type}
-        </div>
+        <td className="px-1 py-3 min-w-max">
+          <div className="flex items-center text-red-600 font-medium">
+            <X size={15} className="mr-1" />
+            {type}
+          </div>
+        </td>
       );
     }
 
@@ -235,10 +237,12 @@ const SubstitutionPlanDisplay = () => {
       type.toLowerCase().includes("s. vertr.")
     ) {
       return (
-        <div className="flex items-center text-amber-600 font-medium">
-          <Replace size={16} className="mr-1" />
-          {type}
-        </div>
+        <td className="px-1 py-3 min-w-max">
+          <div className="flex items-center text-amber-600 font-medium">
+            <Replace size={15} className="mr-1" />
+            vertr.
+          </div>
+        </td>
       );
     }
 
@@ -248,10 +252,12 @@ const SubstitutionPlanDisplay = () => {
       type.toLowerCase().includes("raumänderung")
     ) {
       return (
-        <div className="flex items-center text-green-600 font-medium">
-          <ArrowRightSquare size={16} className="mr-1" />
-          {type}
-        </div>
+        <td className="px-1 py-3 min-w-max">
+          <div className="flex items-center text-green-600 font-medium whitespace-nowrap">
+            <ArrowRightSquare size={15} className="mr-1" />
+            R.-Änd.
+          </div>
+        </td>
       );
     }
 
@@ -260,10 +266,12 @@ const SubstitutionPlanDisplay = () => {
       type.toLowerCase().includes("verleg")
     ) {
       return (
-        <div className="flex items-center text-green-600 font-medium">
-          <ArrowDownUp size={16} className="mr-1" />
-          {type}
-        </div>
+        <td className="px-1 py-3 min-w-max">
+          <div className="flex items-center text-green-600 font-medium">
+            <ArrowDownUp size={15} className="mr-1" />
+            Verleg.
+          </div>
+        </td>
       );
     }
 
@@ -272,10 +280,12 @@ const SubstitutionPlanDisplay = () => {
       type.toLowerCase().includes("eigenverantwort")
     ) {
       return (
-        <div className="flex items-center text-indigo-600 font-medium">
-          <BookOpen size={16} className="mr-1" />
-          {type}
-        </div>
+        <td className="px-1 py-3 min-w-max">
+          <div className="flex items-center text-indigo-600 font-medium">
+            <BookOpen size={15} className="mr-1" />
+            {type}
+          </div>
+        </td>
       );
     }
 
@@ -284,10 +294,12 @@ const SubstitutionPlanDisplay = () => {
       type.toLowerCase().includes("veranstaltung")
     ) {
       return (
-        <div className="flex items-center text-slate-600 font-medium">
-          <Calendar size={16} className="mr-1" />
-          {type}
-        </div>
+        <td className="px-1 py-3 min-w-max">
+          <div className="flex items-center text-slate-600 font-medium">
+            <Calendar size={15} className="mr-1" />
+            {type}
+          </div>
+        </td>
       );
     }
 
@@ -296,10 +308,12 @@ const SubstitutionPlanDisplay = () => {
       type.toLowerCase().includes("geändert")
     ) {
       return (
-        <div className="flex items-center text-blue-600 font-medium">
-          <PenLine size={16} className="mr-1" />
-          {type}
-        </div>
+        <td className="px-1 py-3 min-w-max">
+          <div className="flex items-center text-blue-600 font-medium">
+            <PenLine size={15} className="mr-1" />
+            {type}
+          </div>
+        </td>
       );
     }
 
@@ -308,14 +322,20 @@ const SubstitutionPlanDisplay = () => {
       type.toLowerCase().includes("mitbetreuung")
     ) {
       return (
-        <div className="flex items-center text-green-600 font-medium">
-          <Users size={16} className="mr-1" />
-          {type}
-        </div>
+        <td className="px-1 py-3 min-w-max">
+          <div className="flex items-center text-green-600 font-medium">
+            <Users size={15} className="mr-1" />
+            {type}
+          </div>
+        </td>
       );
     }
 
-    return <span className="text-gray-800">{type}</span>;
+    return (
+      <td className="px-1 py-3 min-w-max">
+        <span className="text-gray-800">{type}</span>
+      </td>
+    );
   };
 
   const headerDate =
@@ -327,6 +347,10 @@ const SubstitutionPlanDisplay = () => {
           month: "2-digit",
           year: "numeric",
         });
+
+  const getTHeaderClass = (grade: GradeKey) => {
+    return `${gradeStyles[grade].tableHeader} text-white backdrop-blur-md border-b border-white/10 px-[6.7px] py-6 text-left text-[12px]  leading-tight`;
+  };
 
   return (
     <div className="w-full h-full flex flex-col min-h-0">
@@ -372,7 +396,7 @@ const SubstitutionPlanDisplay = () => {
         )}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 flex-1 min-h-0 overflow-hidden ">
+      <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2 flex-1 min-h-0 overflow-hidden ">
         {" "}
         {gradeOrder.map((grade) => {
           const entries = groupedEntries[grade];
@@ -381,7 +405,7 @@ const SubstitutionPlanDisplay = () => {
           return (
             <div
               key={grade}
-              className={`rounded-xl border shadow-md p-3 flex flex-col min-h-0 max-h-full overflow-hidden ${styles.container}`}
+              className={`rounded-xl border shadow-md p-2 flex flex-col min-h-0 max-h-full overflow-hidden ${styles.container}`}
             >
               <div className="flex items-center justify-between mb-2 gap-2">
                 <h3 className={`text-lg font-semibold ${styles.heading}`}>
@@ -395,64 +419,62 @@ const SubstitutionPlanDisplay = () => {
               </div>
 
               {entries.length > 0 ? (
-                <div className="flex-1 min-h-0 overflow-y-auto">
-                  <table className="min-w-full border-collapse text-sm">
+                <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden">
+                  <table className="w-full border-collapse text-sm">
                     <thead className="sticky top-0 z-10">
                       <tr>
+                        <th
+                          className={
+                            getTHeaderClass(grade) + " rounded-tl-lg min-w-max"
+                          }
+                        >
+                          Typ
+                        </th>
                         {grade !== "11" && grade !== "12" ? (
                           <>
                             <th
-                              className={`${styles.tableHeader} text-white backdrop-blur-md border-b border-white/10 px-3 py-2 text-left rounded-tl-lg`}
+                              className={getTHeaderClass(grade) + " min-w-max"}
                             >
                               Klasse
                             </th>
 
                             <th
-                              className={`${styles.tableHeader} text-white backdrop-blur-md border-b border-white/10 px-2 py-2 text-left`}
+                              className={getTHeaderClass(grade) + " min-w-max"}
                             >
                               Stunde
                             </th>
                           </>
                         ) : (
-                          <th
-                            className={`${styles.tableHeader} text-white backdrop-blur-md border-b border-white/10 px-2 py-2 text-left rounded-tl-lg`}
-                          >
+                          <th className={getTHeaderClass(grade) + " min-w-max"}>
                             Stunde
                           </th>
                         )}
 
-                        <th
-                          className={`${styles.tableHeader} text-white backdrop-blur-md border-b border-white/10 px-2 py-2 text-left`}
-                        >
+                        {/* <th className={getTHeaderClass(grade) + " min-w-max"}>
                           Fehlt
+                        </th> */}
+                        <th
+                          className={
+                            getTHeaderClass(grade) +
+                            " min-w-max whitespace-nowrap"
+                          }
+                        >
+                          Fehlt ➔ Vertr.
                         </th>
                         <th
-                          className={`${styles.tableHeader} text-white backdrop-blur-md border-b border-white/10 px-2 py-2 text-left`}
+                          className={
+                            getTHeaderClass(grade) +
+                            " whitespace-nowrap min-w-max"
+                          }
                         >
-                          Vertreter
+                          Fach (alt 🡲 neu)
                         </th>
-                        <th
-                          className={`${styles.tableHeader} text-white backdrop-blur-md border-b border-white/10 px-2 py-2 text-left`}
-                        >
-                          Originales Fach
-                        </th>
-                        <th
-                          className={`${styles.tableHeader} text-white backdrop-blur-md border-b border-white/10 px-2 py-2 text-left`}
-                        >
-                          Neues Fach
-                        </th>
-                        <th
-                          className={`${styles.tableHeader} text-white backdrop-blur-md border-b border-white/10 px-2 py-2 text-left`}
-                        >
+                        <th className={getTHeaderClass(grade) + " min-w-max"}>
                           Raum
                         </th>
+
                         <th
-                          className={`${styles.tableHeader} text-white backdrop-blur-md border-b border-white/10 px-2 py-2 text-left`}
-                        >
-                          Typ
-                        </th>
-                        <th
-                          className={`${styles.tableHeader} text-white backdrop-blur-md border-b border-white/10 px-2 py-2 text-left rounded-tr-lg`}
+                          className={getTHeaderClass(grade) + " rounded-tr-lg"}
                         >
                           Infos
                         </th>
@@ -464,35 +486,35 @@ const SubstitutionPlanDisplay = () => {
                           key={`${entry.classes}-${entry.period}-${entryIndex}`}
                           className={`${styles.row} hover:bg-opacity-100 transition duration-300 ease-in-out`}
                         >
+                          {renderTypeCell(entry.type)}
                           {grade !== "11" && grade !== "12" && (
-                            <td className="border-b border-gray-100/30 px-3 py-2 font-medium">
+                            <td className="px-1 py-4 min-w-max">
                               {entry.classes}
                             </td>
                           )}
-                          <td className="border-b border-gray-100/30 px-2 py-2">
-                            {entry.period}
+                          <td className="px-1 py-4 min-w-max">
+                            {entry.period || "-"}
                           </td>
-                          <td className="border-b border-gray-100/30 px-2 py-2">
-                            {entry.absent}
+
+                          <td className="px-1 py-4 min-w-max whitespace-nowrap">
+                            {entry.absent.split(",")[0]}
+                            {entry.absent.split(",").length > 1
+                              ? ", .."
+                              : ""} 🡪 {entry.substitute.split(",")[0]}
+                            {entry.substitute.split(",").length > 1
+                              ? ", .."
+                              : ""}{" "}
                           </td>
-                          <td className="border-b border-gray-100/30 px-2 py-2">
-                            {entry.substitute}
+                          <td className="px-1 py-4 min-w-max whitespace-nowrap">
+                            {entry.originalSubject && entry.subject
+                              ? `${entry.originalSubject} ➔ ${entry.subject}`
+                              : entry.subject || entry.originalSubject}
                           </td>
-                          <td className="border-b border-gray-100/30 px-2 py-2">
-                            {entry.originalSubject}
+
+                          <td className="px-1 py-4 min-w-max">
+                            {entry.newRoom || "-"}
                           </td>
-                          <td className="border-b border-gray-100/30 px-2 py-2">
-                            {entry.subject}
-                          </td>
-                          <td className="border-b border-gray-100/30 px-2 py-2">
-                            {entry.newRoom}
-                          </td>
-                          <td className="border-b border-gray-100/30 px-2 py-2">
-                            {renderTypeCell(entry.type)}
-                          </td>
-                          <td className="border-b border-gray-100/30 px-2 py-2 italic ">
-                            {entry.comment || "-"}
-                          </td>
+                          <td className="px-1 py-4 italic">{entry.comment}</td>
                         </tr>
                       ))}
                     </tbody>

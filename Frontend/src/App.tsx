@@ -53,7 +53,7 @@ const App = () => {
           <div className="lg:w-3/4 flex flex-col min-h-0 flex-1">
             <SubstitutionPlanDisplay />
           </div>
-          <div className="lg:w-1/4 flex flex-col min-h-0 h-full">
+          <div className="lg:w-2/9 flex flex-col min-h-0 h-full">
             <div
               ref={sidebarRef}
               className="flex flex-col gap-5 min-h-0 flex-1 h-full overflow-y-auto pr-1"
