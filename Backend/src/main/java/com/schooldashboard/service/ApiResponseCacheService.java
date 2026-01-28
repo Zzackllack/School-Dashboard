@@ -9,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.Optional;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -47,7 +48,21 @@ public class ApiResponseCacheService {
             return;
         }
 
-        repository.save(new ApiResponseCache(cacheKey, json, contentHash));
+        try {
+            repository.save(new ApiResponseCache(cacheKey, json, contentHash));
+        } catch (DataIntegrityViolationException ex) {
+            Optional<ApiResponseCache> current = repository.findById(cacheKey);
+            if (current.isEmpty()) {
+                throw ex;
+            }
+            ApiResponseCache entry = current.get();
+            if (contentHash.equals(entry.getContentHash())) {
+                return;
+            }
+            entry.setJsonBody(json);
+            entry.setContentHash(contentHash);
+            repository.save(entry);
+        }
     }
 
     public Optional<String> getRawJson(String cacheKey) {
@@ -97,4 +112,3 @@ public class ApiResponseCacheService {
         return new String(hexChars);
     }
 }
-
