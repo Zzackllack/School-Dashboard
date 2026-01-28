@@ -50,7 +50,7 @@ public class CalendarService {
         logger.info("Fetching calendar ICS from {}", calendarUrl);
         ResponseEntity<String> response = restTemplate.getForEntity(calendarUrl, String.class);
         if (!response.getStatusCode().is2xxSuccessful()) {
-            throw new IllegalStateException("Calendar ICS response returned status " + response.getStatusCodeValue());
+            throw new IllegalStateException("Calendar ICS response returned status " + response.getStatusCode().value());
         }
         if (response.getBody() == null || response.getBody().isBlank()) {
             throw new IllegalStateException("Calendar ICS response is empty");

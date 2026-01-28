@@ -67,7 +67,9 @@ public class CalendarServiceIntegrationTest {
             byte[] data = ICS_DATA.getBytes(StandardCharsets.UTF_8);
             exchange.getResponseHeaders().add("Content-Type", "text/calendar");
             exchange.sendResponseHeaders(200, data.length);
-            exchange.getResponseBody().write(data);
+            java.io.OutputStream outputStream = exchange.getResponseBody();
+            outputStream.write(data);
+            outputStream.close();
             exchange.close();
         });
         server.start();
