@@ -64,6 +64,12 @@ const Credits = () => {
           <p className="mt-2 text-center text-sm text-[#5A4635]">
             Informatik Leistungskurs
           </p>
+          <div className="text-[#5A4635] py-2 px-6 text-center text-sm">
+            <p>
+              © 2025 - {new Date().getFullYear()} Cédric, Nikolas, Informatik LK
+              24/26 | GGL
+            </p>
+          </div>
         </div>
       </div>
     </div>
