@@ -9,7 +9,7 @@ dsb.password=your_password
 calendar.ics-url=https://example.test/remote.php/dav/public-calendars/your-id/?export
 
 # H2 Database Configuration
-spring.datasource.url=jdbc:h2:file:./data/substitution-plans;AUTO_SERVER=TRUE;DB_CLOSE_DELAY=-1
+spring.datasource.url=jdbc:h2:file:./data/substitution-plans;DB_CLOSE_DELAY=-1
 spring.datasource.driver-class-name=org.h2.Driver
 spring.datasource.username=sa
 spring.datasource.password=

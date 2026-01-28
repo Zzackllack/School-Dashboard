@@ -103,7 +103,7 @@ While developed specifically for GGL, this application is designed to be adaptab
 
 ### Backend
 
-- Spring Boot 2.7 Java backend
+- Spring Boot 3.2 Java backend
 - RESTful API design
 - Caching for performance optimization
 
@@ -246,6 +246,7 @@ If actuator endpoints are enabled (see `management.endpoints.web.exposure.includ
 
 - Provide required credentials through environment variables (e.g. add a `.env` file in the `Docker/` directory or inject values in your CI/CD system). Typical variables include `DSB_USERNAME`, `DSB_PASSWORD`, and any optional Spring overrides.
 - Persistent storage for the H2 database is already wired via the `backend-data` volume (mounted at `/data`). Create regular backups of this volume if the substitution history is important for you.
+- If you upgraded from Spring Boot 2.x to 3.x, H2 requires a one-time file format migration. Set `H2_MIGRATE_ON_STARTUP=true` for the backend container to auto-migrate the file on startup (creates a `.bak` and `.sql` export in `/data`).
 
 2. **Configure the Frontend**:
 
