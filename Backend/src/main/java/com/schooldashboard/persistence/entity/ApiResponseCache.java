@@ -9,6 +9,7 @@ import jakarta.persistence.Lob;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
+import jakarta.persistence.Version;
 
 @Entity
 @Table(name = "api_response_cache")
@@ -27,6 +28,10 @@ public class ApiResponseCache {
 
     @Column(name = "updated_at", nullable = false)
     private Instant updatedAt;
+
+    @Version
+    @Column(name = "version", nullable = false)
+    private long version;
 
     protected ApiResponseCache() {
         // JPA
@@ -81,5 +86,9 @@ public class ApiResponseCache {
 
     public void setUpdatedAt(Instant updatedAt) {
         this.updatedAt = updatedAt;
+    }
+
+    public long getVersion() {
+        return version;
     }
 }

@@ -30,6 +30,9 @@ public class CalendarController {
 
     @GetMapping("/events")
     public ResponseEntity<?> getEvents(@RequestParam(defaultValue = "5") int limit) {
+        if (limit < 1 || limit > 100) {
+            return ResponseEntity.badRequest().body("Limit must be between 1 and 100");
+        }
         try {
             return ResponseEntity.ok(calendarService.getUpcomingEvents(limit));
         } catch (Exception e) {

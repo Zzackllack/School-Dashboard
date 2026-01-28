@@ -71,4 +71,11 @@ public class CalendarControllerTest {
                 .andExpect(content().contentType("application/json"))
                 .andExpect(content().string("[{\"summary\":\"Cached\"}]"));
     }
+
+    @Test
+    public void getEventsRejectsInvalidLimit() throws Exception {
+        mockMvc.perform(get("/api/calendar/events").param("limit", "0"))
+                .andExpect(status().isBadRequest())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("Limit must be between 1 and 100")));
+    }
 }
