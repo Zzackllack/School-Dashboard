@@ -69,8 +69,8 @@ public class DSBControllerTest {
         .andExpect(content().contentType("application/json"))
         .andExpect(content().string("[{\"k\":\"v\"}]"));
   }
-  
-  @Test
+
+	@Test
   public void getNewsSuccess() throws Exception {
     when(dsbService.getNews()).thenReturn(Collections.singletonList("n"));
     mockMvc
