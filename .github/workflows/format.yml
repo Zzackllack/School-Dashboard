@@ -3,6 +3,9 @@ name: Auto Format
 on:
   push:
 
+permissions:
+  contents: write
+
 jobs:
   format:
     name: Apply formatting
