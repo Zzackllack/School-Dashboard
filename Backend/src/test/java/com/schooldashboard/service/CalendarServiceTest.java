@@ -22,70 +22,52 @@ import org.springframework.web.client.RestTemplate;
 @ExtendWith(MockitoExtension.class)
 public class CalendarServiceTest {
 
-  private static final String ICS_DATA =
-      String.join(
-              "\r\n",
-              "BEGIN:VCALENDAR",
-              "VERSION:2.0",
-              "PRODID:-//GGL//Calendar//EN",
-              "BEGIN:VEVENT",
-              "UID:future-event",
-              "DTSTART;VALUE=DATE:20990101",
-              "DTEND;VALUE=DATE:20990102",
-              "SUMMARY:Neujahr",
-              "DESCRIPTION:Ferien",
-              "LOCATION:Berlin",
-              "END:VEVENT",
-              "BEGIN:VEVENT",
-              "UID:past-event",
-              "DTSTART;VALUE=DATE:20000101",
-              "DTEND;VALUE=DATE:20000102",
-              "SUMMARY:Alt",
-              "END:VEVENT",
-              "END:VCALENDAR")
-          + "\r\n";
+	private static final String ICS_DATA = String.join("\r\n", "BEGIN:VCALENDAR", "VERSION:2.0",
+			"PRODID:-//GGL//Calendar//EN", "BEGIN:VEVENT", "UID:future-event", "DTSTART;VALUE=DATE:20990101",
+			"DTEND;VALUE=DATE:20990102", "SUMMARY:Neujahr", "DESCRIPTION:Ferien", "LOCATION:Berlin", "END:VEVENT",
+			"BEGIN:VEVENT", "UID:past-event", "DTSTART;VALUE=DATE:20000101", "DTEND;VALUE=DATE:20000102", "SUMMARY:Alt",
+			"END:VEVENT", "END:VCALENDAR") + "\r\n";
 
-  @Mock private ApiResponseCacheService cacheService;
+	@Mock
+	private ApiResponseCacheService cacheService;
 
-  private CalendarService service;
-  private RestTemplate restTemplate;
-  private MockRestServiceServer server;
+	private CalendarService service;
+	private RestTemplate restTemplate;
+	private MockRestServiceServer server;
 
-  @BeforeEach
-  void setUp() {
-    restTemplate = new RestTemplate();
-    server = MockRestServiceServer.createServer(restTemplate);
-    CalendarProperties properties = new CalendarProperties();
-    properties.setIcsUrl("http://localhost/calendar.ics");
-    service = new CalendarService(properties, restTemplate, cacheService);
-  }
+	@BeforeEach
+	void setUp() {
+		restTemplate = new RestTemplate();
+		server = MockRestServiceServer.createServer(restTemplate);
+		CalendarProperties properties = new CalendarProperties();
+		properties.setIcsUrl("http://localhost/calendar.ics");
+		service = new CalendarService(properties, restTemplate, cacheService);
+	}
 
-  @Test
-  public void fetchesAndParsesCalendarEvents() {
-    server
-        .expect(requestTo("http://localhost/calendar.ics"))
-        .andRespond(withSuccess(ICS_DATA, MediaType.TEXT_PLAIN));
+	@Test
+	public void fetchesAndParsesCalendarEvents() {
+		server.expect(requestTo("http://localhost/calendar.ics"))
+				.andRespond(withSuccess(ICS_DATA, MediaType.TEXT_PLAIN));
 
-    List<CalendarEvent> events = service.getUpcomingEvents(10);
+		List<CalendarEvent> events = service.getUpcomingEvents(10);
 
-    assertEquals(1, events.size());
-    assertEquals("Neujahr", events.get(0).getSummary());
-    verify(cacheService).store(eq(ApiResponseCacheKeys.CALENDAR_EVENTS), any());
-    server.verify();
-  }
+		assertEquals(1, events.size());
+		assertEquals("Neujahr", events.get(0).getSummary());
+		verify(cacheService).store(eq(ApiResponseCacheKeys.CALENDAR_EVENTS), any());
+		server.verify();
+	}
 
-  @Test
-  public void trimsQuotedCalendarUrl() {
-    CalendarProperties properties = new CalendarProperties();
-    properties.setIcsUrl("\"http://localhost/calendar.ics\"");
-    CalendarService quotedService = new CalendarService(properties, restTemplate, cacheService);
-    server
-        .expect(requestTo("http://localhost/calendar.ics"))
-        .andRespond(withSuccess(ICS_DATA, MediaType.TEXT_PLAIN));
+	@Test
+	public void trimsQuotedCalendarUrl() {
+		CalendarProperties properties = new CalendarProperties();
+		properties.setIcsUrl("\"http://localhost/calendar.ics\"");
+		CalendarService quotedService = new CalendarService(properties, restTemplate, cacheService);
+		server.expect(requestTo("http://localhost/calendar.ics"))
+				.andRespond(withSuccess(ICS_DATA, MediaType.TEXT_PLAIN));
 
-    List<CalendarEvent> events = quotedService.getUpcomingEvents(10);
+		List<CalendarEvent> events = quotedService.getUpcomingEvents(10);
 
-    assertEquals(1, events.size());
-    server.verify();
-  }
+		assertEquals(1, events.size());
+		server.verify();
+	}
 }

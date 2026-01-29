@@ -9,19 +9,19 @@ import org.springframework.stereotype.Service;
 @Service
 public class DsbMobileClient implements DsbClient {
 
-  @Value("${dsb.username}")
-  private String username;
+	@Value("${dsb.username}")
+	private String username;
 
-  @Value("${dsb.password}")
-  private String password;
+	@Value("${dsb.password}")
+	private String password;
 
-  @Override
-  public List<TimeTable> getTimeTables() {
-    return new DSBMobile(username, password).getTimeTables();
-  }
+	@Override
+	public List<TimeTable> getTimeTables() {
+		return new DSBMobile(username, password).getTimeTables();
+	}
 
-  @Override
-  public Object getNews() {
-    return new DSBMobile(username, password).getNews();
-  }
+	@Override
+	public Object getNews() {
+		return new DSBMobile(username, password).getNews();
+	}
 }

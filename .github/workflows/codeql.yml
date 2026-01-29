@@ -27,6 +27,10 @@ jobs:
         with:
           languages: ${{ matrix.language }}
 
+      - name: Dependency Review
+        if: github.event_name == 'pull_request'
+        uses: actions/dependency-review-action@v4
+
       - name: Set up JDK 21
         if: matrix.language == 'java-kotlin'
         uses: actions/setup-java@v4

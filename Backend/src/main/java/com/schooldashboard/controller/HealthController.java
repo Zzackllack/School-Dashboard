@@ -10,11 +10,11 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class HealthController {
 
-  @GetMapping("/health")
-  public ResponseEntity<Map<String, Object>> health() {
-    Map<String, Object> body = new LinkedHashMap<>();
-    body.put("status", "UP");
-    body.put("timestamp", Instant.now().toString());
-    return ResponseEntity.ok(body);
-  }
+	@GetMapping("/health")
+	public ResponseEntity<Map<String, Object>> health() {
+		Map<String, Object> body = new LinkedHashMap<>();
+		body.put("status", "UP");
+		body.put("timestamp", Instant.now().toString());
+		return ResponseEntity.ok(body);
+	}
 }
