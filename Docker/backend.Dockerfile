@@ -7,7 +7,7 @@ COPY Backend/pom.xml Backend/pom.xml
 COPY Backend/src Backend/src
 
 RUN mvn -f Backend/pom.xml -DskipTests clean package \
-    && JAR_FILE=$(find Backend/target -maxdepth 1 -type f -name "*.jar" ! -name "original-*.jar" | head -n 1) \
+    && JAR_FILE=$(find Backend/target -maxdepth 1 -type f -name "*.jar" ! -name "original-*.jar" -print -quit) \
     && cp "$JAR_FILE" /workspace/app.jar
 
 FROM eclipse-temurin:21-jre-alpine
@@ -17,7 +17,7 @@ RUN addgroup -S app && adduser -S app -G app
 
 COPY --from=build /workspace/app.jar /app/app.jar
 
-RUN apk add --no-cache curl su-exec \
+RUN apk add --no-cache curl=8.14.1-r2 su-exec=0.2-r3 \
     && mkdir -p /data /opt/h2 \
     && chown app:app /data \
     && curl -fsSL -o /opt/h2/h2-old.jar https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar \
