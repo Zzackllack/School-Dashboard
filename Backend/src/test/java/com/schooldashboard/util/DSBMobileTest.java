@@ -74,7 +74,8 @@ public class DSBMobileTest {
 		}
 
 		@Override
-		public void connect() {}
+		public void connect() {
+		}
 
 		@Override
 		public OutputStream getOutputStream() {
@@ -240,10 +241,9 @@ public class DSBMobileTest {
 		JsonObject response = new JsonObject();
 		response.addProperty("d", Base64.encode("{\"Result\":\"ok\"}"));
 		String payload = response.toString();
-		CloseTrackingInputStream inputStream =
-				new CloseTrackingInputStream(payload.getBytes(StandardCharsets.UTF_8));
-		FakeHttpURLConnection connection =
-				new FakeHttpURLConnection(new URL("http://localhost/test"), inputStream, outputStream);
+		CloseTrackingInputStream inputStream = new CloseTrackingInputStream(payload.getBytes(StandardCharsets.UTF_8));
+		FakeHttpURLConnection connection = new FakeHttpURLConnection(new URL("http://localhost/test"), inputStream,
+				outputStream);
 
 		DSBMobile mobile = new ConnectionDSBMobile(connection, connection.getURL());
 		JsonObject result = mobile.pullData();
