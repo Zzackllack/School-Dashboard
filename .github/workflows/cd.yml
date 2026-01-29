@@ -27,6 +27,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
+
       - name: Backend image metadata
         id: meta-backend
         uses: docker/metadata-action@v5
@@ -68,11 +69,8 @@ jobs:
         uses: sigstore/cosign-installer@v3.7.0
 
       - name: Sign backend image
-        env:
-          COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
-          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          printf '%s\n' "$BACKEND_IMAGE_TAGS" | xargs -n1 cosign sign --key env://COSIGN_KEY --yes
+          printf '%s\n' "$BACKEND_IMAGE_TAGS" | xargs -n1 cosign sign --yes
 
       - name: Frontend image metadata
         id: meta-frontend
@@ -112,8 +110,5 @@ jobs:
           exit-code: "1"
 
       - name: Sign frontend image
-        env:
-          COSIGN_KEY: ${{ secrets.COSIGN_KEY }}
-          COSIGN_PASSWORD: ${{ secrets.COSIGN_PASSWORD }}
         run: |
-          printf '%s\n' "$FRONTEND_IMAGE_TAGS" | xargs -n1 cosign sign --key env://COSIGN_KEY --yes
+          printf '%s\n' "$FRONTEND_IMAGE_TAGS" | xargs -n1 cosign sign --yes
