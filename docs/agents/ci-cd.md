@@ -9,6 +9,12 @@ This repository uses GitHub Actions for CI and CD.
 - Backend: Spotless format check, unit tests, package build.
 - Frontend: Prettier format check, ESLint, Vite build.
 
+### Auto Format (`.github/workflows/format.yml`)
+
+- Applies formatting on push and commits changes via `github-actions[bot]`.
+- Uses Prettier for the frontend and Spotless for the backend.
+- Skips runs triggered by the bot to avoid loops.
+
 ### CodeQL (`.github/workflows/codeql.yml`)
 
 - Static analysis for Java and TypeScript/JavaScript.
