@@ -228,6 +228,26 @@ If actuator endpoints are enabled (see `management.endpoints.web.exposure.includ
   npm run lint    # optional lint pass
   ```
 
+### Code Quality and CI/CD
+
+- **Formatting**
+  - Backend: Spotless (`mvn -f Backend/pom.xml spotless:check`)
+  - Frontend: Prettier (`npm --prefix Frontend run format:check`)
+- **Linting**
+  - Frontend: ESLint (`npm --prefix Frontend run lint`)
+- **CI/CD**
+  - GitHub Actions workflows for CI, CodeQL, and Docker image publishing
+
+Monorepo helpers from the repo root:
+
+```bash
+npm run format:check
+npm run format
+npm run lint
+npm run test
+npm run build
+```
+
 ### Access the application
 
 - Frontend: <http://localhost:5173>
@@ -337,6 +357,8 @@ Our dashboard solves these problems by providing a modern, readable interface th
 ## 🤝 Contributing
 
 Contributions are welcome! While this project was created for GGL, we've designed it to be adaptable for any school. Please feel free to submit a Pull Request.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
 
 1. Fork the repository
 2. Create your feature branch (`git checkout -b feature/amazing-feature`)

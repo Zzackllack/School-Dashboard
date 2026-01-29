@@ -1,0 +1,11 @@
+{
+  "name": "school-dashboard",
+  "private": true,
+  "scripts": {
+    "format": "npm --prefix Frontend run format && mvn -f Backend/pom.xml spotless:apply",
+    "format:check": "npm --prefix Frontend run format:check && mvn -f Backend/pom.xml spotless:check",
+    "lint": "npm --prefix Frontend run lint",
+    "build": "npm --prefix Frontend run build && mvn -f Backend/pom.xml -DskipTests package",
+    "test": "mvn -f Backend/pom.xml test"
+  }
+}

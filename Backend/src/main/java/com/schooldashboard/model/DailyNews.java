@@ -5,39 +5,39 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DailyNews implements Serializable {
-    private static final long serialVersionUID = 1L;
-    
-    private String date;
-    private List<String> newsItems;
-    
-    public DailyNews() {
-        newsItems = new ArrayList<>();
-    }
-    
-    public DailyNews(String date) {
-        this();
-        this.date = date;
-    }
+	private static final long serialVersionUID = 1L;
 
-    public String getDate() {
-        return date;
-    }
+	private String date;
+	private List<String> newsItems;
 
-    public void setDate(String date) {
-        this.date = date;
-    }
+	public DailyNews() {
+		newsItems = new ArrayList<>();
+	}
 
-    public List<String> getNewsItems() {
-        return newsItems;
-    }
+	public DailyNews(String date) {
+		this();
+		this.date = date;
+	}
 
-    public void setNewsItems(List<String> newsItems) {
-        this.newsItems = newsItems;
-    }
-    
-    public void addNewsItem(String newsItem) {
-        if (newsItem != null && !newsItem.trim().isEmpty()) {
-            this.newsItems.add(newsItem.trim());
-        }
-    }
+	public String getDate() {
+		return date;
+	}
+
+	public void setDate(String date) {
+		this.date = date;
+	}
+
+	public List<String> getNewsItems() {
+		return newsItems;
+	}
+
+	public void setNewsItems(List<String> newsItems) {
+		this.newsItems = (newsItems == null) ? new ArrayList<>() : newsItems;
+	}
+
+	public void addNewsItem(String newsItem) {
+		if (newsItem != null && !newsItem.trim().isEmpty()) {
+			this.newsItems.add(newsItem.trim());
+		}
+	}
 }

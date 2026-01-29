@@ -1,0 +1,11 @@
+.git
+Backend/target
+Backend/data
+Frontend/dist
+Frontend/node_modules
+**/*.png
+**/*.webp
+**/*.svg
+**/*.ico
+**/*.jar
+**/*.log

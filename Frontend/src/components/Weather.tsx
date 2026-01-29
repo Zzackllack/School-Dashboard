@@ -1,28 +1,28 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect } from "react";
 
 // Import weather icons
-import clearIcon from '../assets/airy/clear@4x.png';
-import densedrizzleIcon from '../assets/airy/dense-drizzle@4x.png';
-import denseFreezeingDrizzleIcon from '../assets/airy/dense-freezing-drizzle@4x.png';
-import fogIcon from '../assets/airy/fog@4x.png';
-import heavyFreezeingRainIcon from '../assets/airy/heavy-freezing-rain@4x.png';
-import heavyRainIcon from '../assets/airy/heavy-rain@4x.png';
-import heavySnowfallIcon from '../assets/airy/heavy-snowfall@4x.png';
-import lightDrizzleIcon from '../assets/airy/light-drizzle@4x.png';
-import lightFreezeingDrizzleIcon from '../assets/airy/light-freezing-drizzle@4x.png';
-import lightFreezeingRainIcon from '../assets/airy/light-freezing-rain@4x.png';
-import lightRainIcon from '../assets/airy/light-rain@4x.png';
-import moderateDrizzleIcon from '../assets/airy/moderate-drizzle@4x.png';
-import moderateRainIcon from '../assets/airy/moderate-rain@4x.png';
-import moderateSnowfallIcon from '../assets/airy/moderate-snowfall@4x.png';
-import mostlyClearIcon from '../assets/airy/mostly-clear@4x.png';
-import overcastIcon from '../assets/airy/overcast@4x.png';
-import partlyCloudyIcon from '../assets/airy/partly-cloudy@4x.png';
-import rimeFogIcon from '../assets/airy/rime-fog@4x.png';
-import slightSnowfallIcon from '../assets/airy/slight-snowfall@4x.png';
-import snowflakeIcon from '../assets/airy/snowflake@4x.png';
-import thunderstormWithHailIcon from '../assets/airy/thunderstorm-with-hail@4x.png';
-import thunderstormIcon from '../assets/airy/thunderstorm@4x.png';
+import clearIcon from "../assets/airy/clear@4x.png";
+import densedrizzleIcon from "../assets/airy/dense-drizzle@4x.png";
+import denseFreezeingDrizzleIcon from "../assets/airy/dense-freezing-drizzle@4x.png";
+import fogIcon from "../assets/airy/fog@4x.png";
+import heavyFreezeingRainIcon from "../assets/airy/heavy-freezing-rain@4x.png";
+import heavyRainIcon from "../assets/airy/heavy-rain@4x.png";
+import heavySnowfallIcon from "../assets/airy/heavy-snowfall@4x.png";
+import lightDrizzleIcon from "../assets/airy/light-drizzle@4x.png";
+import lightFreezeingDrizzleIcon from "../assets/airy/light-freezing-drizzle@4x.png";
+import lightFreezeingRainIcon from "../assets/airy/light-freezing-rain@4x.png";
+import lightRainIcon from "../assets/airy/light-rain@4x.png";
+import moderateDrizzleIcon from "../assets/airy/moderate-drizzle@4x.png";
+import moderateRainIcon from "../assets/airy/moderate-rain@4x.png";
+import moderateSnowfallIcon from "../assets/airy/moderate-snowfall@4x.png";
+import mostlyClearIcon from "../assets/airy/mostly-clear@4x.png";
+import overcastIcon from "../assets/airy/overcast@4x.png";
+import partlyCloudyIcon from "../assets/airy/partly-cloudy@4x.png";
+import rimeFogIcon from "../assets/airy/rime-fog@4x.png";
+import slightSnowfallIcon from "../assets/airy/slight-snowfall@4x.png";
+import snowflakeIcon from "../assets/airy/snowflake@4x.png";
+import thunderstormWithHailIcon from "../assets/airy/thunderstorm-with-hail@4x.png";
+import thunderstormIcon from "../assets/airy/thunderstorm@4x.png";
 
 // Define TypeScript interfaces for Open Meteo API responses
 interface WeatherData {
@@ -61,7 +61,7 @@ const Weather = () => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-  
+
   // School coordinates - same as in Transportation.tsx
   const schoolLat = 52.43432378391319;
   const schoolLng = 13.305375391277634;
@@ -72,11 +72,11 @@ const Weather = () => {
       try {
         const response = await fetch(
           `https://api.open-meteo.com/v1/forecast?` +
-          `latitude=${schoolLat}&longitude=${schoolLng}` +
-          `&current_weather=true` +
-          `&hourly=temperature_2m,relativehumidity_2m,precipitation,weathercode` +
-          `&daily=weathercode,temperature_2m_max,temperature_2m_min` +
-          `&timezone=Europe/Berlin`
+            `latitude=${schoolLat}&longitude=${schoolLng}` +
+            `&current_weather=true` +
+            `&hourly=temperature_2m,relativehumidity_2m,precipitation,weathercode` +
+            `&daily=weathercode,temperature_2m_max,temperature_2m_min` +
+            `&timezone=Europe/Berlin`,
         );
 
         if (!response.ok) {
@@ -84,12 +84,14 @@ const Weather = () => {
         }
 
         const data: WeatherData = await response.json();
-        console.log('Weather data:', data); // Debug log
+        console.log("Weather data:", data); // Debug log
         setWeatherData(data);
         setError(null);
       } catch (err) {
-        console.error('Failed to fetch weather data:', err);
-        setError('Fehler beim laden der Wetterdaten, versuche es später erneut oder kontaktiere Cédric.');
+        console.error("Failed to fetch weather data:", err);
+        setError(
+          "Fehler beim laden der Wetterdaten, versuche es später erneut oder kontaktiere Cédric.",
+        );
       } finally {
         setLoading(false);
       }
@@ -158,79 +160,83 @@ const Weather = () => {
   const getWeatherCondition = (code: number): string => {
     switch (true) {
       case code === 0:
-        return 'Klarer Himmel';
+        return "Klarer Himmel";
       case code === 1:
-        return 'Überwiegend klar';
+        return "Überwiegend klar";
       case code === 2:
-        return 'Teilweise bewölkt';
+        return "Teilweise bewölkt";
       case code === 3:
-        return 'Bedeckt';
+        return "Bedeckt";
       case [45, 48].includes(code):
-        return 'Nebel';
+        return "Nebel";
       case [51, 53, 55].includes(code):
-        return 'Nieselregen';
+        return "Nieselregen";
       case [61, 63, 65].includes(code):
-        return 'Regen';
+        return "Regen";
       case [80, 81, 82].includes(code):
-        return 'Regenschauer';
+        return "Regenschauer";
       case [71, 73, 75].includes(code):
-        return 'Schneefall';
+        return "Schneefall";
       case [85, 86].includes(code):
-        return 'Schneeschauer';
+        return "Schneeschauer";
       case [95, 96, 99].includes(code):
-        return 'Gewitter';
+        return "Gewitter";
       default:
-        return 'Unbekannt';
+        return "Unbekannt";
     }
   };
 
   // Format date to day name (Heute, Morgen, or day of week)
   const formatDay = (dateString: string, index: number): string => {
-    if (index === 0) return 'Heute';
-    if (index === 1) return 'Morgen';
-    if (index === 0) return 'Heute';
-    if (index === 1) return 'Morgen';
-    
+    if (index === 0) return "Heute";
+    if (index === 1) return "Morgen";
+    if (index === 0) return "Heute";
+    if (index === 1) return "Morgen";
+
     const date = new Date(dateString);
-    return date.toLocaleDateString('de-DE', { weekday: 'short' });
+    return date.toLocaleDateString("de-DE", { weekday: "short" });
   };
 
   // Get current humidity from hourly data
   const getCurrentHumidity = (): number => {
     if (!weatherData?.hourly) return 0;
-    
+
     // Current time format is like "2025-03-23T14:15"
     const currentTimeString = weatherData.current_weather.time;
-    
+
     // Extract just the date and hour part to match hourly data format
     const currentHour = currentTimeString.substring(0, 13) + ":00"; // Convert "2025-03-23T14:15" to "2025-03-23T14:00"
-    
+
     // Find the index of this hour in the hourly data
-    const index = weatherData.hourly.time.findIndex(time => time === currentHour);
-    
+    const index = weatherData.hourly.time.findIndex(
+      (time) => time === currentHour,
+    );
+
     if (index !== -1) {
       return weatherData.hourly.relativehumidity_2m[index];
     } else {
       // If exact hour not found, find the closest hour
-      console.warn("Exact hour match not found for humidity, using closest available hour");
-      
+      console.warn(
+        "Exact hour match not found for humidity, using closest available hour",
+      );
+
       // Get just the current hour as a Date object for comparison
       const currentTime = new Date(currentTimeString);
-      
+
       // Find the closest time by comparing timestamps
       let closestIndex = 0;
       let smallestDiff = Infinity;
-      
+
       weatherData.hourly.time.forEach((timeString, idx) => {
         const time = new Date(timeString);
         const diff = Math.abs(time.getTime() - currentTime.getTime());
-        
+
         if (diff < smallestDiff) {
           smallestDiff = diff;
           closestIndex = idx;
         }
       });
-      
+
       return weatherData.hourly.relativehumidity_2m[closestIndex];
     }
   };
@@ -238,13 +244,15 @@ const Weather = () => {
   // Get current precipitation from hourly data
   const getCurrentPrecipitation = (): number => {
     if (!weatherData?.hourly) return 0;
-    
+
     // Use the same approach as getCurrentHumidity to find the current hour
     const currentTimeString = weatherData.current_weather.time;
     const currentHour = currentTimeString.substring(0, 13) + ":00";
-    
-    const index = weatherData.hourly.time.findIndex(time => time === currentHour);
-    
+
+    const index = weatherData.hourly.time.findIndex(
+      (time) => time === currentHour,
+    );
+
     if (index !== -1) {
       return weatherData.hourly.precipitation[index];
     } else {
@@ -252,17 +260,17 @@ const Weather = () => {
       const currentTime = new Date(currentTimeString);
       let closestIndex = 0;
       let smallestDiff = Infinity;
-      
+
       weatherData.hourly.time.forEach((timeString, idx) => {
         const time = new Date(timeString);
         const diff = Math.abs(time.getTime() - currentTime.getTime());
-        
+
         if (diff < smallestDiff) {
           smallestDiff = diff;
           closestIndex = idx;
         }
       });
-      
+
       return weatherData.hourly.precipitation[closestIndex];
     }
   };
@@ -270,20 +278,20 @@ const Weather = () => {
   // Calculate daily precipitation totals
   const getDailyPrecipitation = (): number[] => {
     if (!weatherData?.daily || !weatherData?.hourly) return [0, 0, 0];
-    
-    const dailyTotals = weatherData.daily.time.slice(0, 3).map(date => {
+
+    const dailyTotals = weatherData.daily.time.slice(0, 3).map((date) => {
       const datePrefix = date + "T";
       const hourlyIndices = weatherData.hourly.time
-        .map((time, index) => time.startsWith(datePrefix) ? index : -1)
-        .filter(index => index !== -1);
-      
+        .map((time, index) => (time.startsWith(datePrefix) ? index : -1))
+        .filter((index) => index !== -1);
+
       // Sum precipitation for all hours in this day
       return hourlyIndices.reduce(
-        (total, index) => total + weatherData.hourly.precipitation[index], 
-        0
+        (total, index) => total + weatherData.hourly.precipitation[index],
+        0,
       );
     });
-    
+
     return dailyTotals;
   };
 
@@ -297,7 +305,9 @@ const Weather = () => {
   if (loading) {
     return (
       <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
-        <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Wetter</h2>
+        <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">
+          Wetter
+        </h2>
         <div className="flex justify-center items-center h-40">
           <p>Wetterdaten werden geladen...</p>
         </div>
@@ -308,9 +318,11 @@ const Weather = () => {
   if (error || !weatherData) {
     return (
       <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
-        <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Wetter</h2>
+        <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">
+          Wetter
+        </h2>
         <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 rounded">
-          {error || 'Wetterdaten konnten nicht geladen werden'}
+          {error || "Wetterdaten konnten nicht geladen werden"}
         </div>
       </div>
     );
@@ -320,55 +332,73 @@ const Weather = () => {
   const forecastDays = weatherData.daily.time.slice(0, 3);
   const dailyPrecipitation = getDailyPrecipitation();
   const currentPrecipitation = getCurrentPrecipitation();
-  
+
   return (
     <div className="bg-white rounded-lg shadow p-4 mb-4 text-center w-full">
-      <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">Wetter</h2>
+      <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">
+        Wetter
+      </h2>
       <div className="mb-4">
         <div className="text-lg font-bold text-[#3E3128]">Berlin</div>
         <div className="flex justify-center items-center my-2">
-          <img 
-            src={getWeatherIcon(weatherData.current_weather.weathercode)} 
+          <img
+            src={getWeatherIcon(weatherData.current_weather.weathercode)}
             alt={getWeatherCondition(weatherData.current_weather.weathercode)}
             className="w-16 h-16 mr-4"
           />
-          <span className="text-4xl font-bold text-[#3E3128]">{Math.round(weatherData.current_weather.temperature)}°C</span>
+          <span className="text-4xl font-bold text-[#3E3128]">
+            {Math.round(weatherData.current_weather.temperature)}°C
+          </span>
         </div>
         <div className="mb-2 text-[#5A4635]">
           {getWeatherCondition(weatherData.current_weather.weathercode)}
         </div>
         <div className="flex justify-around text-[#5A4635] text-sm mb-2">
           <div>Luftfeuchtigkeit: {getCurrentHumidity()}%</div>
-          <div>Wind: {Math.round(weatherData.current_weather.windspeed)} km/h</div>
+          <div>
+            Wind: {Math.round(weatherData.current_weather.windspeed)} km/h
+          </div>
         </div>
         <div className="text-[#5A4635] text-sm">
           <div className="flex items-center justify-center">
             <span className="mr-1">Niederschlag:</span>
             <span className="mr-1">Niederschlag:</span>
-            <span className={currentPrecipitation > 0 ? "text-[#8C7356] font-medium" : ""}>
+            <span
+              className={
+                currentPrecipitation > 0 ? "text-[#8C7356] font-medium" : ""
+              }
+            >
               {formatPrecipitation(currentPrecipitation)}
             </span>
           </div>
         </div>
       </div>
-      
+
       <div className="flex justify-around border-t border-gray-200 pt-4">
         {forecastDays.map((day, index) => (
           <div key={index} className="text-center">
-            <div className="font-medium text-[#3E3128]">{formatDay(day, index)}</div>
+            <div className="font-medium text-[#3E3128]">
+              {formatDay(day, index)}
+            </div>
             <div className="my-2">
-              <img 
-                src={getWeatherIcon(weatherData.daily.weathercode[index])} 
+              <img
+                src={getWeatherIcon(weatherData.daily.weathercode[index])}
                 alt={getWeatherCondition(weatherData.daily.weathercode[index])}
                 className="w-12 h-12 mx-auto"
               />
             </div>
             <div className="flex justify-center gap-2">
-              <span className="font-bold text-[#3E3128]">{Math.round(weatherData.daily.temperature_2m_max[index])}°</span>
-              <span className="text-[#5A4635]">{Math.round(weatherData.daily.temperature_2m_min[index])}°</span>
+              <span className="font-bold text-[#3E3128]">
+                {Math.round(weatherData.daily.temperature_2m_max[index])}°
+              </span>
+              <span className="text-[#5A4635]">
+                {Math.round(weatherData.daily.temperature_2m_min[index])}°
+              </span>
             </div>
             <div className="text-xs mt-1 text-[#5A4635]">
-              <span className={dailyPrecipitation[index] > 0 ? "text-gray-800" : ""}>
+              <span
+                className={dailyPrecipitation[index] > 0 ? "text-gray-800" : ""}
+              >
                 {formatPrecipitation(dailyPrecipitation[index])}
               </span>
             </div>
@@ -376,7 +406,25 @@ const Weather = () => {
         ))}
       </div>
       <p className="text-xs text-gray-500 mt-4 text-center">
-        Es wird keine Haftung für die Richtigkeit der Daten übernommen. <br></br> Datenquelle: <a href="https://open-meteo.com/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700">Open-Meteo</a>, lizenziert unter <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener noreferrer" className="underline hover:text-gray-700">CC BY 4.0</a>
+        Es wird keine Haftung für die Richtigkeit der Daten übernommen.{" "}
+        <br></br> Datenquelle:{" "}
+        <a
+          href="https://open-meteo.com/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-gray-700"
+        >
+          Open-Meteo
+        </a>
+        , lizenziert unter{" "}
+        <a
+          href="https://creativecommons.org/licenses/by/4.0/"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="underline hover:text-gray-700"
+        >
+          CC BY 4.0
+        </a>
       </p>
     </div>
   );
