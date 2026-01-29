@@ -9,11 +9,11 @@ import org.springframework.web.client.RestTemplate;
 @Configuration
 public class RestTemplateConfig {
 
-    @Bean
-    public RestTemplate restTemplate(RestTemplateBuilder builder) {
-        return builder
-                .setConnectTimeout(Duration.ofSeconds(5))
-                .setReadTimeout(Duration.ofSeconds(10))
-                .build();
-    }
+  @Bean
+  public RestTemplate restTemplate(RestTemplateBuilder builder) {
+    return builder
+        .setConnectTimeout(Duration.ofSeconds(5))
+        .setReadTimeout(Duration.ofSeconds(10))
+        .build();
+  }
 }

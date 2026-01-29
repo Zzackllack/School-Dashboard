@@ -1,11 +1,10 @@
 package com.schooldashboard.service;
 
+import com.schooldashboard.util.DSBMobile.TimeTable;
 import java.util.List;
 
-import com.schooldashboard.util.DSBMobile.TimeTable;
-
 public interface DsbClient {
-    List<TimeTable> getTimeTables();
+  List<TimeTable> getTimeTables();
 
-    Object getNews();
+  Object getNews();
 }

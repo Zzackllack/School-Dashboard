@@ -19,188 +19,203 @@ import org.springframework.stereotype.Service;
 @Service
 public class SubstitutionPlanPersistenceService {
 
-    private static final Logger logger = LoggerFactory.getLogger(SubstitutionPlanPersistenceService.class);
-    private static final char[] HEX_ARRAY = "0123456789abcdef".toCharArray();
+  private static final Logger logger =
+      LoggerFactory.getLogger(SubstitutionPlanPersistenceService.class);
+  private static final char[] HEX_ARRAY = "0123456789abcdef".toCharArray();
 
-    private final SubstitutionPlanDocumentRepository repository;
+  private final SubstitutionPlanDocumentRepository repository;
 
-    public SubstitutionPlanPersistenceService(SubstitutionPlanDocumentRepository repository) {
-        this.repository = repository;
+  public SubstitutionPlanPersistenceService(SubstitutionPlanDocumentRepository repository) {
+    this.repository = repository;
+  }
+
+  private static final Pattern PAGE_PATTERN = Pattern.compile("(?i)seite\\s+(\\d+)\\s*/\\s*(\\d+)");
+
+  public SubstitutionPlanDocument store(TimeTable table, SubstitutionPlan plan, String rawHtml) {
+    if (table == null || rawHtml == null || rawHtml.isBlank()) {
+      logger.warn(
+          "[SubstitutionPlanPersistenceService] Skipping storage due to missing data (table={}, hasHtml={})",
+          table,
+          rawHtml != null && !rawHtml.isBlank());
+      return null;
     }
 
-    private static final Pattern PAGE_PATTERN = Pattern.compile("(?i)seite\\s+(\\d+)\\s*/\\s*(\\d+)");
+    String detailUrl = table.getDetail();
+    String planUuid = table.getUUID() != null ? table.getUUID().toString() : null;
 
-    public SubstitutionPlanDocument store(TimeTable table, SubstitutionPlan plan, String rawHtml) {
-        if (table == null || rawHtml == null || rawHtml.isBlank()) {
-            logger.warn(
-                    "[SubstitutionPlanPersistenceService] Skipping storage due to missing data (table={}, hasHtml={})",
-                    table, rawHtml != null && !rawHtml.isBlank());
-            return null;
-        }
+    if (planUuid == null || detailUrl == null || detailUrl.isBlank()) {
+      logger.warn(
+          "[SubstitutionPlanPersistenceService] Skipping storage due to missing identifiers (uuid={}, detail={})",
+          planUuid,
+          detailUrl);
+      return null;
+    }
 
-        String detailUrl = table.getDetail();
-        String planUuid = table.getUUID() != null ? table.getUUID().toString() : null;
+    String contentHash = hashContent(rawHtml);
+    Optional<SubstitutionPlanDocument> existing =
+        repository
+            .findByPlanUuidAndDetailUrl(planUuid, detailUrl)
+            .or(() -> repository.findByDetailUrl(detailUrl));
 
-        if (planUuid == null || detailUrl == null || detailUrl.isBlank()) {
-            logger.warn(
-                    "[SubstitutionPlanPersistenceService] Skipping storage due to missing identifiers (uuid={}, detail={})",
-                    planUuid, detailUrl);
-            return null;
-        }
-
-        String contentHash = hashContent(rawHtml);
-        Optional<SubstitutionPlanDocument> existing = repository
-                .findByPlanUuidAndDetailUrl(planUuid, detailUrl)
-                .or(() -> repository.findByDetailUrl(detailUrl));
-
-        if (existing.isPresent()) {
-            SubstitutionPlanDocument document = existing.get();
-            if (!contentHash.equals(document.getContentHash())) {
-                logger.info("[SubstitutionPlanPersistenceService] Updating stored plan {} due to content change",
-                        document.getId());
-                document.setRawHtml(rawHtml);
-                document.setContentHash(contentHash);
-                applyMetadata(document, table, plan);
-                document.setUpdatedAt(Instant.now());
-                return repository.save(document);
-            }
-
-            boolean metadataChanged = applyMetadata(document, table, plan);
-            if (metadataChanged) {
-                logger.info("[SubstitutionPlanPersistenceService] Metadata changed for plan {}, updating record",
-                        document.getId());
-                document.setUpdatedAt(Instant.now());
-                return repository.save(document);
-            }
-
-            logger.debug("[SubstitutionPlanPersistenceService] Stored plan {} unchanged, skipping update",
-                    document.getId());
-            return document;
-        }
-
-        SubstitutionPlanDocument document = new SubstitutionPlanDocument(
-                planUuid,
-                table.getGroupName(),
-                plan != null ? plan.getDate() : table.getDate(),
-                resolveFileName(detailUrl),
-                detailUrl,
-                rawHtml,
-                contentHash,
-                Instant.now());
+    if (existing.isPresent()) {
+      SubstitutionPlanDocument document = existing.get();
+      if (!contentHash.equals(document.getContentHash())) {
+        logger.info(
+            "[SubstitutionPlanPersistenceService] Updating stored plan {} due to content change",
+            document.getId());
+        document.setRawHtml(rawHtml);
+        document.setContentHash(contentHash);
         applyMetadata(document, table, plan);
+        document.setUpdatedAt(Instant.now());
+        return repository.save(document);
+      }
 
-        logger.info("[SubstitutionPlanPersistenceService] Persisting new substitution plan for UUID {}",
-                table.getUUID());
-        try {
-            return repository.save(document);
-        } catch (DataIntegrityViolationException ex) {
-            logger.debug(
-                    "[SubstitutionPlanPersistenceService] Concurrent insert detected for {} - reusing existing entry",
-                    detailUrl);
-            return repository.findByPlanUuidAndDetailUrl(planUuid, detailUrl)
-                    .or(() -> repository.findByDetailUrl(detailUrl))
-                    .orElseThrow(() -> ex);
-        }
+      boolean metadataChanged = applyMetadata(document, table, plan);
+      if (metadataChanged) {
+        logger.info(
+            "[SubstitutionPlanPersistenceService] Metadata changed for plan {}, updating record",
+            document.getId());
+        document.setUpdatedAt(Instant.now());
+        return repository.save(document);
+      }
+
+      logger.debug(
+          "[SubstitutionPlanPersistenceService] Stored plan {} unchanged, skipping update",
+          document.getId());
+      return document;
     }
 
-    private boolean applyMetadata(SubstitutionPlanDocument document, TimeTable table, SubstitutionPlan plan) {
-        boolean changed = false;
+    SubstitutionPlanDocument document =
+        new SubstitutionPlanDocument(
+            planUuid,
+            table.getGroupName(),
+            plan != null ? plan.getDate() : table.getDate(),
+            resolveFileName(detailUrl),
+            detailUrl,
+            rawHtml,
+            contentHash,
+            Instant.now());
+    applyMetadata(document, table, plan);
 
-        changed |= updateIfChanged(document::getGroupName, document::setGroupName, table.getGroupName());
-        changed |= updateIfChanged(document::getSourceDate, document::setSourceDate, table.getDate());
-        changed |= updateIfChanged(document::getSourceTitle, document::setSourceTitle, table.getTitle());
+    logger.info(
+        "[SubstitutionPlanPersistenceService] Persisting new substitution plan for UUID {}",
+        table.getUUID());
+    try {
+      return repository.save(document);
+    } catch (DataIntegrityViolationException ex) {
+      logger.debug(
+          "[SubstitutionPlanPersistenceService] Concurrent insert detected for {} - reusing existing entry",
+          detailUrl);
+      return repository
+          .findByPlanUuidAndDetailUrl(planUuid, detailUrl)
+          .or(() -> repository.findByDetailUrl(detailUrl))
+          .orElseThrow(() -> ex);
+    }
+  }
 
-        String resolvedTitle = resolveFileName(document.getDetailUrl());
-        changed |= updateIfChanged(document::getTitle, document::setTitle, resolvedTitle);
+  private boolean applyMetadata(
+      SubstitutionPlanDocument document, TimeTable table, SubstitutionPlan plan) {
+    boolean changed = false;
 
-        String planDate = null;
-        if (plan != null && plan.getDate() != null && !plan.getDate().isBlank()) {
-            planDate = plan.getDate();
-        }
-        if (planDate == null || planDate.isBlank()) {
-            planDate = table.getDate();
-        }
-        changed |= updateIfChanged(document::getPlanDate, document::setPlanDate, planDate);
+    changed |=
+        updateIfChanged(document::getGroupName, document::setGroupName, table.getGroupName());
+    changed |= updateIfChanged(document::getSourceDate, document::setSourceDate, table.getDate());
+    changed |=
+        updateIfChanged(document::getSourceTitle, document::setSourceTitle, table.getTitle());
 
-        Integer pageNumber = null;
-        Integer pageCount = null;
-        if (planDate != null && !planDate.isBlank()) {
-            Matcher matcher = PAGE_PATTERN.matcher(planDate);
-            if (matcher.find()) {
-                pageNumber = parseIntSafe(matcher.group(1));
-                pageCount = parseIntSafe(matcher.group(2));
-            }
-        }
+    String resolvedTitle = resolveFileName(document.getDetailUrl());
+    changed |= updateIfChanged(document::getTitle, document::setTitle, resolvedTitle);
 
-        if (pageNumber == null) {
-            pageNumber = pageFromFileName(resolvedTitle);
-        }
+    String planDate = null;
+    if (plan != null && plan.getDate() != null && !plan.getDate().isBlank()) {
+      planDate = plan.getDate();
+    }
+    if (planDate == null || planDate.isBlank()) {
+      planDate = table.getDate();
+    }
+    changed |= updateIfChanged(document::getPlanDate, document::setPlanDate, planDate);
 
-        changed |= updateIfChanged(document::getPageNumber, document::setPageNumber, pageNumber);
-        changed |= updateIfChanged(document::getPageCount, document::setPageCount, pageCount);
-
-        return changed;
+    Integer pageNumber = null;
+    Integer pageCount = null;
+    if (planDate != null && !planDate.isBlank()) {
+      Matcher matcher = PAGE_PATTERN.matcher(planDate);
+      if (matcher.find()) {
+        pageNumber = parseIntSafe(matcher.group(1));
+        pageCount = parseIntSafe(matcher.group(2));
+      }
     }
 
-    private <T> boolean updateIfChanged(java.util.function.Supplier<T> getter, java.util.function.Consumer<T> setter,
-            T newValue) {
-        T current = getter.get();
-        if (current == null ? newValue != null : !current.equals(newValue)) {
-            setter.accept(newValue);
-            return true;
-        }
-        return false;
+    if (pageNumber == null) {
+      pageNumber = pageFromFileName(resolvedTitle);
     }
 
-    private Integer parseIntSafe(String value) {
-        try {
-            return Integer.valueOf(value);
-        } catch (NumberFormatException ex) {
-            logger.debug("[SubstitutionPlanPersistenceService] Unable to parse integer from '{}': {}", value,
-                    ex.getMessage());
-            return null;
-        }
-    }
+    changed |= updateIfChanged(document::getPageNumber, document::setPageNumber, pageNumber);
+    changed |= updateIfChanged(document::getPageCount, document::setPageCount, pageCount);
 
-    private String resolveFileName(String detailUrl) {
-        if (detailUrl == null || detailUrl.isBlank()) {
-            return null;
-        }
-        int lastSlash = detailUrl.lastIndexOf('/') + 1;
-        if (lastSlash <= 0 || lastSlash >= detailUrl.length()) {
-            return detailUrl;
-        }
-        return detailUrl.substring(lastSlash);
-    }
+    return changed;
+  }
 
-    private Integer pageFromFileName(String fileName) {
-        if (fileName == null) {
-            return null;
-        }
-        Matcher matcher = Pattern.compile(".*?(\\d+)(?=\\.html?|$)").matcher(fileName);
-        if (matcher.find()) {
-            return parseIntSafe(matcher.group(1));
-        }
-        return null;
+  private <T> boolean updateIfChanged(
+      java.util.function.Supplier<T> getter, java.util.function.Consumer<T> setter, T newValue) {
+    T current = getter.get();
+    if (current == null ? newValue != null : !current.equals(newValue)) {
+      setter.accept(newValue);
+      return true;
     }
+    return false;
+  }
 
-    private String hashContent(String content) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            byte[] hashBytes = digest.digest(content.getBytes(StandardCharsets.UTF_8));
-            return toHex(hashBytes);
-        } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 algorithm is not available", e);
-        }
+  private Integer parseIntSafe(String value) {
+    try {
+      return Integer.valueOf(value);
+    } catch (NumberFormatException ex) {
+      logger.debug(
+          "[SubstitutionPlanPersistenceService] Unable to parse integer from '{}': {}",
+          value,
+          ex.getMessage());
+      return null;
     }
+  }
 
-    private String toHex(byte[] bytes) {
-        char[] hexChars = new char[bytes.length * 2];
-        for (int j = 0; j < bytes.length; j++) {
-            int v = bytes[j] & 0xFF;
-            hexChars[j * 2] = HEX_ARRAY[v >>> 4];
-            hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
-        }
-        return new String(hexChars);
+  private String resolveFileName(String detailUrl) {
+    if (detailUrl == null || detailUrl.isBlank()) {
+      return null;
     }
+    int lastSlash = detailUrl.lastIndexOf('/') + 1;
+    if (lastSlash <= 0 || lastSlash >= detailUrl.length()) {
+      return detailUrl;
+    }
+    return detailUrl.substring(lastSlash);
+  }
+
+  private Integer pageFromFileName(String fileName) {
+    if (fileName == null) {
+      return null;
+    }
+    Matcher matcher = Pattern.compile(".*?(\\d+)(?=\\.html?|$)").matcher(fileName);
+    if (matcher.find()) {
+      return parseIntSafe(matcher.group(1));
+    }
+    return null;
+  }
+
+  private String hashContent(String content) {
+    try {
+      MessageDigest digest = MessageDigest.getInstance("SHA-256");
+      byte[] hashBytes = digest.digest(content.getBytes(StandardCharsets.UTF_8));
+      return toHex(hashBytes);
+    } catch (NoSuchAlgorithmException e) {
+      throw new IllegalStateException("SHA-256 algorithm is not available", e);
+    }
+  }
+
+  private String toHex(byte[] bytes) {
+    char[] hexChars = new char[bytes.length * 2];
+    for (int j = 0; j < bytes.length; j++) {
+      int v = bytes[j] & 0xFF;
+      hexChars[j * 2] = HEX_ARRAY[v >>> 4];
+      hexChars[j * 2 + 1] = HEX_ARRAY[v & 0x0F];
+    }
+    return new String(hexChars);
+  }
 }
