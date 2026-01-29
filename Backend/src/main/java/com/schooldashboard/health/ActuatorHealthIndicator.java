@@ -40,6 +40,13 @@ public class ActuatorHealthIndicator implements HealthIndicator {
 			} catch (Exception e) {
 				details.put("db", "DOWN");
 				details.put("dbError", e.getMessage());
+				if (cacheManager != null) {
+					details.put("caches", cacheManager.getCacheNames());
+				} else {
+					details.put("caches", "NOT CONFIGURED");
+				}
+				long uptimeMs = ManagementFactory.getRuntimeMXBean().getUptime();
+				details.put("uptime_ms", uptimeMs);
 				return Health.down().withDetails(details).build();
 			}
 		} else {

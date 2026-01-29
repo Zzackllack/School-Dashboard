@@ -29,6 +29,7 @@ public class DSBServiceIntegrationTest {
 		UUID uuid = UUID.fromString("a05eab4c-af64-49f8-b8e6-e608269ebc05");
 		cacheService.store(ApiResponseCacheKeys.DSB_TIMETABLES, List.of(Map.of("uuid", uuid.toString(), "groupName",
 				"cached-group", "date", "2025-01-01", "title", "cached-title", "detail", "cached-detail")));
+		dsbService.clearCache();
 		when(dsbClient.getTimeTables()).thenThrow(new RuntimeException("offline"));
 
 		List<DSBMobile.TimeTable> tables = dsbService.getTimeTables();

@@ -1,7 +1,6 @@
 package com.schooldashboard.util;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -20,6 +19,95 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 
 public class DSBMobileTest {
+
+	private static class CloseTrackingInputStream extends ByteArrayInputStream {
+		private boolean closed;
+
+		CloseTrackingInputStream(byte[] buf) {
+			super(buf);
+		}
+
+		@Override
+		public void close() {
+			closed = true;
+		}
+
+		boolean isClosed() {
+			return closed;
+		}
+	}
+
+	private static class CloseTrackingOutputStream extends ByteArrayOutputStream {
+		private boolean closed;
+
+		@Override
+		public void close() {
+			closed = true;
+		}
+
+		boolean isClosed() {
+			return closed;
+		}
+	}
+
+	private static class FakeHttpURLConnection extends HttpURLConnection {
+		private final InputStream inputStream;
+		private final OutputStream outputStream;
+		private boolean disconnected;
+		private int connectTimeout;
+		private int readTimeout;
+
+		FakeHttpURLConnection(URL url, InputStream inputStream, OutputStream outputStream) {
+			super(url);
+			this.inputStream = inputStream;
+			this.outputStream = outputStream;
+		}
+
+		@Override
+		public void disconnect() {
+			disconnected = true;
+		}
+
+		@Override
+		public boolean usingProxy() {
+			return false;
+		}
+
+		@Override
+		public void connect() {}
+
+		@Override
+		public OutputStream getOutputStream() {
+			return outputStream;
+		}
+
+		@Override
+		public InputStream getInputStream() {
+			return inputStream;
+		}
+
+		@Override
+		public void setConnectTimeout(int timeout) {
+			this.connectTimeout = timeout;
+		}
+
+		@Override
+		public void setReadTimeout(int timeout) {
+			this.readTimeout = timeout;
+		}
+
+		int getConnectTimeoutValue() {
+			return connectTimeout;
+		}
+
+		int getReadTimeoutValue() {
+			return readTimeout;
+		}
+
+		boolean isDisconnected() {
+			return disconnected;
+		}
+	}
 
 	private static class ConnectionDSBMobile extends DSBMobile {
 		private final HttpURLConnection connection;
@@ -148,28 +236,31 @@ public class DSBMobileTest {
 
 	@Test
 	public void pullDataAppliesTimeoutsAndClosesResources() throws Exception {
-		HttpURLConnection connection = mock(HttpURLConnection.class);
-		ByteArrayOutputStream outputStream = spy(new ByteArrayOutputStream());
-		String payload = "{\"d\":\"" + Base64.encode("{\\\"Result\\\":\\\"ok\\\"}") + "\"}";
-		InputStream inputStream = spy(new ByteArrayInputStream(payload.getBytes(StandardCharsets.UTF_8)));
+		CloseTrackingOutputStream outputStream = new CloseTrackingOutputStream();
+		JsonObject response = new JsonObject();
+		response.addProperty("d", Base64.encode("{\"Result\":\"ok\"}"));
+		String payload = response.toString();
+		CloseTrackingInputStream inputStream =
+				new CloseTrackingInputStream(payload.getBytes(StandardCharsets.UTF_8));
+		FakeHttpURLConnection connection =
+				new FakeHttpURLConnection(new URL("http://localhost/test"), inputStream, outputStream);
 
-		when(connection.getOutputStream()).thenReturn(outputStream);
-		when(connection.getInputStream()).thenReturn(inputStream);
-
-		DSBMobile mobile = new ConnectionDSBMobile(connection, new URL("http://localhost/test"));
+		DSBMobile mobile = new ConnectionDSBMobile(connection, connection.getURL());
 		JsonObject result = mobile.pullData();
 
 		assertEquals("ok", result.get("Result").getAsString());
-		verify(connection).setConnectTimeout(5000);
-		verify(connection).setReadTimeout(10000);
-		verify(outputStream).close();
-		verify(inputStream).close();
-		verify(connection).disconnect();
+		assertEquals(5000, connection.getConnectTimeoutValue());
+		assertEquals(10000, connection.getReadTimeoutValue());
+		assertTrue(outputStream.isClosed());
+		assertTrue(inputStream.isClosed());
+		assertTrue(connection.isDisconnected());
 	}
 
 	@Test
 	public void pullDataParsesResponseFromServer() throws Exception {
-		String payload = "{\"d\":\"" + Base64.encode("{\\\"Result\\\":\\\"ok\\\"}") + "\"}";
+		JsonObject response = new JsonObject();
+		response.addProperty("d", Base64.encode("{\"Result\":\"ok\"}"));
+		String payload = response.toString();
 		HttpServer server = HttpServer.create(new InetSocketAddress(0), 0);
 		server.createContext("/test", exchange -> {
 			byte[] bytes = payload.getBytes(StandardCharsets.UTF_8);
