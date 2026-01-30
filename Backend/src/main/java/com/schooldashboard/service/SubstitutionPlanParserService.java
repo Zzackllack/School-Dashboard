@@ -151,35 +151,54 @@ public class SubstitutionPlanParserService {
 
 		if (!newsHeaders.isEmpty()) {
 			Element newsHeader = newsHeaders.first();
-			Element current = (newsHeader == null) ? null : newsHeader.nextElementSibling();
-
-			// Look for paragraphs or divs after the header until the substitution table
-			// appears
-			while (current != null) {
-				if (current.is("table.mon_list")) {
-					break;
-				}
-
-				if (current.is("p, div")) {
-					String text = current.text().trim();
-					if (!text.isEmpty() && !text.contains("Untis Stundenplan")) {
-						news.addNewsItem(text);
+			Element parent = (newsHeader == null) ? null : newsHeader.parent();
+			if (parent != null) {
+				Elements newsElements = parent.nextElementSiblings();
+				for (Element element : newsElements) {
+					if (element.is("table.mon_list")) {
+						break;
+					}
+					if (element.is("p, div, tr, td, font")) {
+						addNewsItem(news, element.text());
 					}
 				}
+			}
 
-				current = current.nextElementSibling();
+			if (news.getNewsItems().isEmpty()) {
+				Element current = (newsHeader == null) ? null : newsHeader.nextElementSibling();
+
+				// Look for paragraphs or divs after the header until the substitution table
+				// appears
+				while (current != null) {
+					if (current.is("table.mon_list")) {
+						break;
+					}
+
+					if (current.is("p, div")) {
+						addNewsItem(news, current.text());
+					}
+
+					current = current.nextElementSibling();
+				}
 			}
 
 			// If no siblings found, try looking for content within a font or p tag
 			if (news.getNewsItems().isEmpty()) {
 				Elements fontElements = doc.select("font[size=4]");
 				for (Element font : fontElements) {
-					String text = font.text().trim();
-					if (!text.isEmpty() && !text.contains("Untis Stundenplan")) {
-						news.addNewsItem(text);
-					}
+					addNewsItem(news, font.text());
 				}
 			}
+		}
+	}
+
+	private void addNewsItem(DailyNews news, String text) {
+		if (text == null) {
+			return;
+		}
+		String trimmed = text.trim();
+		if (!trimmed.isEmpty() && !trimmed.contains("Untis Stundenplan")) {
+			news.addNewsItem(trimmed);
 		}
 	}
 }

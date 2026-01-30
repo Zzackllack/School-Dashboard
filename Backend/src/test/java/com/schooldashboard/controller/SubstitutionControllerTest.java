@@ -8,6 +8,7 @@ import com.schooldashboard.service.ApiResponseCacheService;
 import com.schooldashboard.service.SubstitutionPlanService;
 import java.util.Collections;
 import java.util.List;
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -59,11 +60,14 @@ public class SubstitutionControllerTest {
 	public void getPlansIncludesDailyNews() throws Exception {
 		com.schooldashboard.model.SubstitutionPlan plan = new com.schooldashboard.model.SubstitutionPlan("2024-01-01",
 				"t");
-		plan.getNews().addNewsItem("Announcement");
+		plan.getNews().addNewsItem("Announcement 1");
+		plan.getNews().addNewsItem("Announcement 2");
 		when(service.getSubstitutionPlans()).thenReturn(List.of(plan));
 
 		mockMvc.perform(get("/api/substitution/plans")).andExpect(status().isOk())
 				.andExpect(jsonPath("$[0].news.date").value("2024-01-01"))
-				.andExpect(jsonPath("$[0].news.newsItems[0]").value("Announcement"));
+				.andExpect(jsonPath("$[0].news.newsItems", Matchers.hasSize(2)))
+				.andExpect(jsonPath("$[0].news.newsItems[0]").value("Announcement 1"))
+				.andExpect(jsonPath("$[0].news.newsItems[1]").value("Announcement 2"));
 	}
 }

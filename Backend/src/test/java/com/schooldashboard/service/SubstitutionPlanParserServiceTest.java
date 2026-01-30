@@ -73,6 +73,22 @@ public class SubstitutionPlanParserServiceTest {
 	}
 
 	@Test
+	public void parseDocumentReadsNewsFromInfoTableRows() throws Exception {
+		String html = "<html><table class='info'>" + "<tr class='info'><td>Nachrichten zum Tag</td></tr>"
+				+ "<tr class='info'><td>Unterrichtsfrei 4-12 Std.</td></tr>"
+				+ "<tr class='info'><td>Die Sportflächen sind gesperrt.</td></tr>" + "</table>"
+				+ "<table class='mon_list'><tr><td>Table</td></tr></table>" + "</html>";
+		Document doc = Jsoup.parse(html);
+		SubstitutionPlanParserService svc = new SubstitutionPlanParserService();
+		Method m = SubstitutionPlanParserService.class.getDeclaredMethod("parseDocument", Document.class);
+		m.setAccessible(true);
+		SubstitutionPlan plan = (SubstitutionPlan) m.invoke(svc, doc);
+		assertEquals(2, plan.getNews().getNewsItems().size());
+		assertEquals("Unterrichtsfrei 4-12 Std.", plan.getNews().getNewsItems().get(0));
+		assertEquals("Die Sportflächen sind gesperrt.", plan.getNews().getNewsItems().get(1));
+	}
+
+	@Test
 	public void parseDocumentWithoutNews() throws Exception {
 		String html = "<html><div class='mon_title'>02.02.2024</div>"
 				+ "<table class='mon_list'><tr class='list'><th>Klasse</th><th>Vertreter</th></tr>"
