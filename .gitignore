@@ -89,3 +89,5 @@ application.properties
 .settings/
 .classpath
 .project
+
+.agents/

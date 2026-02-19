@@ -1,5 +1,5 @@
 import { Calendar, Clock } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 interface CalendarEvent {
   summary: string;
@@ -11,46 +11,22 @@ interface CalendarEvent {
 }
 
 const CalendarEvents = () => {
-  const [events, setEvents] = useState<CalendarEvent[]>([]);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchCalendarEvents = async () => {
-      setLoading(true);
-      try {
-        const backendUrl =
-          import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
-        const response = await fetch(
-          `${backendUrl}/api/calendar/events?limit=5`,
-        );
-        if (!response.ok) {
-          console.error(
-            "Calendar API error:",
-            response.status,
-            response.statusText,
-          );
-          throw new Error(`Calendar API error: ${response.status}`);
-        }
-        const parsedEvents: CalendarEvent[] = await response.json();
-        setEvents(parsedEvents);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to fetch calendar events:", err);
-        setError(
-          "Termine konnten nicht geladen werden. Bitte versuche es später erneut, oder kontaktiere Cédric.",
-        );
-      } finally {
-        setLoading(false);
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
+  const {
+    data: events = [],
+    isLoading: loading,
+    error,
+  } = useQuery<CalendarEvent[]>({
+    queryKey: ["calendar-events"],
+    queryFn: async () => {
+      const response = await fetch(`${backendUrl}/api/calendar/events?limit=5`);
+      if (!response.ok) {
+        throw new Error(`Calendar API error: ${response.status}`);
       }
-    };
-
-    fetchCalendarEvents();
-
-    // Refresh every 30 minutes
-    const intervalId = setInterval(fetchCalendarEvents, 30 * 60 * 1000);
-    return () => clearInterval(intervalId);
-  }, []);
+      return response.json();
+    },
+    refetchInterval: 30 * 60 * 1000,
+  });
 
   // Format date to a readable format
   const formatEventDate = (
@@ -139,7 +115,8 @@ const CalendarEvents = () => {
 
       {error && (
         <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 mb-4 rounded">
-          {error}
+          Termine konnten nicht geladen werden. Bitte versuche es später erneut,
+          oder kontaktiere Cédric.
         </div>
       )}
 
@@ -156,7 +133,7 @@ const CalendarEvents = () => {
           const eventRunning = isEventRunning(eventStartDate, eventEndDate);
           return (
             <div
-              key={index}
+              key={`${event.summary}-${event.startDate}-${event.endDate}`}
               className={`p-3 rounded-lg border transition-colors ${
                 eventRunning
                   ? "bg-amber-50 border-amber-300 border-l-4 shadow-md"

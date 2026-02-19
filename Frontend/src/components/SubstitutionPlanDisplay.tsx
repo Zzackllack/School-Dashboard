@@ -9,7 +9,7 @@ import {
   Users,
   X,
 } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 interface SubstitutionEntry {
   classes: string;
@@ -37,37 +37,22 @@ interface SubstitutionPlan {
 }
 
 const SubstitutionPlanDisplay = () => {
-  const [substitutionPlans, setSubstitutionPlans] = useState<
-    SubstitutionPlan[]
-  >([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchSubstitutionPlans = async () => {
-      setLoading(true);
-      try {
-        const backendUrl =
-          import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
-        const response = await fetch(`${backendUrl}/api/substitution/plans`); // Assuming the endpoint is without a trailing slash
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
-        const data: SubstitutionPlan[] = await response.json();
-        setSubstitutionPlans(data);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to fetch substitution plans:", err);
-        setError(
-          "Vertretungspläne konnten nicht geladen werden. Bitte versuche es später erneut, oder kontaktiere Cédric.",
-        );
-      } finally {
-        setLoading(false);
+  const backendUrl = import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
+  const {
+    data: substitutionPlans = [],
+    isLoading: loading,
+    error,
+  } = useQuery<SubstitutionPlan[]>({
+    queryKey: ["substitution-plans"],
+    queryFn: async () => {
+      const response = await fetch(`${backendUrl}/api/substitution/plans`);
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
       }
-    };
-
-    fetchSubstitutionPlans();
-  }, []);
+      return response.json();
+    },
+    refetchInterval: 5 * 60 * 1000,
+  });
 
   // Format date from "DD.MM.YYYY Day" to a more readable format
   const formatDate = (dateString: string) => {
@@ -262,7 +247,8 @@ const SubstitutionPlanDisplay = () => {
 
         {error && (
           <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 mb-4 rounded">
-            {error}
+            Vertretungspläne konnten nicht geladen werden. Bitte versuche es
+            später erneut, oder kontaktiere Cédric.
           </div>
         )}
 
@@ -275,9 +261,9 @@ const SubstitutionPlanDisplay = () => {
       </div>
 
       {/* Each day gets its own container */}
-      {substitutionPlans.map((plan, planIndex) => (
+      {substitutionPlans.map((plan) => (
         <div
-          key={planIndex}
+          key={`${plan.date}-${plan.title}`}
           className="bg-white/90 backdrop-blur-md rounded-xl shadow-lg border border-white/20 p-5 mb-5 w-full transition-all duration-300 hover:shadow-xl"
         >
           <h3 className="text-lg font-semibold mb-3 text-gray-800 flex items-center">
@@ -293,8 +279,8 @@ const SubstitutionPlanDisplay = () => {
                   <Info size={20} className="mr-2 text-amber-600" />
                   Nachrichten zum Tag
                 </h4>
-                {plan.news.newsItems.map((newsItem, idx) => (
-                  <p key={idx} className="mb-2 text-gray-700">
+                {plan.news.newsItems.map((newsItem) => (
+                  <p key={newsItem} className="mb-2 text-gray-700">
                     {newsItem}
                   </p>
                 ))}
@@ -305,9 +291,9 @@ const SubstitutionPlanDisplay = () => {
             <>
               {/* Class legend */}
               <div className="mb-5 flex flex-wrap gap-2">
-                {getClassesInPlan(plan).map((className, idx) => (
+                {getClassesInPlan(plan).map((className) => (
                   <div
-                    key={idx}
+                    key={className}
                     className={`${getClassColor(className)} px-3 py-1.5 border border-white/30 rounded-full text-sm shadow-sm hover:shadow transition duration-300 ease-in-out`}
                   >
                     {className}

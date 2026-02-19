@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 // Define interfaces for API responses
 interface Stop {
@@ -55,10 +56,8 @@ interface DeparturesResponse {
 }
 
 const Transportation = () => {
-  const [, setNearbyStops] = useState<Stop[]>([]);
   const [departures, setDepartures] = useState<Departure[]>([]);
   const [sBahnDepartures, setSBahnDepartures] = useState<Departure[]>([]);
-  const [isLoadingStops, setIsLoadingStops] = useState(true);
   const [isLoadingDepartures, setIsLoadingDepartures] = useState(false);
   const [isLoadingSBahnDepartures, setIsLoadingSBahnDepartures] =
     useState(false);
@@ -71,6 +70,24 @@ const Transportation = () => {
   // School coordinates
   const schoolLat = 52.43432378391319;
   const schoolLng = 13.305375391277634;
+
+  const {
+    data: nearbyStops = [],
+    isLoading: isLoadingStops,
+    error: nearbyStopsError,
+  } = useQuery<Stop[]>({
+    queryKey: ["nearby-stops", schoolLat, schoolLng],
+    queryFn: async () => {
+      const response = await fetch(
+        `https://v6.bvg.transport.rest/locations/nearby?latitude=${schoolLat}&longitude=${schoolLng}&results=30`,
+      );
+      if (!response.ok) {
+        throw new Error(`API error: ${response.status}`);
+      }
+      return response.json();
+    },
+    refetchInterval: 30 * 60 * 1000,
+  });
 
   // Create fetchDepartures as a useCallback function so it can be used in useEffect and in the interval
   const fetchDepartures = useCallback(async (stopId: string) => {
@@ -151,49 +168,49 @@ const Transportation = () => {
     );
   }, [currentStop, currentSBahnStop, fetchDepartures, fetchSBahnDepartures]);
 
-  // Initial data fetch
   useEffect(() => {
-    const fetchNearbyStops = async () => {
-      setIsLoadingStops(true);
-      try {
-        const response = await fetch(
-          `https://v6.bvg.transport.rest/locations/nearby?latitude=${schoolLat}&longitude=${schoolLng}&results=30`,
-        );
-        if (!response.ok) {
-          throw new Error(`API error: ${response.status}`);
-        }
-        const data: Stop[] = await response.json();
-        setNearbyStops(data);
+    if (nearbyStopsError) {
+      setError("Failed to load nearby stops. Please try again later.");
+      return;
+    }
 
-        // Set nearest stop (regardless of type)
-        if (data.length > 0) {
-          setCurrentStop(data[0]);
-          fetchDepartures(data[0].id);
-        } else {
-          throw new Error("No stops found near the school location.");
-        }
+    if (nearbyStops.length === 0) {
+      return;
+    }
 
-        // Find nearest S-Bahn station
-        const nearestSBahnStop = data.find(
-          (stop) => stop.products.suburban === true,
-        );
-        if (nearestSBahnStop) {
-          setCurrentSBahnStop(nearestSBahnStop);
-          fetchSBahnDepartures(nearestSBahnStop.id);
-        } else {
-          setSBahnError("No S-Bahn stations found nearby.");
-        }
-      } catch (err) {
-        console.error("Failed to fetch nearby stops:", err);
-        setError("Failed to load nearby stops. Please try again later.");
-      } finally {
-        setIsLoadingStops(false);
-        setLastUpdated(new Date());
-      }
-    };
+    setCurrentStop((prev) =>
+      prev && nearbyStops.some((stop) => stop.id === prev.id)
+        ? prev
+        : nearbyStops[0],
+    );
 
-    fetchNearbyStops();
-  }, [fetchDepartures, fetchSBahnDepartures]);
+    const nearestSBahnStop = nearbyStops.find(
+      (stop) => stop.products.suburban === true,
+    );
+    if (nearestSBahnStop) {
+      setCurrentSBahnStop((prev) =>
+        prev?.id === nearestSBahnStop.id ? prev : nearestSBahnStop,
+      );
+      setSBahnError(null);
+    } else {
+      setCurrentSBahnStop(null);
+      setSBahnError("No S-Bahn stations found nearby.");
+    }
+  }, [nearbyStops, nearbyStopsError]);
+
+  useEffect(() => {
+    if (currentStop) {
+      fetchDepartures(currentStop.id);
+      setLastUpdated(new Date());
+    }
+  }, [currentStop, fetchDepartures]);
+
+  useEffect(() => {
+    if (currentSBahnStop) {
+      fetchSBahnDepartures(currentSBahnStop.id);
+      setLastUpdated(new Date());
+    }
+  }, [currentSBahnStop, fetchSBahnDepartures]);
 
   // Set up automatic refresh every 3 minutes
   useEffect(() => {
@@ -313,7 +330,7 @@ const Transportation = () => {
             <tbody>
               {limitedDepartures.map((departure, index) => (
                 <tr
-                  key={index}
+                  key={`${departure.tripId}-${departure.plannedWhen}`}
                   className={`${index % 2 === 0 ? "bg-white" : "bg-gray-50/80"} backdrop-blur-sm`}
                 >
                   <td className="px-4 py-3 border-b border-gray-100/30">

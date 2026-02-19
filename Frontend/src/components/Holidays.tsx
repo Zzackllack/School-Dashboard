@@ -180,7 +180,7 @@ const Holidays = () => {
       <div className="space-y-4">
         {holidays.slice(0, 4).map((holiday, index) => (
           <div
-            key={index}
+            key={`${holiday.name}-${holiday.start}-${holiday.end}`}
             className={`p-3 rounded-lg border ${getEventHighlightClass(holiday.type)}`}
           >
             <div className="flex items-start">

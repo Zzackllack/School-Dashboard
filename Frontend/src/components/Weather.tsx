@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useQuery } from "@tanstack/react-query";
 
 // Import weather icons
 import clearIcon from "../assets/airy/clear@4x.png";
@@ -58,47 +58,34 @@ interface DailyWeather {
 }
 
 const Weather = () => {
-  const [weatherData, setWeatherData] = useState<WeatherData | null>(null);
-  const [loading, setLoading] = useState<boolean>(true);
-  const [error, setError] = useState<string | null>(null);
-
   // School coordinates - same as in Transportation.tsx
   const schoolLat = 52.43432378391319;
   const schoolLng = 13.305375391277634;
 
-  useEffect(() => {
-    const fetchWeatherData = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(
-          `https://api.open-meteo.com/v1/forecast?` +
-            `latitude=${schoolLat}&longitude=${schoolLng}` +
-            `&current_weather=true` +
-            `&hourly=temperature_2m,relativehumidity_2m,precipitation,weathercode` +
-            `&daily=weathercode,temperature_2m_max,temperature_2m_min` +
-            `&timezone=Europe/Berlin`,
-        );
+  const {
+    data: weatherData,
+    isLoading: loading,
+    error,
+  } = useQuery<WeatherData>({
+    queryKey: ["weather", schoolLat, schoolLng],
+    queryFn: async () => {
+      const response = await fetch(
+        `https://api.open-meteo.com/v1/forecast?` +
+          `latitude=${schoolLat}&longitude=${schoolLng}` +
+          `&current_weather=true` +
+          `&hourly=temperature_2m,relativehumidity_2m,precipitation,weathercode` +
+          `&daily=weathercode,temperature_2m_max,temperature_2m_min` +
+          `&timezone=Europe/Berlin`,
+      );
 
-        if (!response.ok) {
-          throw new Error(`Weather API error: ${response.status}`);
-        }
-
-        const data: WeatherData = await response.json();
-        console.log("Weather data:", data); // Debug log
-        setWeatherData(data);
-        setError(null);
-      } catch (err) {
-        console.error("Failed to fetch weather data:", err);
-        setError(
-          "Fehler beim laden der Wetterdaten, versuche es später erneut oder kontaktiere Cédric.",
-        );
-      } finally {
-        setLoading(false);
+      if (!response.ok) {
+        throw new Error(`Weather API error: ${response.status}`);
       }
-    };
 
-    fetchWeatherData();
-  }, [schoolLat, schoolLng]);
+      return response.json();
+    },
+    refetchInterval: 30 * 60 * 1000,
+  });
 
   // Function to get weather icon based on weather code
   const getWeatherIcon = (code: number): string => {
@@ -106,7 +93,7 @@ const Weather = () => {
       case code === 0:
         return clearIcon; // Clear sky
       case code === 1:
-        return mostlyClearIcon; // Mainly clear
+        return mostlyClearIcon;
       case code === 2:
         return partlyCloudyIcon; // Partly cloudy
       case code === 3:
@@ -190,8 +177,6 @@ const Weather = () => {
   const formatDay = (dateString: string, index: number): string => {
     if (index === 0) return "Heute";
     if (index === 1) return "Morgen";
-    if (index === 0) return "Heute";
-    if (index === 1) return "Morgen";
 
     const date = new Date(dateString);
     return date.toLocaleDateString("de-DE", { weekday: "short" });
@@ -203,9 +188,7 @@ const Weather = () => {
 
     // Current time format is like "2025-03-23T14:15"
     const currentTimeString = weatherData.current_weather.time;
-
-    // Extract just the date and hour part to match hourly data format
-    const currentHour = currentTimeString.substring(0, 13) + ":00"; // Convert "2025-03-23T14:15" to "2025-03-23T14:00"
+    const currentHour = currentTimeString.substring(0, 13) + ":00";
 
     // Find the index of this hour in the hourly data
     const index = weatherData.hourly.time.findIndex(
@@ -214,31 +197,23 @@ const Weather = () => {
 
     if (index !== -1) {
       return weatherData.hourly.relativehumidity_2m[index];
-    } else {
-      // If exact hour not found, find the closest hour
-      console.warn(
-        "Exact hour match not found for humidity, using closest available hour",
-      );
-
-      // Get just the current hour as a Date object for comparison
-      const currentTime = new Date(currentTimeString);
-
-      // Find the closest time by comparing timestamps
-      let closestIndex = 0;
-      let smallestDiff = Infinity;
-
-      weatherData.hourly.time.forEach((timeString, idx) => {
-        const time = new Date(timeString);
-        const diff = Math.abs(time.getTime() - currentTime.getTime());
-
-        if (diff < smallestDiff) {
-          smallestDiff = diff;
-          closestIndex = idx;
-        }
-      });
-
-      return weatherData.hourly.relativehumidity_2m[closestIndex];
     }
+
+    const currentTime = new Date(currentTimeString);
+    let closestIndex = 0;
+    let smallestDiff = Infinity;
+
+    weatherData.hourly.time.forEach((timeString, idx) => {
+      const time = new Date(timeString);
+      const diff = Math.abs(time.getTime() - currentTime.getTime());
+
+      if (diff < smallestDiff) {
+        smallestDiff = diff;
+        closestIndex = idx;
+      }
+    });
+
+    return weatherData.hourly.relativehumidity_2m[closestIndex];
   };
 
   // Get current precipitation from hourly data
@@ -255,31 +230,30 @@ const Weather = () => {
 
     if (index !== -1) {
       return weatherData.hourly.precipitation[index];
-    } else {
-      // Find closest hour similar to getCurrentHumidity
-      const currentTime = new Date(currentTimeString);
-      let closestIndex = 0;
-      let smallestDiff = Infinity;
-
-      weatherData.hourly.time.forEach((timeString, idx) => {
-        const time = new Date(timeString);
-        const diff = Math.abs(time.getTime() - currentTime.getTime());
-
-        if (diff < smallestDiff) {
-          smallestDiff = diff;
-          closestIndex = idx;
-        }
-      });
-
-      return weatherData.hourly.precipitation[closestIndex];
     }
+
+    const currentTime = new Date(currentTimeString);
+    let closestIndex = 0;
+    let smallestDiff = Infinity;
+
+    weatherData.hourly.time.forEach((timeString, idx) => {
+      const time = new Date(timeString);
+      const diff = Math.abs(time.getTime() - currentTime.getTime());
+
+      if (diff < smallestDiff) {
+        smallestDiff = diff;
+        closestIndex = idx;
+      }
+    });
+
+    return weatherData.hourly.precipitation[closestIndex];
   };
 
   // Calculate daily precipitation totals
   const getDailyPrecipitation = (): number[] => {
     if (!weatherData?.daily || !weatherData?.hourly) return [0, 0, 0];
 
-    const dailyTotals = weatherData.daily.time.slice(0, 3).map((date) => {
+    return weatherData.daily.time.slice(0, 3).map((date) => {
       const datePrefix = date + "T";
       const hourlyIndices = weatherData.hourly.time
         .map((time, index) => (time.startsWith(datePrefix) ? index : -1))
@@ -291,8 +265,6 @@ const Weather = () => {
         0,
       );
     });
-
-    return dailyTotals;
   };
 
   // Format precipitation display in German
@@ -322,13 +294,13 @@ const Weather = () => {
           Wetter
         </h2>
         <div className="bg-[#F5E1DA] border border-[#A45D5D] text-[#A45D5D] px-4 py-3 rounded">
-          {error || "Wetterdaten konnten nicht geladen werden"}
+          Fehler beim laden der Wetterdaten, versuche es später erneut oder
+          kontaktiere Cédric.
         </div>
       </div>
     );
   }
 
-  // Get forecast for next 3 days
   const forecastDays = weatherData.daily.time.slice(0, 3);
   const dailyPrecipitation = getDailyPrecipitation();
   const currentPrecipitation = getCurrentPrecipitation();
@@ -362,7 +334,6 @@ const Weather = () => {
         <div className="text-[#5A4635] text-sm">
           <div className="flex items-center justify-center">
             <span className="mr-1">Niederschlag:</span>
-            <span className="mr-1">Niederschlag:</span>
             <span
               className={
                 currentPrecipitation > 0 ? "text-[#8C7356] font-medium" : ""
@@ -376,7 +347,7 @@ const Weather = () => {
 
       <div className="flex justify-around border-t border-gray-200 pt-4">
         {forecastDays.map((day, index) => (
-          <div key={index} className="text-center">
+          <div key={day} className="text-center">
             <div className="font-medium text-[#3E3128]">
               {formatDay(day, index)}
             </div>
@@ -406,8 +377,8 @@ const Weather = () => {
         ))}
       </div>
       <p className="text-xs text-gray-500 mt-4 text-center">
-        Es wird keine Haftung für die Richtigkeit der Daten übernommen.{" "}
-        <br></br> Datenquelle:{" "}
+        Es wird keine Haftung für die Richtigkeit der Daten übernommen. <br />
+        Datenquelle:{" "}
         <a
           href="https://open-meteo.com/"
           target="_blank"
