@@ -83,6 +83,7 @@ dist-ssr
 
 # ───── Java Spring Boot ─────
 application.properties
+!Backend/src/test/resources/application.properties
 
 # ───── Eclipse ─────
 .settings/

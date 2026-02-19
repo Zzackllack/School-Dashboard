@@ -17,7 +17,7 @@ RUN addgroup -S app && adduser -S app -G app
 
 COPY --from=build /workspace/app.jar /app/app.jar
 
-RUN apk add --no-cache curl=8.14.1-r2 su-exec=0.2-r3 \
+RUN apk add --no-cache curl su-exec \
     && mkdir -p /data /opt/h2 \
     && chown app:app /data \
     && curl -fsSL -o /opt/h2/h2-old.jar https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar \
