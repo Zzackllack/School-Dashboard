@@ -3,6 +3,7 @@
 ![Status](https://img.shields.io/badge/status-under%20development-yellow)
 ![Version](https://img.shields.io/badge/version-1.19.19-blue)
 ![License](https://img.shields.io/badge/license-BSD%203--Clause-green)
+[![React Doctor](https://www.react.doctor/share/badge?p=frontend&s=96&w=14&f=7)](https://www.react.doctor/share?p=frontend&s=96&w=14&f=7)
 
 > A modern, intuitive dashboard designed originally for Goethe Gymnasium Lichterfelde (GGL) to transform the lobby information display into a comprehensive school information hub.
 
