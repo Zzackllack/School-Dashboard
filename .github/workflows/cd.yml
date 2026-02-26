@@ -43,7 +43,7 @@ jobs:
           echo "BACKEND_CACHE_REF=$(printf '%s\n' "${{ steps.meta-backend.outputs.tags }}" | head -n 1 | cut -d: -f1):buildcache" >> $GITHUB_ENV
 
       - name: Lint backend Dockerfile
-        uses: hadolint/hadolint-action@v3.1.0
+        uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: Docker/backend.Dockerfile
 
@@ -88,7 +88,7 @@ jobs:
           echo "FRONTEND_CACHE_REF=$(printf '%s\n' "${{ steps.meta-frontend.outputs.tags }}" | head -n 1 | cut -d: -f1):buildcache" >> $GITHUB_ENV
 
       - name: Lint frontend Dockerfile
-        uses: hadolint/hadolint-action@v3.1.0
+        uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: Docker/frontend.Dockerfile
 
