@@ -60,7 +60,7 @@ jobs:
           cache-to: type=registry,ref=${{ env.BACKEND_CACHE_REF }},mode=max
 
       - name: Scan backend image
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@0.34.1
         with:
           image-ref: ${{ env.BACKEND_IMAGE_REF }}
           severity: HIGH,CRITICAL
@@ -105,7 +105,7 @@ jobs:
           cache-to: type=registry,ref=${{ env.FRONTEND_CACHE_REF }},mode=max
 
       - name: Scan frontend image
-        uses: aquasecurity/trivy-action@0.33.1
+        uses: aquasecurity/trivy-action@0.34.1
         with:
           image-ref: ${{ env.FRONTEND_IMAGE_REF }}
           severity: HIGH,CRITICAL
