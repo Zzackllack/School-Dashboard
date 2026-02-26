@@ -1,0 +1,13 @@
+name = "school-dashboard-frontend"
+compatibility_date = "2025-04-18"
+workers_dev = true
+preview_urls = true
+keep_vars = true
+
+[assets]
+directory = "./dist"
+not_found_handling = "single-page-application"
+
+[[routes]]
+pattern = "goethe-dashboard.zacklack.de"
+custom_domain = true

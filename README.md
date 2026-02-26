@@ -254,6 +254,23 @@ npm run build
 - Frontend: <http://localhost:5173>
 - Backend API: <http://localhost:8080>
 
+### Cloudflare Workers (Frontend Only)
+
+This repository now supports deploying only `Frontend/` with Wrangler (Cloudflare Workers static assets):
+
+- Wrangler config: `Frontend/wrangler.toml`
+- Production domain: `goethe-dashboard.zacklack.de`
+- Preview URLs: enabled via `preview_urls = true` and `workers_dev = true`
+
+Cloudflare-managed build/deploy (Workers Builds):
+
+1. In Cloudflare Workers, connect the GitHub repository.
+2. Build settings:
+   - Root directory: `Frontend`
+   - Build command: `npm ci && npm run build`
+   - Deploy command: `npx wrangler deploy`
+   - Non-production branch deploy command: `npx wrangler versions upload`
+
 ## Production
 
 ### Prerequisites
