@@ -17,11 +17,10 @@ RUN addgroup -S app && adduser -S app -G app
 
 COPY --from=build /workspace/app.jar /app/app.jar
 
-RUN apk add --no-cache curl=~8.17 su-exec=~0.3 \
-    && mkdir -p /data /opt/h2 \
-    && chown app:app /data \
-    && curl -fsSL -o /opt/h2/h2-old.jar https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar \
-    && curl -fsSL -o /opt/h2/h2-new.jar https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
+RUN apk add --no-cache su-exec=~0.3 \
+    && apk upgrade --no-cache \
+    && mkdir -p /data \
+    && chown app:app /data
 
 COPY Docker/backend-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh

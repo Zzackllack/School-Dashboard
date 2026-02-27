@@ -11,6 +11,13 @@ if [ "${H2_MIGRATE_ON_STARTUP}" = "true" ]; then
   DB_USER="${DB_USER:-sa}"
   DB_PASS="${DB_PASS:-}"
   if [ -f "$DB_FILE" ] && [ ! -f "$MIGRATED_FLAG" ]; then
+    mkdir -p /opt/h2
+    if [ ! -f /opt/h2/h2-old.jar ]; then
+      wget -q -O /opt/h2/h2-old.jar https://repo1.maven.org/maven2/com/h2database/h2/2.1.214/h2-2.1.214.jar
+    fi
+    if [ ! -f /opt/h2/h2-new.jar ]; then
+      wget -q -O /opt/h2/h2-new.jar https://repo1.maven.org/maven2/com/h2database/h2/2.2.224/h2-2.2.224.jar
+    fi
     echo "[entrypoint] Migrating H2 database file for Spring Boot 3.x..."
     java -cp /opt/h2/h2-old.jar org.h2.tools.Script \
       -url "jdbc:h2:file:${DB_PATH}" \
