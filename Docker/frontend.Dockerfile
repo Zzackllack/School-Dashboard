@@ -5,9 +5,8 @@ COPY Frontend/package*.json ./
 RUN npm ci
 COPY Frontend/ ./
 # Update API URLs in the code (replaces localhost:8080 with /api)
-RUN find src -type f \( -name "*.ts" -o -name "*.tsx" \) -print0 \
-    | xargs -0 sed -i 's|http://localhost:8080|/api|g' \
-    || echo "No files found or modified"
+RUN find src -type f \( -name "*.ts" -o -name "*.tsx" \) \
+    -exec sed -i 's|http://localhost:8080|/api|g' {} +
 RUN npm run build
 
 FROM nginx:alpine
