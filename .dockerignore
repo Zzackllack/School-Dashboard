@@ -1,0 +1,15 @@
+.git
+.gitignore
+.github
+
+**/node_modules
+**/dist
+**/target
+
+Frontend/node_modules
+Frontend/dist
+Backend/target
+
+.vscode
+.idea
+.DS_Store

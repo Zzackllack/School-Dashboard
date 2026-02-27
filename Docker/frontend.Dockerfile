@@ -1,5 +1,5 @@
-FROM node:18-alpine AS build
-SHELL ["/bin/ash", "-eo", "pipefail", "-c"]
+FROM platformatic/node-caged:25-slim AS build
+SHELL ["/bin/sh", "-ec"]
 WORKDIR /app
 COPY Frontend/package*.json ./
 RUN npm ci
