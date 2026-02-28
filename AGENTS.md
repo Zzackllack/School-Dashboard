@@ -2,13 +2,24 @@
 
 A modern, intuitive dashboard designed originally for Goethe Gymnasium Lichterfelde (GGL) to transform the lobby information display into a comprehensive school information hub.
 
+## Technology Stack
+
+- Backend: Maven + Java 21 with Spring Boot + H2 as the embedded database.
+- Frontend: React 19 with TypeScript + TanStack Start (TanStack Query, TanStack Router) + Tailwind CSS + Vite + Nitro.
+- Testing: Vitest + Playwright for frontend, JUnit 5 + Mockito for backend.
+- Deployment: Backend via Docker, Frontend via Cloudflare Workers (see `Frontend/wrangler.toml`).
+
 ## Essentials
 
+- ALWAYS research and understand the existing codebase before making changes. Refer to official documentation using any of the following options:
+  - `context7`
+  - `web request/web fetch`
+  - `tools/mcp server`
 - Builds/typechecks:
   - Backend: `cd Backend && mvn -q package -DskipTests` (use `mvn clean package -DskipTests` for a clean build)
-  - Frontend: `cd Frontend && npm install && npm run build`
-- Testing: Every code change must include automated tests covering unit, integration, and web layers. See [Testing](docs/agents/testing.md).
-- Security: Do not commit credentials or secrets; use environment variables per `README.md` and `SECURITY.md`. See [Security](docs/agents/security.md).
+  - Frontend: `cd Frontend && pnpm install && pnpm run build`
+- Testing: Every code change must include automated tests covering unit, integration, and web layers. See [Testing](docs/agents/testing.md) and existing test files.
+- Security: NEVER commit credentials or secrets; use environment variables per `README.md` and `SECURITY.md`. See [Security](docs/agents/security.md).
 
 ## More Guidance
 

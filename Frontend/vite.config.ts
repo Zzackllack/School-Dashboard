@@ -1,12 +1,17 @@
 import { defineConfig } from "vite";
-import react from "@vitejs/plugin-react-swc";
+import tsconfigPaths from "vite-tsconfig-paths";
+import { tanstackStart } from "@tanstack/react-start/plugin/vite";
+import { nitro } from "nitro/vite";
+import react from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
 
-// https://vite.dev/config/
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
-  assetsInclude: ["**/*.JPEG"], // Add support for JPEG files
-  define: {
-    "process.env.BACKEND_URL": JSON.stringify(process.env.BACKEND_URL),
-  },
+  plugins: [
+    nitro({ rollupConfig: { external: [/^@sentry\//] } }),
+    tsconfigPaths({ projects: ["./tsconfig.json"] }),
+    tailwindcss(),
+    tanstackStart(),
+    react(),
+  ],
+  assetsInclude: ["**/*.JPEG"],
 });

@@ -1,7 +1,7 @@
 # Project Overview
 
 - Backend: Java Spring Boot in `Backend/`; build with Maven.
-- Frontend: React 19 + Vite + TypeScript in `Frontend/`.
+- Frontend: TanStack Start (React 19) + TypeScript in `Frontend/`.
 - Docker: container and compose definitions in `Docker/` for production and development.
 - Documentation: `README.md` for build/deploy; `SECURITY.md` for security policy.
 - CI/CD and quality: see `docs/agents/ci-cd.md` and `docs/agents/code-quality.md`.

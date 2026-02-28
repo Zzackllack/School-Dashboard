@@ -1,33 +1,13 @@
 import { Calendar, Clock } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-
-interface CalendarEvent {
-  summary: string;
-  description: string;
-  location: string;
-  startDate: number;
-  endDate: number;
-  allDay: boolean;
-}
+import { calendarEventsQueryOptions } from "../lib/api/dashboard";
 
 const CalendarEvents = () => {
-  const backendUrl =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
   const {
     data: events = [],
     isLoading: loading,
     error,
-  } = useQuery<CalendarEvent[]>({
-    queryKey: ["calendar-events"],
-    queryFn: async () => {
-      const response = await fetch(`${backendUrl}/api/calendar/events?limit=5`);
-      if (!response.ok) {
-        throw new Error(`Calendar API error: ${response.status}`);
-      }
-      return response.json();
-    },
-    refetchInterval: 30 * 60 * 1000,
-  });
+  } = useQuery(calendarEventsQueryOptions(5));
 
   // Format date to a readable format
   const formatEventDate = (

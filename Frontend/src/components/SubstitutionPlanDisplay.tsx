@@ -10,50 +10,17 @@ import {
   X,
 } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-
-interface SubstitutionEntry {
-  classes: string;
-  period: string;
-  absent: string;
-  substitute: string;
-  originalSubject: string;
-  subject: string;
-  newRoom: string;
-  type: string;
-  comment: string;
-  date: string;
-}
-
-interface DailyNews {
-  date: string;
-  newsItems: string[];
-}
-
-interface SubstitutionPlan {
-  date: string;
-  title: string;
-  entries: SubstitutionEntry[];
-  news: DailyNews;
-}
+import {
+  substitutionPlansQueryOptions,
+  type SubstitutionPlan,
+} from "../lib/api/dashboard";
 
 const SubstitutionPlanDisplay = () => {
-  const backendUrl =
-    import.meta.env.VITE_BACKEND_URL || "http://localhost:8080";
   const {
     data: substitutionPlans = [],
     isLoading: loading,
     error,
-  } = useQuery<SubstitutionPlan[]>({
-    queryKey: ["substitution-plans"],
-    queryFn: async () => {
-      const response = await fetch(`${backendUrl}/api/substitution/plans`);
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-      return response.json();
-    },
-    refetchInterval: 5 * 60 * 1000,
-  });
+  } = useQuery(substitutionPlansQueryOptions);
 
   // Format date from "DD.MM.YYYY Day" to a more readable format
   const formatDate = (dateString: string) => {

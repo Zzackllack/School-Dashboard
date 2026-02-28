@@ -98,9 +98,10 @@ While developed specifically for GGL, this application is designed to be adaptab
 
 ### Frontend
 
-- React 19 with TypeScript
+- TanStack Start (React 19) with TypeScript
+- TanStack Router (file-based routing)
 - Tailwind CSS for styling
-- Vite for fast development and build process
+- Vite + Nitro adapter for development and production builds
 
 ### Backend
 
@@ -207,7 +208,7 @@ If actuator endpoints are enabled (see `management.endpoints.web.exposure.includ
 - `GET /actuator/metrics`
 - `GET /actuator/env`
 
-### Frontend (React + Vite)
+### Frontend (TanStack Start)
 
 - **Install dependencies**
 
@@ -225,8 +226,11 @@ If actuator endpoints are enabled (see `management.endpoints.web.exposure.includ
 - **Run checks**
 
   ```bash
-  npm run build   # type check + production bundle
+  npm run build   # production bundle
   npm run lint    # optional lint pass
+  npm run test:unit
+  npm run test:integration
+  npm run test:web
   ```
 
 ### Code Quality and CI/CD
@@ -288,7 +292,7 @@ Cloudflare-managed build/deploy (Workers Builds):
 
 2. **Configure the Frontend**:
 
-- Ensure the frontend is configured to point to the correct backend URL. In the Dockerfile, the `sed` command replaces `http://localhost:8080` with `/api`. This assumes that your Nginx configuration correctly proxies `/api` requests to the backend service.
+- Set `BACKEND_URL` for the frontend runtime (for example `http://backend:8080` in Docker Compose). The TanStack Start server routes under `/api/*` forward requests to this backend origin.
 
 ### Deployment Steps
 
