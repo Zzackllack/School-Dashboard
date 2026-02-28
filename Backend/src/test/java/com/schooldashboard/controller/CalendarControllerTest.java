@@ -9,26 +9,36 @@ import com.schooldashboard.model.CalendarEvent;
 import com.schooldashboard.service.ApiResponseCacheKeys;
 import com.schooldashboard.service.ApiResponseCacheService;
 import com.schooldashboard.service.CalendarService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.util.List;
 import java.util.Optional;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Primary;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 @WebMvcTest(CalendarController.class)
+@Import(CalendarControllerTest.TestBeans.class)
 public class CalendarControllerTest {
 
 	@Autowired
 	private MockMvc mockMvc;
 
-	@MockBean
+	@MockitoBean
 	private CalendarService calendarService;
 
-	@MockBean
+	@MockitoBean
 	private ApiResponseCacheService cacheService;
+
+	@MockitoBean
+	private CacheManager cacheManager;
 
 	@Test
 	public void getEventsSuccess() throws Exception {
@@ -94,5 +104,14 @@ public class CalendarControllerTest {
 	public void getEventsRejectsInvalidLimit() throws Exception {
 		mockMvc.perform(get("/api/calendar/events").param("limit", "0")).andExpect(status().isBadRequest())
 				.andExpect(content().string(org.hamcrest.Matchers.containsString("Limit must be between 1 and 100")));
+	}
+
+	@TestConfiguration
+	static class TestBeans {
+		@Bean
+		@Primary
+		ObjectMapper objectMapper() {
+			return new ObjectMapper();
+		}
 	}
 }

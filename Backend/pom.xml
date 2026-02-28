@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>3.4.5</version>
+        <version>4.0.3</version>
         <relativePath />
     </parent>
     <groupId>com.schooldashboard</groupId>
@@ -17,9 +17,6 @@
 
     <properties>
         <java.version>21</java.version>
-        <spring-framework.version>6.2.11</spring-framework.version>
-        <tomcat.version>10.1.45</tomcat.version>
-        <jackson-bom.version>2.18.6</jackson-bom.version>
     </properties>
 
     <dependencies>
@@ -36,6 +33,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-cache</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-classic</artifactId>
         </dependency>
 
         <dependency>
@@ -58,6 +60,11 @@
         </dependency>
 
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-restclient</artifactId>
+        </dependency>
+
+        <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
         </dependency>
@@ -72,7 +79,7 @@
         <dependency>
             <groupId>org.mnode.ical4j</groupId>
             <artifactId>ical4j</artifactId>
-            <version>3.2.19</version>
+            <version>4.2.3</version>
         </dependency>
 
         <dependency>
@@ -101,6 +108,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test-classic</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>

@@ -5,6 +5,12 @@ import com.schooldashboard.model.CalendarEvent;
 import java.io.IOException;
 import java.io.StringReader;
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -77,18 +83,18 @@ public class CalendarService {
 					continue;
 				}
 				VEvent event = (VEvent) component;
-				DtStart startProperty = event.getStartDate();
+				DtStart<?> startProperty = event.getStartDate().orElse(null);
 				if (startProperty == null) {
 					continue;
 				}
-				Date startDate = startProperty.getDate();
-				Date endDate = getEndDate(event, startDate);
-				if (startDate == null || endDate == null) {
+				Temporal startDate = startProperty.getDate();
+				Temporal endDate = getEndDate(event, startDate);
+				Instant startInstant = toInstant(startDate);
+				Instant endInstant = toInstant(endDate);
+				if (startInstant == null || endInstant == null) {
 					continue;
 				}
-				boolean allDay = !(startDate instanceof DateTime);
-				Instant startInstant = Instant.ofEpochMilli(startDate.getTime());
-				Instant endInstant = Instant.ofEpochMilli(endDate.getTime());
+				boolean allDay = isAllDay(startDate);
 				if (endInstant.isBefore(now)) {
 					continue;
 				}
@@ -104,12 +110,41 @@ public class CalendarService {
 		return parsed;
 	}
 
-	private Date getEndDate(VEvent event, Date startDate) {
-		DtEnd endProperty = event.getEndDate();
+	private Temporal getEndDate(VEvent event, Temporal startDate) {
+		DtEnd<?> endProperty = event.getEndDate().orElse(null);
 		if (endProperty != null && endProperty.getDate() != null) {
 			return endProperty.getDate();
 		}
 		return startDate;
+	}
+
+	private Instant toInstant(Temporal temporal) {
+		if (temporal == null) {
+			return null;
+		}
+		if (temporal instanceof Instant instant) {
+			return instant;
+		}
+		if (temporal instanceof ZonedDateTime zonedDateTime) {
+			return zonedDateTime.toInstant();
+		}
+		if (temporal instanceof OffsetDateTime offsetDateTime) {
+			return offsetDateTime.toInstant();
+		}
+		if (temporal instanceof LocalDateTime localDateTime) {
+			return localDateTime.atZone(ZoneId.systemDefault()).toInstant();
+		}
+		if (temporal instanceof LocalDate localDate) {
+			return localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
+		}
+		if (temporal instanceof Date date) {
+			return Instant.ofEpochMilli(date.getTime());
+		}
+		return null;
+	}
+
+	private boolean isAllDay(Temporal startDate) {
+		return startDate instanceof LocalDate || (startDate instanceof Date && !(startDate instanceof DateTime));
 	}
 
 	private String getValue(Summary summary) {

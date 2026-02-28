@@ -10,7 +10,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
 @SpringBootTest(properties = "spring.task.scheduling.enabled=false")
 public class DSBServiceIntegrationTest {
@@ -21,7 +21,7 @@ public class DSBServiceIntegrationTest {
 	@Autowired
 	private ApiResponseCacheService cacheService;
 
-	@MockBean
+	@MockitoBean
 	private DsbClient dsbClient;
 
 	@Test
