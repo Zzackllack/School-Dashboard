@@ -20,8 +20,7 @@ public class ActuatorHealthIndicator implements HealthIndicator {
 	private final CacheManager cacheManager;
 	private final String appVersion;
 
-	public ActuatorHealthIndicator(Optional<DataSource> dataSource,
-			Optional<CacheManager> cacheManager,
+	public ActuatorHealthIndicator(Optional<DataSource> dataSource, Optional<CacheManager> cacheManager,
 			@Value("${app.version:unknown}") String appVersion) {
 		this.dataSource = dataSource.orElse(null);
 		this.cacheManager = cacheManager.orElse(null);

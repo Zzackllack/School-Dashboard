@@ -19,8 +19,8 @@ public class ActuatorHealthIndicatorTest {
 		DataSource dataSource = mock(DataSource.class);
 		when(dataSource.getConnection()).thenThrow(new SQLException("offline"));
 
-		ActuatorHealthIndicator indicator =
-				new ActuatorHealthIndicator(Optional.of(dataSource), Optional.empty(), "1.0");
+		ActuatorHealthIndicator indicator = new ActuatorHealthIndicator(Optional.of(dataSource), Optional.empty(),
+				"1.0");
 		Health health = indicator.health();
 
 		assertEquals("DOWN", health.getStatus().getCode());
@@ -41,8 +41,8 @@ public class ActuatorHealthIndicatorTest {
 		CacheManager cacheManager = mock(CacheManager.class);
 		when(cacheManager.getCacheNames()).thenReturn(java.util.List.of("plans"));
 
-		ActuatorHealthIndicator indicator =
-				new ActuatorHealthIndicator(Optional.of(dataSource), Optional.of(cacheManager), "2.0");
+		ActuatorHealthIndicator indicator = new ActuatorHealthIndicator(Optional.of(dataSource),
+				Optional.of(cacheManager), "2.0");
 		Health health = indicator.health();
 
 		assertEquals("UP", health.getStatus().getCode());
@@ -54,8 +54,7 @@ public class ActuatorHealthIndicatorTest {
 
 	@Test
 	public void reportsNotConfiguredWhenNoDependencies() {
-		ActuatorHealthIndicator indicator =
-				new ActuatorHealthIndicator(Optional.empty(), Optional.empty(), "unknown");
+		ActuatorHealthIndicator indicator = new ActuatorHealthIndicator(Optional.empty(), Optional.empty(), "unknown");
 		Health health = indicator.health();
 
 		assertEquals("UP", health.getStatus().getCode());

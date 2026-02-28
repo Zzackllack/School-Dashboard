@@ -243,8 +243,8 @@ public class DSBMobileTest {
 		response.addProperty("d", Base64.encode("{\"Result\":\"ok\"}"));
 		String payload = response.toString();
 		CloseTrackingInputStream inputStream = new CloseTrackingInputStream(payload.getBytes(StandardCharsets.UTF_8));
-		FakeHttpURLConnection connection = new FakeHttpURLConnection(URI.create("http://localhost/test").toURL(), inputStream,
-				outputStream);
+		FakeHttpURLConnection connection = new FakeHttpURLConnection(URI.create("http://localhost/test").toURL(),
+				inputStream, outputStream);
 
 		DSBMobile mobile = new ConnectionDSBMobile(connection, connection.getURL());
 		JsonObject result = mobile.pullData();

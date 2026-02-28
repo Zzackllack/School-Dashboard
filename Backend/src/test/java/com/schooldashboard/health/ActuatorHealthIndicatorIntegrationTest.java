@@ -17,8 +17,8 @@ public class ActuatorHealthIndicatorIntegrationTest {
 		dataSource.setUser("sa");
 		dataSource.setPassword("");
 
-		ActuatorHealthIndicator indicator =
-				new ActuatorHealthIndicator(Optional.of(dataSource), Optional.empty(), "1.0");
+		ActuatorHealthIndicator indicator = new ActuatorHealthIndicator(Optional.of(dataSource), Optional.empty(),
+				"1.0");
 		Health health = indicator.health();
 
 		assertEquals("UP", health.getStatus().getCode());
