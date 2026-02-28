@@ -8,16 +8,16 @@
   },
   "scripts": {
     "dev": "vite dev --port 3000",
-    "build": "npm run typecheck && vite build",
+    "build": "pnpm run typecheck && vite build",
     "typecheck": "tsc --noEmit",
     "format": "prettier --write . --ignore-path ../.prettierignore",
     "format:check": "prettier --check . --ignore-path ../.prettierignore",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "npm run test:unit && npm run test:integration && npm run test:web",
+    "test": "pnpm run test:unit && pnpm run test:integration && pnpm run test:web",
     "test:unit": "vitest run --project unit",
     "test:integration": "vitest run --project integration",
-    "test:web": "npm run build && playwright test"
+    "test:web": "pnpm run build && playwright test"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.2.1",

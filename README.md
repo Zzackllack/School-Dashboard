@@ -140,7 +140,7 @@ This opacity has forced us to rely on reverse-engineered solutions, creating unn
 ### Prerequisites
 
 - JDK 21
-- Node.js 18+ and npm
+- Node.js 24+ and pnpm
 - Maven
 
 ### Installation
@@ -214,43 +214,43 @@ If actuator endpoints are enabled (see `management.endpoints.web.exposure.includ
 
   ```bash
   cd ../Frontend
-  npm install
+  pnpm install --frozen-lockfile
   ```
 
 - **Start the dev server**
 
   ```bash
-  npm run dev
+  pnpm run dev
   ```
 
 - **Run checks**
 
   ```bash
-  npm run build   # production bundle
-  npm run lint    # optional lint pass
-  npm run test:unit
-  npm run test:integration
-  npm run test:web
+  pnpm run build   # production bundle
+  pnpm run lint    # optional lint pass
+  pnpm run test:unit
+  pnpm run test:integration
+  pnpm run test:web
   ```
 
 ### Code Quality and CI/CD
 
 - **Formatting**
   - Backend: Spotless (`mvn -f Backend/pom.xml spotless:check`)
-  - Frontend: Prettier (`npm --prefix Frontend run format:check`)
+  - Frontend: Prettier (`pnpm --dir Frontend run format:check`)
 - **Linting**
-  - Frontend: ESLint (`npm --prefix Frontend run lint`)
+  - Frontend: ESLint (`pnpm --dir Frontend run lint`)
 - **CI/CD**
   - GitHub Actions workflows for CI, CodeQL, and Docker image publishing
 
 Monorepo helpers from the repo root:
 
 ```bash
-npm run format:check
-npm run format
-npm run lint
-npm run test
-npm run build
+pnpm run format:check
+pnpm run format
+pnpm run lint
+pnpm run test
+pnpm run build
 ```
 
 ### Access the application
@@ -271,9 +271,9 @@ Cloudflare-managed build/deploy (Workers Builds):
 1. In Cloudflare Workers, connect the GitHub repository.
 2. Build settings:
    - Root directory: `Frontend`
-   - Build command: `npm ci && npm run build`
-   - Deploy command: `npx wrangler deploy`
-   - Non-production branch deploy command: `npx wrangler versions upload`
+   - Build command: `pnpm install --frozen-lockfile && pnpm run build`
+   - Deploy command: `pnpm dlx wrangler deploy`
+   - Non-production branch deploy command: `pnpm dlx wrangler versions upload`
 
 ## Production
 

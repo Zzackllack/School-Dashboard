@@ -11,6 +11,8 @@ A modern, intuitive dashboard designed originally for Goethe Gymnasium Lichterfe
 
 ## Essentials
 
+- This repo is a monorepo.
+- ALWAYS use pnpm instead of npm, if npm is not available, give the user a clear error message with instructions to install pnpm.
 - ALWAYS research and understand the existing codebase before making changes. Refer to official documentation using any of the following options:
   - `context7`
   - `web request/web fetch`

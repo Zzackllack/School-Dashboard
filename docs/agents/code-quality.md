@@ -9,13 +9,13 @@ This project enforces consistent formatting and linting across the backend and f
   - Apply: `mvn -f Backend/pom.xml spotless:apply`
 
 - Frontend (TypeScript/React): Prettier.
-  - Check: `npm --prefix Frontend run format:check`
-  - Apply: `npm --prefix Frontend run format`
+  - Check: `pnpm --dir Frontend run format:check`
+  - Apply: `pnpm --dir Frontend run format`
 
 ## Linting
 
 - Frontend: ESLint.
-  - `npm --prefix Frontend run lint`
+  - `pnpm --dir Frontend run lint`
 
 ## Static analysis
 

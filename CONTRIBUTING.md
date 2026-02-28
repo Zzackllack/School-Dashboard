@@ -18,16 +18,16 @@ Backend:
 
 Frontend:
 
-- `npm --prefix Frontend run format:check`
-- `npm --prefix Frontend run lint`
-- `npm --prefix Frontend run build`
+- `pnpm --dir Frontend run format:check`
+- `pnpm --dir Frontend run lint`
+- `pnpm --dir Frontend run build`
 
 Monorepo helpers (from repo root):
 
-- `npm run format:check`
-- `npm run lint`
-- `npm run test`
-- `npm run build`
+- `pnpm run format:check`
+- `pnpm run lint`
+- `pnpm run test`
+- `pnpm run build`
 
 ## Pull requests
 
