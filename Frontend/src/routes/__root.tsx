@@ -12,6 +12,10 @@ interface RouterContext {
   queryClient: QueryClient;
 }
 
+const isDev =
+  (typeof process !== "undefined" && process.env.NODE_ENV !== "production") ||
+  import.meta.env.DEV;
+
 export const Route = createRootRouteWithContext<RouterContext>()({
   ssr: true,
   head: () => ({
@@ -260,7 +264,7 @@ export const Route = createRootRouteWithContext<RouterContext>()({
   notFoundComponent: RootNotFoundComponent,
 });
 
-function RootDocument({ children }: { children: ReactNode }) {
+export function RootDocument({ children }: { children: ReactNode }) {
   return (
     <html lang="de">
       <head>
@@ -280,15 +284,24 @@ function RootDocument({ children }: { children: ReactNode }) {
   );
 }
 
-function RootErrorComponent({ error }: { error: unknown }) {
+export function RootErrorComponent({ error }: { error: unknown }) {
   const errorMessage =
     error instanceof Error ? error.message : "Unknown route error";
   const errorStack = error instanceof Error ? error.stack : undefined;
 
-  console.error("[router] route-level failure", {
+  const metadata = {
     message: errorMessage,
-    stack: errorStack,
-  });
+    routeId: "__root",
+  };
+
+  if (isDev) {
+    console.error("[router] route-level failure", {
+      ...metadata,
+      stack: errorStack,
+    });
+  } else {
+    console.error("[router] route-level failure", metadata);
+  }
 
   return (
     <main className="min-h-screen bg-gray-100 p-8 text-gray-900">
@@ -302,7 +315,7 @@ function RootErrorComponent({ error }: { error: unknown }) {
   );
 }
 
-function RootNotFoundComponent() {
+export function RootNotFoundComponent() {
   return (
     <main className="min-h-screen bg-gray-100 p-8 text-gray-900">
       <section className="mx-auto max-w-3xl rounded-xl bg-white p-6 shadow-lg">

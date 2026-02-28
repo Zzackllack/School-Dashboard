@@ -9,12 +9,18 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ThrowErrorRouteImport } from './routes/throw-error'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as DisplayScreenIdRouteImport } from './routes/display.$screenId'
 import { Route as ApiSubstitutionPlansRouteImport } from './routes/api.substitution.plans'
 import { Route as ApiCalendarEventsRouteImport } from './routes/api.calendar.events'
 
+const ThrowErrorRoute = ThrowErrorRouteImport.update({
+  id: '/throw-error',
+  path: '/throw-error',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminRoute = AdminRouteImport.update({
   id: '/admin',
   path: '/admin',
@@ -44,6 +50,7 @@ const ApiCalendarEventsRoute = ApiCalendarEventsRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/throw-error': typeof ThrowErrorRoute
   '/display/$screenId': typeof DisplayScreenIdRoute
   '/api/calendar/events': typeof ApiCalendarEventsRoute
   '/api/substitution/plans': typeof ApiSubstitutionPlansRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/throw-error': typeof ThrowErrorRoute
   '/display/$screenId': typeof DisplayScreenIdRoute
   '/api/calendar/events': typeof ApiCalendarEventsRoute
   '/api/substitution/plans': typeof ApiSubstitutionPlansRoute
@@ -59,6 +67,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/admin': typeof AdminRoute
+  '/throw-error': typeof ThrowErrorRoute
   '/display/$screenId': typeof DisplayScreenIdRoute
   '/api/calendar/events': typeof ApiCalendarEventsRoute
   '/api/substitution/plans': typeof ApiSubstitutionPlansRoute
@@ -68,6 +77,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/admin'
+    | '/throw-error'
     | '/display/$screenId'
     | '/api/calendar/events'
     | '/api/substitution/plans'
@@ -75,6 +85,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/admin'
+    | '/throw-error'
     | '/display/$screenId'
     | '/api/calendar/events'
     | '/api/substitution/plans'
@@ -82,6 +93,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/admin'
+    | '/throw-error'
     | '/display/$screenId'
     | '/api/calendar/events'
     | '/api/substitution/plans'
@@ -90,6 +102,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AdminRoute: typeof AdminRoute
+  ThrowErrorRoute: typeof ThrowErrorRoute
   DisplayScreenIdRoute: typeof DisplayScreenIdRoute
   ApiCalendarEventsRoute: typeof ApiCalendarEventsRoute
   ApiSubstitutionPlansRoute: typeof ApiSubstitutionPlansRoute
@@ -97,6 +110,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/throw-error': {
+      id: '/throw-error'
+      path: '/throw-error'
+      fullPath: '/throw-error'
+      preLoaderRoute: typeof ThrowErrorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin': {
       id: '/admin'
       path: '/admin'
@@ -138,6 +158,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AdminRoute: AdminRoute,
+  ThrowErrorRoute: ThrowErrorRoute,
   DisplayScreenIdRoute: DisplayScreenIdRoute,
   ApiCalendarEventsRoute: ApiCalendarEventsRoute,
   ApiSubstitutionPlansRoute: ApiSubstitutionPlansRoute,

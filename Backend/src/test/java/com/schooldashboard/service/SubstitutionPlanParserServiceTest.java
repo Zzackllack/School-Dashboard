@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.junit.jupiter.api.AfterAll;
@@ -29,10 +30,11 @@ public class SubstitutionPlanParserServiceTest {
 	public static void startServer() throws IOException {
 		server = HttpServer.create(new InetSocketAddress(0), 0);
 		server.createContext("/plan", e -> {
+			byte[] htmlBytes = HTML.getBytes(StandardCharsets.UTF_8);
 			e.getResponseHeaders().set("Content-Type", "text/html; charset=utf-8");
-			e.sendResponseHeaders(200, HTML.getBytes().length);
+			e.sendResponseHeaders(200, htmlBytes.length);
 			try (OutputStream os = e.getResponseBody()) {
-				os.write(HTML.getBytes());
+				os.write(htmlBytes);
 			}
 		});
 		server.start();

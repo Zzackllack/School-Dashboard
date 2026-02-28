@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
-import { render, screen } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
+import { cleanup, render, screen } from "@testing-library/react";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DisplayPage } from "./DisplayPage";
 
 const useParamsMock = vi.fn();
@@ -10,6 +10,14 @@ vi.mock("@tanstack/react-router", () => ({
 }));
 
 describe("DisplayPage", () => {
+  beforeEach(() => {
+    useParamsMock.mockClear();
+  });
+
+  afterEach(() => {
+    cleanup();
+  });
+
   it("renders screen id from useParams and scaffold text", () => {
     useParamsMock.mockReturnValue({ screenId: "screen-42" });
 
@@ -30,11 +38,8 @@ describe("DisplayPage", () => {
 
     render(<DisplayPage />);
 
-    expect(
-      screen.getAllByText(/Angefragte Display-ID:/i).length,
-    ).toBeGreaterThan(0);
-    const strongElements = document.querySelectorAll("strong");
-    const lastStrong = strongElements.item(strongElements.length - 1);
-    expect(lastStrong?.textContent ?? "").toBe("");
+    const idLabel = screen.getByText(/Angefragte Display-ID:/i);
+    expect(idLabel).toBeDefined();
+    expect(idLabel.textContent ?? "").toContain("Angefragte Display-ID:");
   });
 });

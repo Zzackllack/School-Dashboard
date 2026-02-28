@@ -37,6 +37,12 @@ export default tseslint.config(
     },
   },
   {
+    files: ["src/routes/**/*.tsx"],
+    rules: {
+      "react-refresh/only-export-components": "off",
+    },
+  },
+  {
     files: [
       "src/routes/api.*.ts",
       "src/lib/config/backend.ts",

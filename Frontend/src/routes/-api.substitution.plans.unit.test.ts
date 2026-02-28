@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { Route } from "./api.substitution.plans";
 
 function getSubstitutionPlansGetHandler() {
@@ -17,47 +17,48 @@ function getSubstitutionPlansGetHandler() {
   ).GET;
 }
 
+afterEach(() => {
+  vi.restoreAllMocks();
+  vi.useRealTimers();
+});
+
 describe("substitution plans API route", () => {
   it("aborts slow upstream requests and returns 504 Gateway Timeout", async () => {
     vi.useFakeTimers();
     const handler = getSubstitutionPlansGetHandler();
 
-    try {
-      vi.spyOn(globalThis, "fetch").mockImplementation(
-        async (_input: RequestInfo | URL, init?: RequestInit) =>
-          new Promise<Response>((_, reject) => {
-            const signal = init?.signal;
-            if (!signal) {
-              return;
-            }
+    vi.spyOn(globalThis, "fetch").mockImplementation(
+      async (_input: RequestInfo | URL, init?: RequestInit) =>
+        new Promise<Response>((_, reject) => {
+          const signal = init?.signal;
+          if (!signal) {
+            return;
+          }
 
-            signal.addEventListener(
-              "abort",
-              () => {
-                reject(new DOMException("aborted", "AbortError"));
-              },
-              { once: true },
-            );
-          }),
-      );
+          signal.addEventListener(
+            "abort",
+            () => {
+              reject(new DOMException("aborted", "AbortError"));
+            },
+            { once: true },
+          );
+        }),
+    );
 
-      const responsePromise = handler({
-        request: new Request(
-          "https://dashboard.local/api/substitution/plans?screen=lobby",
-        ),
-      });
+    const responsePromise = handler({
+      request: new Request(
+        "https://dashboard.local/api/substitution/plans?screen=lobby",
+      ),
+    });
 
-      await vi.advanceTimersByTimeAsync(8_000);
-      const response = await responsePromise;
+    await vi.advanceTimersByTimeAsync(8_000);
+    const response = await responsePromise;
 
-      expect(response.status).toBe(504);
-      expect(response.statusText).toBe("Gateway Timeout");
-      await expect(response.json()).resolves.toEqual({
-        message: "Backend timeout",
-      });
-    } finally {
-      vi.useRealTimers();
-    }
+    expect(response.status).toBe(504);
+    expect(response.statusText).toBe("Gateway Timeout");
+    await expect(response.json()).resolves.toEqual({
+      message: "Backend timeout",
+    });
   });
 
   it("returns 503 when upstream fetch rejects with non-abort errors", async () => {

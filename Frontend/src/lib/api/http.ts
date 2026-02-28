@@ -14,17 +14,23 @@ export async function fetchJson<T>(
 
   const contentLength = response.headers.get("Content-Length");
   const contentType = response.headers.get("Content-Type");
-  if (
-    response.status === 204 ||
-    contentLength === "0" ||
-    !contentType ||
-    !contentType.toLowerCase().includes("application/json")
-  ) {
+
+  if (response.status === 204 || contentLength === "0") {
     return undefined;
   }
 
   const responseBody = await response.text();
   if (responseBody.trim().length === 0) {
+    return undefined;
+  }
+
+  if (!contentType || !contentType.toLowerCase().includes("application/json")) {
+    console.warn("[api] skipping JSON parse for non-JSON content", {
+      status: response.status,
+      url: response.url,
+      contentType,
+      responseBodyPreview: responseBody.slice(0, 200),
+    });
     return undefined;
   }
 

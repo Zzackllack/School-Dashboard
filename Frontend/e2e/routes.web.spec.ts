@@ -244,6 +244,30 @@ test("renders admin route scaffold", async ({ page }) => {
   ).toBeVisible();
 });
 
+test("renders root error component when a route throws", async ({ page }) => {
+  await page.goto("/throw-error");
+
+  await expect(
+    page.getByRole("heading", { name: "Anwendungsfehler" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText("Die Seite konnte nicht geladen werden. Bitte versuche es erneut."),
+  ).toBeVisible();
+});
+
+test("renders root not-found component for unknown routes", async ({ page }) => {
+  await page.goto("/does-not-exist");
+
+  await expect(
+    page.getByRole("heading", { name: "Seite nicht gefunden" }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(
+      "Diese Route existiert nicht in der aktuellen Dashboard-Anwendung.",
+    ),
+  ).toBeVisible();
+});
+
 test("calendar API route forwards upstream status, headers, and body", async ({
   request,
 }) => {

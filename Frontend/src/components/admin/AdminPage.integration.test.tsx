@@ -18,7 +18,7 @@ describe("AdminPage integration", () => {
     });
 
     expect(screen.getByText(/Diese Route/i)).toBeDefined();
-    expect(document.querySelector("main.min-h-screen")).not.toBeNull();
+    expect(screen.getByRole("main")).toBeDefined();
     unmount();
   });
 });

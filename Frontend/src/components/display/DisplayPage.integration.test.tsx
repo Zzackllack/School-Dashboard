@@ -19,27 +19,23 @@ describe("DisplayPage integration", () => {
 
     expect(screen.getByText(/Angefragte Display-ID:/i)).toBeDefined();
     expect(screen.getByText("test-screen")).toBeDefined();
-    expect(document.querySelector("main.min-h-screen")).not.toBeNull();
+    expect(screen.getByRole("main")).toBeDefined();
 
     unmount();
   });
 
-  it("initializes router state/context when DisplayPage is rendered", async () => {
+  it("renders the requested stateful screen id in visible UI", async () => {
     window.history.pushState({}, "", "/display/stateful-screen");
     const router = getRouter();
 
     const { unmount } = render(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(router.state.location.pathname).toBe("/display/stateful-screen");
+      expect(screen.getByText(/Angefragte Display-ID:/i)).toBeDefined();
     });
 
-    expect(router.options.context.queryClient).toBeDefined();
-    expect(
-      router.state.matches.some((match) =>
-        String(match.routeId).includes("/display/$screenId"),
-      ),
-    ).toBe(true);
+    expect(screen.getByText("stateful-screen")).toBeDefined();
+    expect(screen.getByRole("main")).toBeDefined();
 
     unmount();
   });
