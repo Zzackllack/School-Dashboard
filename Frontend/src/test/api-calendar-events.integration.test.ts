@@ -10,8 +10,11 @@ function getCalendarEventsGetHandler() {
 
   const resolvedHandlers =
     typeof handlers === "function" ? handlers({} as never) : handlers;
-  return (resolvedHandlers as { GET: (ctx: { request: Request }) => Promise<Response> })
-    .GET;
+  return (
+    resolvedHandlers as {
+      GET: (ctx: { request: Request }) => Promise<Response>;
+    }
+  ).GET;
 }
 
 describe("calendar events API route timeout handling", () => {

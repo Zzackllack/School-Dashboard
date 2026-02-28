@@ -57,7 +57,9 @@ function normalizeCalendarEventsLimit(limit: number): number {
   return Math.min(roundedLimit, MAX_CALENDAR_EVENTS_LIMIT);
 }
 
-export const calendarEventsQueryOptions = (limit = DEFAULT_CALENDAR_EVENTS_LIMIT) => {
+export const calendarEventsQueryOptions = (
+  limit = DEFAULT_CALENDAR_EVENTS_LIMIT,
+) => {
   const normalizedLimit = normalizeCalendarEventsLimit(limit);
 
   return queryOptions({

@@ -4,11 +4,9 @@ import { toBackendApiUrl } from "../lib/config/backend";
 const UPSTREAM_TIMEOUT_MS = 8_000;
 
 function isAbortError(error: unknown): boolean {
-  return (
-    error instanceof DOMException
-      ? error.name === "AbortError"
-      : error instanceof Error && error.name === "AbortError"
-  );
+  return error instanceof DOMException
+    ? error.name === "AbortError"
+    : error instanceof Error && error.name === "AbortError";
 }
 
 export const Route = createFileRoute("/api/calendar/events")({
@@ -16,7 +14,10 @@ export const Route = createFileRoute("/api/calendar/events")({
     handlers: {
       GET: async ({ request }) => {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
+        const timeoutId = setTimeout(
+          () => controller.abort(),
+          UPSTREAM_TIMEOUT_MS,
+        );
 
         try {
           const upstreamResponse = await fetch(

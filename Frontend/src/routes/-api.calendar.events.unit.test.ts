@@ -12,8 +12,11 @@ function getCalendarEventsGetHandler() {
 
   const resolvedHandlers =
     typeof handlers === "function" ? handlers({} as never) : handlers;
-  return (resolvedHandlers as { GET: (ctx: { request: Request }) => Promise<Response> })
-    .GET;
+  return (
+    resolvedHandlers as {
+      GET: (ctx: { request: Request }) => Promise<Response>;
+    }
+  ).GET;
 }
 
 afterEach(() => {
@@ -64,7 +67,9 @@ describe("calendar events API route", () => {
     vi.spyOn(globalThis, "fetch").mockRejectedValue(new Error("ECONNREFUSED"));
 
     const response = await handler({
-      request: new Request("https://dashboard.local/api/calendar/events?limit=5"),
+      request: new Request(
+        "https://dashboard.local/api/calendar/events?limit=5",
+      ),
     });
 
     expect(response.status).toBe(503);

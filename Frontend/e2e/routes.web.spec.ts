@@ -231,7 +231,9 @@ test("renders display route scaffold", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Display Route Placeholder" }),
   ).toBeVisible();
-  await expect(page.getByText("Angefragte Display-ID: test-screen")).toBeVisible();
+  await expect(
+    page.getByText("Angefragte Display-ID: test-screen"),
+  ).toBeVisible();
 });
 
 test("renders admin route scaffold", async ({ page }) => {

@@ -32,6 +32,7 @@ public class SubstitutionPlanParserServiceIntegrationTest {
 	public static void startServer() throws IOException {
 		server = HttpServer.create(new InetSocketAddress(0), 0);
 		server.createContext("/plan", e -> {
+			e.getResponseHeaders().set("Content-Type", "text/html; charset=utf-8");
 			e.sendResponseHeaders(200, HTML.getBytes().length);
 			try (OutputStream os = e.getResponseBody()) {
 				os.write(HTML.getBytes());
