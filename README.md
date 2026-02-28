@@ -271,9 +271,9 @@ Cloudflare-managed build/deploy (Workers Builds):
 1. In Cloudflare Workers, connect the GitHub repository.
 2. Build settings:
    - Root directory: `Frontend`
-   - Build command: `pnpm install --frozen-lockfile && pnpm run build`
-   - Deploy command: `pnpm dlx wrangler deploy`
-   - Non-production branch deploy command: `pnpm dlx wrangler versions upload`
+   - Build command: `pnpm run build:workers`
+   - Deploy command: `pnpm run deploy:workers`
+   - Non-production branch deploy command: `pnpm run deploy:workers:preview`
 
 ## Production
 

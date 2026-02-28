@@ -4,9 +4,6 @@ workers_dev = true
 preview_urls = true
 keep_vars = true
 
-[build]
-command = "pnpm install --frozen-lockfile && pnpm run build"
-
 [assets]
 directory = "./dist"
 not_found_handling = "single-page-application"
