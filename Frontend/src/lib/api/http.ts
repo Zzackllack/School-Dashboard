@@ -28,5 +28,13 @@ export async function fetchJson<T>(
     return undefined;
   }
 
-  return JSON.parse(responseBody) as T;
+  try {
+    return JSON.parse(responseBody) as T;
+  } catch (error) {
+    const responsePreview = responseBody.slice(0, 200);
+    throw new Error(
+      `Failed to parse JSON response for ${path}: ${responsePreview}`,
+      { cause: error },
+    );
+  }
 }

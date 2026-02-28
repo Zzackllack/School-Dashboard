@@ -265,7 +265,8 @@ function RootDocument({ children }: { children: ReactNode }) {
     <html lang="de">
       <head>
         <script
-          defer
+          async
+          crossOrigin="anonymous"
           src="https://umami-analytics.zacklack.de/script.js"
           data-website-id="a415a45d-7527-43f9-a63b-f42c314f2ca7"
         />

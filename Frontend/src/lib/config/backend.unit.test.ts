@@ -47,4 +47,12 @@ describe("backend config helpers", () => {
       "http://backend:8080/api/calendar/events?limit=7",
     );
   });
+
+  it("falls back to empty search when requestUrl is invalid", () => {
+    process.env.BACKEND_URL = "http://backend:8080";
+
+    const target = toBackendApiUrl("/calendar/events", "not-a-valid-url");
+
+    expect(target.toString()).toBe("http://backend:8080/api/calendar/events");
+  });
 });

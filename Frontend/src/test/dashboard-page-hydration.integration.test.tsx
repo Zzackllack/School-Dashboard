@@ -23,17 +23,25 @@ vi.mock("../hooks/useAutoScroll", () => ({ default: () => undefined }));
 
 describe("DashboardPage hydration", () => {
   it("hydrates without mismatch and starts the client clock after mount", async () => {
-    vi.useFakeTimers();
-    const consoleErrorSpy = vi
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
-    const container = document.createElement("div");
-    container.innerHTML = renderToString(<DashboardPage />);
-    const root = hydrateRoot(container, <DashboardPage />);
+    let root: ReturnType<typeof hydrateRoot> | null = null;
+    let consoleErrorSpy: ReturnType<typeof vi.spyOn> | null = null;
 
-    await act(async () => {});
+    const recoverableErrors: unknown[] = [];
 
     try {
+      vi.useFakeTimers();
+      consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
+
+      const container = document.createElement("div");
+      container.innerHTML = renderToString(<DashboardPage />);
+      root = hydrateRoot(container, <DashboardPage />, {
+        onRecoverableError: (error) => {
+          recoverableErrors.push(error);
+        },
+      });
+
+      await act(async () => {});
+
       expect(
         container.querySelector('[data-testid="clock-placeholder"]'),
       ).not.toBeNull();
@@ -47,15 +55,10 @@ describe("DashboardPage hydration", () => {
         container.querySelector('[data-testid="clock-time"]'),
       ).not.toBeNull();
       expect(container.textContent).not.toContain("Stand: --");
-
-      const hydrationErrors = consoleErrorSpy.mock.calls.filter(([firstArg]) =>
-        typeof firstArg === "string"
-          ? firstArg.toLowerCase().includes("hydration")
-          : false,
-      );
-      expect(hydrationErrors).toHaveLength(0);
+      expect(recoverableErrors).toHaveLength(0);
     } finally {
-      root.unmount();
+      root?.unmount();
+      consoleErrorSpy?.mockRestore();
       vi.useRealTimers();
     }
   });

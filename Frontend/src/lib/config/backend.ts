@@ -29,7 +29,11 @@ export function toBackendApiUrl(path: string, requestUrl?: string): URL {
   const target = new URL(normalizeApiPath(path), `${backendOrigin}/`);
 
   if (requestUrl) {
-    target.search = new URL(requestUrl).search;
+    try {
+      target.search = new URL(requestUrl).search;
+    } catch {
+      target.search = "";
+    }
   }
 
   return target;

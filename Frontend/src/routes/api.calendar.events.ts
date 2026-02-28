@@ -1,13 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { toBackendApiUrl } from "../lib/config/backend";
-
-const UPSTREAM_TIMEOUT_MS = 8_000;
-
-function isAbortError(error: unknown): boolean {
-  return error instanceof DOMException
-    ? error.name === "AbortError"
-    : error instanceof Error && error.name === "AbortError";
-}
+import {
+  isAbortError,
+  UPSTREAM_TIMEOUT_MS,
+} from "../lib/proxy/api-proxy-utils";
 
 export const Route = createFileRoute("/api/calendar/events")({
   server: {

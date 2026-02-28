@@ -1,6 +1,10 @@
 import { QueryClient } from "@tanstack/react-query";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { calendarEventsQueryOptions } from "./dashboard";
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe("calendarEventsQueryOptions", () => {
   it.each([
