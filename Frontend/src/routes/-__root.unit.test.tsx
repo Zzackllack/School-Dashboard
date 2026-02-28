@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  RootErrorComponent,
-  RootNotFoundComponent,
-  Route,
-} from "./__root";
+import { RootErrorComponent, RootNotFoundComponent, Route } from "./__root";
 
 describe("root route configuration", () => {
   it("keeps SSR enabled", () => {

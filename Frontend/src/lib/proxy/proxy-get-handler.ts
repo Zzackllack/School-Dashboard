@@ -39,7 +39,10 @@ export async function proxyGetRequest(
   }
 }
 
-export function createProxyGetHandler(upstreamPath: string, resourceName: string) {
+export function createProxyGetHandler(
+  upstreamPath: string,
+  resourceName: string,
+) {
   return async ({ request }: { request: Request }) =>
     proxyGetRequest(upstreamPath, request, resourceName);
 }

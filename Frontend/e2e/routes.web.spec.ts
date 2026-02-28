@@ -251,11 +251,15 @@ test("renders root error component when a route throws", async ({ page }) => {
     page.getByRole("heading", { name: "Anwendungsfehler" }),
   ).toBeVisible();
   await expect(
-    page.getByText("Die Seite konnte nicht geladen werden. Bitte versuche es erneut."),
+    page.getByText(
+      "Die Seite konnte nicht geladen werden. Bitte versuche es erneut.",
+    ),
   ).toBeVisible();
 });
 
-test("renders root not-found component for unknown routes", async ({ page }) => {
+test("renders root not-found component for unknown routes", async ({
+  page,
+}) => {
   await page.goto("/does-not-exist");
 
   await expect(
