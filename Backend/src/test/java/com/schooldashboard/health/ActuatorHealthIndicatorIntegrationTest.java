@@ -3,6 +3,7 @@ package com.schooldashboard.health;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import java.util.Optional;
 import org.h2.jdbcx.JdbcDataSource;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.health.contributor.Health;
@@ -16,7 +17,8 @@ public class ActuatorHealthIndicatorIntegrationTest {
 		dataSource.setUser("sa");
 		dataSource.setPassword("");
 
-		ActuatorHealthIndicator indicator = new ActuatorHealthIndicator(dataSource, null, "1.0");
+		ActuatorHealthIndicator indicator =
+				new ActuatorHealthIndicator(Optional.of(dataSource), Optional.empty(), "1.0");
 		Health health = indicator.health();
 
 		assertEquals("UP", health.getStatus().getCode());

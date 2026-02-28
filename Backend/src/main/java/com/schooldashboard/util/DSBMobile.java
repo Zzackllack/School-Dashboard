@@ -9,17 +9,26 @@ package com.schooldashboard.util;
  * <p>Original work: © Sematre 2019, distributed under the MIT License (see upstream repository
  * LICENSE). This project includes a modified copy for integration into this backend.
  *
+ * <p>Local adaptation changelog (School-Dashboard):
+ *
+ * <ul>
+ *   <li>Networking hardening: explicit HTTP connect/read timeouts in data fetch requests.
+ *   <li>Resource-safety updates: try-with-resources and explicit connection cleanup.
+ *   <li>JDK modernization: replaced deprecated {@code new URL(String)} usage with
+ *       {@code URI.create(...).toURL()}.
+ *   <li>Code-style modernization: converted legacy switch statement to Java rule-switch syntax.
+ *   <li>Cleanup: removed no-longer-needed deprecation suppressions.
+ * </ul>
+ *
  * @author Sematre
  */
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Serializable;
+import java.net.HttpURLConnection;
+import java.net.URI;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -28,7 +37,11 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.UUID;
-import java.net.HttpURLConnection;
+
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 public class DSBMobile implements Serializable {
 
@@ -122,7 +135,6 @@ public class DSBMobile implements Serializable {
 		return news;
 	}
 
-	@SuppressWarnings("deprecation")
 	public JsonObject pullData() {
 		HttpURLConnection connection = null;
 		try {
@@ -159,7 +171,7 @@ public class DSBMobile implements Serializable {
 	}
 
 	URL getEndpointUrl() throws IOException {
-		return new URL("https://www.dsbmobile.de/JsonHandler.ashx/GetData");
+		return URI.create("https://www.dsbmobile.de/JsonHandler.ashx/GetData").toURL();
 	}
 
 	HttpURLConnection openConnection(URL url) throws IOException {
@@ -228,44 +240,29 @@ public class DSBMobile implements Serializable {
 				}
 
 				switch (nextChar) {
-					case '\\' :
-						ch = '\\';
-						break;
-					case 'b' :
-						ch = '\b';
-						break;
-					case 'f' :
-						ch = '\f';
-						break;
-					case 'n' :
-						ch = '\n';
-						break;
-					case 'r' :
-						ch = '\r';
-						break;
-					case 't' :
-						ch = '\t';
-						break;
-					case '\"' :
-						ch = '\"';
-						break;
-					case '\'' :
-						ch = '\'';
-						break;
-
+					case '\\' -> ch = '\\';
+					case 'b' -> ch = '\b';
+					case 'f' -> ch = '\f';
+					case 'n' -> ch = '\n';
+					case 'r' -> ch = '\r';
+					case 't' -> ch = '\t';
+					case '\"' -> ch = '\"';
+					case '\'' -> ch = '\'';
 					// Hex Unicode: u????
-					case 'u' :
+					case 'u' -> {
 						if (i >= text.length() - 5) {
 							ch = 'u';
 							break;
 						}
-
 						int code = Integer.parseInt(
 								"" + text.charAt(i + 2) + text.charAt(i + 3) + text.charAt(i + 4) + text.charAt(i + 5),
 								16);
 						builder.append(Character.toChars(code));
 						i += 5;
 						continue;
+					}
+					default -> {
+					}
 				}
 
 				i++;

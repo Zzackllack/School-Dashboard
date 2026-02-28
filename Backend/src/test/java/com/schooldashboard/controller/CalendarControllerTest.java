@@ -38,6 +38,7 @@ public class CalendarControllerTest {
 	private ApiResponseCacheService cacheService;
 
 	@MockitoBean
+	@SuppressWarnings("unused")
 	private CacheManager cacheManager;
 
 	@Test
@@ -110,6 +111,7 @@ public class CalendarControllerTest {
 	static class TestBeans {
 		@Bean
 		@Primary
+		@SuppressWarnings("unused")
 		ObjectMapper objectMapper() {
 			return new ObjectMapper();
 		}

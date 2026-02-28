@@ -48,7 +48,7 @@ public class ApiResponseCacheServiceTest {
 	public void storeHandlesDuplicateKeyOnInsert() {
 		ApiResponseCacheRepository repo = mock(ApiResponseCacheRepository.class);
 		ApiResponseCache existing = new ApiResponseCache("k", "[]", "old");
-		when(repo.findById("k")).thenReturn(Optional.empty(), Optional.of(existing));
+		when(repo.findById("k")).thenReturn(Optional.empty()).thenReturn(Optional.of(existing));
 		doThrow(new DataIntegrityViolationException("duplicate")).doAnswer(invocation -> invocation.getArgument(0))
 				.when(repo).save(any(ApiResponseCache.class));
 		ApiResponseCacheService service = new ApiResponseCacheService(repo, new ObjectMapper());

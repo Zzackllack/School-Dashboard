@@ -5,6 +5,7 @@ import com.schooldashboard.model.CalendarEvent;
 import java.io.IOException;
 import java.io.StringReader;
 import java.time.Instant;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.OffsetDateTime;
@@ -17,8 +18,6 @@ import java.util.List;
 import net.fortuna.ical4j.data.CalendarBuilder;
 import net.fortuna.ical4j.data.ParserException;
 import net.fortuna.ical4j.model.Calendar;
-import net.fortuna.ical4j.model.Date;
-import net.fortuna.ical4j.model.DateTime;
 import net.fortuna.ical4j.model.component.VEvent;
 import net.fortuna.ical4j.model.property.Description;
 import net.fortuna.ical4j.model.property.DtEnd;
@@ -83,7 +82,7 @@ public class CalendarService {
 					continue;
 				}
 				VEvent event = (VEvent) component;
-				DtStart<?> startProperty = event.getStartDate().orElse(null);
+				DtStart<?> startProperty = event.getDateTimeStart();
 				if (startProperty == null) {
 					continue;
 				}
@@ -111,7 +110,7 @@ public class CalendarService {
 	}
 
 	private Temporal getEndDate(VEvent event, Temporal startDate) {
-		DtEnd<?> endProperty = event.getEndDate().orElse(null);
+		DtEnd<?> endProperty = event.getDateTimeEnd();
 		if (endProperty != null && endProperty.getDate() != null) {
 			return endProperty.getDate();
 		}
@@ -137,14 +136,15 @@ public class CalendarService {
 		if (temporal instanceof LocalDate localDate) {
 			return localDate.atStartOfDay(ZoneId.systemDefault()).toInstant();
 		}
-		if (temporal instanceof Date date) {
-			return Instant.ofEpochMilli(date.getTime());
+		try {
+			return Instant.from(temporal);
+		} catch (DateTimeException ex) {
+			return null;
 		}
-		return null;
 	}
 
 	private boolean isAllDay(Temporal startDate) {
-		return startDate instanceof LocalDate || (startDate instanceof Date && !(startDate instanceof DateTime));
+		return startDate instanceof LocalDate;
 	}
 
 	private String getValue(Summary summary) {

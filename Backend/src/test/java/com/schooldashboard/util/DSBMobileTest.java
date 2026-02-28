@@ -12,6 +12,7 @@ import java.io.OutputStream;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.InetSocketAddress;
+import java.net.URI;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
@@ -242,7 +243,7 @@ public class DSBMobileTest {
 		response.addProperty("d", Base64.encode("{\"Result\":\"ok\"}"));
 		String payload = response.toString();
 		CloseTrackingInputStream inputStream = new CloseTrackingInputStream(payload.getBytes(StandardCharsets.UTF_8));
-		FakeHttpURLConnection connection = new FakeHttpURLConnection(new URL("http://localhost/test"), inputStream,
+		FakeHttpURLConnection connection = new FakeHttpURLConnection(URI.create("http://localhost/test").toURL(), inputStream,
 				outputStream);
 
 		DSBMobile mobile = new ConnectionDSBMobile(connection, connection.getURL());
@@ -272,7 +273,7 @@ public class DSBMobileTest {
 		server.start();
 
 		try {
-			URL endpoint = new URL("http://localhost:" + server.getAddress().getPort() + "/test");
+			URL endpoint = URI.create("http://localhost:" + server.getAddress().getPort() + "/test").toURL();
 			DSBMobile mobile = new DSBMobile("u", "p") {
 				@Override
 				URL getEndpointUrl() {

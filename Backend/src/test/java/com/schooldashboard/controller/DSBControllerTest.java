@@ -31,6 +31,7 @@ public class DSBControllerTest {
 	private ApiResponseCacheService cacheService;
 
 	@MockitoBean
+	@SuppressWarnings("unused")
 	private CacheManager cacheManager;
 
 	@Test

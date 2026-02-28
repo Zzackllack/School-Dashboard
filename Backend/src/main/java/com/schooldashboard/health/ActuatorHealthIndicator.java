@@ -5,12 +5,12 @@ import java.sql.Connection;
 import java.sql.Statement;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 import javax.sql.DataSource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.health.contributor.Health;
 import org.springframework.boot.health.contributor.HealthIndicator;
 import org.springframework.cache.CacheManager;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
 
 @Component("applicationHealth")
@@ -20,10 +20,11 @@ public class ActuatorHealthIndicator implements HealthIndicator {
 	private final CacheManager cacheManager;
 	private final String appVersion;
 
-	public ActuatorHealthIndicator(@Nullable DataSource dataSource, @Nullable CacheManager cacheManager,
+	public ActuatorHealthIndicator(Optional<DataSource> dataSource,
+			Optional<CacheManager> cacheManager,
 			@Value("${app.version:unknown}") String appVersion) {
-		this.dataSource = dataSource;
-		this.cacheManager = cacheManager;
+		this.dataSource = dataSource.orElse(null);
+		this.cacheManager = cacheManager.orElse(null);
 		this.appVersion = appVersion;
 	}
 
