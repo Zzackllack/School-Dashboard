@@ -1,5 +1,6 @@
 package com.schooldashboard.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
@@ -74,7 +75,7 @@ public class CalendarController {
 				truncated.add(array.get(i));
 			}
 			return objectMapper.writeValueAsString(truncated);
-		} catch (Exception ex) {
+		} catch (JsonProcessingException ex) {
 			logger.warn("Failed to parse cached calendar events", ex);
 			return cachedJson;
 		}

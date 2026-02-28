@@ -44,6 +44,7 @@ public class ApiResponseCache {
 	}
 
 	@PrePersist
+	@SuppressWarnings("unused")
 	void onCreate() {
 		if (updatedAt == null) {
 			updatedAt = Instant.now();
@@ -51,6 +52,7 @@ public class ApiResponseCache {
 	}
 
 	@PreUpdate
+	@SuppressWarnings("unused")
 	void onUpdate() {
 		updatedAt = Instant.now();
 	}

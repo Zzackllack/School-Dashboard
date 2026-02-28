@@ -106,33 +106,17 @@ public class SubstitutionPlanParserService {
 
 						if (fieldType != null) {
 							switch (fieldType) {
-								case "classes" :
-									entry.setClasses(value);
-									break;
-								case "period" :
-									entry.setPeriod(value);
-									break;
-								case "absent" :
-									entry.setAbsent(value);
-									break;
-								case "substitute" :
-									entry.setSubstitute(value);
-									break;
-								case "originalSubject" :
-									entry.setOriginalSubject(value);
-									break;
-								case "subject" :
-									entry.setSubject(value);
-									break;
-								case "room" :
-									entry.setNewRoom(value);
-									break;
-								case "type" :
-									entry.setType(value);
-									break;
-								case "comment" :
-									entry.setComment(value);
-									break;
+								case "classes" -> entry.setClasses(value);
+								case "period" -> entry.setPeriod(value);
+								case "absent" -> entry.setAbsent(value);
+								case "substitute" -> entry.setSubstitute(value);
+								case "originalSubject" -> entry.setOriginalSubject(value);
+								case "subject" -> entry.setSubject(value);
+								case "room" -> entry.setNewRoom(value);
+								case "type" -> entry.setType(value);
+								case "comment" -> entry.setComment(value);
+								default -> {
+								}
 							}
 						}
 					}
