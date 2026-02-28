@@ -10,11 +10,14 @@ import schoolLogo from "../assets/Goethe-Logo.webp";
 import useAutoScroll from "../hooks/useAutoScroll";
 
 const DashboardPage = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [currentTime, setCurrentTime] = useState<Date | null>(null);
+  const [isHydrated, setIsHydrated] = useState(false);
 
   useAutoScroll(5, 80);
 
   useEffect(() => {
+    setIsHydrated(true);
+
     const clockTimer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -39,7 +42,14 @@ const DashboardPage = () => {
             className="mr-4 h-16"
           />
         </div>
-        <Clock currentTime={currentTime} />
+        {isHydrated && currentTime ? (
+          <Clock currentTime={currentTime} />
+        ) : (
+          <div className="text-right" data-testid="clock-placeholder">
+            <div className="text-2xl font-bold">--:--:--</div>
+            <div className="text-base">--.--.----</div>
+          </div>
+        )}
       </header>
 
       <main className="flex flex-grow flex-col px-4 py-6">
@@ -62,7 +72,10 @@ const DashboardPage = () => {
           © 2025 - {new Date().getFullYear()} Cédric, Nikolas, Informatik LK
           24/26 | GGL
         </p>
-        <p>Stand: {currentTime.toLocaleString()}</p>
+        <p>
+          Stand:{" "}
+          {isHydrated && currentTime ? currentTime.toLocaleString() : "--"}
+        </p>
       </footer>
     </div>
   );

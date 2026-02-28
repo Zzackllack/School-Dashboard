@@ -23,6 +23,7 @@ describe("backend config helpers", () => {
     expect(toFrontendApiPath("/api/calendar/events")).toBe(
       "/api/calendar/events",
     );
+    expect(toFrontendApiPath("/apiary/events")).toBe("/api/apiary/events");
   });
 
   it("builds backend URLs with runtime env overrides", () => {

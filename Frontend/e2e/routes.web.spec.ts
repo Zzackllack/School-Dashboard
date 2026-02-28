@@ -1,4 +1,10 @@
 import { expect, test } from "@playwright/test";
+import {
+  createServer,
+  type IncomingMessage,
+  type Server,
+  type ServerResponse,
+} from "node:http";
 
 const substitutionFixture = [
   {
@@ -125,6 +131,28 @@ const departuresFixture = {
   ],
 };
 
+async function startMockBackend(
+  handler: (req: IncomingMessage, res: ServerResponse) => void,
+) {
+  return await new Promise<Server>((resolve, reject) => {
+    const server = createServer(handler);
+    server.once("error", reject);
+    server.listen(8080, "127.0.0.1", () => resolve(server));
+  });
+}
+
+async function stopMockBackend(server: Server) {
+  await new Promise<void>((resolve, reject) => {
+    server.close((error) => {
+      if (error) {
+        reject(error);
+        return;
+      }
+      resolve();
+    });
+  });
+}
+
 test.beforeEach(async ({ page }) => {
   await page.route("**/api/substitution/plans", async (route) => {
     await route.fulfill({
@@ -176,6 +204,9 @@ test.beforeEach(async ({ page }) => {
 test("renders dashboard root route with core modules", async ({ page }) => {
   await page.goto("/");
 
+  await expect(page.getByTestId("clock-placeholder")).toBeVisible();
+  await expect(page.getByText("Stand: --")).toBeVisible();
+
   await expect(
     page.getByRole("heading", { name: "Vertretungspläne" }),
   ).toBeVisible();
@@ -189,6 +220,9 @@ test("renders dashboard root route with core modules", async ({ page }) => {
     page.getByRole("heading", { name: "Nächste Schulferien" }),
   ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Credits" })).toBeVisible();
+
+  await expect(page.getByTestId("clock-time")).toBeVisible({ timeout: 5_000 });
+  await expect(page.getByTestId("clock-placeholder")).toHaveCount(0);
 });
 
 test("renders display route scaffold", async ({ page }) => {
@@ -197,7 +231,7 @@ test("renders display route scaffold", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Display Route Placeholder" }),
   ).toBeVisible();
-  await expect(page.getByText("Angefragte Display-ID:")).toBeVisible();
+  await expect(page.getByText("Angefragte Display-ID: test-screen")).toBeVisible();
 });
 
 test("renders admin route scaffold", async ({ page }) => {
@@ -206,4 +240,57 @@ test("renders admin route scaffold", async ({ page }) => {
   await expect(
     page.getByRole("heading", { name: "Admin Route Placeholder" }),
   ).toBeVisible();
+});
+
+test("calendar API route forwards upstream status, headers, and body", async ({
+  request,
+}) => {
+  let backendServer: Server | null = null;
+
+  try {
+    backendServer = await startMockBackend((incomingRequest, response) => {
+      if (!incomingRequest.url?.startsWith("/api/calendar/events?limit=9")) {
+        response.statusCode = 404;
+        response.end("Not Found");
+        return;
+      }
+
+      response.statusCode = 207;
+      response.statusMessage = "Multi-Status";
+      response.setHeader("Content-Type", "application/json");
+      response.setHeader("X-Upstream", "calendar");
+      response.end('{"source":"upstream"}');
+    });
+  } catch (error) {
+    test.skip(
+      true,
+      `Mock backend server could not bind to 127.0.0.1:8080: ${String(error)}`,
+    );
+    return;
+  }
+
+  try {
+    const response = await request.get("/api/calendar/events?limit=9");
+
+    expect(response.status()).toBe(207);
+    expect(response.statusText()).toBe("Multi-Status");
+    expect(response.headers()["x-upstream"]).toBe("calendar");
+    await expect(response.text()).resolves.toBe('{"source":"upstream"}');
+  } finally {
+    if (backendServer) {
+      await stopMockBackend(backendServer);
+    }
+  }
+});
+
+test("calendar API route returns fallback 503 when backend is unavailable", async ({
+  request,
+}) => {
+  const response = await request.get("/api/calendar/events?limit=9");
+
+  expect(response.status()).toBe(503);
+  expect(response.statusText()).toBe("Service Unavailable");
+  await expect(response.json()).resolves.toEqual({
+    message: "Backend unavailable",
+  });
 });

@@ -6,7 +6,9 @@ function stripTrailingSlash(value: string): string {
 
 function normalizeApiPath(path: string): string {
   const normalized = path.startsWith("/") ? path : `/${path}`;
-  return normalized.startsWith("/api") ? normalized : `/api${normalized}`;
+  return normalized === "/api" || normalized.startsWith("/api/")
+    ? normalized
+    : `/api${normalized}`;
 }
 
 export function getBackendOrigin(): string {

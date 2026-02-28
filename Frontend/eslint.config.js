@@ -22,7 +22,6 @@ export default tseslint.config(
       ecmaVersion: 2020,
       globals: {
         ...globals.browser,
-        ...globals.node,
       },
     },
     plugins: {
@@ -35,6 +34,21 @@ export default tseslint.config(
         "warn",
         { allowConstantExport: true },
       ],
+    },
+  },
+  {
+    files: [
+      "src/routes/api.*.ts",
+      "src/lib/config/backend.ts",
+      "src/**/*.test.{ts,tsx}",
+      "e2e/**/*.ts",
+      "playwright.config.ts",
+      "vitest.config.ts",
+    ],
+    languageOptions: {
+      globals: {
+        ...globals.node,
+      },
     },
   },
 );

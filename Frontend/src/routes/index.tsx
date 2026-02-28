@@ -8,17 +8,6 @@ export async function loadDashboardRouteData(queryClient: QueryClient) {
 }
 
 export const Route = createFileRoute("/")({
-  loader: async ({ context }) => {
-    try {
-      await loadDashboardRouteData(context.queryClient);
-    } catch (error) {
-      // Route must still render even if backend-dependent prefetch fails.
-      console.warn("[dashboard-route] loader prefetch failed", error);
-    }
-  },
-  component: DashboardRoute,
+  loader: ({ context }) => loadDashboardRouteData(context.queryClient),
+  component: DashboardPage,
 });
-
-function DashboardRoute() {
-  return <DashboardPage />;
-}

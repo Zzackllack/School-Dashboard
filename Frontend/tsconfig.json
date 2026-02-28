@@ -6,8 +6,7 @@
     "module": "ESNext",
     "baseUrl": ".",
     "paths": {
-      "#/*": ["./src/*"],
-      "@/*": ["./src/*"]
+      "#/*": ["./src/*"]
     },
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["vite/client", "node"],
@@ -21,5 +20,15 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+    ".output",
+    "build",
+    ".next",
+    ".tanstack",
+    "playwright-report",
+    "test-results"
+  ]
 }

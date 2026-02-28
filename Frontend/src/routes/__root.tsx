@@ -13,7 +13,7 @@ interface RouterContext {
 }
 
 export const Route = createRootRouteWithContext<RouterContext>()({
-  ssr: false,
+  ssr: true,
   head: () => ({
     meta: [
       {
@@ -157,10 +157,6 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       {
         name: "msapplication-config",
         content: "/favicon/browserconfig.xml",
-      },
-      {
-        name: "application-name",
-        content: "GGL Dashboard",
       },
       {
         name: "HandheldFriendly",
