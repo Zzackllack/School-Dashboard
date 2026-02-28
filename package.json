@@ -1,11 +1,12 @@
 {
   "name": "school-dashboard",
   "private": true,
+  "packageManager": "pnpm@10.12.4",
   "scripts": {
-    "format": "npm --prefix Frontend run format && mvn -f Backend/pom.xml spotless:apply",
-    "format:check": "npm --prefix Frontend run format:check && mvn -f Backend/pom.xml spotless:check",
-    "lint": "npm --prefix Frontend run lint",
-    "build": "npm --prefix Frontend run build && mvn -f Backend/pom.xml -DskipTests package",
+    "format": "pnpm --dir Frontend run format && mvn -f Backend/pom.xml spotless:apply",
+    "format:check": "pnpm --dir Frontend run format:check && mvn -f Backend/pom.xml spotless:check",
+    "lint": "pnpm --dir Frontend run lint",
+    "build": "pnpm --dir Frontend run build && mvn -f Backend/pom.xml -DskipTests package",
     "test": "mvn -f Backend/pom.xml test"
   }
 }

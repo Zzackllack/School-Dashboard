@@ -98,9 +98,10 @@ While developed specifically for GGL, this application is designed to be adaptab
 
 ### Frontend
 
-- React 19 with TypeScript
+- TanStack Start (React 19) with TypeScript
+- TanStack Router (file-based routing)
 - Tailwind CSS for styling
-- Vite for fast development and build process
+- Vite + Nitro adapter for development and production builds
 
 ### Backend
 
@@ -139,7 +140,7 @@ This opacity has forced us to rely on reverse-engineered solutions, creating unn
 ### Prerequisites
 
 - JDK 21
-- Node.js 18+ and npm
+- Node.js 24+ and pnpm
 - Maven
 
 ### Installation
@@ -207,51 +208,54 @@ If actuator endpoints are enabled (see `management.endpoints.web.exposure.includ
 - `GET /actuator/metrics`
 - `GET /actuator/env`
 
-### Frontend (React + Vite)
+### Frontend (TanStack Start)
 
 - **Install dependencies**
 
   ```bash
   cd ../Frontend
-  npm install
+  pnpm install --frozen-lockfile
   ```
 
 - **Start the dev server**
 
   ```bash
-  npm run dev
+  pnpm run dev
   ```
 
 - **Run checks**
 
   ```bash
-  npm run build   # type check + production bundle
-  npm run lint    # optional lint pass
+  pnpm run build   # production bundle
+  pnpm run lint    # optional lint pass
+  pnpm run test:unit
+  pnpm run test:integration
+  pnpm run test:web
   ```
 
 ### Code Quality and CI/CD
 
 - **Formatting**
   - Backend: Spotless (`mvn -f Backend/pom.xml spotless:check`)
-  - Frontend: Prettier (`npm --prefix Frontend run format:check`)
+  - Frontend: Prettier (`pnpm --dir Frontend run format:check`)
 - **Linting**
-  - Frontend: ESLint (`npm --prefix Frontend run lint`)
+  - Frontend: ESLint (`pnpm --dir Frontend run lint`)
 - **CI/CD**
   - GitHub Actions workflows for CI, CodeQL, and Docker image publishing
 
 Monorepo helpers from the repo root:
 
 ```bash
-npm run format:check
-npm run format
-npm run lint
-npm run test
-npm run build
+pnpm run format:check
+pnpm run format
+pnpm run lint
+pnpm run test
+pnpm run build
 ```
 
 ### Access the application
 
-- Frontend: <http://localhost:5173>
+- Frontend: <http://localhost:3000>
 - Backend API: <http://localhost:8080>
 
 ### Cloudflare Workers (Frontend Only)
@@ -267,9 +271,9 @@ Cloudflare-managed build/deploy (Workers Builds):
 1. In Cloudflare Workers, connect the GitHub repository.
 2. Build settings:
    - Root directory: `Frontend`
-   - Build command: `npm ci && npm run build`
-   - Deploy command: `npx wrangler deploy`
-   - Non-production branch deploy command: `npx wrangler versions upload`
+   - Build command: `pnpm run build:workers`
+   - Deploy command: `pnpm run deploy:workers`
+   - Non-production branch deploy command: `pnpm run deploy:workers:preview`
 
 ## Production
 
@@ -288,7 +292,7 @@ Cloudflare-managed build/deploy (Workers Builds):
 
 2. **Configure the Frontend**:
 
-- Ensure the frontend is configured to point to the correct backend URL. In the Dockerfile, the `sed` command replaces `http://localhost:8080` with `/api`. This assumes that your Nginx configuration correctly proxies `/api` requests to the backend service.
+- Set `BACKEND_URL` for the frontend runtime (for example `http://backend:8080` in Docker Compose). The TanStack Start server routes under `/api/*` forward requests to this backend origin.
 
 ### Deployment Steps
 

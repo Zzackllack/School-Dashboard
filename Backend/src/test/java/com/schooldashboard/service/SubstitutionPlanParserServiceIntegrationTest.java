@@ -7,6 +7,7 @@ import com.sun.net.httpserver.HttpServer;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.net.InetSocketAddress;
+import java.nio.charset.StandardCharsets;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -32,9 +33,11 @@ public class SubstitutionPlanParserServiceIntegrationTest {
 	public static void startServer() throws IOException {
 		server = HttpServer.create(new InetSocketAddress(0), 0);
 		server.createContext("/plan", e -> {
-			e.sendResponseHeaders(200, HTML.getBytes().length);
+			byte[] htmlBytes = HTML.getBytes(StandardCharsets.UTF_8);
+			e.getResponseHeaders().set("Content-Type", "text/html; charset=utf-8");
+			e.sendResponseHeaders(200, htmlBytes.length);
 			try (OutputStream os = e.getResponseBody()) {
-				os.write(HTML.getBytes());
+				os.write(htmlBytes);
 			}
 		});
 		server.start();

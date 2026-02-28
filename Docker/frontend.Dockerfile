@@ -1,19 +1,29 @@
-FROM platformatic/node-caged:25-slim AS build
-SHELL ["/bin/sh", "-ec"]
+FROM node:24-alpine AS build
 WORKDIR /app
-COPY Frontend/package*.json ./
-RUN npm ci
-COPY Frontend/ ./
-# Update API URLs in the code (replaces localhost:8080 with /api)
-RUN find src -type f \( -name "*.ts" -o -name "*.tsx" \) \
-    -exec sed -i 's|http://localhost:8080|/api|g' {} + \
-    && npm run build
 
-FROM nginx:alpine
-COPY --from=build /app/dist /usr/share/nginx/html
-COPY Docker/nginx.conf /etc/nginx/conf.d/default.conf
-# Install wget for healthcheck
-RUN apk add --no-cache wget=1.25.0-r2 \
-    && apk upgrade --no-cache
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
+RUN corepack enable
+COPY Frontend/package.json Frontend/pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
+
+COPY Frontend/ ./
+RUN pnpm run build
+
+FROM node:24-alpine AS runtime
+WORKDIR /app
+
+ENV NODE_ENV=production
+ENV HOST=0.0.0.0
+ENV PORT=3000
+
+RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+
+COPY --from=build --chown=appuser:appgroup /app/.output ./.output
+
+EXPOSE 3000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
+  CMD node -e "fetch(`http://127.0.0.1:${process.env.PORT || 3000}`).then((response) => { if (!response.ok) process.exit(1); }).catch(() => process.exit(1))"
+
+USER appuser
+
+CMD ["node", ".output/server/index.mjs"]

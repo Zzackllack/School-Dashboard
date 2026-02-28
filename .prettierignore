@@ -3,6 +3,11 @@ Backend/target
 Backend/data
 Frontend/dist
 Frontend/node_modules
+Frontend/.output
+Frontend/.tanstack
+Frontend/playwright-report
+Frontend/test-results
+Frontend/src/routeTree.gen.ts
 **/*.png
 **/*.webp
 **/*.svg

@@ -7,7 +7,7 @@ This repository uses GitHub Actions for CI and CD.
 ### CI (`.github/workflows/ci.yml`)
 
 - Backend: Spotless format check, unit tests, package build.
-- Frontend: Prettier format check, ESLint, Vite build.
+- Frontend: Prettier format check, ESLint, unit tests, integration tests, web tests.
 
 ### Auto Format (`.github/workflows/format.yml`)
 
@@ -34,16 +34,18 @@ This repository uses GitHub Actions for CI and CD.
   - `mvn -f Backend/pom.xml test`
   - `mvn -f Backend/pom.xml -DskipTests package`
 - Frontend:
-  - `npm --prefix Frontend run format:check`
-  - `npm --prefix Frontend run lint`
-  - `npm --prefix Frontend run build`
+  - `pnpm --dir Frontend run format:check`
+  - `pnpm --dir Frontend run lint`
+  - `pnpm --dir Frontend run test:unit`
+  - `pnpm --dir Frontend run test:integration`
+  - `pnpm --dir Frontend run test:web`
 
 ## Monorepo helpers
 
 At the repo root:
 
-- `npm run format:check`
-- `npm run format`
-- `npm run lint`
-- `npm run test`
-- `npm run build`
+- `pnpm run format:check`
+- `pnpm run format`
+- `pnpm run lint`
+- `pnpm run test`
+- `pnpm run build`
