@@ -251,11 +251,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
       },
       {
         rel: "preconnect",
-        href: "https://cloud.umami.is",
+        href: "https://umami-analytics.zacklack.de",
       },
       {
         rel: "dns-prefetch",
-        href: "//cloud.umami.is",
+        href: "//umami-analytics.zacklack.de",
       },
     ],
   }),
@@ -270,8 +270,8 @@ function RootDocument({ children }: { children: ReactNode }) {
       <head>
         <script
           defer
-          src="https://cloud.umami.is/script.js"
-          data-website-id="02678dcd-988c-454d-82f5-736231784060"
+          src="https://umami-analytics.zacklack.de/script.js"
+          data-website-id="a415a45d-7527-43f9-a63b-f42c314f2ca7"
         />
         <HeadContent />
       </head>
