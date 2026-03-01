@@ -3,7 +3,7 @@ WORKDIR /app
 
 RUN corepack enable
 COPY Frontend/package.json Frontend/pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --prod=false
+RUN pnpm install --frozen-lockfile --prod=false --ignore-workspace
 
 COPY Frontend/ ./
 RUN pnpm run build
@@ -16,6 +16,10 @@ ENV HOST=0.0.0.0
 ENV PORT=3000
 
 RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+# Remove package managers from runtime image; not needed to run the app and
+# avoids shipping vulnerable npm transitive dependencies.
+RUN rm -rf /usr/local/lib/node_modules/npm \
+    && rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
 
 COPY --from=build --chown=appuser:appgroup /app/.output ./.output
 

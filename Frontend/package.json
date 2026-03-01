@@ -15,7 +15,7 @@
     "format:check": "prettier --check . --ignore-path ../.prettierignore",
     "lint": "eslint .",
     "preview": "vite preview",
-    "build:workers": "pnpm install --frozen-lockfile --prod=false && pnpm run build",
+    "build:workers": "pnpm install --frozen-lockfile --prod=false --ignore-workspace && pnpm run build",
     "deploy:workers": "pnpm dlx wrangler deploy",
     "deploy:workers:preview": "pnpm dlx wrangler versions upload",
     "test": "pnpm run test:unit && pnpm run test:integration && pnpm run test:web",
