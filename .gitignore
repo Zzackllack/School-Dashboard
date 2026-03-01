@@ -95,4 +95,10 @@ application.properties
 .classpath
 .project
 
+# ───── Agents ─────
 .agents/
+
+# ───── Maven ─────
+.mvn/
+mvnw
+mvnw.cmd

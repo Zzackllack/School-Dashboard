@@ -140,17 +140,20 @@ This opacity has forced us to rely on reverse-engineered solutions, creating unn
 ### Prerequisites
 
 - JDK 21
-- Node.js 24+ and pnpm
-- Maven
+- Node.js 24+ and pnpm (enable via `corepack enable`)
+- Maven (only needed once to bootstrap Maven Wrapper if wrapper files are missing)
 
 ### Installation
 
 ```bash
 git clone https://github.com/Zzacklack/school-dashboard.git
 cd school-dashboard
+pnpm run setup
 ```
 
 ### Backend (Spring Boot)
+
+The monorepo helper scripts prefer Maven Wrapper (`Backend/mvnw` / `Backend/mvnw.cmd`) and fall back to system Maven if wrapper files are missing.
 
 - **Install dependencies**
 

@@ -3,10 +3,19 @@
   "private": true,
   "packageManager": "pnpm@10.12.4",
   "scripts": {
-    "format": "pnpm --dir Frontend run format && mvn -f Backend/pom.xml spotless:apply",
-    "format:check": "pnpm --dir Frontend run format:check && mvn -f Backend/pom.xml spotless:check",
+    "setup": "node ./scripts/setup.mjs",
+    "setup:maven-wrapper": "node ./scripts/setup-maven-wrapper.mjs",
+    "format": "pnpm --dir Frontend run format && node ./scripts/maven-runner.mjs spotless:apply",
+    "format:check": "pnpm --dir Frontend run format:check && node ./scripts/maven-runner.mjs spotless:check",
     "lint": "pnpm --dir Frontend run lint",
-    "build": "pnpm --dir Frontend run build && mvn -f Backend/pom.xml -DskipTests package",
-    "test": "mvn -f Backend/pom.xml test"
+    "build": "pnpm --dir Frontend run build && node ./scripts/maven-runner.mjs -DskipTests package",
+    "test": "node ./scripts/maven-runner.mjs test",
+    "test:scripts": "node --test ./scripts/maven-runner.test.mjs",
+    "dev": "node ./scripts/announce-and-wait.mjs \"Starting frontend [0] and backend [1] development servers in 3 seconds...\" 3000 && concurrently \"pnpm --dir Frontend run dev\" \"pnpm run dev:backend\"",
+    "dev:frontend": "pnpm --dir Frontend run dev",
+    "dev:backend": "node ./scripts/maven-runner.mjs spring-boot:run"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
   }
 }
