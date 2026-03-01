@@ -55,5 +55,14 @@
     "vite": "^7.3.1",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.2.4"
+  },
+  "pnpm": {
+    "overrides": {
+      "@eslint/config-array@0.21.1>minimatch": "3.1.5",
+      "@eslint/eslintrc@3.3.1>minimatch": "3.1.5",
+      "eslint@9.39.2>minimatch": "3.1.5",
+      "minimatch@10.1.2": "10.2.4",
+      "tar@7.5.7": "7.5.8"
+    }
   }
 }
