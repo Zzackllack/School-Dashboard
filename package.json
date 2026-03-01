@@ -17,11 +17,5 @@
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
-  },
-  "pnpm": {
-    "overrides": {
-      "minimatch@10.1.2": "10.2.4",
-      "tar@7.5.7": "7.5.8"
-    }
   }
 }

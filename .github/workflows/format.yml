@@ -38,7 +38,7 @@ jobs:
 
       - name: Install frontend dependencies
         working-directory: Frontend
-        run: pnpm install --frozen-lockfile
+        run: pnpm install --frozen-lockfile --prod=false
 
       - name: Format frontend
         run: pnpm --dir Frontend run format

@@ -4,10 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  minimatch@10.1.2: 10.2.4
-  tar@7.5.7: 7.5.8
-
 importers:
 
   .:

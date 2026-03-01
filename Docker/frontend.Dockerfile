@@ -3,7 +3,7 @@ WORKDIR /app
 
 RUN corepack enable
 COPY Frontend/package.json Frontend/pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile
+RUN pnpm install --frozen-lockfile --prod=false
 
 COPY Frontend/ ./
 RUN pnpm run build
