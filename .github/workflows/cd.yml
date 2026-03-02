@@ -4,12 +4,49 @@ on:
   push:
     branches: [main]
     tags: ["v*"]
+    paths:
+      - "Backend/**"
+      - "Frontend/**"
+      - "Docker/**"
+      - "pnpm-lock.yaml"
+      - "pnpm-workspace.yaml"
+      - "package.json"
+      - ".github/workflows/cd.yml"
 
 jobs:
+  changes:
+    name: Detect changed areas
+    runs-on: ubuntu-latest
+    if: github.actor != 'dependabot[bot]'
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Detect file changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - 'Backend/**'
+              - 'Docker/backend.Dockerfile'
+              - '.github/workflows/cd.yml'
+            frontend:
+              - 'Frontend/**'
+              - 'Docker/frontend.Dockerfile'
+              - 'pnpm-lock.yaml'
+              - 'pnpm-workspace.yaml'
+              - 'package.json'
+              - '.github/workflows/cd.yml'
+
   publish:
     name: Build and publish images
     runs-on: ubuntu-latest
-    if: github.actor != 'dependabot[bot]'
+    needs: changes
+    if: github.actor != 'dependabot[bot]' && (needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true')
     permissions:
       contents: read
       packages: write
@@ -28,14 +65,15 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-
       - name: Backend image metadata
+        if: needs.changes.outputs.backend == 'true'
         id: meta-backend
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}-backend
 
       - name: Select backend image tags
+        if: needs.changes.outputs.backend == 'true'
         run: |
           echo "BACKEND_IMAGE_TAGS<<EOF" >> $GITHUB_ENV
           echo "${{ steps.meta-backend.outputs.tags }}" >> $GITHUB_ENV
@@ -44,11 +82,13 @@ jobs:
           echo "BACKEND_CACHE_REF=$(printf '%s\n' "${{ steps.meta-backend.outputs.tags }}" | head -n 1 | cut -d: -f1):buildcache" >> $GITHUB_ENV
 
       - name: Lint backend Dockerfile
+        if: needs.changes.outputs.backend == 'true'
         uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: Docker/backend.Dockerfile
 
       - name: Build and push backend image
+        if: needs.changes.outputs.backend == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -61,6 +101,7 @@ jobs:
           cache-to: type=registry,ref=${{ env.BACKEND_CACHE_REF }},mode=max
 
       - name: Scan backend image
+        if: needs.changes.outputs.backend == 'true'
         uses: aquasecurity/trivy-action@0.34.1
         with:
           image-ref: ${{ env.BACKEND_IMAGE_REF }}
@@ -68,19 +109,23 @@ jobs:
           exit-code: "1"
 
       - name: Install Cosign
+        if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true'
         uses: sigstore/cosign-installer@v4.0.0
 
       - name: Sign backend image
+        if: needs.changes.outputs.backend == 'true'
         run: |
           printf '%s\n' "$BACKEND_IMAGE_TAGS" | xargs -n1 cosign sign --yes
 
       - name: Frontend image metadata
+        if: needs.changes.outputs.frontend == 'true'
         id: meta-frontend
         uses: docker/metadata-action@v5
         with:
           images: ghcr.io/${{ github.repository }}-frontend
 
       - name: Select frontend image tags
+        if: needs.changes.outputs.frontend == 'true'
         run: |
           echo "FRONTEND_IMAGE_TAGS<<EOF" >> $GITHUB_ENV
           echo "${{ steps.meta-frontend.outputs.tags }}" >> $GITHUB_ENV
@@ -89,11 +134,13 @@ jobs:
           echo "FRONTEND_CACHE_REF=$(printf '%s\n' "${{ steps.meta-frontend.outputs.tags }}" | head -n 1 | cut -d: -f1):buildcache" >> $GITHUB_ENV
 
       - name: Lint frontend Dockerfile
+        if: needs.changes.outputs.frontend == 'true'
         uses: hadolint/hadolint-action@v3.3.0
         with:
           dockerfile: Docker/frontend.Dockerfile
 
       - name: Build and push frontend image
+        if: needs.changes.outputs.frontend == 'true'
         uses: docker/build-push-action@v6
         with:
           context: .
@@ -106,6 +153,7 @@ jobs:
           cache-to: type=registry,ref=${{ env.FRONTEND_CACHE_REF }},mode=max
 
       - name: Scan frontend image
+        if: needs.changes.outputs.frontend == 'true'
         uses: aquasecurity/trivy-action@0.34.1
         with:
           image-ref: ${{ env.FRONTEND_IMAGE_REF }}
@@ -113,5 +161,6 @@ jobs:
           exit-code: "1"
 
       - name: Sign frontend image
+        if: needs.changes.outputs.frontend == 'true'
         run: |
           printf '%s\n' "$FRONTEND_IMAGE_TAGS" | xargs -n1 cosign sign --yes
