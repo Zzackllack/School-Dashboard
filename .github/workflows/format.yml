@@ -39,7 +39,7 @@ jobs:
           cache: maven
       - name: Install frontend dependencies
         working-directory: Frontend
-        run: pnpm install --frozen-lockfile --prod=false --ignore-workspace
+        run: pnpm install --no-frozen-lockfile --prod=false --ignore-workspace
 
       - name: Format frontend
         run: pnpm --dir Frontend run format
