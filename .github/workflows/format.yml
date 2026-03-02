@@ -2,6 +2,8 @@ name: Auto Format
 
 on:
   push:
+    branches-ignore:
+      - "dependabot/**"
 
 permissions:
   contents: write
@@ -9,7 +11,7 @@ permissions:
 jobs:
   format:
     name: Apply formatting
-    if: github.actor != 'github-actions[bot]'
+    if: github.actor != 'github-actions[bot]' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -35,7 +37,6 @@ jobs:
           distribution: temurin
           java-version: "21"
           cache: maven
-
       - name: Install frontend dependencies
         working-directory: Frontend
         run: pnpm install --frozen-lockfile --prod=false --ignore-workspace
