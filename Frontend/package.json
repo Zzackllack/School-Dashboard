@@ -28,13 +28,13 @@
     "@tanstack/react-query": "^5.90.21",
     "@tanstack/react-router": "^1.163.3",
     "@tanstack/react-router-ssr-query": "^1.163.3",
-    "@tanstack/react-start": "^1.163.3",
-    "@tanstack/router-plugin": "^1.163.3",
+    "@tanstack/react-start": "^1.166.1",
+    "@tanstack/router-plugin": "^1.164.0",
     "lucide-react": "^0.575.0",
     "nitro": "npm:nitro-nightly@latest",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "tailwindcss": "^4.2.0"
+    "tailwindcss": "^4.2.1"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.2",
@@ -48,7 +48,7 @@
     "eslint": "^9.39.1",
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.5.2",
-    "globals": "^17.3.0",
+    "globals": "^17.4.0",
     "jsdom": "^27.0.0",
     "prettier": "^3.8.1",
     "typescript": "~5.9.3",
