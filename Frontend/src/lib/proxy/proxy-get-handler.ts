@@ -1,7 +1,18 @@
 import { toBackendApiUrl } from "../config/backend";
 import { isAbortError, UPSTREAM_TIMEOUT_MS } from "./api-proxy-utils";
 
+const FORWARDED_HEADERS = [
+  "accept",
+  "accept-language",
+  "authorization",
+  "content-type",
+  "x-admin-token",
+  "x-admin-id",
+  "x-request-id",
+];
+
 export async function proxyGetRequest(
+  method: "GET" | "POST" | "PATCH",
   upstreamPath: string,
   request: Request,
   resourceName: string,
@@ -10,9 +21,22 @@ export async function proxyGetRequest(
   const timeoutId = setTimeout(() => controller.abort(), UPSTREAM_TIMEOUT_MS);
 
   try {
+    const init: RequestInit = {
+      method,
+      signal: controller.signal,
+      headers: copyForwardedHeaders(request),
+    };
+
+    if (method !== "GET") {
+      const body = await request.arrayBuffer();
+      if (body.byteLength > 0) {
+        init.body = body;
+      }
+    }
+
     const upstreamResponse = await fetch(
       toBackendApiUrl(upstreamPath, request.url),
-      { signal: controller.signal },
+      init,
     );
 
     return new Response(upstreamResponse.body, {
@@ -44,5 +68,32 @@ export function createProxyGetHandler(
   resourceName: string,
 ) {
   return async ({ request }: { request: Request }) =>
-    proxyGetRequest(upstreamPath, request, resourceName);
+    proxyGetRequest("GET", upstreamPath, request, resourceName);
+}
+
+export function createProxyPostHandler(
+  upstreamPath: string,
+  resourceName: string,
+) {
+  return async ({ request }: { request: Request }) =>
+    proxyGetRequest("POST", upstreamPath, request, resourceName);
+}
+
+export function createProxyPatchHandler(
+  upstreamPath: string,
+  resourceName: string,
+) {
+  return async ({ request }: { request: Request }) =>
+    proxyGetRequest("PATCH", upstreamPath, request, resourceName);
+}
+
+function copyForwardedHeaders(request: Request): Headers {
+  const headers = new Headers();
+  for (const header of FORWARDED_HEADERS) {
+    const value = request.headers.get(header);
+    if (value) {
+      headers.set(header, value);
+    }
+  }
+  return headers;
 }
