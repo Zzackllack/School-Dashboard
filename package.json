@@ -3,19 +3,31 @@
   "private": true,
   "packageManager": "pnpm@10.12.4",
   "scripts": {
+    "presetup": "node ./scripts/require-pnpm.mjs",
     "setup": "node ./scripts/setup.mjs",
+    "presetup:maven-wrapper": "node ./scripts/require-pnpm.mjs",
     "setup:maven-wrapper": "node ./scripts/setup-maven-wrapper.mjs",
+    "preformat": "node ./scripts/require-pnpm.mjs",
     "format": "pnpm --dir Frontend run format && node ./scripts/maven-runner.mjs spotless:apply",
+    "preformat:check": "node ./scripts/require-pnpm.mjs",
     "format:check": "pnpm --dir Frontend run format:check && node ./scripts/maven-runner.mjs spotless:check",
+    "prelint": "node ./scripts/require-pnpm.mjs",
     "lint": "pnpm --dir Frontend run lint",
+    "prebuild": "node ./scripts/require-pnpm.mjs",
     "build": "pnpm --dir Frontend run build && node ./scripts/maven-runner.mjs -DskipTests package",
+    "pretest": "node ./scripts/require-pnpm.mjs",
     "test": "node ./scripts/maven-runner.mjs test",
+    "pretest:scripts": "node ./scripts/require-pnpm.mjs",
     "test:scripts": "node --test ./scripts/maven-runner.test.mjs",
+    "predev": "node ./scripts/require-pnpm.mjs",
     "dev": "node ./scripts/announce-and-wait.mjs \"Starting frontend [0] and backend [1] development servers in 3 seconds...\" 3000 && concurrently \"pnpm --dir Frontend run dev\" \"pnpm run dev:backend\"",
+    "predev:frontend": "node ./scripts/require-pnpm.mjs",
     "dev:frontend": "pnpm --dir Frontend run dev",
+    "predev:backend": "node ./scripts/require-pnpm.mjs",
     "dev:backend": "node ./scripts/maven-runner.mjs spring-boot:run"
   },
   "devDependencies": {
     "concurrently": "^9.2.1"
   }
 }
+ 
