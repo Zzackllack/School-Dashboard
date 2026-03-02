@@ -9,6 +9,7 @@ jobs:
   publish:
     name: Build and publish images
     runs-on: ubuntu-latest
+    if: github.actor != 'dependabot[bot]'
     permissions:
       contents: read
       packages: write

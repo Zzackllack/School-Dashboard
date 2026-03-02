@@ -10,7 +10,8 @@ jobs:
   backend:
     name: Backend
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || github.event.workflow_run.conclusion == 'success'
+    if: (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]') ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.actor.login != 'dependabot[bot]')
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -34,7 +35,8 @@ jobs:
   frontend:
     name: Frontend
     runs-on: ubuntu-latest
-    if: github.event_name == 'pull_request' || github.event.workflow_run.conclusion == 'success'
+    if: (github.event_name == 'pull_request' && github.event.pull_request.user.login != 'dependabot[bot]') ||
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.actor.login != 'dependabot[bot]')
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -50,7 +52,6 @@ jobs:
           node-version: "24"
           cache: pnpm
           cache-dependency-path: Frontend/pnpm-lock.yaml
-
       - name: Install dependencies
         working-directory: Frontend
         run: pnpm install --frozen-lockfile --prod=false --ignore-workspace
