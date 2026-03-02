@@ -83,9 +83,7 @@ function GuardedDisplayRoute() {
       <main className="flex min-h-screen items-center justify-center bg-slate-100 p-6 text-slate-900">
         <section className="w-full max-w-lg rounded-2xl bg-white p-8 shadow-xl">
           <h1 className="text-2xl font-bold">Display Zugriff wird geprüft</h1>
-          <p className="mt-3 text-slate-600">
-            Bitte einen Moment warten.
-          </p>
+          <p className="mt-3 text-slate-600">Bitte einen Moment warten.</p>
         </section>
       </main>
     );

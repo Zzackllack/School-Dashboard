@@ -17,7 +17,10 @@ describe("proxy request handlers", () => {
       }),
     );
 
-    const handler = createProxyPostHandler("/admin/displays/enrollment-codes", "admin-codes");
+    const handler = createProxyPostHandler(
+      "/admin/displays/enrollment-codes",
+      "admin-codes",
+    );
 
     await handler({
       request: new Request(
@@ -50,14 +53,20 @@ describe("proxy request handlers", () => {
       }),
     );
 
-    const handler = createProxyPatchHandler("/admin/displays/display-1", "display-update");
+    const handler = createProxyPatchHandler(
+      "/admin/displays/display-1",
+      "display-update",
+    );
 
     await handler({
-      request: new Request("https://dashboard.local/api/admin/displays/display-1", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: "INACTIVE" }),
-      }),
+      request: new Request(
+        "https://dashboard.local/api/admin/displays/display-1",
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: "INACTIVE" }),
+        },
+      ),
     });
 
     const [, init] = fetchSpy.mock.calls[0] ?? [];

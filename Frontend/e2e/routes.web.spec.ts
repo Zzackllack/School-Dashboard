@@ -187,10 +187,14 @@ test.beforeEach(async ({ page }) => {
 test("routes fresh kiosk from root to setup", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByRole("heading", { name: "Display Setup" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Display Setup" }),
+  ).toBeVisible();
 });
 
-test("completes setup -> pending -> approved -> display flow", async ({ page }) => {
+test("completes setup -> pending -> approved -> display flow", async ({
+  page,
+}) => {
   let pollCount = 0;
 
   await page.route("**/api/displays/enrollments", async (route) => {
@@ -317,7 +321,9 @@ test("falls back to setup when stored token is revoked", async ({ page }) => {
   await page.goto("/");
 
   await expect(page).toHaveURL(/\/setup/);
-  await expect(page.getByRole("heading", { name: "Display Setup" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Display Setup" }),
+  ).toBeVisible();
 });
 
 test("blocks direct /display/:displayId access without a session token", async ({
@@ -326,7 +332,9 @@ test("blocks direct /display/:displayId access without a session token", async (
   await page.goto("/display/direct-access");
 
   await expect(page).toHaveURL(/\/setup/);
-  await expect(page.getByRole("heading", { name: "Display Setup" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Display Setup" }),
+  ).toBeVisible();
 });
 
 test("blocks direct /display/:displayId access when token is revoked", async ({
@@ -353,36 +361,41 @@ test("blocks direct /display/:displayId access when token is revoked", async ({
   await page.goto("/display/revoked-screen");
 
   await expect(page).toHaveURL(/\/setup/);
-  await expect(page.getByRole("heading", { name: "Display Setup" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Display Setup" }),
+  ).toBeVisible();
 });
 
 test("admin pending page supports approval action", async ({ page }) => {
   let listRequestCount = 0;
 
-  await page.route("**/api/admin/displays/enrollments?status=PENDING", async (route) => {
-    listRequestCount += 1;
+  await page.route(
+    "**/api/admin/displays/enrollments?status=PENDING",
+    async (route) => {
+      listRequestCount += 1;
 
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify(
-        listRequestCount === 1
-          ? [
-              {
-                requestId: "req-approve",
-                enrollmentCodeId: "code-1",
-                proposedDisplayName: "North Wing",
-                deviceInfo: null,
-                status: "PENDING",
-                displayId: null,
-                createdAt: "2026-03-01T10:00:00Z",
-                expiresAt: "2026-03-02T10:00:00Z",
-              },
-            ]
-          : [],
-      ),
-    });
-  });
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(
+          listRequestCount === 1
+            ? [
+                {
+                  requestId: "req-approve",
+                  enrollmentCodeId: "code-1",
+                  proposedDisplayName: "North Wing",
+                  deviceInfo: null,
+                  status: "PENDING",
+                  displayId: null,
+                  createdAt: "2026-03-01T10:00:00Z",
+                  expiresAt: "2026-03-02T10:00:00Z",
+                },
+              ]
+            : [],
+        ),
+      });
+    },
+  );
 
   await page.route(
     "**/api/admin/displays/enrollments/req-approve/approve",
@@ -412,30 +425,33 @@ test("admin pending page supports approval action", async ({ page }) => {
 test("admin pending page supports rejection action", async ({ page }) => {
   let listRequestCount = 0;
 
-  await page.route("**/api/admin/displays/enrollments?status=PENDING", async (route) => {
-    listRequestCount += 1;
+  await page.route(
+    "**/api/admin/displays/enrollments?status=PENDING",
+    async (route) => {
+      listRequestCount += 1;
 
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify(
-        listRequestCount === 1
-          ? [
-              {
-                requestId: "req-reject",
-                enrollmentCodeId: "code-2",
-                proposedDisplayName: "South Wing",
-                deviceInfo: null,
-                status: "PENDING",
-                displayId: null,
-                createdAt: "2026-03-01T11:00:00Z",
-                expiresAt: "2026-03-02T11:00:00Z",
-              },
-            ]
-          : [],
-      ),
-    });
-  });
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify(
+          listRequestCount === 1
+            ? [
+                {
+                  requestId: "req-reject",
+                  enrollmentCodeId: "code-2",
+                  proposedDisplayName: "South Wing",
+                  deviceInfo: null,
+                  status: "PENDING",
+                  displayId: null,
+                  createdAt: "2026-03-01T11:00:00Z",
+                  expiresAt: "2026-03-02T11:00:00Z",
+                },
+              ]
+            : [],
+        ),
+      });
+    },
+  );
 
   await page.route(
     "**/api/admin/displays/enrollments/req-reject/reject",
@@ -475,7 +491,9 @@ test("renders root error component when a route throws", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("renders root not-found component for unknown routes", async ({ page }) => {
+test("renders root not-found component for unknown routes", async ({
+  page,
+}) => {
   await page.goto("/does-not-exist");
 
   await expect(

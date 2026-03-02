@@ -93,7 +93,8 @@ function AdminDisplaysPage() {
         <header className="rounded-2xl bg-white p-6 shadow-lg">
           <h1 className="text-3xl font-bold">Display Administration</h1>
           <p className="mt-2 text-sm text-slate-600">
-            Verwalte Enrollment-Codes, ausstehende Freigaben und aktive Displays.
+            Verwalte Enrollment-Codes, ausstehende Freigaben und aktive
+            Displays.
           </p>
           <label className="mt-4 block text-sm font-semibold text-slate-700">
             Admin API Token
@@ -117,7 +118,10 @@ function AdminDisplaysPage() {
 
         <section className="rounded-2xl bg-white p-6 shadow-lg">
           <h2 className="text-xl font-semibold">Enrollment Code erstellen</h2>
-          <form className="mt-4 grid gap-4 sm:grid-cols-3" onSubmit={handleCodeCreate}>
+          <form
+            className="mt-4 grid gap-4 sm:grid-cols-3"
+            onSubmit={handleCodeCreate}
+          >
             <label className="text-sm font-semibold text-slate-700">
               TTL (Sekunden)
               <input
@@ -159,7 +163,9 @@ function AdminDisplaysPage() {
         <section className="rounded-2xl bg-white p-6 shadow-lg">
           <h2 className="text-xl font-semibold">Bekannte Displays</h2>
           {displays.length === 0 ? (
-            <p className="mt-3 text-sm text-slate-600">Keine Displays vorhanden.</p>
+            <p className="mt-3 text-sm text-slate-600">
+              Keine Displays vorhanden.
+            </p>
           ) : (
             <ul className="mt-4 space-y-3">
               {displays.map((display) => (
@@ -169,7 +175,8 @@ function AdminDisplaysPage() {
                 >
                   <p className="font-semibold">{display.name}</p>
                   <p className="text-sm text-slate-600">
-                    Status: {display.status} | Standort: {display.locationLabel ?? "-"}
+                    Status: {display.status} | Standort:{" "}
+                    {display.locationLabel ?? "-"}
                   </p>
                   <Link
                     className="mt-2 inline-flex text-sm font-semibold text-slate-800 underline"

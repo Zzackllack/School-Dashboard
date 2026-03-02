@@ -16,7 +16,9 @@ const displaysApiModule = await import("../lib/api/displays");
 
 describe("display route guard", () => {
   it("redirects to setup when no display session token exists", async () => {
-    vi.mocked(displaySessionModule.getDisplaySessionToken).mockReturnValue(null);
+    vi.mocked(displaySessionModule.getDisplaySessionToken).mockReturnValue(
+      null,
+    );
 
     await expect(resolveDisplayAccess("display-1")).resolves.toEqual({
       kind: "redirect-setup",

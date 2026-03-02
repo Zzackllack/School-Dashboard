@@ -38,7 +38,8 @@ public class DisplayPublicController {
 	@PostMapping("/enrollments")
 	public ResponseEntity<CreateEnrollmentResponse> createEnrollment(@RequestBody CreateEnrollmentRequest request,
 			HttpServletRequest httpRequest) {
-		enforceRateLimit("display-enrollment", resolveClientKey(httpRequest), rateLimitProperties.getEnrollmentsPerMinute());
+		enforceRateLimit("display-enrollment", resolveClientKey(httpRequest),
+				rateLimitProperties.getEnrollmentsPerMinute());
 		CreateEnrollmentResponse response = enrollmentService.createEnrollmentRequest(request);
 		return ResponseEntity.status(HttpStatus.CREATED).body(response);
 	}
@@ -50,8 +51,7 @@ public class DisplayPublicController {
 
 	@GetMapping("/session")
 	public DisplaySessionValidationResponse validateSession(
-			@RequestHeader(name = "Authorization", required = false) String authorization,
-			HttpServletRequest request) {
+			@RequestHeader(name = "Authorization", required = false) String authorization, HttpServletRequest request) {
 		enforceRateLimit("display-session-validation", resolveClientKey(request),
 				rateLimitProperties.getSessionValidationsPerMinute());
 		return enrollmentService.validateSession(extractBearerToken(authorization));

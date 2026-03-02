@@ -19,10 +19,10 @@ public class DisplayExceptionHandler {
 	}
 
 	@ExceptionHandler(Exception.class)
-	public ResponseEntity<DisplayErrorResponse> handleUnexpectedException(Exception exception, HttpServletRequest request) {
-		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-				.body(new DisplayErrorResponse("DISPLAY_INTERNAL_ERROR", "Unexpected display API error",
-						resolveRequestId(request), Instant.now()));
+	public ResponseEntity<DisplayErrorResponse> handleUnexpectedException(Exception exception,
+			HttpServletRequest request) {
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new DisplayErrorResponse(
+				"DISPLAY_INTERNAL_ERROR", "Unexpected display API error", resolveRequestId(request), Instant.now()));
 	}
 
 	private String resolveRequestId(HttpServletRequest request) {

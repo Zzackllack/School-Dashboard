@@ -212,11 +212,14 @@ export async function rejectDisplayEnrollment(
 export async function listDisplays(
   adminToken: string,
 ): Promise<DisplaySummaryResponse[]> {
-  const response = await fetchJson<DisplaySummaryResponse[]>("/admin/displays", {
-    headers: {
-      "X-Admin-Token": adminToken,
+  const response = await fetchJson<DisplaySummaryResponse[]>(
+    "/admin/displays",
+    {
+      headers: {
+        "X-Admin-Token": adminToken,
+      },
     },
-  });
+  );
 
   return response ?? [];
 }

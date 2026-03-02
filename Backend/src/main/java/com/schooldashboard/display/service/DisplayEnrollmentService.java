@@ -106,14 +106,16 @@ public class DisplayEnrollmentService {
 					"Proposed display name is required");
 		}
 
-		DisplayEnrollmentCodeEntity codeEntity = enrollmentCodeRepository.findByCodeHash(tokenHashService.hash(enrollmentCode))
+		DisplayEnrollmentCodeEntity codeEntity = enrollmentCodeRepository
+				.findByCodeHash(tokenHashService.hash(enrollmentCode))
 				.orElseThrow(() -> new DisplayDomainException("ENROLLMENT_CODE_INVALID", HttpStatus.BAD_REQUEST,
 						"Enrollment code is invalid or expired"));
 
 		Instant now = Instant.now();
 		expireEnrollmentCodeIfNeeded(codeEntity, now);
 
-		if (codeEntity.getStatus() != EnrollmentCodeStatus.ACTIVE || codeEntity.getUsesCount() >= codeEntity.getMaxUses()) {
+		if (codeEntity.getStatus() != EnrollmentCodeStatus.ACTIVE
+				|| codeEntity.getUsesCount() >= codeEntity.getMaxUses()) {
 			throw new DisplayDomainException("ENROLLMENT_CODE_INVALID", HttpStatus.BAD_REQUEST,
 					"Enrollment code is invalid or expired");
 		}
@@ -160,12 +162,14 @@ public class DisplayEnrollmentService {
 				.sorted(Comparator.comparing(DisplayEnrollmentRequestEntity::getCreatedAt))
 				.map(request -> new PendingEnrollmentResponse(request.getId(), request.getEnrollmentCodeId(),
 						request.getProposedDisplayName(), parseJsonObject(request.getDeviceInfoJson()),
-						request.getStatus().name(), request.getDisplayId(), request.getCreatedAt(), request.getExpiresAt()))
+						request.getStatus().name(), request.getDisplayId(), request.getCreatedAt(),
+						request.getExpiresAt()))
 				.toList();
 	}
 
 	@Transactional
-	public EnrollmentStatusResponse approveEnrollment(String requestId, ApproveEnrollmentRequest request, String adminId) {
+	public EnrollmentStatusResponse approveEnrollment(String requestId, ApproveEnrollmentRequest request,
+			String adminId) {
 		DisplayEnrollmentRequestEntity requestEntity = findEnrollmentRequest(requestId);
 		refreshEnrollmentRequestIfExpired(requestEntity);
 		if (requestEntity.getStatus() != EnrollmentRequestStatus.PENDING) {
@@ -187,8 +191,8 @@ public class DisplayEnrollmentService {
 
 		Instant now = Instant.now();
 		String sessionToken = randomTokenService.nextSessionToken(64);
-		DisplaySessionEntity sessionEntity = new DisplaySessionEntity(display.getId(), tokenHashService.hash(sessionToken), now,
-				now.plusSeconds(enrollmentProperties.getSessionTtlSeconds()));
+		DisplaySessionEntity sessionEntity = new DisplaySessionEntity(display.getId(),
+				tokenHashService.hash(sessionToken), now, now.plusSeconds(enrollmentProperties.getSessionTtlSeconds()));
 		sessionRepository.save(sessionEntity);
 
 		requestEntity.setStatus(EnrollmentRequestStatus.APPROVED);
@@ -208,7 +212,8 @@ public class DisplayEnrollmentService {
 	}
 
 	@Transactional
-	public EnrollmentStatusResponse rejectEnrollment(String requestId, RejectEnrollmentRequest request, String adminId) {
+	public EnrollmentStatusResponse rejectEnrollment(String requestId, RejectEnrollmentRequest request,
+			String adminId) {
 		DisplayEnrollmentRequestEntity requestEntity = findEnrollmentRequest(requestId);
 		refreshEnrollmentRequestIfExpired(requestEntity);
 
@@ -222,8 +227,10 @@ public class DisplayEnrollmentService {
 		enrollmentRequestRepository.save(requestEntity);
 
 		auditLogService.log(adminId, "ENROLLMENT_REQUEST_REJECTED", "display_enrollment_request", requestEntity.getId(),
-				Map.of("reason", trimToNull(request == null ? null : request.reason()) == null ? "unspecified"
-						: trimToNull(request.reason())));
+				Map.of("reason",
+						trimToNull(request == null ? null : request.reason()) == null
+								? "unspecified"
+								: trimToNull(request.reason())));
 
 		return new EnrollmentStatusResponse(requestEntity.getId(), requestEntity.getStatus().name(), null, null, null);
 	}
@@ -235,7 +242,8 @@ public class DisplayEnrollmentService {
 			return invalidSessionResponse();
 		}
 
-		Optional<DisplaySessionEntity> sessionEntityOpt = sessionRepository.findByTokenHash(tokenHashService.hash(token));
+		Optional<DisplaySessionEntity> sessionEntityOpt = sessionRepository
+				.findByTokenHash(tokenHashService.hash(token));
 		if (sessionEntityOpt.isEmpty()) {
 			return invalidSessionResponse();
 		}
@@ -265,9 +273,8 @@ public class DisplayEnrollmentService {
 
 	@Transactional
 	public DisplaySummaryResponse revokeDisplaySession(String displayId, String adminId) {
-		DisplayEntity displayEntity = displayRepository.findById(displayId)
-				.orElseThrow(() -> new DisplayDomainException("DISPLAY_NOT_FOUND", HttpStatus.NOT_FOUND,
-						"Display not found"));
+		DisplayEntity displayEntity = displayRepository.findById(displayId).orElseThrow(
+				() -> new DisplayDomainException("DISPLAY_NOT_FOUND", HttpStatus.NOT_FOUND, "Display not found"));
 
 		Instant revokedAt = Instant.now();
 		List<DisplaySessionEntity> sessions = sessionRepository.findByDisplayId(displayId);
@@ -292,9 +299,8 @@ public class DisplayEnrollmentService {
 
 	@Transactional
 	public DisplaySummaryResponse updateDisplay(String displayId, UpdateDisplayRequest request, String adminId) {
-		DisplayEntity displayEntity = displayRepository.findById(displayId)
-				.orElseThrow(() -> new DisplayDomainException("DISPLAY_NOT_FOUND", HttpStatus.NOT_FOUND,
-						"Display not found"));
+		DisplayEntity displayEntity = displayRepository.findById(displayId).orElseThrow(
+				() -> new DisplayDomainException("DISPLAY_NOT_FOUND", HttpStatus.NOT_FOUND, "Display not found"));
 		if (request == null) {
 			throw new DisplayDomainException("DISPLAY_UPDATE_INVALID", HttpStatus.BAD_REQUEST,
 					"Display update payload is required");
@@ -351,15 +357,14 @@ public class DisplayEnrollmentService {
 
 	@Transactional(readOnly = true)
 	public List<DisplaySummaryResponse> listDisplays() {
-		return displayRepository.findAll().stream().sorted(Comparator.comparing(DisplayEntity::getName)).map(this::mapDisplay)
-				.toList();
+		return displayRepository.findAll().stream().sorted(Comparator.comparing(DisplayEntity::getName))
+				.map(this::mapDisplay).toList();
 	}
 
 	@Transactional(readOnly = true)
 	public DisplaySummaryResponse getDisplay(String displayId) {
-		DisplayEntity displayEntity = displayRepository.findById(displayId)
-				.orElseThrow(() -> new DisplayDomainException("DISPLAY_NOT_FOUND", HttpStatus.NOT_FOUND,
-						"Display not found"));
+		DisplayEntity displayEntity = displayRepository.findById(displayId).orElseThrow(
+				() -> new DisplayDomainException("DISPLAY_NOT_FOUND", HttpStatus.NOT_FOUND, "Display not found"));
 		return mapDisplay(displayEntity);
 	}
 

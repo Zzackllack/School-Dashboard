@@ -136,7 +136,10 @@ function AdminDisplayDetailPage() {
               className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
               value={formState.name}
               onChange={(event) =>
-                setFormState((current) => ({ ...current, name: event.target.value }))
+                setFormState((current) => ({
+                  ...current,
+                  name: event.target.value,
+                }))
               }
             />
           </label>
@@ -147,7 +150,10 @@ function AdminDisplayDetailPage() {
               className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
               value={formState.slug}
               onChange={(event) =>
-                setFormState((current) => ({ ...current, slug: event.target.value }))
+                setFormState((current) => ({
+                  ...current,
+                  slug: event.target.value,
+                }))
               }
             />
           </label>
@@ -158,7 +164,10 @@ function AdminDisplayDetailPage() {
               className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
               value={formState.locationLabel}
               onChange={(event) =>
-                setFormState((current) => ({ ...current, locationLabel: event.target.value }))
+                setFormState((current) => ({
+                  ...current,
+                  locationLabel: event.target.value,
+                }))
               }
             />
           </label>
@@ -185,7 +194,10 @@ function AdminDisplayDetailPage() {
               onChange={(event) =>
                 setFormState((current) => ({
                   ...current,
-                  status: event.target.value as "ACTIVE" | "INACTIVE" | "REVOKED",
+                  status: event.target.value as
+                    | "ACTIVE"
+                    | "INACTIVE"
+                    | "REVOKED",
                 }))
               }
             >

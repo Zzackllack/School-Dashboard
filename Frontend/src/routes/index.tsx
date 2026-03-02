@@ -46,7 +46,10 @@ export function BootstrapResolverPage() {
           return;
         }
 
-        if (redirectTarget.to === "/display/$displayId" && redirectTarget.displayId) {
+        if (
+          redirectTarget.to === "/display/$displayId" &&
+          redirectTarget.displayId
+        ) {
           await navigate({
             to: "/display/$displayId",
             params: { displayId: redirectTarget.displayId },

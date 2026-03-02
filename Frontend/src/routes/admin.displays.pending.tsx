@@ -111,10 +111,13 @@ function AdminPendingDisplaysPage() {
                 className="rounded-lg border border-slate-200 p-4"
               >
                 <p className="font-semibold">{request.proposedDisplayName}</p>
-                <p className="text-xs text-slate-500">ID: {request.requestId}</p>
+                <p className="text-xs text-slate-500">
+                  ID: {request.requestId}
+                </p>
                 <p className="mt-1 text-xs text-slate-500">
-                  Erstellt: {new Date(request.createdAt).toLocaleString("de-DE")} |
-                  Läuft ab: {new Date(request.expiresAt).toLocaleString("de-DE")}
+                  Erstellt:{" "}
+                  {new Date(request.createdAt).toLocaleString("de-DE")} | Läuft
+                  ab: {new Date(request.expiresAt).toLocaleString("de-DE")}
                 </p>
                 <div className="mt-3 flex gap-2">
                   <button

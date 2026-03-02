@@ -15,7 +15,9 @@ const displaysApiModule = await import("../lib/api/displays");
 
 describe("bootstrap resolver", () => {
   it("routes to setup when no token is present", async () => {
-    vi.mocked(displaySessionModule.getDisplaySessionToken).mockReturnValue(null);
+    vi.mocked(displaySessionModule.getDisplaySessionToken).mockReturnValue(
+      null,
+    );
 
     await expect(resolveBootstrapRedirect()).resolves.toEqual({ to: "/setup" });
   });

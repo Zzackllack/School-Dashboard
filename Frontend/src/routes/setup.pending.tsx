@@ -113,7 +113,9 @@ export function SetupPendingPage() {
         <dl className="mt-6 rounded-lg border border-slate-200 bg-slate-50 p-4 text-sm">
           <div className="flex justify-between gap-3">
             <dt className="font-semibold text-slate-600">Request ID</dt>
-            <dd className="break-all font-mono text-slate-800">{requestId ?? "-"}</dd>
+            <dd className="break-all font-mono text-slate-800">
+              {requestId ?? "-"}
+            </dd>
           </div>
           <div className="mt-2 flex justify-between gap-3">
             <dt className="font-semibold text-slate-600">Status</dt>
@@ -127,9 +129,15 @@ export function SetupPendingPage() {
           </p>
         ) : null}
 
-        {status === "REJECTED" || status === "EXPIRED" || status === "UNKNOWN" ? (
+        {status === "REJECTED" ||
+        status === "EXPIRED" ||
+        status === "UNKNOWN" ? (
           <p className="mt-6 text-sm text-slate-600">
-            Bitte starte das Setup erneut unter <Link className="font-semibold underline" to="/setup">/setup</Link>.
+            Bitte starte das Setup erneut unter{" "}
+            <Link className="font-semibold underline" to="/setup">
+              /setup
+            </Link>
+            .
           </p>
         ) : null}
       </section>

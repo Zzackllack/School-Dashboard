@@ -12,7 +12,8 @@ public class TokenHashService {
 
 	public String hash(String value) {
 		if (value == null || value.isBlank()) {
-			throw new DisplayDomainException("DISPLAY_TOKEN_INVALID", HttpStatus.BAD_REQUEST, "Token must not be blank");
+			throw new DisplayDomainException("DISPLAY_TOKEN_INVALID", HttpStatus.BAD_REQUEST,
+					"Token must not be blank");
 		}
 		try {
 			MessageDigest digest = MessageDigest.getInstance("SHA-256");

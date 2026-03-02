@@ -20,7 +20,8 @@ public class TokenHashServiceTest {
 
 	@Test
 	public void hashRejectsBlankValue() {
-		DisplayDomainException exception = assertThrows(DisplayDomainException.class, () -> tokenHashService.hash("   "));
+		DisplayDomainException exception = assertThrows(DisplayDomainException.class,
+				() -> tokenHashService.hash("   "));
 		assertEquals("DISPLAY_TOKEN_INVALID", exception.getCode());
 	}
 }
