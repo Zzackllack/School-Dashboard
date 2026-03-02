@@ -9,6 +9,10 @@ vi.mock("@tanstack/react-router", () => ({
   useParams: () => useParamsMock(),
 }));
 
+vi.mock("../DashboardPage", () => ({
+  default: () => <div data-testid="dashboard-page">Dashboard</div>,
+}));
+
 describe("DisplayPage", () => {
   beforeEach(() => {
     useParamsMock.mockClear();
@@ -18,28 +22,20 @@ describe("DisplayPage", () => {
     cleanup();
   });
 
-  it("renders screen id from useParams and scaffold text", () => {
-    useParamsMock.mockReturnValue({ screenId: "screen-42" });
+  it("renders display id header and dashboard content", () => {
+    useParamsMock.mockReturnValue({ displayId: "display-42" });
 
     render(<DisplayPage />);
 
-    expect(
-      screen.getByRole("heading", { name: "Display Route Placeholder" }),
-    ).toBeDefined();
-    expect(
-      screen.getByText(/display-spezifische Konfigurationen/i),
-    ).toBeDefined();
-    expect(screen.getByText(/Angefragte Display-ID:/i)).toBeDefined();
-    expect(screen.getByText("screen-42")).toBeDefined();
+    expect(screen.getByText(/Display: display-42/)).toBeDefined();
+    expect(screen.getByTestId("dashboard-page")).toBeDefined();
   });
 
-  it("renders gracefully when screenId is missing", () => {
-    useParamsMock.mockReturnValue({ screenId: "" });
+  it("renders gracefully when displayId is empty", () => {
+    useParamsMock.mockReturnValue({ displayId: "" });
 
     render(<DisplayPage />);
 
-    const idLabel = screen.getByText(/Angefragte Display-ID:/i);
-    expect(idLabel).toBeDefined();
-    expect(idLabel.textContent ?? "").toContain("Angefragte Display-ID:");
+    expect(screen.getByText(/Display:/)).toBeDefined();
   });
 });
