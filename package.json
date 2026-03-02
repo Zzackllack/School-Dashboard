@@ -27,7 +27,7 @@
     "dev:backend": "node ./scripts/maven-runner.mjs spring-boot:run"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1"
+    "concurrently": "^9.2.1",
+    "shadcn": "^3.8.5"
   }
 }
- 
