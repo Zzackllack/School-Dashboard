@@ -102,3 +102,6 @@ application.properties
 .mvn/
 mvnw
 mvnw.cmd
+
+# ───── Cloudflare ─────
+.wrangler/
