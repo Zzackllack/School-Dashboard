@@ -51,37 +51,31 @@ jobs:
         with:
           node-version: "24"
           cache: pnpm
-          cache-dependency-path: Frontend/pnpm-lock.yaml
+          cache-dependency-path: pnpm-lock.yaml
+
       - name: Install dependencies
-        working-directory: Frontend
-        run: pnpm install --frozen-lockfile --prod=false --ignore-workspace
+        run: pnpm install --frozen-lockfile
 
       - name: Format check
-        working-directory: Frontend
-        run: pnpm run format:check
+        run: pnpm --dir Frontend run format:check
 
       - name: Lint
-        working-directory: Frontend
-        run: pnpm run lint
+        run: pnpm --dir Frontend run lint
 
       - name: Cache Playwright browsers
         uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('Frontend/pnpm-lock.yaml') }}
+          key: playwright-${{ runner.os }}-${{ hashFiles('pnpm-lock.yaml') }}
 
       - name: Install Playwright browser
-        working-directory: Frontend
-        run: pnpm exec playwright install --with-deps chromium
+        run: pnpm --dir Frontend exec playwright install --with-deps chromium
 
       - name: Unit tests
-        working-directory: Frontend
-        run: pnpm run test:unit
+        run: pnpm --dir Frontend run test:unit
 
       - name: Integration tests
-        working-directory: Frontend
-        run: pnpm run test:integration
+        run: pnpm --dir Frontend run test:integration
 
       - name: Web tests
-        working-directory: Frontend
-        run: pnpm run test:web
+        run: pnpm --dir Frontend run test:web

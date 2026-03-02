@@ -23,7 +23,7 @@
     "prepreview": "node ./scripts/require-pnpm.mjs",
     "preview": "vite preview",
     "prebuild:workers": "node ./scripts/require-pnpm.mjs",
-    "build:workers": "pnpm install --no-frozen-lockfile --prod=false --ignore-workspace && pnpm run build",
+    "build:workers": "pnpm run build",
     "predeploy:workers": "node ./scripts/require-pnpm.mjs",
     "deploy:workers": "pnpm dlx wrangler deploy",
     "predeploy:workers:preview": "node ./scripts/require-pnpm.mjs",

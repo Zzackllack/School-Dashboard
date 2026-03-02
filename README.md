@@ -145,10 +145,13 @@ This opacity has forced us to rely on reverse-engineered solutions, creating unn
 
 ### Installation
 
+TL;DR:
+
 ```bash
 git clone https://github.com/Zzacklack/school-dashboard.git
 cd school-dashboard
 pnpm run setup
+pnpm run dev
 ```
 
 ### Backend (Spring Boot)
@@ -216,24 +219,23 @@ If actuator endpoints are enabled (see `management.endpoints.web.exposure.includ
 - **Install dependencies**
 
   ```bash
-  cd ../Frontend
   pnpm install --frozen-lockfile
   ```
 
 - **Start the dev server**
 
   ```bash
-  pnpm run dev
+  pnpm --dir Frontend run dev
   ```
 
 - **Run checks**
 
   ```bash
-  pnpm run build   # production bundle
-  pnpm run lint    # optional lint pass
-  pnpm run test:unit
-  pnpm run test:integration
-  pnpm run test:web
+  pnpm --dir Frontend run build   # production bundle
+  pnpm --dir Frontend run lint    # optional lint pass
+  pnpm --dir Frontend run test:unit
+  pnpm --dir Frontend run test:integration
+  pnpm --dir Frontend run test:web
   ```
 
 ### Code Quality and CI/CD
@@ -273,10 +275,10 @@ Cloudflare-managed build/deploy (Workers Builds):
 
 1. In Cloudflare Workers, connect the GitHub repository.
 2. Build settings:
-   - Root directory: `Frontend`
-   - Build command: `pnpm run build:workers`
-   - Deploy command: `pnpm run deploy:workers`
-   - Non-production branch deploy command: `pnpm run deploy:workers:preview`
+   - Root directory: repository root (`/`)
+   - Build command: `pnpm --dir Frontend run build:workers`
+   - Deploy command: `pnpm --dir Frontend run deploy:workers`
+   - Non-production branch deploy command: `pnpm --dir Frontend run deploy:workers:preview`
 
 ## Production
 

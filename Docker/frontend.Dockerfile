@@ -2,11 +2,12 @@ FROM node:24-alpine AS build
 WORKDIR /app
 
 RUN corepack enable
-COPY Frontend/package.json Frontend/pnpm-lock.yaml ./
-RUN pnpm install --frozen-lockfile --prod=false --ignore-workspace
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY Frontend/package.json Frontend/package.json
+RUN pnpm install --frozen-lockfile --filter frontend...
 
-COPY Frontend/ ./
-RUN pnpm run build
+COPY Frontend/ Frontend/
+RUN pnpm --dir Frontend run build
 
 FROM node:24-alpine AS runtime
 WORKDIR /app
@@ -21,7 +22,7 @@ RUN addgroup -S appgroup && adduser -S appuser -G appgroup
 RUN rm -rf /usr/local/lib/node_modules/npm \
     && rm -f /usr/local/bin/npm /usr/local/bin/npx /usr/local/bin/corepack
 
-COPY --from=build --chown=appuser:appgroup /app/.output ./.output
+COPY --from=build --chown=appuser:appgroup /app/Frontend/.output ./.output
 
 EXPOSE 3000
 
