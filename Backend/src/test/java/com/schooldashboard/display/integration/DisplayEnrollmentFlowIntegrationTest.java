@@ -2,6 +2,7 @@ package com.schooldashboard.display.integration;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -87,6 +88,20 @@ public class DisplayEnrollmentFlowIntegrationTest {
 						.header("Authorization", "Bearer " + asString(approvedStatusResponse, "displaySessionToken")))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals(Boolean.FALSE, revokedValidationResponse.get("valid"));
+
+		Map<String, Object> reactivateResponse = readMap(mockMvc
+				.perform(patch("/api/admin/displays/{displayId}", asString(approveResponse, "displayId"))
+						.header("X-Admin-Token", "test-admin-token").header("X-Admin-Id", "integration-admin")
+						.contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"ACTIVE\"}"))
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+		assertEquals("ACTIVE", asString(reactivateResponse, "status"));
+
+		Map<String, Object> reactivatedValidationResponse = readMap(mockMvc
+				.perform(get("/api/displays/session")
+						.header("Authorization", "Bearer " + asString(approvedStatusResponse, "displaySessionToken")))
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+		assertEquals(Boolean.TRUE, reactivatedValidationResponse.get("valid"));
+		assertEquals(asString(approveResponse, "displayId"), asString(reactivatedValidationResponse, "displayId"));
 	}
 
 	@Test

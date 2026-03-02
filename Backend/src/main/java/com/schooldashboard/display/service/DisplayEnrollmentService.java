@@ -28,6 +28,7 @@ import com.schooldashboard.display.repository.DisplaySessionRepository;
 import com.schooldashboard.display.web.DisplayDomainException;
 import java.time.Instant;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -319,9 +320,11 @@ public class DisplayEnrollmentService {
 		displayEntity.setLocationLabel(trimToNull(request.locationLabel()));
 		displayEntity.setAssignedProfileId(trimToNull(request.assignedProfileId()));
 
+		DisplayStatus requestedStatus = null;
 		if (trimToNull(request.status()) != null) {
 			try {
-				displayEntity.setStatus(DisplayStatus.valueOf(request.status().trim().toUpperCase()));
+				requestedStatus = DisplayStatus.valueOf(request.status().trim().toUpperCase());
+				displayEntity.setStatus(requestedStatus);
 			} catch (IllegalArgumentException exception) {
 				throw new DisplayDomainException("DISPLAY_STATUS_INVALID", HttpStatus.BAD_REQUEST,
 						"Display status must be ACTIVE, INACTIVE, or REVOKED");
@@ -329,9 +332,19 @@ public class DisplayEnrollmentService {
 		}
 
 		displayRepository.save(displayEntity);
+		int reactivatedSessions = 0;
+		if (requestedStatus == DisplayStatus.ACTIVE) {
+			reactivatedSessions = reactivateDisplaySessions(displayEntity.getId());
+		}
 
-		auditLogService.log(adminId, "DISPLAY_UPDATED", "display", displayId,
-				Map.of("status", displayEntity.getStatus().name(), "slug", displayEntity.getSlug()));
+		Map<String, Object> auditMetadata = new HashMap<>();
+		auditMetadata.put("status", displayEntity.getStatus().name());
+		auditMetadata.put("slug", displayEntity.getSlug());
+		if (reactivatedSessions > 0) {
+			auditMetadata.put("reactivatedSessions", reactivatedSessions);
+		}
+
+		auditLogService.log(adminId, "DISPLAY_UPDATED", "display", displayId, auditMetadata);
 
 		return mapDisplay(displayEntity);
 	}
@@ -431,6 +444,21 @@ public class DisplayEnrollmentService {
 			return null;
 		}
 		return trimmed;
+	}
+
+	private int reactivateDisplaySessions(String displayId) {
+		Instant now = Instant.now();
+		int reactivatedSessions = 0;
+
+		for (DisplaySessionEntity session : sessionRepository.findByDisplayId(displayId)) {
+			if (session.getRevokedAt() != null && session.getExpiresAt().isAfter(now)) {
+				session.setRevokedAt(null);
+				session.setRevokedByAdminId(null);
+				sessionRepository.save(session);
+				reactivatedSessions++;
+			}
+		}
+		return reactivatedSessions;
 	}
 
 	private DisplaySessionValidationResponse invalidSessionResponse() {

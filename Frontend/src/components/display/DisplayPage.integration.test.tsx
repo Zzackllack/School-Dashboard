@@ -4,8 +4,20 @@ import { RouterProvider } from "@tanstack/react-router";
 import { describe, expect, it, vi } from "vitest";
 import { getRouter } from "../../router";
 
-vi.mock("../../lib/query/dashboard", () => ({
-  prefetchDashboardData: vi.fn().mockResolvedValue(undefined),
+vi.mock("../../lib/display-session", () => ({
+  getDisplaySessionToken: vi.fn(() => "valid-token"),
+  clearDisplaySessionStorage: vi.fn(),
+  setDisplayIdHint: vi.fn(),
+}));
+
+vi.mock("../../lib/api/displays", () => ({
+  validateDisplaySession: vi.fn().mockResolvedValue({
+    valid: true,
+    displayId: "test-screen",
+    displaySlug: "test",
+    assignedProfileId: "default",
+    redirectPath: "/display/test-screen",
+  }),
 }));
 
 vi.mock("../DashboardPage", () => ({

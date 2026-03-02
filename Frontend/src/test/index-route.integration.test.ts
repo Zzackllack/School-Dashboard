@@ -3,7 +3,6 @@ import { resolveBootstrapRedirect } from "../routes/index";
 
 vi.mock("../lib/display-session", () => ({
   getDisplaySessionToken: vi.fn(),
-  clearDisplaySessionStorage: vi.fn(),
   setDisplayIdHint: vi.fn(),
 }));
 
@@ -42,7 +41,7 @@ describe("bootstrap resolver", () => {
     );
   });
 
-  it("clears storage and routes to setup when session is invalid", async () => {
+  it("routes to setup when session is invalid", async () => {
     vi.mocked(displaySessionModule.getDisplaySessionToken).mockReturnValue(
       "session-token",
     );
@@ -55,6 +54,5 @@ describe("bootstrap resolver", () => {
     });
 
     await expect(resolveBootstrapRedirect()).resolves.toEqual({ to: "/setup" });
-    expect(displaySessionModule.clearDisplaySessionStorage).toHaveBeenCalled();
   });
 });

@@ -2,7 +2,6 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { validateDisplaySession } from "../lib/api/displays";
 import {
-  clearDisplaySessionStorage,
   getDisplaySessionToken,
   setDisplayIdHint,
 } from "../lib/display-session";
@@ -27,7 +26,6 @@ export async function resolveBootstrapRedirect(): Promise<BootstrapRedirectTarge
     };
   }
 
-  clearDisplaySessionStorage();
   return { to: "/setup" };
 }
 
@@ -67,11 +65,9 @@ export function BootstrapResolverPage() {
         return;
       }
 
-      clearDisplaySessionStorage();
       setMessage(
         "Display-Session ist ungültig oder abgelaufen. Setup wird geöffnet.",
       );
-      clearDisplaySessionStorage();
       await navigate({ to: "/setup", replace: true });
     }
 

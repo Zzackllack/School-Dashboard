@@ -241,6 +241,20 @@ test("completes setup -> pending -> approved -> display flow", async ({ page }) 
     });
   });
 
+  await page.route("**/api/displays/session", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        valid: true,
+        displayId: "display-1",
+        displaySlug: "main-hall",
+        assignedProfileId: "default",
+        redirectPath: "/display/display-1",
+      }),
+    });
+  });
+
   await page.goto("/setup");
   await page.waitForLoadState("networkidle");
   await page.getByLabel("Enrollment Code").fill("ABCD1234");
@@ -304,11 +318,42 @@ test("falls back to setup when stored token is revoked", async ({ page }) => {
 
   await expect(page).toHaveURL(/\/setup/);
   await expect(page.getByRole("heading", { name: "Display Setup" })).toBeVisible();
+});
 
-  const storedToken = await page.evaluate(() =>
-    window.localStorage.getItem("display_session_token"),
-  );
-  expect(storedToken).toBeNull();
+test("blocks direct /display/:displayId access without a session token", async ({
+  page,
+}) => {
+  await page.goto("/display/direct-access");
+
+  await expect(page).toHaveURL(/\/setup/);
+  await expect(page.getByRole("heading", { name: "Display Setup" })).toBeVisible();
+});
+
+test("blocks direct /display/:displayId access when token is revoked", async ({
+  page,
+}) => {
+  await page.addInitScript(() => {
+    window.localStorage.setItem("display_session_token", "revoked-token");
+  });
+
+  await page.route("**/api/displays/session", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        valid: false,
+        displayId: null,
+        displaySlug: null,
+        assignedProfileId: null,
+        redirectPath: null,
+      }),
+    });
+  });
+
+  await page.goto("/display/revoked-screen");
+
+  await expect(page).toHaveURL(/\/setup/);
+  await expect(page.getByRole("heading", { name: "Display Setup" })).toBeVisible();
 });
 
 test("admin pending page supports approval action", async ({ page }) => {
