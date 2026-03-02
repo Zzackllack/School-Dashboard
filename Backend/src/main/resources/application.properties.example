@@ -24,3 +24,6 @@ management.endpoint.health.show-details=always
 
 # Application metadata available to health/info
 app.version=3.2.5
+
+# API token for admin authentication (set this to a secure random value in production)
+display.admin-auth.api-token=1234
