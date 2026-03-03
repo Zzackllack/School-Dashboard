@@ -75,9 +75,15 @@ export interface UpdateDisplayRequest {
   status?: "ACTIVE" | "INACTIVE" | "REVOKED";
 }
 
-function adminHeaders(adminToken: string): HeadersInit {
+export interface AdminCredentials {
+  adminToken: string;
+  adminPassword: string;
+}
+
+function adminHeaders(credentials: AdminCredentials): HeadersInit {
   return {
-    "X-Admin-Token": adminToken,
+    "X-Admin-Token": credentials.adminToken,
+    "X-Admin-Password": credentials.adminPassword,
     "Content-Type": "application/json",
   };
 }
@@ -139,14 +145,14 @@ export async function validateDisplaySession(
 }
 
 export async function createEnrollmentCode(
-  adminToken: string,
+  credentials: AdminCredentials,
   payload: { ttlSeconds?: number; maxUses?: number },
 ): Promise<CreateEnrollmentCodeResponse> {
   const response = await fetchJson<CreateEnrollmentCodeResponse>(
     "/admin/displays/enrollment-codes",
     {
       method: "POST",
-      headers: adminHeaders(adminToken),
+      headers: adminHeaders(credentials),
       body: JSON.stringify(payload),
     },
   );
@@ -157,14 +163,15 @@ export async function createEnrollmentCode(
 }
 
 export async function listDisplayEnrollments(
-  adminToken: string,
+  credentials: AdminCredentials,
   status = "PENDING",
 ): Promise<PendingEnrollmentResponse[]> {
   const response = await fetchJson<PendingEnrollmentResponse[]>(
     `/admin/displays/enrollments?status=${encodeURIComponent(status)}`,
     {
       headers: {
-        "X-Admin-Token": adminToken,
+        "X-Admin-Token": credentials.adminToken,
+        "X-Admin-Password": credentials.adminPassword,
       },
     },
   );
@@ -172,7 +179,7 @@ export async function listDisplayEnrollments(
 }
 
 export async function approveDisplayEnrollment(
-  adminToken: string,
+  credentials: AdminCredentials,
   requestId: string,
   payload: ApproveEnrollmentRequest,
 ): Promise<EnrollmentStatusResponse> {
@@ -180,7 +187,7 @@ export async function approveDisplayEnrollment(
     `/admin/displays/enrollments/${encodeURIComponent(requestId)}/approve`,
     {
       method: "POST",
-      headers: adminHeaders(adminToken),
+      headers: adminHeaders(credentials),
       body: JSON.stringify(payload),
     },
   );
@@ -191,7 +198,7 @@ export async function approveDisplayEnrollment(
 }
 
 export async function rejectDisplayEnrollment(
-  adminToken: string,
+  credentials: AdminCredentials,
   requestId: string,
   payload: RejectEnrollmentRequest,
 ): Promise<EnrollmentStatusResponse> {
@@ -199,7 +206,7 @@ export async function rejectDisplayEnrollment(
     `/admin/displays/enrollments/${encodeURIComponent(requestId)}/reject`,
     {
       method: "POST",
-      headers: adminHeaders(adminToken),
+      headers: adminHeaders(credentials),
       body: JSON.stringify(payload),
     },
   );
@@ -210,13 +217,14 @@ export async function rejectDisplayEnrollment(
 }
 
 export async function listDisplays(
-  adminToken: string,
+  credentials: AdminCredentials,
 ): Promise<DisplaySummaryResponse[]> {
   const response = await fetchJson<DisplaySummaryResponse[]>(
     "/admin/displays",
     {
       headers: {
-        "X-Admin-Token": adminToken,
+        "X-Admin-Token": credentials.adminToken,
+        "X-Admin-Password": credentials.adminPassword,
       },
     },
   );
@@ -225,14 +233,15 @@ export async function listDisplays(
 }
 
 export async function getDisplay(
-  adminToken: string,
+  credentials: AdminCredentials,
   displayId: string,
 ): Promise<DisplaySummaryResponse> {
   const response = await fetchJson<DisplaySummaryResponse>(
     `/admin/displays/${encodeURIComponent(displayId)}`,
     {
       headers: {
-        "X-Admin-Token": adminToken,
+        "X-Admin-Token": credentials.adminToken,
+        "X-Admin-Password": credentials.adminPassword,
       },
     },
   );
@@ -244,7 +253,7 @@ export async function getDisplay(
 }
 
 export async function revokeDisplaySession(
-  adminToken: string,
+  credentials: AdminCredentials,
   displayId: string,
 ): Promise<DisplaySummaryResponse> {
   const response = await fetchJson<DisplaySummaryResponse>(
@@ -252,7 +261,8 @@ export async function revokeDisplaySession(
     {
       method: "POST",
       headers: {
-        "X-Admin-Token": adminToken,
+        "X-Admin-Token": credentials.adminToken,
+        "X-Admin-Password": credentials.adminPassword,
       },
     },
   );
@@ -264,7 +274,7 @@ export async function revokeDisplaySession(
 }
 
 export async function updateDisplay(
-  adminToken: string,
+  credentials: AdminCredentials,
   displayId: string,
   payload: UpdateDisplayRequest,
 ): Promise<DisplaySummaryResponse> {
@@ -272,7 +282,7 @@ export async function updateDisplay(
     `/admin/displays/${encodeURIComponent(displayId)}`,
     {
       method: "PATCH",
-      headers: adminHeaders(adminToken),
+      headers: adminHeaders(credentials),
       body: JSON.stringify(payload),
     },
   );
@@ -281,4 +291,31 @@ export async function updateDisplay(
     throw new Error("Display update returned an empty response");
   }
   return response;
+}
+
+export async function deleteDisplay(
+  credentials: AdminCredentials,
+  displayId: string,
+): Promise<void> {
+  await fetchJson<void>(`/admin/displays/${encodeURIComponent(displayId)}`, {
+    method: "DELETE",
+    headers: {
+      "X-Admin-Token": credentials.adminToken,
+      "X-Admin-Password": credentials.adminPassword,
+    },
+  });
+}
+
+export async function verifyAdminAccess(
+  credentials: AdminCredentials,
+): Promise<boolean> {
+  const response = await fetchJson<{ authenticated: boolean }>(
+    "/admin/displays/auth/verify",
+    {
+      method: "POST",
+      headers: adminHeaders(credentials),
+      body: "{}",
+    },
+  );
+  return Boolean(response?.authenticated);
 }

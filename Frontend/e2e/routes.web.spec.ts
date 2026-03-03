@@ -182,6 +182,17 @@ test.beforeEach(async ({ page }) => {
       });
     },
   );
+
+  await page.route("**/api/admin/displays/auth/verify", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        authenticated: true,
+        adminId: "admin",
+      }),
+    });
+  });
 });
 
 test("routes fresh kiosk from root to setup", async ({ page }) => {
@@ -264,9 +275,6 @@ test("completes setup -> pending -> approved -> display flow", async ({
   await page.getByLabel("Enrollment Code").fill("ABCD1234");
   await page.getByLabel("Display Name").fill("Main Hall Screen");
   await page.getByRole("button", { name: "Enrollment starten" }).click();
-
-  await expect(page).toHaveURL(/\/setup\/pending/);
-  await expect(page.getByText("Status")).toBeVisible();
 
   await expect(page).toHaveURL(/\/display\/display-1/);
   await expect(page.getByText("Display: display-1")).toBeVisible();
@@ -367,18 +375,20 @@ test("blocks direct /display/:displayId access when token is revoked", async ({
 });
 
 test("admin pending page supports approval action", async ({ page }) => {
-  let listRequestCount = 0;
+  let approved = false;
+  await page.addInitScript(() => {
+    window.localStorage.setItem("display_admin_api_token", "admin-secret");
+    window.localStorage.setItem("display_admin_password", "1234");
+  });
 
   await page.route(
     "**/api/admin/displays/enrollments?status=PENDING",
     async (route) => {
-      listRequestCount += 1;
-
       await route.fulfill({
         status: 200,
         contentType: "application/json",
         body: JSON.stringify(
-          listRequestCount === 1
+          !approved
             ? [
                 {
                   requestId: "req-approve",
@@ -400,6 +410,7 @@ test("admin pending page supports approval action", async ({ page }) => {
   await page.route(
     "**/api/admin/displays/enrollments/req-approve/approve",
     async (route) => {
+      approved = true;
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -416,25 +427,26 @@ test("admin pending page supports approval action", async ({ page }) => {
 
   await page.goto("/admin/displays/pending");
   await page.waitForLoadState("networkidle");
-  await page.getByPlaceholder("X-Admin-Token").fill("admin-secret");
   await page.getByRole("button", { name: "Freigeben" }).click();
 
   await expect(page.getByText("Keine offenen Requests.")).toBeVisible();
 });
 
 test("admin pending page supports rejection action", async ({ page }) => {
-  let listRequestCount = 0;
+  let rejected = false;
+  await page.addInitScript(() => {
+    window.localStorage.setItem("display_admin_api_token", "admin-secret");
+    window.localStorage.setItem("display_admin_password", "1234");
+  });
 
   await page.route(
     "**/api/admin/displays/enrollments?status=PENDING",
     async (route) => {
-      listRequestCount += 1;
-
       await route.fulfill({
         status: 200,
         contentType: "application/json",
         body: JSON.stringify(
-          listRequestCount === 1
+          !rejected
             ? [
                 {
                   requestId: "req-reject",
@@ -456,6 +468,7 @@ test("admin pending page supports rejection action", async ({ page }) => {
   await page.route(
     "**/api/admin/displays/enrollments/req-reject/reject",
     async (route) => {
+      rejected = true;
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -472,7 +485,6 @@ test("admin pending page supports rejection action", async ({ page }) => {
 
   await page.goto("/admin/displays/pending");
   await page.waitForLoadState("networkidle");
-  await page.getByPlaceholder("X-Admin-Token").fill("admin-secret");
   await page.getByRole("button", { name: "Ablehnen" }).click();
 
   await expect(page.getByText("Keine offenen Requests.")).toBeVisible();

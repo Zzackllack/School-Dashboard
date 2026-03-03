@@ -1,5 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import {
+  createProxyDeleteHandler,
   createProxyGetHandler,
   createProxyPatchHandler,
 } from "../lib/proxy/proxy-get-handler";
@@ -16,6 +17,11 @@ export const Route = createFileRoute("/api/admin/displays/$displayId")({
         createProxyPatchHandler(
           `/admin/displays/${encodeURIComponent(params.displayId)}`,
           "admin-display-update",
+        )({ request }),
+      DELETE: ({ request, params }) =>
+        createProxyDeleteHandler(
+          `/admin/displays/${encodeURIComponent(params.displayId)}`,
+          "admin-display-delete",
         )({ request }),
     },
   },

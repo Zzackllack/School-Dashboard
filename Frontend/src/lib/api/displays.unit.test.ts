@@ -54,11 +54,15 @@ describe("display api client", () => {
       ),
     );
 
-    await createEnrollmentCode("admin-secret", { ttlSeconds: 300, maxUses: 5 });
+    await createEnrollmentCode(
+      { adminToken: "admin-secret", adminPassword: "1234" },
+      { ttlSeconds: 300, maxUses: 5 },
+    );
 
     const [, init] = fetchSpy.mock.calls[0] ?? [];
     const headers = new Headers((init as RequestInit | undefined)?.headers);
     expect(headers.get("x-admin-token")).toBe("admin-secret");
+    expect(headers.get("x-admin-password")).toBe("1234");
   });
 
   it("validates session with bearer token", async () => {
@@ -101,7 +105,11 @@ describe("display api client", () => {
       ),
     );
 
-    await approveDisplayEnrollment("admin-secret", "request-1", {});
+    await approveDisplayEnrollment(
+      { adminToken: "admin-secret", adminPassword: "1234" },
+      "request-1",
+      {},
+    );
 
     expect(fetchSpy).toHaveBeenCalledWith(
       "/api/admin/displays/enrollments/request-1/approve",

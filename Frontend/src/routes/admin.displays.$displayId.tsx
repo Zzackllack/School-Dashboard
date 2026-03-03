@@ -1,20 +1,22 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import {
+  deleteDisplay,
   getDisplay,
   revokeDisplaySession,
   updateDisplay,
 } from "../lib/api/displays";
-import { getAdminApiToken, setAdminApiToken } from "../lib/display-session";
+import { getAdminCredentials } from "../lib/display-session";
 
 export const Route = createFileRoute("/admin/displays/$displayId")({
   component: AdminDisplayDetailPage,
 });
 
 function AdminDisplayDetailPage() {
+  const navigate = useNavigate();
   const { displayId } = Route.useParams();
-  const [adminToken, setToken] = useState(() => getAdminApiToken() ?? "");
+  const [credentials] = useState(() => getAdminCredentials());
   const [formState, setFormState] = useState({
     name: "",
     slug: "",
@@ -25,19 +27,15 @@ function AdminDisplayDetailPage() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    setAdminApiToken(adminToken);
-  }, [adminToken]);
-
-  useEffect(() => {
     let cancelled = false;
 
     async function loadDisplay() {
-      if (!adminToken) {
+      if (!credentials) {
         return;
       }
 
       try {
-        const display = await getDisplay(adminToken, displayId);
+        const display = await getDisplay(credentials, displayId);
         if (!cancelled) {
           setFormState({
             name: display.name,
@@ -64,18 +62,18 @@ function AdminDisplayDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [adminToken, displayId]);
+  }, [credentials, displayId]);
 
   async function handleUpdate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!adminToken) {
-      setStatusMessage("Bitte zuerst einen Admin API Token eintragen.");
+    if (!credentials) {
+      setStatusMessage("Bitte zuerst im Admin-Bereich anmelden.");
       return;
     }
 
     try {
-      const response = await updateDisplay(adminToken, displayId, formState);
+      const response = await updateDisplay(credentials, displayId, formState);
       setFormState({
         name: response.name,
         slug: response.slug,
@@ -94,13 +92,13 @@ function AdminDisplayDetailPage() {
   }
 
   async function handleRevoke() {
-    if (!adminToken) {
-      setStatusMessage("Bitte zuerst einen Admin API Token eintragen.");
+    if (!credentials) {
+      setStatusMessage("Bitte zuerst im Admin-Bereich anmelden.");
       return;
     }
 
     try {
-      const response = await revokeDisplaySession(adminToken, displayId);
+      const response = await revokeDisplaySession(credentials, displayId);
       setFormState((current) => ({ ...current, status: response.status }));
       setStatusMessage("Display-Session wurde widerrufen.");
     } catch (error) {
@@ -112,22 +110,34 @@ function AdminDisplayDetailPage() {
     }
   }
 
+  async function handleDelete() {
+    if (!credentials) {
+      setStatusMessage("Bitte zuerst im Admin-Bereich anmelden.");
+      return;
+    }
+    const confirmed = window.confirm(
+      "Display wirklich löschen? Dieser Schritt kann nicht rückgängig gemacht werden.",
+    );
+    if (!confirmed) {
+      return;
+    }
+    try {
+      await deleteDisplay(credentials, displayId);
+      await navigate({ to: "/admin/displays", replace: true });
+    } catch (error) {
+      setStatusMessage(
+        error instanceof Error
+          ? error.message
+          : "Display-Löschung fehlgeschlagen.",
+      );
+    }
+  }
+
   return (
     <main className="min-h-screen bg-slate-100 p-6 text-slate-900">
       <section className="mx-auto max-w-3xl rounded-2xl bg-white p-6 shadow-lg">
         <h1 className="text-3xl font-bold">Display Detail</h1>
         <p className="mt-2 font-mono text-xs text-slate-500">ID: {displayId}</p>
-
-        <label className="mt-4 block text-sm font-semibold text-slate-700">
-          Admin API Token
-          <input
-            className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm"
-            value={adminToken}
-            onChange={(event) => setToken(event.target.value)}
-            placeholder="X-Admin-Token"
-            autoComplete="off"
-          />
-        </label>
 
         <form className="mt-6 space-y-4" onSubmit={handleUpdate}>
           <label className="block text-sm font-semibold text-slate-700">
@@ -220,6 +230,13 @@ function AdminDisplayDetailPage() {
               onClick={() => void handleRevoke()}
             >
               Session widerrufen
+            </button>
+            <button
+              className="rounded-lg bg-red-800 px-4 py-2 text-sm font-semibold text-white"
+              type="button"
+              onClick={() => void handleDelete()}
+            >
+              Display löschen
             </button>
           </div>
         </form>

@@ -5,14 +5,14 @@ import {
   listDisplayEnrollments,
   rejectDisplayEnrollment,
 } from "../lib/api/displays";
-import { getAdminApiToken, setAdminApiToken } from "../lib/display-session";
+import { getAdminCredentials } from "../lib/display-session";
 
 export const Route = createFileRoute("/admin/displays/pending")({
   component: AdminPendingDisplaysPage,
 });
 
 function AdminPendingDisplaysPage() {
-  const [adminToken, setToken] = useState(() => getAdminApiToken() ?? "");
+  const [credentials] = useState(() => getAdminCredentials());
   const [pendingRequests, setPendingRequests] = useState<
     Array<{
       requestId: string;
@@ -23,18 +23,14 @@ function AdminPendingDisplaysPage() {
   >([]);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
-  useEffect(() => {
-    setAdminApiToken(adminToken);
-  }, [adminToken]);
-
   async function refreshPending() {
-    if (!adminToken) {
+    if (!credentials) {
       setPendingRequests([]);
       return;
     }
 
     try {
-      const response = await listDisplayEnrollments(adminToken, "PENDING");
+      const response = await listDisplayEnrollments(credentials, "PENDING");
       setPendingRequests(response);
       setStatusMessage(null);
     } catch (error) {
@@ -48,11 +44,15 @@ function AdminPendingDisplaysPage() {
 
   useEffect(() => {
     void refreshPending();
-  }, [adminToken]);
+  }, [credentials]);
 
   async function approve(requestId: string) {
     try {
-      await approveDisplayEnrollment(adminToken, requestId, {});
+      if (!credentials) {
+        setStatusMessage("Admin-Anmeldung fehlt.");
+        return;
+      }
+      await approveDisplayEnrollment(credentials, requestId, {});
       setStatusMessage(`Request ${requestId} freigegeben.`);
       await refreshPending();
     } catch (error) {
@@ -64,7 +64,11 @@ function AdminPendingDisplaysPage() {
 
   async function reject(requestId: string) {
     try {
-      await rejectDisplayEnrollment(adminToken, requestId, {
+      if (!credentials) {
+        setStatusMessage("Admin-Anmeldung fehlt.");
+        return;
+      }
+      await rejectDisplayEnrollment(credentials, requestId, {
         reason: "Rejected by admin",
       });
       setStatusMessage(`Request ${requestId} abgelehnt.`);
@@ -83,17 +87,6 @@ function AdminPendingDisplaysPage() {
         <p className="mt-2 text-sm text-slate-600">
           Freigabe oder Ablehnung für neue Display-Enrollments.
         </p>
-
-        <label className="mt-4 block text-sm font-semibold text-slate-700">
-          Admin API Token
-          <input
-            className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm"
-            value={adminToken}
-            onChange={(event) => setToken(event.target.value)}
-            placeholder="X-Admin-Token"
-            autoComplete="off"
-          />
-        </label>
 
         {statusMessage ? (
           <p className="mt-4 rounded-md bg-slate-100 px-3 py-2 text-sm text-slate-700">

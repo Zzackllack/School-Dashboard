@@ -7,12 +7,13 @@ const FORWARDED_HEADERS = [
   "authorization",
   "content-type",
   "x-admin-token",
+  "x-admin-password",
   "x-admin-id",
   "x-request-id",
 ];
 
 export async function proxyGetRequest(
-  method: "GET" | "POST" | "PATCH",
+  method: "GET" | "POST" | "PATCH" | "DELETE",
   upstreamPath: string,
   request: Request,
   resourceName: string,
@@ -85,6 +86,14 @@ export function createProxyPatchHandler(
 ) {
   return async ({ request }: { request: Request }) =>
     proxyGetRequest("PATCH", upstreamPath, request, resourceName);
+}
+
+export function createProxyDeleteHandler(
+  upstreamPath: string,
+  resourceName: string,
+) {
+  return async ({ request }: { request: Request }) =>
+    proxyGetRequest("DELETE", upstreamPath, request, resourceName);
 }
 
 function copyForwardedHeaders(request: Request): Headers {

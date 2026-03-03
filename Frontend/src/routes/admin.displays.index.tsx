@@ -2,14 +2,17 @@ import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { createEnrollmentCode, listDisplays } from "../lib/api/displays";
-import { getAdminApiToken, setAdminApiToken } from "../lib/display-session";
+import {
+  clearAdminAuthStorage,
+  getAdminCredentials,
+} from "../lib/display-session";
 
 export const Route = createFileRoute("/admin/displays/")({
   component: AdminDisplaysPage,
 });
 
 function AdminDisplaysPage() {
-  const [adminToken, setToken] = useState(() => getAdminApiToken() ?? "");
+  const [credentials, setCredentials] = useState(() => getAdminCredentials());
   const [ttlSeconds, setTtlSeconds] = useState("900");
   const [maxUses, setMaxUses] = useState("5");
   const [createdCode, setCreatedCode] = useState<string | null>(null);
@@ -24,20 +27,16 @@ function AdminDisplaysPage() {
   >([]);
 
   useEffect(() => {
-    setAdminApiToken(adminToken);
-  }, [adminToken]);
-
-  useEffect(() => {
     let cancelled = false;
 
     async function loadDisplays() {
-      if (!adminToken) {
+      if (!credentials) {
         setDisplays([]);
         return;
       }
 
       try {
-        const response = await listDisplays(adminToken);
+        const response = await listDisplays(credentials);
         if (!cancelled) {
           setDisplays(response);
         }
@@ -57,20 +56,20 @@ function AdminDisplaysPage() {
     return () => {
       cancelled = true;
     };
-  }, [adminToken]);
+  }, [credentials]);
 
   async function handleCodeCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatusMessage(null);
     setCreatedCode(null);
 
-    if (!adminToken) {
-      setStatusMessage("Bitte zuerst einen Admin API Token eintragen.");
+    if (!credentials) {
+      setStatusMessage("Bitte zuerst im Admin-Bereich anmelden.");
       return;
     }
 
     try {
-      const response = await createEnrollmentCode(adminToken, {
+      const response = await createEnrollmentCode(credentials, {
         ttlSeconds: Number(ttlSeconds),
         maxUses: Number(maxUses),
       });
@@ -96,16 +95,6 @@ function AdminDisplaysPage() {
             Verwalte Enrollment-Codes, ausstehende Freigaben und aktive
             Displays.
           </p>
-          <label className="mt-4 block text-sm font-semibold text-slate-700">
-            Admin API Token
-            <input
-              className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm"
-              value={adminToken}
-              onChange={(event) => setToken(event.target.value)}
-              placeholder="X-Admin-Token"
-              autoComplete="off"
-            />
-          </label>
           <div className="mt-4 flex gap-3 text-sm">
             <Link
               className="rounded-md bg-slate-900 px-3 py-2 font-semibold text-white"
@@ -113,6 +102,17 @@ function AdminDisplaysPage() {
             >
               Offene Requests
             </Link>
+            <button
+              className="rounded-md border border-slate-300 px-3 py-2 font-semibold text-slate-700"
+              type="button"
+              onClick={() => {
+                clearAdminAuthStorage();
+                setCredentials(null);
+                window.location.href = "/admin/login";
+              }}
+            >
+              Abmelden
+            </button>
           </div>
         </header>
 
