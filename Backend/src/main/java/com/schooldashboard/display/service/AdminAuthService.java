@@ -16,16 +16,22 @@ public class AdminAuthService {
 		this.authProperties = authProperties;
 	}
 
-	public String requireAdmin(String tokenHeader, String adminIdHeader) {
+	public String requireAdmin(String tokenHeader, String passwordHeader, String adminIdHeader) {
 		String expectedToken = authProperties.getApiToken();
+		String expectedPassword = authProperties.getApiPassword();
 		String providedToken = tokenHeader == null ? "" : tokenHeader.trim();
+		String providedPassword = passwordHeader == null ? "" : passwordHeader.trim();
 
 		if (expectedToken == null || expectedToken.isBlank()) {
 			throw new DisplayDomainException("ADMIN_AUTH_CONFIG_INVALID", HttpStatus.INTERNAL_SERVER_ERROR,
 					"Admin auth token is not configured");
 		}
+		if (expectedPassword == null || expectedPassword.isBlank()) {
+			throw new DisplayDomainException("ADMIN_AUTH_CONFIG_INVALID", HttpStatus.INTERNAL_SERVER_ERROR,
+					"Admin auth password is not configured");
+		}
 
-		if (!constantTimeEquals(expectedToken, providedToken)) {
+		if (!constantTimeEquals(expectedToken, providedToken) || !constantTimeEquals(expectedPassword, providedPassword)) {
 			throw new DisplayDomainException("ADMIN_UNAUTHORIZED", HttpStatus.UNAUTHORIZED,
 					"Admin authentication failed");
 		}

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Component;
 public class DisplayAdminAuthProperties {
 
 	private String apiToken = "dev-admin-token";
+	private String apiPassword = "1234";
 
 	public String getApiToken() {
 		return apiToken;
@@ -15,5 +16,13 @@ public class DisplayAdminAuthProperties {
 
 	public void setApiToken(String apiToken) {
 		this.apiToken = apiToken;
+	}
+
+	public String getApiPassword() {
+		return apiPassword;
+	}
+
+	public void setApiPassword(String apiPassword) {
+		this.apiPassword = apiPassword;
 	}
 }

@@ -38,11 +38,12 @@ public class AdminDisplayControllerTest {
 
 	@Test
 	public void createEnrollmentCodeRequiresAdminToken() throws Exception {
-		when(adminAuthService.requireAdmin(eq("valid-token"), eq("school-admin"))).thenReturn("school-admin");
+		when(adminAuthService.requireAdmin(eq("valid-token"), eq("1234"), eq("school-admin"))).thenReturn("school-admin");
 		when(enrollmentService.createEnrollmentCode(eq("school-admin"), any()))
 				.thenReturn(new CreateEnrollmentCodeResponse("code-1", "ABCD1234", Instant.now(), 3));
 
 		mockMvc.perform(post("/api/admin/displays/enrollment-codes").header("X-Admin-Token", "valid-token")
+				.header("X-Admin-Password", "1234")
 				.header("X-Admin-Id", "school-admin").contentType("application/json")
 				.content("{\"ttlSeconds\":300,\"maxUses\":3}"))
 				.andExpect(status().isOk()).andExpect(jsonPath("$.code").value("ABCD1234"));
@@ -50,21 +51,23 @@ public class AdminDisplayControllerTest {
 
 	@Test
 	public void createEnrollmentCodeReturnsUnauthorizedForInvalidToken() throws Exception {
-		when(adminAuthService.requireAdmin(eq("bad-token"), isNull()))
+		when(adminAuthService.requireAdmin(eq("bad-token"), eq("1234"), isNull()))
 				.thenThrow(new DisplayDomainException("ADMIN_UNAUTHORIZED", HttpStatus.UNAUTHORIZED,
 						"Admin authentication failed"));
 
 		mockMvc.perform(post("/api/admin/displays/enrollment-codes").header("X-Admin-Token", "bad-token")
+				.header("X-Admin-Password", "1234")
 				.contentType("application/json").content("{}"))
 				.andExpect(status().isUnauthorized()).andExpect(jsonPath("$.code").value("ADMIN_UNAUTHORIZED"));
 	}
 
 	@Test
 	public void listDisplaysUsesAdminAuth() throws Exception {
-		when(adminAuthService.requireAdmin(eq("valid-token"), isNull())).thenReturn("admin");
+		when(adminAuthService.requireAdmin(eq("valid-token"), eq("1234"), isNull())).thenReturn("admin");
 		when(enrollmentService.listDisplays()).thenReturn(List.of());
 
-		mockMvc.perform(get("/api/admin/displays").header("X-Admin-Token", "valid-token"))
+		mockMvc.perform(get("/api/admin/displays").header("X-Admin-Token", "valid-token")
+				.header("X-Admin-Password", "1234"))
 				.andExpect(status().isOk());
 	}
 }

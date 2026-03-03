@@ -27,3 +27,6 @@ app.version=3.2.5
 
 # API token for admin authentication (set this to a secure random value in production)
 display.admin-auth.api-token=1234
+
+# Admin PIN/password required in addition to API token (set to a secure value in production)
+display.admin-auth.api-password=1234

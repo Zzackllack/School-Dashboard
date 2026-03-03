@@ -368,6 +368,24 @@ public class DisplayEnrollmentService {
 		return mapDisplay(displayEntity);
 	}
 
+	@Transactional
+	public void deleteDisplay(String displayId, String adminId) {
+		DisplayEntity displayEntity = displayRepository.findById(displayId).orElseThrow(
+				() -> new DisplayDomainException("DISPLAY_NOT_FOUND", HttpStatus.NOT_FOUND, "Display not found"));
+
+		List<DisplayEnrollmentRequestEntity> linkedRequests = enrollmentRequestRepository.findByDisplayId(displayId);
+		for (DisplayEnrollmentRequestEntity linkedRequest : linkedRequests) {
+			linkedRequest.setDisplayId(null);
+			enrollmentRequestRepository.save(linkedRequest);
+		}
+
+		sessionRepository.deleteByDisplayId(displayId);
+		displayRepository.delete(displayEntity);
+
+		auditLogService.log(adminId, "DISPLAY_DELETED", "display", displayId,
+				Map.of("enrollmentRequestsUpdated", linkedRequests.size()));
+	}
+
 	@Transactional(readOnly = true)
 	public EnrollmentRequestStatus parseEnrollmentStatus(String status) {
 		if (status == null || status.isBlank()) {

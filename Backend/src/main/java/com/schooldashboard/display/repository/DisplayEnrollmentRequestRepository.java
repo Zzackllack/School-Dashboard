@@ -8,4 +8,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface DisplayEnrollmentRequestRepository extends JpaRepository<DisplayEnrollmentRequestEntity, String> {
 
 	List<DisplayEnrollmentRequestEntity> findByStatusOrderByCreatedAtAsc(EnrollmentRequestStatus status);
+
+	List<DisplayEnrollmentRequestEntity> findByDisplayId(String displayId);
 }

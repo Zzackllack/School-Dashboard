@@ -12,9 +12,10 @@ public class AdminAuthServiceTest {
 	public void requireAdminReturnsProvidedAdminIdWhenTokenMatches() {
 		DisplayAdminAuthProperties properties = new DisplayAdminAuthProperties();
 		properties.setApiToken("top-secret");
+		properties.setApiPassword("1234");
 		AdminAuthService service = new AdminAuthService(properties);
 
-		String adminId = service.requireAdmin("top-secret", "ops-admin");
+		String adminId = service.requireAdmin("top-secret", "1234", "ops-admin");
 		assertEquals("ops-admin", adminId);
 	}
 
@@ -22,9 +23,10 @@ public class AdminAuthServiceTest {
 	public void requireAdminFallsBackToDefaultAdminId() {
 		DisplayAdminAuthProperties properties = new DisplayAdminAuthProperties();
 		properties.setApiToken("top-secret");
+		properties.setApiPassword("1234");
 		AdminAuthService service = new AdminAuthService(properties);
 
-		String adminId = service.requireAdmin("top-secret", "  ");
+		String adminId = service.requireAdmin("top-secret", "1234", "  ");
 		assertEquals("admin", adminId);
 	}
 
@@ -32,10 +34,23 @@ public class AdminAuthServiceTest {
 	public void requireAdminRejectsInvalidToken() {
 		DisplayAdminAuthProperties properties = new DisplayAdminAuthProperties();
 		properties.setApiToken("top-secret");
+		properties.setApiPassword("1234");
 		AdminAuthService service = new AdminAuthService(properties);
 
 		DisplayDomainException exception = assertThrows(DisplayDomainException.class,
-				() -> service.requireAdmin("invalid", "ops-admin"));
+				() -> service.requireAdmin("invalid", "1234", "ops-admin"));
+		assertEquals("ADMIN_UNAUTHORIZED", exception.getCode());
+	}
+
+	@Test
+	public void requireAdminRejectsInvalidPassword() {
+		DisplayAdminAuthProperties properties = new DisplayAdminAuthProperties();
+		properties.setApiToken("top-secret");
+		properties.setApiPassword("1234");
+		AdminAuthService service = new AdminAuthService(properties);
+
+		DisplayDomainException exception = assertThrows(DisplayDomainException.class,
+				() -> service.requireAdmin("top-secret", "0000", "ops-admin"));
 		assertEquals("ADMIN_UNAUTHORIZED", exception.getCode());
 	}
 }

@@ -10,4 +10,6 @@ public interface DisplaySessionRepository extends JpaRepository<DisplaySessionEn
 	Optional<DisplaySessionEntity> findByTokenHash(String tokenHash);
 
 	List<DisplaySessionEntity> findByDisplayId(String displayId);
+
+	void deleteByDisplayId(String displayId);
 }
