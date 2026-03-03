@@ -49,7 +49,9 @@ function AdminLoginPage() {
     } catch (error) {
       clearAdminAuthStorage();
       setErrorMessage(
-        error instanceof Error ? error.message : "Admin-Anmeldung fehlgeschlagen.",
+        error instanceof Error
+          ? error.message
+          : "Admin-Anmeldung fehlgeschlagen.",
       );
     } finally {
       setIsSubmitting(false);

@@ -20,9 +20,10 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
-@SpringBootTest(properties = {"spring.task.scheduling.enabled=false", "display.admin-auth.api-token=test-admin-token", "display.admin-auth.api-password=test-admin-pin",
-		"display.enrollment.code-ttl-seconds=900", "display.enrollment.request-ttl-seconds=900",
-		"display.enrollment.session-ttl-seconds=3600", "dsb.username=test", "dsb.password=test", "calendar.ics-url="})
+@SpringBootTest(properties = {"spring.task.scheduling.enabled=false", "display.admin-auth.api-token=test-admin-token",
+		"display.admin-auth.api-password=test-admin-pin", "display.enrollment.code-ttl-seconds=900",
+		"display.enrollment.request-ttl-seconds=900", "display.enrollment.session-ttl-seconds=3600",
+		"dsb.username=test", "dsb.password=test", "calendar.ics-url="})
 @AutoConfigureMockMvc
 public class DisplayEnrollmentFlowIntegrationTest {
 
@@ -35,8 +36,9 @@ public class DisplayEnrollmentFlowIntegrationTest {
 	@Test
 	public void enrollApproveValidateAndRevokeFlowWorks() throws Exception {
 		Map<String, Object> createdCode = readMap(mockMvc
-				.perform(post("/api/admin/displays/enrollment-codes").header("X-Admin-Token", "test-admin-token").header("X-Admin-Password", "test-admin-pin")
-						.header("X-Admin-Id", "integration-admin").contentType(MediaType.APPLICATION_JSON)
+				.perform(post("/api/admin/displays/enrollment-codes").header("X-Admin-Token", "test-admin-token")
+						.header("X-Admin-Password", "test-admin-pin").header("X-Admin-Id", "integration-admin")
+						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(new CreateEnrollmentCodeRequest(300, 3))))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 
@@ -55,8 +57,8 @@ public class DisplayEnrollmentFlowIntegrationTest {
 
 		Map<String, Object> approveResponse = readMap(mockMvc
 				.perform(post("/api/admin/displays/enrollments/{requestId}/approve", requestId)
-						.header("X-Admin-Token", "test-admin-token").header("X-Admin-Password", "test-admin-pin").header("X-Admin-Id", "integration-admin")
-						.contentType(MediaType.APPLICATION_JSON)
+						.header("X-Admin-Token", "test-admin-token").header("X-Admin-Password", "test-admin-pin")
+						.header("X-Admin-Id", "integration-admin").contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(
 								new ApproveEnrollmentRequest("main-profile", "Main Hall", null, null))))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
@@ -79,7 +81,8 @@ public class DisplayEnrollmentFlowIntegrationTest {
 
 		Map<String, Object> revokeResponse = readMap(mockMvc
 				.perform(post("/api/admin/displays/{displayId}/revoke-session", asString(approveResponse, "displayId"))
-						.header("X-Admin-Token", "test-admin-token").header("X-Admin-Password", "test-admin-pin").header("X-Admin-Id", "integration-admin"))
+						.header("X-Admin-Token", "test-admin-token").header("X-Admin-Password", "test-admin-pin")
+						.header("X-Admin-Id", "integration-admin"))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals("REVOKED", asString(revokeResponse, "status"));
 
@@ -91,8 +94,9 @@ public class DisplayEnrollmentFlowIntegrationTest {
 
 		Map<String, Object> reactivateResponse = readMap(mockMvc
 				.perform(patch("/api/admin/displays/{displayId}", asString(approveResponse, "displayId"))
-						.header("X-Admin-Token", "test-admin-token").header("X-Admin-Password", "test-admin-pin").header("X-Admin-Id", "integration-admin")
-						.contentType(MediaType.APPLICATION_JSON).content("{\"status\":\"ACTIVE\"}"))
+						.header("X-Admin-Token", "test-admin-token").header("X-Admin-Password", "test-admin-pin")
+						.header("X-Admin-Id", "integration-admin").contentType(MediaType.APPLICATION_JSON)
+						.content("{\"status\":\"ACTIVE\"}"))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals("ACTIVE", asString(reactivateResponse, "status"));
 
@@ -117,8 +121,9 @@ public class DisplayEnrollmentFlowIntegrationTest {
 	@Test
 	public void rejectFlowReturnsRejectedStatus() throws Exception {
 		Map<String, Object> codeResponse = readMap(mockMvc
-				.perform(post("/api/admin/displays/enrollment-codes").header("X-Admin-Token", "test-admin-token").header("X-Admin-Password", "test-admin-pin")
-						.header("X-Admin-Id", "integration-admin").contentType(MediaType.APPLICATION_JSON)
+				.perform(post("/api/admin/displays/enrollment-codes").header("X-Admin-Token", "test-admin-token")
+						.header("X-Admin-Password", "test-admin-pin").header("X-Admin-Id", "integration-admin")
+						.contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(new CreateEnrollmentCodeRequest(300, 1))))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 
@@ -130,8 +135,8 @@ public class DisplayEnrollmentFlowIntegrationTest {
 
 		Map<String, Object> rejectResponse = readMap(mockMvc.perform(
 				post("/api/admin/displays/enrollments/{requestId}/reject", asString(enrollmentResponse, "requestId"))
-						.header("X-Admin-Token", "test-admin-token").header("X-Admin-Password", "test-admin-pin").header("X-Admin-Id", "integration-admin")
-						.contentType(MediaType.APPLICATION_JSON)
+						.header("X-Admin-Token", "test-admin-token").header("X-Admin-Password", "test-admin-pin")
+						.header("X-Admin-Id", "integration-admin").contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(new RejectEnrollmentRequest("Not needed"))))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals("REJECTED", asString(rejectResponse, "status"));

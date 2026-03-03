@@ -31,7 +31,8 @@ public class AdminAuthService {
 					"Admin auth password is not configured");
 		}
 
-		if (!constantTimeEquals(expectedToken, providedToken) || !constantTimeEquals(expectedPassword, providedPassword)) {
+		if (!constantTimeEquals(expectedToken, providedToken)
+				|| !constantTimeEquals(expectedPassword, providedPassword)) {
 			throw new DisplayDomainException("ADMIN_UNAUTHORIZED", HttpStatus.UNAUTHORIZED,
 					"Admin authentication failed");
 		}

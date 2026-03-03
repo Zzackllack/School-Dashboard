@@ -72,7 +72,8 @@ public class AdminDisplayController {
 			@RequestHeader(name = "X-Admin-Password", required = false) String adminPassword,
 			@RequestHeader(name = "X-Admin-Id", required = false) String adminId,
 			@RequestBody(required = false) ApproveEnrollmentRequest request) {
-		return enrollmentService.approveEnrollment(requestId, request, requireAdmin(adminToken, adminPassword, adminId));
+		return enrollmentService.approveEnrollment(requestId, request,
+				requireAdmin(adminToken, adminPassword, adminId));
 	}
 
 	@PostMapping("/enrollments/{requestId}/reject")

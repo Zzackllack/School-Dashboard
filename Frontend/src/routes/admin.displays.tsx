@@ -1,7 +1,10 @@
 import { Outlet, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { verifyAdminAccess } from "../lib/api/displays";
-import { clearAdminAuthStorage, getAdminCredentials } from "../lib/display-session";
+import {
+  clearAdminAuthStorage,
+  getAdminCredentials,
+} from "../lib/display-session";
 
 function AdminDisplaysLayout() {
   const navigate = useNavigate();
