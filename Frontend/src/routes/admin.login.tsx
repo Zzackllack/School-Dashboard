@@ -1,13 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { verifyAdminAccess } from "../lib/api/displays";
-import {
-  clearAdminAuthStorage,
-  getAdminCredentials,
-  setAdminApiToken,
-  setAdminPassword,
-} from "../lib/display-session";
+import { adminLogin, getAdminAuthStatus } from "../lib/api/displays";
 
 export const Route = createFileRoute("/admin/login")({
   component: AdminLoginPage,
@@ -15,17 +9,26 @@ export const Route = createFileRoute("/admin/login")({
 
 function AdminLoginPage() {
   const navigate = useNavigate();
-  const [adminToken, setAdminToken] = useState("");
-  const [adminPassword, setAdminPasswordValue] = useState("");
+  const [username, setUsername] = useState("");
+  const [password, setPasswordValue] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   useEffect(() => {
-    const credentials = getAdminCredentials();
-    if (!credentials) {
-      return;
+    let cancelled = false;
+
+    async function checkAuth() {
+      const authStatus = await getAdminAuthStatus();
+      if (!cancelled && authStatus.authenticated) {
+        await navigate({ to: "/admin/displays", replace: true });
+      }
     }
-    void navigate({ to: "/admin/displays", replace: true });
+
+    void checkAuth();
+
+    return () => {
+      cancelled = true;
+    };
   }, [navigate]);
 
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
@@ -34,20 +37,14 @@ function AdminLoginPage() {
     setIsSubmitting(true);
 
     try {
-      const authenticated = await verifyAdminAccess({
-        adminToken,
-        adminPassword,
-      });
-      if (!authenticated) {
+      const authStatus = await adminLogin(username, password);
+      if (!authStatus.authenticated) {
         setErrorMessage("Admin-Anmeldung fehlgeschlagen.");
         return;
       }
 
-      setAdminApiToken(adminToken);
-      setAdminPassword(adminPassword);
       await navigate({ to: "/admin/displays", replace: true });
     } catch (error) {
-      clearAdminAuthStorage();
       setErrorMessage(
         error instanceof Error
           ? error.message
@@ -63,33 +60,33 @@ function AdminLoginPage() {
       <section className="w-full max-w-xl rounded-2xl bg-white p-8 shadow-xl">
         <h1 className="text-3xl font-bold">Admin Login</h1>
         <p className="mt-3 text-slate-600">
-          Zugriff nur mit Admin API Token und PIN/Passwort.
+          Zugriff nur mit Admin-Benutzername und Passwort.
         </p>
 
         <form className="mt-8 space-y-5" onSubmit={handleLogin}>
           <label className="block">
             <span className="text-sm font-semibold text-slate-700">
-              Admin API Token
+              Benutzername
             </span>
             <input
-              className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 font-mono text-sm focus:border-slate-500 focus:outline-none"
-              value={adminToken}
-              onChange={(event) => setAdminToken(event.target.value)}
-              placeholder="X-Admin-Token"
+              className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 text-sm focus:border-slate-500 focus:outline-none"
+              value={username}
+              onChange={(event) => setUsername(event.target.value)}
+              placeholder="admin"
               required
-              autoComplete="off"
+              autoComplete="username"
             />
           </label>
 
           <label className="block">
             <span className="text-sm font-semibold text-slate-700">
-              Admin PIN / Passwort
+              Passwort
             </span>
             <input
               className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2 focus:border-slate-500 focus:outline-none"
-              value={adminPassword}
-              onChange={(event) => setAdminPasswordValue(event.target.value)}
-              placeholder="X-Admin-Password"
+              value={password}
+              onChange={(event) => setPasswordValue(event.target.value)}
+              placeholder="Passwort"
               type="password"
               required
               autoComplete="current-password"

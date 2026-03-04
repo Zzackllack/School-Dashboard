@@ -7,7 +7,6 @@ import {
   revokeDisplaySession,
   updateDisplay,
 } from "../lib/api/displays";
-import { getAdminCredentials } from "../lib/display-session";
 
 export const Route = createFileRoute("/admin/displays/$displayId")({
   component: AdminDisplayDetailPage,
@@ -16,7 +15,6 @@ export const Route = createFileRoute("/admin/displays/$displayId")({
 function AdminDisplayDetailPage() {
   const navigate = useNavigate();
   const { displayId } = Route.useParams();
-  const [credentials] = useState(() => getAdminCredentials());
   const [formState, setFormState] = useState({
     name: "",
     slug: "",
@@ -30,12 +28,8 @@ function AdminDisplayDetailPage() {
     let cancelled = false;
 
     async function loadDisplay() {
-      if (!credentials) {
-        return;
-      }
-
       try {
-        const display = await getDisplay(credentials, displayId);
+        const display = await getDisplay(displayId);
         if (!cancelled) {
           setFormState({
             name: display.name,
@@ -62,18 +56,13 @@ function AdminDisplayDetailPage() {
     return () => {
       cancelled = true;
     };
-  }, [credentials, displayId]);
+  }, [displayId]);
 
   async function handleUpdate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
-    if (!credentials) {
-      setStatusMessage("Bitte zuerst im Admin-Bereich anmelden.");
-      return;
-    }
-
     try {
-      const response = await updateDisplay(credentials, displayId, formState);
+      const response = await updateDisplay(displayId, formState);
       setFormState({
         name: response.name,
         slug: response.slug,
@@ -92,13 +81,8 @@ function AdminDisplayDetailPage() {
   }
 
   async function handleRevoke() {
-    if (!credentials) {
-      setStatusMessage("Bitte zuerst im Admin-Bereich anmelden.");
-      return;
-    }
-
     try {
-      const response = await revokeDisplaySession(credentials, displayId);
+      const response = await revokeDisplaySession(displayId);
       setFormState((current) => ({ ...current, status: response.status }));
       setStatusMessage("Display-Session wurde widerrufen.");
     } catch (error) {
@@ -111,10 +95,6 @@ function AdminDisplayDetailPage() {
   }
 
   async function handleDelete() {
-    if (!credentials) {
-      setStatusMessage("Bitte zuerst im Admin-Bereich anmelden.");
-      return;
-    }
     const confirmed = window.confirm(
       "Display wirklich löschen? Dieser Schritt kann nicht rückgängig gemacht werden.",
     );
@@ -122,7 +102,7 @@ function AdminDisplayDetailPage() {
       return;
     }
     try {
-      await deleteDisplay(credentials, displayId);
+      await deleteDisplay(displayId);
       await navigate({ to: "/admin/displays", replace: true });
     } catch (error) {
       setStatusMessage(

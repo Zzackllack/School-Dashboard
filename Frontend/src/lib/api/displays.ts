@@ -75,32 +75,89 @@ export interface UpdateDisplayRequest {
   status?: "ACTIVE" | "INACTIVE" | "REVOKED";
 }
 
-export interface AdminCredentials {
-  adminToken: string;
-  adminPassword: string;
+export interface AdminAuthStatusResponse {
+  authenticated: boolean;
+  username: string | null;
+  roles: string[];
 }
 
-function adminHeaders(credentials: AdminCredentials): HeadersInit {
-  return {
-    "X-Admin-Token": credentials.adminToken,
-    "X-Admin-Password": credentials.adminPassword,
+interface CsrfTokenResponse {
+  headerName: string;
+  parameterName: string;
+  token: string;
+}
+
+function isApiStatusError(error: unknown, status: number): boolean {
+  return (
+    error instanceof Error && error.message.startsWith(`API error: ${status}`)
+  );
+}
+
+async function getAdminCsrfHeaders(
+  initialHeaders?: HeadersInit,
+): Promise<Headers> {
+  const csrf = await fetchJson<CsrfTokenResponse>("/admin/auth/csrf");
+  if (!csrf?.headerName || !csrf?.token) {
+    throw new Error("CSRF token endpoint returned an invalid response");
+  }
+
+  const headers = new Headers(initialHeaders);
+  headers.set(csrf.headerName, csrf.token);
+  return headers;
+}
+
+export async function adminLogin(
+  username: string,
+  password: string,
+): Promise<AdminAuthStatusResponse> {
+  const headers = await getAdminCsrfHeaders({
     "Content-Type": "application/json",
-  };
+  });
+  const response = await fetchJson<AdminAuthStatusResponse>("/admin/auth/login", {
+    method: "POST",
+    headers,
+    body: JSON.stringify({ username, password }),
+  });
+
+  if (!response) {
+    throw new Error("Admin login returned an empty response");
+  }
+  return response;
+}
+
+export async function adminLogout(): Promise<void> {
+  const headers = await getAdminCsrfHeaders();
+  await fetchJson<void>("/admin/auth/logout", {
+    method: "POST",
+    headers,
+  });
+}
+
+export async function getAdminAuthStatus(): Promise<AdminAuthStatusResponse> {
+  try {
+    const response = await fetchJson<AdminAuthStatusResponse>("/admin/auth/me");
+    if (!response) {
+      return { authenticated: false, username: null, roles: [] };
+    }
+    return response;
+  } catch (error) {
+    if (isApiStatusError(error, 401)) {
+      return { authenticated: false, username: null, roles: [] };
+    }
+    throw error;
+  }
 }
 
 export async function createEnrollment(
   request: CreateEnrollmentRequest,
 ): Promise<CreateEnrollmentResponse> {
-  const response = await fetchJson<CreateEnrollmentResponse>(
-    "/displays/enrollments",
-    {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(request),
+  const response = await fetchJson<CreateEnrollmentResponse>("/displays/enrollments", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
     },
-  );
+    body: JSON.stringify(request),
+  });
 
   if (!response) {
     throw new Error("Enrollment creation returned an empty response");
@@ -144,15 +201,18 @@ export async function validateDisplaySession(
   return response;
 }
 
-export async function createEnrollmentCode(
-  credentials: AdminCredentials,
-  payload: { ttlSeconds?: number; maxUses?: number },
-): Promise<CreateEnrollmentCodeResponse> {
+export async function createEnrollmentCode(payload: {
+  ttlSeconds?: number;
+  maxUses?: number;
+}): Promise<CreateEnrollmentCodeResponse> {
+  const headers = await getAdminCsrfHeaders({
+    "Content-Type": "application/json",
+  });
   const response = await fetchJson<CreateEnrollmentCodeResponse>(
     "/admin/displays/enrollment-codes",
     {
       method: "POST",
-      headers: adminHeaders(credentials),
+      headers,
       body: JSON.stringify(payload),
     },
   );
@@ -163,31 +223,26 @@ export async function createEnrollmentCode(
 }
 
 export async function listDisplayEnrollments(
-  credentials: AdminCredentials,
   status = "PENDING",
 ): Promise<PendingEnrollmentResponse[]> {
   const response = await fetchJson<PendingEnrollmentResponse[]>(
     `/admin/displays/enrollments?status=${encodeURIComponent(status)}`,
-    {
-      headers: {
-        "X-Admin-Token": credentials.adminToken,
-        "X-Admin-Password": credentials.adminPassword,
-      },
-    },
   );
   return response ?? [];
 }
 
 export async function approveDisplayEnrollment(
-  credentials: AdminCredentials,
   requestId: string,
   payload: ApproveEnrollmentRequest,
 ): Promise<EnrollmentStatusResponse> {
+  const headers = await getAdminCsrfHeaders({
+    "Content-Type": "application/json",
+  });
   const response = await fetchJson<EnrollmentStatusResponse>(
     `/admin/displays/enrollments/${encodeURIComponent(requestId)}/approve`,
     {
       method: "POST",
-      headers: adminHeaders(credentials),
+      headers,
       body: JSON.stringify(payload),
     },
   );
@@ -198,15 +253,17 @@ export async function approveDisplayEnrollment(
 }
 
 export async function rejectDisplayEnrollment(
-  credentials: AdminCredentials,
   requestId: string,
   payload: RejectEnrollmentRequest,
 ): Promise<EnrollmentStatusResponse> {
+  const headers = await getAdminCsrfHeaders({
+    "Content-Type": "application/json",
+  });
   const response = await fetchJson<EnrollmentStatusResponse>(
     `/admin/displays/enrollments/${encodeURIComponent(requestId)}/reject`,
     {
       method: "POST",
-      headers: adminHeaders(credentials),
+      headers,
       body: JSON.stringify(payload),
     },
   );
@@ -216,34 +273,16 @@ export async function rejectDisplayEnrollment(
   return response;
 }
 
-export async function listDisplays(
-  credentials: AdminCredentials,
-): Promise<DisplaySummaryResponse[]> {
-  const response = await fetchJson<DisplaySummaryResponse[]>(
-    "/admin/displays",
-    {
-      headers: {
-        "X-Admin-Token": credentials.adminToken,
-        "X-Admin-Password": credentials.adminPassword,
-      },
-    },
-  );
-
+export async function listDisplays(): Promise<DisplaySummaryResponse[]> {
+  const response = await fetchJson<DisplaySummaryResponse[]>("/admin/displays");
   return response ?? [];
 }
 
 export async function getDisplay(
-  credentials: AdminCredentials,
   displayId: string,
 ): Promise<DisplaySummaryResponse> {
   const response = await fetchJson<DisplaySummaryResponse>(
     `/admin/displays/${encodeURIComponent(displayId)}`,
-    {
-      headers: {
-        "X-Admin-Token": credentials.adminToken,
-        "X-Admin-Password": credentials.adminPassword,
-      },
-    },
   );
 
   if (!response) {
@@ -253,17 +292,14 @@ export async function getDisplay(
 }
 
 export async function revokeDisplaySession(
-  credentials: AdminCredentials,
   displayId: string,
 ): Promise<DisplaySummaryResponse> {
+  const headers = await getAdminCsrfHeaders();
   const response = await fetchJson<DisplaySummaryResponse>(
     `/admin/displays/${encodeURIComponent(displayId)}/revoke-session`,
     {
       method: "POST",
-      headers: {
-        "X-Admin-Token": credentials.adminToken,
-        "X-Admin-Password": credentials.adminPassword,
-      },
+      headers,
     },
   );
 
@@ -274,15 +310,17 @@ export async function revokeDisplaySession(
 }
 
 export async function updateDisplay(
-  credentials: AdminCredentials,
   displayId: string,
   payload: UpdateDisplayRequest,
 ): Promise<DisplaySummaryResponse> {
+  const headers = await getAdminCsrfHeaders({
+    "Content-Type": "application/json",
+  });
   const response = await fetchJson<DisplaySummaryResponse>(
     `/admin/displays/${encodeURIComponent(displayId)}`,
     {
       method: "PATCH",
-      headers: adminHeaders(credentials),
+      headers,
       body: JSON.stringify(payload),
     },
   );
@@ -293,29 +331,10 @@ export async function updateDisplay(
   return response;
 }
 
-export async function deleteDisplay(
-  credentials: AdminCredentials,
-  displayId: string,
-): Promise<void> {
+export async function deleteDisplay(displayId: string): Promise<void> {
+  const headers = await getAdminCsrfHeaders();
   await fetchJson<void>(`/admin/displays/${encodeURIComponent(displayId)}`, {
     method: "DELETE",
-    headers: {
-      "X-Admin-Token": credentials.adminToken,
-      "X-Admin-Password": credentials.adminPassword,
-    },
+    headers,
   });
-}
-
-export async function verifyAdminAccess(
-  credentials: AdminCredentials,
-): Promise<boolean> {
-  const response = await fetchJson<{ authenticated: boolean }>(
-    "/admin/displays/auth/verify",
-    {
-      method: "POST",
-      headers: adminHeaders(credentials),
-      body: "{}",
-    },
-  );
-  return Boolean(response?.authenticated);
 }

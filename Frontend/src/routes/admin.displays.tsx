@@ -1,10 +1,6 @@
 import { Outlet, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { verifyAdminAccess } from "../lib/api/displays";
-import {
-  clearAdminAuthStorage,
-  getAdminCredentials,
-} from "../lib/display-session";
+import { getAdminAuthStatus } from "../lib/api/displays";
 
 function AdminDisplaysLayout() {
   const navigate = useNavigate();
@@ -14,16 +10,9 @@ function AdminDisplaysLayout() {
     let cancelled = false;
 
     async function verifyAccess() {
-      const credentials = getAdminCredentials();
-      if (!credentials) {
-        await navigate({ to: "/admin/login", replace: true });
-        return;
-      }
-
       try {
-        const authenticated = await verifyAdminAccess(credentials);
-        if (!authenticated) {
-          clearAdminAuthStorage();
+        const authStatus = await getAdminAuthStatus();
+        if (!authStatus.authenticated) {
           await navigate({ to: "/admin/login", replace: true });
           return;
         }
@@ -32,7 +21,6 @@ function AdminDisplaysLayout() {
           setReady(true);
         }
       } catch {
-        clearAdminAuthStorage();
         if (!cancelled) {
           await navigate({ to: "/admin/login", replace: true });
         }

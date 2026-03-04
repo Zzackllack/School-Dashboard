@@ -5,14 +5,12 @@ import {
   listDisplayEnrollments,
   rejectDisplayEnrollment,
 } from "../lib/api/displays";
-import { getAdminCredentials } from "../lib/display-session";
 
 export const Route = createFileRoute("/admin/displays/pending")({
   component: AdminPendingDisplaysPage,
 });
 
 function AdminPendingDisplaysPage() {
-  const [credentials] = useState(() => getAdminCredentials());
   const [pendingRequests, setPendingRequests] = useState<
     Array<{
       requestId: string;
@@ -24,13 +22,8 @@ function AdminPendingDisplaysPage() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
   async function refreshPending() {
-    if (!credentials) {
-      setPendingRequests([]);
-      return;
-    }
-
     try {
-      const response = await listDisplayEnrollments(credentials, "PENDING");
+      const response = await listDisplayEnrollments("PENDING");
       setPendingRequests(response);
       setStatusMessage(null);
     } catch (error) {
@@ -44,15 +37,11 @@ function AdminPendingDisplaysPage() {
 
   useEffect(() => {
     void refreshPending();
-  }, [credentials]);
+  }, []);
 
   async function approve(requestId: string) {
     try {
-      if (!credentials) {
-        setStatusMessage("Admin-Anmeldung fehlt.");
-        return;
-      }
-      await approveDisplayEnrollment(credentials, requestId, {});
+      await approveDisplayEnrollment(requestId, {});
       setStatusMessage(`Request ${requestId} freigegeben.`);
       await refreshPending();
     } catch (error) {
@@ -64,11 +53,7 @@ function AdminPendingDisplaysPage() {
 
   async function reject(requestId: string) {
     try {
-      if (!credentials) {
-        setStatusMessage("Admin-Anmeldung fehlt.");
-        return;
-      }
-      await rejectDisplayEnrollment(credentials, requestId, {
+      await rejectDisplayEnrollment(requestId, {
         reason: "Rejected by admin",
       });
       setStatusMessage(`Request ${requestId} abgelehnt.`);
@@ -108,7 +93,7 @@ function AdminPendingDisplaysPage() {
                   ID: {request.requestId}
                 </p>
                 <p className="mt-1 text-xs text-slate-500">
-                  Erstellt:{" "}
+                  Erstellt: {" "}
                   {new Date(request.createdAt).toLocaleString("de-DE")} | Läuft
                   ab: {new Date(request.expiresAt).toLocaleString("de-DE")}
                 </p>

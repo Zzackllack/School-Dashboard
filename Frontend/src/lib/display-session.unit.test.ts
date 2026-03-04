@@ -2,11 +2,9 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   clearDisplaySessionStorage,
-  getAdminApiToken,
   getDisplayIdHint,
   getDisplaySessionToken,
   getPendingEnrollmentRequestId,
-  setAdminApiToken,
   setDisplayIdHint,
   setDisplaySessionToken,
   setPendingEnrollmentRequestId,
@@ -31,7 +29,6 @@ describe("display-session storage", () => {
     });
 
     clearDisplaySessionStorage();
-    setAdminApiToken(null);
   });
 
   it("stores and clears display session values", () => {
@@ -48,13 +45,5 @@ describe("display-session storage", () => {
     expect(getDisplaySessionToken()).toBeNull();
     expect(getDisplayIdHint()).toBeNull();
     expect(getPendingEnrollmentRequestId()).toBeNull();
-  });
-
-  it("stores admin api token independently", () => {
-    setAdminApiToken("admin-token");
-    expect(getAdminApiToken()).toBe("admin-token");
-
-    setAdminApiToken(null);
-    expect(getAdminApiToken()).toBeNull();
   });
 });

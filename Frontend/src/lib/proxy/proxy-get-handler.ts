@@ -5,10 +5,9 @@ const FORWARDED_HEADERS = [
   "accept",
   "accept-language",
   "authorization",
+  "cookie",
   "content-type",
-  "x-admin-token",
-  "x-admin-password",
-  "x-admin-id",
+  "x-csrf-token",
   "x-request-id",
 ];
 

@@ -31,7 +31,10 @@ import { Route as ApiDisplaysEnrollmentsRequestIdRouteImport } from './routes/ap
 import { Route as ApiAdminDisplaysEnrollmentsRouteImport } from './routes/api.admin.displays.enrollments'
 import { Route as ApiAdminDisplaysEnrollmentCodesRouteImport } from './routes/api.admin.displays.enrollment-codes'
 import { Route as ApiAdminDisplaysDisplayIdRouteImport } from './routes/api.admin.displays.$displayId'
-import { Route as ApiAdminDisplaysAuthVerifyRouteImport } from './routes/api.admin.displays.auth.verify'
+import { Route as ApiAdminAuthMeRouteImport } from './routes/api.admin.auth.me'
+import { Route as ApiAdminAuthLogoutRouteImport } from './routes/api.admin.auth.logout'
+import { Route as ApiAdminAuthLoginRouteImport } from './routes/api.admin.auth.login'
+import { Route as ApiAdminAuthCsrfRouteImport } from './routes/api.admin.auth.csrf'
 import { Route as ApiAdminDisplaysDisplayIdRevokeSessionRouteImport } from './routes/api.admin.displays.$displayId.revoke-session'
 import { Route as ApiAdminDisplaysEnrollmentsRequestIdRejectRouteImport } from './routes/api.admin.displays.enrollments.$requestId.reject'
 import { Route as ApiAdminDisplaysEnrollmentsRequestIdApproveRouteImport } from './routes/api.admin.displays.enrollments.$requestId.approve'
@@ -150,12 +153,26 @@ const ApiAdminDisplaysDisplayIdRoute =
     path: '/$displayId',
     getParentRoute: () => ApiAdminDisplaysRoute,
   } as any)
-const ApiAdminDisplaysAuthVerifyRoute =
-  ApiAdminDisplaysAuthVerifyRouteImport.update({
-    id: '/auth/verify',
-    path: '/auth/verify',
-    getParentRoute: () => ApiAdminDisplaysRoute,
-  } as any)
+const ApiAdminAuthMeRoute = ApiAdminAuthMeRouteImport.update({
+  id: '/api/admin/auth/me',
+  path: '/api/admin/auth/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminAuthLogoutRoute = ApiAdminAuthLogoutRouteImport.update({
+  id: '/api/admin/auth/logout',
+  path: '/api/admin/auth/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminAuthLoginRoute = ApiAdminAuthLoginRouteImport.update({
+  id: '/api/admin/auth/login',
+  path: '/api/admin/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminAuthCsrfRoute = ApiAdminAuthCsrfRouteImport.update({
+  id: '/api/admin/auth/csrf',
+  path: '/api/admin/auth/csrf',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminDisplaysDisplayIdRevokeSessionRoute =
   ApiAdminDisplaysDisplayIdRevokeSessionRouteImport.update({
     id: '/revoke-session',
@@ -194,12 +211,15 @@ export interface FileRoutesByFullPath {
   '/api/displays/session': typeof ApiDisplaysSessionRoute
   '/api/substitution/plans': typeof ApiSubstitutionPlansRoute
   '/admin/displays/': typeof AdminDisplaysIndexRoute
+  '/api/admin/auth/csrf': typeof ApiAdminAuthCsrfRoute
+  '/api/admin/auth/login': typeof ApiAdminAuthLoginRoute
+  '/api/admin/auth/logout': typeof ApiAdminAuthLogoutRoute
+  '/api/admin/auth/me': typeof ApiAdminAuthMeRoute
   '/api/admin/displays/$displayId': typeof ApiAdminDisplaysDisplayIdRouteWithChildren
   '/api/admin/displays/enrollment-codes': typeof ApiAdminDisplaysEnrollmentCodesRoute
   '/api/admin/displays/enrollments': typeof ApiAdminDisplaysEnrollmentsRouteWithChildren
   '/api/displays/enrollments/$requestId': typeof ApiDisplaysEnrollmentsRequestIdRoute
   '/api/admin/displays/$displayId/revoke-session': typeof ApiAdminDisplaysDisplayIdRevokeSessionRoute
-  '/api/admin/displays/auth/verify': typeof ApiAdminDisplaysAuthVerifyRoute
   '/api/admin/displays/enrollments/$requestId/approve': typeof ApiAdminDisplaysEnrollmentsRequestIdApproveRoute
   '/api/admin/displays/enrollments/$requestId/reject': typeof ApiAdminDisplaysEnrollmentsRequestIdRejectRoute
 }
@@ -219,12 +239,15 @@ export interface FileRoutesByTo {
   '/api/displays/session': typeof ApiDisplaysSessionRoute
   '/api/substitution/plans': typeof ApiSubstitutionPlansRoute
   '/admin/displays': typeof AdminDisplaysIndexRoute
+  '/api/admin/auth/csrf': typeof ApiAdminAuthCsrfRoute
+  '/api/admin/auth/login': typeof ApiAdminAuthLoginRoute
+  '/api/admin/auth/logout': typeof ApiAdminAuthLogoutRoute
+  '/api/admin/auth/me': typeof ApiAdminAuthMeRoute
   '/api/admin/displays/$displayId': typeof ApiAdminDisplaysDisplayIdRouteWithChildren
   '/api/admin/displays/enrollment-codes': typeof ApiAdminDisplaysEnrollmentCodesRoute
   '/api/admin/displays/enrollments': typeof ApiAdminDisplaysEnrollmentsRouteWithChildren
   '/api/displays/enrollments/$requestId': typeof ApiDisplaysEnrollmentsRequestIdRoute
   '/api/admin/displays/$displayId/revoke-session': typeof ApiAdminDisplaysDisplayIdRevokeSessionRoute
-  '/api/admin/displays/auth/verify': typeof ApiAdminDisplaysAuthVerifyRoute
   '/api/admin/displays/enrollments/$requestId/approve': typeof ApiAdminDisplaysEnrollmentsRequestIdApproveRoute
   '/api/admin/displays/enrollments/$requestId/reject': typeof ApiAdminDisplaysEnrollmentsRequestIdRejectRoute
 }
@@ -248,12 +271,15 @@ export interface FileRoutesById {
   '/api/displays/session': typeof ApiDisplaysSessionRoute
   '/api/substitution/plans': typeof ApiSubstitutionPlansRoute
   '/admin/displays/': typeof AdminDisplaysIndexRoute
+  '/api/admin/auth/csrf': typeof ApiAdminAuthCsrfRoute
+  '/api/admin/auth/login': typeof ApiAdminAuthLoginRoute
+  '/api/admin/auth/logout': typeof ApiAdminAuthLogoutRoute
+  '/api/admin/auth/me': typeof ApiAdminAuthMeRoute
   '/api/admin/displays/$displayId': typeof ApiAdminDisplaysDisplayIdRouteWithChildren
   '/api/admin/displays/enrollment-codes': typeof ApiAdminDisplaysEnrollmentCodesRoute
   '/api/admin/displays/enrollments': typeof ApiAdminDisplaysEnrollmentsRouteWithChildren
   '/api/displays/enrollments/$requestId': typeof ApiDisplaysEnrollmentsRequestIdRoute
   '/api/admin/displays/$displayId/revoke-session': typeof ApiAdminDisplaysDisplayIdRevokeSessionRoute
-  '/api/admin/displays/auth/verify': typeof ApiAdminDisplaysAuthVerifyRoute
   '/api/admin/displays/enrollments/$requestId/approve': typeof ApiAdminDisplaysEnrollmentsRequestIdApproveRoute
   '/api/admin/displays/enrollments/$requestId/reject': typeof ApiAdminDisplaysEnrollmentsRequestIdRejectRoute
 }
@@ -278,12 +304,15 @@ export interface FileRouteTypes {
     | '/api/displays/session'
     | '/api/substitution/plans'
     | '/admin/displays/'
+    | '/api/admin/auth/csrf'
+    | '/api/admin/auth/login'
+    | '/api/admin/auth/logout'
+    | '/api/admin/auth/me'
     | '/api/admin/displays/$displayId'
     | '/api/admin/displays/enrollment-codes'
     | '/api/admin/displays/enrollments'
     | '/api/displays/enrollments/$requestId'
     | '/api/admin/displays/$displayId/revoke-session'
-    | '/api/admin/displays/auth/verify'
     | '/api/admin/displays/enrollments/$requestId/approve'
     | '/api/admin/displays/enrollments/$requestId/reject'
   fileRoutesByTo: FileRoutesByTo
@@ -303,12 +332,15 @@ export interface FileRouteTypes {
     | '/api/displays/session'
     | '/api/substitution/plans'
     | '/admin/displays'
+    | '/api/admin/auth/csrf'
+    | '/api/admin/auth/login'
+    | '/api/admin/auth/logout'
+    | '/api/admin/auth/me'
     | '/api/admin/displays/$displayId'
     | '/api/admin/displays/enrollment-codes'
     | '/api/admin/displays/enrollments'
     | '/api/displays/enrollments/$requestId'
     | '/api/admin/displays/$displayId/revoke-session'
-    | '/api/admin/displays/auth/verify'
     | '/api/admin/displays/enrollments/$requestId/approve'
     | '/api/admin/displays/enrollments/$requestId/reject'
   id:
@@ -331,12 +363,15 @@ export interface FileRouteTypes {
     | '/api/displays/session'
     | '/api/substitution/plans'
     | '/admin/displays/'
+    | '/api/admin/auth/csrf'
+    | '/api/admin/auth/login'
+    | '/api/admin/auth/logout'
+    | '/api/admin/auth/me'
     | '/api/admin/displays/$displayId'
     | '/api/admin/displays/enrollment-codes'
     | '/api/admin/displays/enrollments'
     | '/api/displays/enrollments/$requestId'
     | '/api/admin/displays/$displayId/revoke-session'
-    | '/api/admin/displays/auth/verify'
     | '/api/admin/displays/enrollments/$requestId/approve'
     | '/api/admin/displays/enrollments/$requestId/reject'
   fileRoutesById: FileRoutesById
@@ -352,6 +387,10 @@ export interface RootRouteChildren {
   ApiDisplaysEnrollmentsRoute: typeof ApiDisplaysEnrollmentsRouteWithChildren
   ApiDisplaysSessionRoute: typeof ApiDisplaysSessionRoute
   ApiSubstitutionPlansRoute: typeof ApiSubstitutionPlansRoute
+  ApiAdminAuthCsrfRoute: typeof ApiAdminAuthCsrfRoute
+  ApiAdminAuthLoginRoute: typeof ApiAdminAuthLoginRoute
+  ApiAdminAuthLogoutRoute: typeof ApiAdminAuthLogoutRoute
+  ApiAdminAuthMeRoute: typeof ApiAdminAuthMeRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -510,12 +549,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminDisplaysDisplayIdRouteImport
       parentRoute: typeof ApiAdminDisplaysRoute
     }
-    '/api/admin/displays/auth/verify': {
-      id: '/api/admin/displays/auth/verify'
-      path: '/auth/verify'
-      fullPath: '/api/admin/displays/auth/verify'
-      preLoaderRoute: typeof ApiAdminDisplaysAuthVerifyRouteImport
-      parentRoute: typeof ApiAdminDisplaysRoute
+    '/api/admin/auth/me': {
+      id: '/api/admin/auth/me'
+      path: '/api/admin/auth/me'
+      fullPath: '/api/admin/auth/me'
+      preLoaderRoute: typeof ApiAdminAuthMeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/auth/logout': {
+      id: '/api/admin/auth/logout'
+      path: '/api/admin/auth/logout'
+      fullPath: '/api/admin/auth/logout'
+      preLoaderRoute: typeof ApiAdminAuthLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/auth/login': {
+      id: '/api/admin/auth/login'
+      path: '/api/admin/auth/login'
+      fullPath: '/api/admin/auth/login'
+      preLoaderRoute: typeof ApiAdminAuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/auth/csrf': {
+      id: '/api/admin/auth/csrf'
+      path: '/api/admin/auth/csrf'
+      fullPath: '/api/admin/auth/csrf'
+      preLoaderRoute: typeof ApiAdminAuthCsrfRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/admin/displays/$displayId/revoke-session': {
       id: '/api/admin/displays/$displayId/revoke-session'
@@ -620,7 +680,6 @@ interface ApiAdminDisplaysRouteChildren {
   ApiAdminDisplaysDisplayIdRoute: typeof ApiAdminDisplaysDisplayIdRouteWithChildren
   ApiAdminDisplaysEnrollmentCodesRoute: typeof ApiAdminDisplaysEnrollmentCodesRoute
   ApiAdminDisplaysEnrollmentsRoute: typeof ApiAdminDisplaysEnrollmentsRouteWithChildren
-  ApiAdminDisplaysAuthVerifyRoute: typeof ApiAdminDisplaysAuthVerifyRoute
 }
 
 const ApiAdminDisplaysRouteChildren: ApiAdminDisplaysRouteChildren = {
@@ -628,7 +687,6 @@ const ApiAdminDisplaysRouteChildren: ApiAdminDisplaysRouteChildren = {
   ApiAdminDisplaysEnrollmentCodesRoute: ApiAdminDisplaysEnrollmentCodesRoute,
   ApiAdminDisplaysEnrollmentsRoute:
     ApiAdminDisplaysEnrollmentsRouteWithChildren,
-  ApiAdminDisplaysAuthVerifyRoute: ApiAdminDisplaysAuthVerifyRoute,
 }
 
 const ApiAdminDisplaysRouteWithChildren =
@@ -659,6 +717,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiDisplaysEnrollmentsRoute: ApiDisplaysEnrollmentsRouteWithChildren,
   ApiDisplaysSessionRoute: ApiDisplaysSessionRoute,
   ApiSubstitutionPlansRoute: ApiSubstitutionPlansRoute,
+  ApiAdminAuthCsrfRoute: ApiAdminAuthCsrfRoute,
+  ApiAdminAuthLoginRoute: ApiAdminAuthLoginRoute,
+  ApiAdminAuthLogoutRoute: ApiAdminAuthLogoutRoute,
+  ApiAdminAuthMeRoute: ApiAdminAuthMeRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

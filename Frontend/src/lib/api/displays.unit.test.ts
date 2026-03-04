@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import {
+  adminLogin,
   approveDisplayEnrollment,
   createEnrollment,
   createEnrollmentCode,
@@ -38,31 +39,90 @@ describe("display api client", () => {
     );
   });
 
-  it("passes admin token headers for code creation", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          codeId: "code-1",
-          code: "ABCD1234",
-          expiresAt: "2026-01-01T10:00:00Z",
-          maxUses: 5,
-        }),
-        {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        },
-      ),
+  it("creates enrollment code with csrf protection", async () => {
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            headerName: "X-CSRF-TOKEN",
+            parameterName: "_csrf",
+            token: "csrf-123",
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            codeId: "code-1",
+            code: "ABCD1234",
+            expiresAt: "2026-01-01T10:00:00Z",
+            maxUses: 5,
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        ),
+      );
+
+    await createEnrollmentCode({ ttlSeconds: 300, maxUses: 5 });
+
+    expect(fetchSpy).toHaveBeenNthCalledWith(
+      1,
+      "/api/admin/auth/csrf",
+      undefined,
     );
 
-    await createEnrollmentCode(
-      { adminToken: "admin-secret", adminPassword: "1234" },
-      { ttlSeconds: 300, maxUses: 5 },
-    );
-
-    const [, init] = fetchSpy.mock.calls[0] ?? [];
+    const [, init] = fetchSpy.mock.calls[1] ?? [];
     const headers = new Headers((init as RequestInit | undefined)?.headers);
-    expect(headers.get("x-admin-token")).toBe("admin-secret");
-    expect(headers.get("x-admin-password")).toBe("1234");
+    expect(headers.get("x-csrf-token")).toBe("csrf-123");
+    expect(headers.get("content-type")).toBe("application/json");
+  });
+
+  it("logs in admin using username/password", async () => {
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            headerName: "X-CSRF-TOKEN",
+            parameterName: "_csrf",
+            token: "csrf-123",
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            authenticated: true,
+            username: "admin",
+            roles: ["ROLE_ADMIN"],
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        ),
+      );
+
+    const response = await adminLogin("admin", "password");
+
+    expect(response.authenticated).toBe(true);
+    const [, init] = fetchSpy.mock.calls[1] ?? [];
+    const requestInit = init as RequestInit;
+    expect(requestInit.method).toBe("POST");
+    expect(requestInit.body).toContain("admin");
+    const headers = new Headers(requestInit.headers);
+    expect(headers.get("x-csrf-token")).toBe("csrf-123");
   });
 
   it("validates session with bearer token", async () => {
@@ -88,32 +148,48 @@ describe("display api client", () => {
     expect(response.displayId).toBe("display-1");
   });
 
-  it("approves enrollment request via admin endpoint", async () => {
-    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
-      new Response(
-        JSON.stringify({
-          requestId: "request-1",
-          status: "APPROVED",
-          displayId: "display-1",
-          displaySessionToken: "token-123",
-          pollAfterSeconds: null,
-        }),
-        {
-          status: 200,
-          headers: { "Content-Type": "application/json" },
-        },
-      ),
-    );
+  it("approves enrollment request via csrf-protected admin endpoint", async () => {
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            headerName: "X-CSRF-TOKEN",
+            parameterName: "_csrf",
+            token: "csrf-123",
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            requestId: "request-1",
+            status: "APPROVED",
+            displayId: "display-1",
+            displaySessionToken: "token-123",
+            pollAfterSeconds: null,
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        ),
+      );
 
-    await approveDisplayEnrollment(
-      { adminToken: "admin-secret", adminPassword: "1234" },
-      "request-1",
-      {},
-    );
+    await approveDisplayEnrollment("request-1", {});
 
-    expect(fetchSpy).toHaveBeenCalledWith(
+    expect(fetchSpy).toHaveBeenNthCalledWith(
+      2,
       "/api/admin/displays/enrollments/request-1/approve",
       expect.objectContaining({ method: "POST" }),
     );
+
+    const [, init] = fetchSpy.mock.calls[1] ?? [];
+    const headers = new Headers((init as RequestInit | undefined)?.headers);
+    expect(headers.get("x-csrf-token")).toBe("csrf-123");
   });
 });

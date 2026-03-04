@@ -9,7 +9,7 @@ afterEach(() => {
 });
 
 describe("proxy request handlers", () => {
-  it("forwards POST bodies and admin headers", async () => {
+  it("forwards POST bodies, cookie and csrf header", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(JSON.stringify({ ok: true }), {
         status: 200,
@@ -29,7 +29,8 @@ describe("proxy request handlers", () => {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-Admin-Token": "admin-token",
+            Cookie: "JSESSIONID=session-1; XSRF-TOKEN=csrf-cookie",
+            "X-CSRF-TOKEN": "csrf-header",
           },
           body: JSON.stringify({ ttlSeconds: 300, maxUses: 2 }),
         },
@@ -39,7 +40,8 @@ describe("proxy request handlers", () => {
     const [, init] = fetchSpy.mock.calls[0] ?? [];
     const headers = new Headers((init as RequestInit | undefined)?.headers);
     expect((init as RequestInit | undefined)?.method).toBe("POST");
-    expect(headers.get("x-admin-token")).toBe("admin-token");
+    expect(headers.get("cookie")).toContain("JSESSIONID=session-1");
+    expect(headers.get("x-csrf-token")).toBe("csrf-header");
     await expect(
       new Response((init as RequestInit | undefined)?.body).text(),
     ).resolves.toContain("ttlSeconds");

@@ -1,8 +1,6 @@
 const DISPLAY_SESSION_TOKEN_KEY = "display_session_token";
 const DISPLAY_ID_KEY = "display_id";
 const DISPLAY_PENDING_REQUEST_ID_KEY = "display_pending_request_id";
-const ADMIN_API_TOKEN_KEY = "display_admin_api_token";
-const ADMIN_PASSWORD_KEY = "display_admin_password";
 
 function getStorage(): Storage | null {
   if (typeof window === "undefined") {
@@ -68,39 +66,4 @@ export function clearDisplaySessionStorage() {
   setDisplaySessionToken(null);
   setDisplayIdHint(null);
   setPendingEnrollmentRequestId(null);
-}
-
-export function getAdminApiToken(): string | null {
-  return readStorageValue(ADMIN_API_TOKEN_KEY);
-}
-
-export function setAdminApiToken(value: string | null) {
-  writeStorageValue(ADMIN_API_TOKEN_KEY, value);
-}
-
-export function getAdminPassword(): string | null {
-  return readStorageValue(ADMIN_PASSWORD_KEY);
-}
-
-export function setAdminPassword(value: string | null) {
-  writeStorageValue(ADMIN_PASSWORD_KEY, value);
-}
-
-export interface AdminCredentials {
-  adminToken: string;
-  adminPassword: string;
-}
-
-export function getAdminCredentials(): AdminCredentials | null {
-  const adminToken = getAdminApiToken();
-  const adminPassword = getAdminPassword();
-  if (!adminToken || !adminPassword) {
-    return null;
-  }
-  return { adminToken, adminPassword };
-}
-
-export function clearAdminAuthStorage() {
-  setAdminApiToken(null);
-  setAdminPassword(null);
 }

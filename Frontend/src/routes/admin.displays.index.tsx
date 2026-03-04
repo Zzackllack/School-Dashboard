@@ -1,18 +1,17 @@
 import { Link, createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { createEnrollmentCode, listDisplays } from "../lib/api/displays";
 import {
-  clearAdminAuthStorage,
-  getAdminCredentials,
-} from "../lib/display-session";
+  adminLogout,
+  createEnrollmentCode,
+  listDisplays,
+} from "../lib/api/displays";
 
 export const Route = createFileRoute("/admin/displays/")({
   component: AdminDisplaysPage,
 });
 
 function AdminDisplaysPage() {
-  const [credentials, setCredentials] = useState(() => getAdminCredentials());
   const [ttlSeconds, setTtlSeconds] = useState("900");
   const [maxUses, setMaxUses] = useState("5");
   const [createdCode, setCreatedCode] = useState<string | null>(null);
@@ -30,13 +29,8 @@ function AdminDisplaysPage() {
     let cancelled = false;
 
     async function loadDisplays() {
-      if (!credentials) {
-        setDisplays([]);
-        return;
-      }
-
       try {
-        const response = await listDisplays(credentials);
+        const response = await listDisplays();
         if (!cancelled) {
           setDisplays(response);
         }
@@ -56,20 +50,15 @@ function AdminDisplaysPage() {
     return () => {
       cancelled = true;
     };
-  }, [credentials]);
+  }, []);
 
   async function handleCodeCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setStatusMessage(null);
     setCreatedCode(null);
 
-    if (!credentials) {
-      setStatusMessage("Bitte zuerst im Admin-Bereich anmelden.");
-      return;
-    }
-
     try {
-      const response = await createEnrollmentCode(credentials, {
+      const response = await createEnrollmentCode({
         ttlSeconds: Number(ttlSeconds),
         maxUses: Number(maxUses),
       });
@@ -84,6 +73,15 @@ function AdminDisplaysPage() {
           : "Enrollment-Code konnte nicht erstellt werden.",
       );
     }
+  }
+
+  async function handleLogout() {
+    try {
+      await adminLogout();
+    } catch {
+      // ignore and continue to login page
+    }
+    window.location.href = "/admin/login";
   }
 
   return (
@@ -105,11 +103,7 @@ function AdminDisplaysPage() {
             <button
               className="rounded-md border border-slate-300 px-3 py-2 font-semibold text-slate-700"
               type="button"
-              onClick={() => {
-                clearAdminAuthStorage();
-                setCredentials(null);
-                window.location.href = "/admin/login";
-              }}
+              onClick={() => void handleLogout()}
             >
               Abmelden
             </button>
@@ -175,7 +169,7 @@ function AdminDisplaysPage() {
                 >
                   <p className="font-semibold">{display.name}</p>
                   <p className="text-sm text-slate-600">
-                    Status: {display.status} | Standort:{" "}
+                    Status: {display.status} | Standort: {" "}
                     {display.locationLabel ?? "-"}
                   </p>
                   <Link

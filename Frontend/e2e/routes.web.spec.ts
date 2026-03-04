@@ -183,13 +183,26 @@ test.beforeEach(async ({ page }) => {
     },
   );
 
-  await page.route("**/api/admin/displays/auth/verify", async (route) => {
+  await page.route("**/api/admin/auth/me", async (route) => {
     await route.fulfill({
       status: 200,
       contentType: "application/json",
       body: JSON.stringify({
         authenticated: true,
-        adminId: "admin",
+        username: "admin",
+        roles: ["ROLE_ADMIN"],
+      }),
+    });
+  });
+
+  await page.route("**/api/admin/auth/csrf", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        headerName: "X-CSRF-TOKEN",
+        parameterName: "_csrf",
+        token: "csrf-test-token",
       }),
     });
   });
@@ -376,10 +389,6 @@ test("blocks direct /display/:displayId access when token is revoked", async ({
 
 test("admin pending page supports approval action", async ({ page }) => {
   let approved = false;
-  await page.addInitScript(() => {
-    window.localStorage.setItem("display_admin_api_token", "admin-secret");
-    window.localStorage.setItem("display_admin_password", "1234");
-  });
 
   await page.route(
     "**/api/admin/displays/enrollments?status=PENDING",
@@ -434,10 +443,6 @@ test("admin pending page supports approval action", async ({ page }) => {
 
 test("admin pending page supports rejection action", async ({ page }) => {
   let rejected = false;
-  await page.addInitScript(() => {
-    window.localStorage.setItem("display_admin_api_token", "admin-secret");
-    window.localStorage.setItem("display_admin_password", "1234");
-  });
 
   await page.route(
     "**/api/admin/displays/enrollments?status=PENDING",
