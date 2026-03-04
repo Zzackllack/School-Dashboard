@@ -93,7 +93,7 @@ function AdminPendingDisplaysPage() {
                   ID: {request.requestId}
                 </p>
                 <p className="mt-1 text-xs text-slate-500">
-                  Erstellt: {" "}
+                  Erstellt:{" "}
                   {new Date(request.createdAt).toLocaleString("de-DE")} | Läuft
                   ab: {new Date(request.expiresAt).toLocaleString("de-DE")}
                 </p>

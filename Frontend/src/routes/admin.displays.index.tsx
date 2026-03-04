@@ -169,7 +169,7 @@ function AdminDisplaysPage() {
                 >
                   <p className="font-semibold">{display.name}</p>
                   <p className="text-sm text-slate-600">
-                    Status: {display.status} | Standort: {" "}
+                    Status: {display.status} | Standort:{" "}
                     {display.locationLabel ?? "-"}
                   </p>
                   <Link

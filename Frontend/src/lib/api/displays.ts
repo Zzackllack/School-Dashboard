@@ -113,11 +113,14 @@ export async function adminLogin(
   const headers = await getAdminCsrfHeaders({
     "Content-Type": "application/json",
   });
-  const response = await fetchJson<AdminAuthStatusResponse>("/admin/auth/login", {
-    method: "POST",
-    headers,
-    body: JSON.stringify({ username, password }),
-  });
+  const response = await fetchJson<AdminAuthStatusResponse>(
+    "/admin/auth/login",
+    {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ username, password }),
+    },
+  );
 
   if (!response) {
     throw new Error("Admin login returned an empty response");
@@ -151,13 +154,16 @@ export async function getAdminAuthStatus(): Promise<AdminAuthStatusResponse> {
 export async function createEnrollment(
   request: CreateEnrollmentRequest,
 ): Promise<CreateEnrollmentResponse> {
-  const response = await fetchJson<CreateEnrollmentResponse>("/displays/enrollments", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await fetchJson<CreateEnrollmentResponse>(
+    "/displays/enrollments",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(request),
     },
-    body: JSON.stringify(request),
-  });
+  );
 
   if (!response) {
     throw new Error("Enrollment creation returned an empty response");
