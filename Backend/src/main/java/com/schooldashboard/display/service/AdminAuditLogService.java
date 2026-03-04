@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.schooldashboard.display.entity.AdminAuditLogEntity;
 import com.schooldashboard.display.repository.AdminAuditLogRepository;
 import java.util.Map;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -20,6 +22,18 @@ public class AdminAuditLogService {
 
 	public void log(String adminId, String action, String targetType, String targetId, Map<String, Object> metadata) {
 		auditLogRepository.save(new AdminAuditLogEntity(adminId, action, targetType, targetId, serialize(metadata)));
+	}
+
+	public void logCurrentAdmin(String action, String targetType, String targetId, Map<String, Object> metadata) {
+		log(resolveCurrentAdminId(), action, targetType, targetId, metadata);
+	}
+
+	private String resolveCurrentAdminId() {
+		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+		if (authentication == null || !authentication.isAuthenticated()) {
+			return "system";
+		}
+		return authentication.getName();
 	}
 
 	private String serialize(Map<String, Object> metadata) {

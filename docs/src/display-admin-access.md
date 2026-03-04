@@ -1,28 +1,26 @@
 # Display Admin Access
 
-This project uses a shared admin API token for display-admin endpoints.
+This project uses Spring Security session authentication for display-admin endpoints.
 
 ## How admin authentication works
 
-- Every admin API call requires `X-Admin-Token`.
-- Backend validates this token in `AdminAuthService`.
-- Admin UI pages (`/admin/displays`, `/admin/displays/pending`) send this header from the token field in the page.
+- Admin users log in at `POST /api/admin/auth/login` with username/password.
+- Authenticated session state is stored server-side and tracked by `JSESSIONID`.
+- Admin API routes under `/api/admin/**` require `ROLE_ADMIN`.
+- Admin UI should call `GET /api/admin/auth/csrf` and include CSRF token on state-changing requests.
 
-## Configure the admin token
+## Configure secure admin bootstrap
 
-You can define the token in either of these ways:
+Use bootstrap only for first setup in local/dev or controlled recovery:
 
-1. Environment variable (recommended):
-   - `DISPLAY_ADMIN_AUTH_API_TOKEN=your-strong-secret`
-2. `application.properties`:
-   - `display.admin-auth.api-token=your-strong-secret`
-
-Spring Boot relaxed binding maps:
-- `display.admin-auth.api-token` <-> `DISPLAY_ADMIN_AUTH_API_TOKEN`
+1. Environment variables (recommended):
+   - `SECURITY_ADMIN_BOOTSTRAP_ENABLED=true`
+   - `SECURITY_ADMIN_BOOTSTRAP_USERNAME=admin`
+   - `SECURITY_ADMIN_BOOTSTRAP_PASSWORD=<strong-password>`
+2. Disable bootstrap after creating permanent admin users.
 
 ## Important notes
 
-- Current code defaults to `dev-admin-token` when nothing is configured.
-- Do not use the default in staging/production.
-- Treat the token like a secret and rotate it if leaked.
-
+- No static `X-Admin-*` header authentication is used anymore.
+- Never commit admin credentials to source control.
+- Restrict `SECURITY_CORS_ALLOWED_ORIGINS` explicitly.

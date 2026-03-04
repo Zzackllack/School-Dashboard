@@ -36,6 +36,7 @@ import java.util.Optional;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -73,6 +74,7 @@ public class DisplayEnrollmentService {
 	}
 
 	@Transactional
+	@PreAuthorize("hasRole('ADMIN')")
 	public CreateEnrollmentCodeResponse createEnrollmentCode(String adminId, CreateEnrollmentCodeRequest request) {
 		int ttlSeconds = normalizePositiveInt(request.ttlSeconds(), enrollmentProperties.getCodeTtlSeconds());
 		int maxUses = normalizePositiveInt(request.maxUses(), enrollmentProperties.getDefaultCodeMaxUses());
@@ -168,6 +170,7 @@ public class DisplayEnrollmentService {
 	}
 
 	@Transactional
+	@PreAuthorize("hasRole('ADMIN')")
 	public EnrollmentStatusResponse approveEnrollment(String requestId, ApproveEnrollmentRequest request,
 			String adminId) {
 		DisplayEnrollmentRequestEntity requestEntity = findEnrollmentRequest(requestId);
@@ -212,6 +215,7 @@ public class DisplayEnrollmentService {
 	}
 
 	@Transactional
+	@PreAuthorize("hasRole('ADMIN')")
 	public EnrollmentStatusResponse rejectEnrollment(String requestId, RejectEnrollmentRequest request,
 			String adminId) {
 		DisplayEnrollmentRequestEntity requestEntity = findEnrollmentRequest(requestId);
@@ -272,6 +276,7 @@ public class DisplayEnrollmentService {
 	}
 
 	@Transactional
+	@PreAuthorize("hasRole('ADMIN')")
 	public DisplaySummaryResponse revokeDisplaySession(String displayId, String adminId) {
 		DisplayEntity displayEntity = displayRepository.findById(displayId).orElseThrow(
 				() -> new DisplayDomainException("DISPLAY_NOT_FOUND", HttpStatus.NOT_FOUND, "Display not found"));
@@ -298,6 +303,7 @@ public class DisplayEnrollmentService {
 	}
 
 	@Transactional
+	@PreAuthorize("hasRole('ADMIN')")
 	public DisplaySummaryResponse updateDisplay(String displayId, UpdateDisplayRequest request, String adminId) {
 		DisplayEntity displayEntity = displayRepository.findById(displayId).orElseThrow(
 				() -> new DisplayDomainException("DISPLAY_NOT_FOUND", HttpStatus.NOT_FOUND, "Display not found"));
@@ -369,6 +375,7 @@ public class DisplayEnrollmentService {
 	}
 
 	@Transactional
+	@PreAuthorize("hasRole('ADMIN')")
 	public void deleteDisplay(String displayId, String adminId) {
 		DisplayEntity displayEntity = displayRepository.findById(displayId).orElseThrow(
 				() -> new DisplayDomainException("DISPLAY_NOT_FOUND", HttpStatus.NOT_FOUND, "Display not found"));

@@ -6,6 +6,7 @@ import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import static org.mockito.Mockito.when;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.cache.CacheManager;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -19,6 +20,7 @@ import com.schooldashboard.service.DSBService;
 import com.schooldashboard.util.DSBMobile;
 
 @WebMvcTest(DSBController.class)
+@AutoConfigureMockMvc(addFilters = false)
 public class DSBControllerTest {
 
 	@Autowired
