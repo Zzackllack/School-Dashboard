@@ -9,7 +9,7 @@ afterEach(() => {
 });
 
 describe("proxy request handlers", () => {
-  it("forwards POST bodies, cookie and csrf header", async () => {
+  it("forwards POST bodies, cookie and xsrf header", async () => {
     const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(JSON.stringify({ ok: true }), {
         status: 200,
@@ -30,7 +30,7 @@ describe("proxy request handlers", () => {
           headers: {
             "Content-Type": "application/json",
             Cookie: "JSESSIONID=session-1; XSRF-TOKEN=csrf-cookie",
-            "X-CSRF-TOKEN": "csrf-header",
+            "X-XSRF-TOKEN": "csrf-header",
           },
           body: JSON.stringify({ ttlSeconds: 300, maxUses: 2 }),
         },
@@ -41,7 +41,7 @@ describe("proxy request handlers", () => {
     const headers = new Headers((init as RequestInit | undefined)?.headers);
     expect((init as RequestInit | undefined)?.method).toBe("POST");
     expect(headers.get("cookie")).toContain("JSESSIONID=session-1");
-    expect(headers.get("x-csrf-token")).toBe("csrf-header");
+    expect(headers.get("x-xsrf-token")).toBe("csrf-header");
     await expect(
       new Response((init as RequestInit | undefined)?.body).text(),
     ).resolves.toContain("ttlSeconds");

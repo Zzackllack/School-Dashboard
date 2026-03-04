@@ -41,10 +41,6 @@ public class DevAdminBootstrapInitializer implements ApplicationRunner {
 		AppRoleEntity adminRole = appRoleRepository.findByName("ROLE_ADMIN")
 				.orElseGet(() -> appRoleRepository.save(new AppRoleEntity("ROLE_ADMIN")));
 
-		if (appUserRepository.count() > 0) {
-			return;
-		}
-
 		SecurityProperties.Bootstrap bootstrap = securityProperties.getAdmin().getBootstrap();
 		if (bootstrap.isEnabled()) {
 			String username = trimToNull(bootstrap.getUsername());
@@ -53,7 +49,11 @@ public class DevAdminBootstrapInitializer implements ApplicationRunner {
 				handleBootstrapMissingCredentials();
 				return;
 			}
-			createBootstrapAdmin(username, password, adminRole);
+			ensureBootstrapAdmin(username, password, adminRole);
+			return;
+		}
+
+		if (appUserRepository.count() > 0) {
 			return;
 		}
 
@@ -74,17 +74,45 @@ public class DevAdminBootstrapInitializer implements ApplicationRunner {
 				"security.admin.bootstrap.enabled=true but username/password are missing. Admin bootstrap skipped in non-prod profile.");
 	}
 
-	private void createBootstrapAdmin(String username, String password, AppRoleEntity adminRole) {
-		if (appUserRepository.findByUsername(username).isPresent()) {
-			logger.info("Bootstrap admin '{}' already exists", username);
+	private void ensureBootstrapAdmin(String username, String password, AppRoleEntity adminRole) {
+		AppUserEntity adminUser = appUserRepository.findByUsername(username).orElse(null);
+		if (adminUser == null) {
+			adminUser = new AppUserEntity(username, passwordEncoder.encode(password));
+			adminUser.addRole(adminRole);
+			appUserRepository.save(adminUser);
+			logger.warn("Bootstrapped initial admin account '{}'. Rotate credentials after first login.", username);
 			return;
 		}
 
-		AppUserEntity adminUser = new AppUserEntity(username, passwordEncoder.encode(password));
-		adminUser.addRole(adminRole);
-		appUserRepository.save(adminUser);
+		boolean changed = false;
+		if (!passwordEncoder.matches(password, adminUser.getPasswordHash())) {
+			adminUser.setPasswordHash(passwordEncoder.encode(password));
+			changed = true;
+		}
+		if (!adminUser.getRoles().stream().map(AppRoleEntity::getName).anyMatch("ROLE_ADMIN"::equals)) {
+			adminUser.addRole(adminRole);
+			changed = true;
+		}
+		if (!adminUser.isEnabled()) {
+			adminUser.setEnabled(true);
+			changed = true;
+		}
+		if (adminUser.isLocked() || adminUser.getFailedLoginCount() > 0 || adminUser.getLockedUntil() != null
+				|| adminUser.getLastFailedLoginAt() != null) {
+			adminUser.setLocked(false);
+			adminUser.setFailedLoginCount(0);
+			adminUser.setLockedUntil(null);
+			adminUser.setLastFailedLoginAt(null);
+			changed = true;
+		}
 
-		logger.warn("Bootstrapped initial admin account '{}'. Rotate credentials after first login.", username);
+		if (changed) {
+			appUserRepository.save(adminUser);
+			logger.warn("Refreshed bootstrap admin account '{}' with ROLE_ADMIN and current bootstrap password.",
+					username);
+		} else {
+			logger.info("Bootstrap admin '{}' already configured", username);
+		}
 	}
 
 	private boolean isProdProfile() {

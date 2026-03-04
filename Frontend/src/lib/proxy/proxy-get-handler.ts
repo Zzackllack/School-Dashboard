@@ -8,6 +8,7 @@ const FORWARDED_HEADERS = [
   "cookie",
   "content-type",
   "x-csrf-token",
+  "x-xsrf-token",
   "x-request-id",
 ];
 
