@@ -23,7 +23,7 @@ public class AppUserEntity {
 	@Column(name = "id", nullable = false, length = 36)
 	private String id;
 
-	@Column(name = "username", nullable = false, unique = true, length = 120, updatable = false)
+	@Column(name = "username", nullable = false, unique = true, length = 120)
 	private String username;
 
 	@Column(name = "password_hash", nullable = false, length = 255)
@@ -94,6 +94,13 @@ public class AppUserEntity {
 
 	public String getUsername() {
 		return username;
+	}
+
+	public void setUsername(String username) {
+		if (username == null || username.trim().isEmpty()) {
+			throw new IllegalArgumentException("username must not be null or blank");
+		}
+		this.username = username.trim();
 	}
 
 	public String getPasswordHash() {

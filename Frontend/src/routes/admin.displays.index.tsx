@@ -4,7 +4,9 @@ import type { FormEvent } from "react";
 import {
   adminLogout,
   createEnrollmentCode,
+  getAdminAuthStatus,
   listDisplays,
+  updateAdminCredentials,
 } from "../lib/api/displays";
 
 export const Route = createFileRoute("/admin/displays/")({
@@ -16,6 +18,13 @@ function AdminDisplaysPage() {
   const [maxUses, setMaxUses] = useState("5");
   const [createdCode, setCreatedCode] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [credentialMessage, setCredentialMessage] = useState<string | null>(null);
+  const [credentialError, setCredentialError] = useState<string | null>(null);
+  const [currentUsername, setCurrentUsername] = useState<string>("");
+  const [newUsername, setNewUsername] = useState("");
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [isCredentialSubmitting, setIsCredentialSubmitting] = useState(false);
   const [displays, setDisplays] = useState<
     Array<{
       id: string;
@@ -30,9 +39,13 @@ function AdminDisplaysPage() {
 
     async function loadDisplays() {
       try {
-        const response = await listDisplays();
+        const [response, authStatus] = await Promise.all([
+          listDisplays(),
+          getAdminAuthStatus(),
+        ]);
         if (!cancelled) {
           setDisplays(response);
+          setCurrentUsername(authStatus.username ?? "");
         }
       } catch (error) {
         if (!cancelled) {
@@ -75,6 +88,35 @@ function AdminDisplaysPage() {
     }
   }
 
+  async function handleCredentialUpdate(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setCredentialMessage(null);
+    setCredentialError(null);
+    setIsCredentialSubmitting(true);
+
+    try {
+      const response = await updateAdminCredentials({
+        currentPassword,
+        newUsername: newUsername.trim() || undefined,
+        newPassword: newPassword.trim() || undefined,
+      });
+
+      setCurrentUsername(response.username ?? "");
+      setNewUsername("");
+      setCurrentPassword("");
+      setNewPassword("");
+      setCredentialMessage("Zugangsdaten erfolgreich aktualisiert.");
+    } catch (error) {
+      setCredentialError(
+        error instanceof Error
+          ? error.message
+          : "Zugangsdaten konnten nicht aktualisiert werden.",
+      );
+    } finally {
+      setIsCredentialSubmitting(false);
+    }
+  }
+
   async function handleLogout() {
     try {
       await adminLogout();
@@ -109,6 +151,72 @@ function AdminDisplaysPage() {
             </button>
           </div>
         </header>
+
+        <section className="rounded-2xl bg-white p-6 shadow-lg">
+          <h2 className="text-xl font-semibold">Admin-Zugangsdaten</h2>
+          <form className="mt-4 grid gap-4 sm:grid-cols-2" onSubmit={handleCredentialUpdate}>
+            <label className="text-sm font-semibold text-slate-700 sm:col-span-2">
+              Aktueller Benutzername
+              <input
+                className="mt-2 w-full rounded-lg border border-slate-300 bg-slate-50 px-3 py-2 text-slate-600"
+                value={currentUsername}
+                readOnly
+              />
+            </label>
+
+            <label className="text-sm font-semibold text-slate-700">
+              Neuer Benutzername
+              <input
+                className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
+                value={newUsername}
+                onChange={(event) => setNewUsername(event.target.value)}
+                placeholder="Optional"
+                autoComplete="username"
+              />
+            </label>
+
+            <label className="text-sm font-semibold text-slate-700">
+              Neues Passwort
+              <input
+                className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
+                value={newPassword}
+                onChange={(event) => setNewPassword(event.target.value)}
+                type="password"
+                placeholder="Optional"
+                autoComplete="new-password"
+              />
+            </label>
+
+            <label className="text-sm font-semibold text-slate-700 sm:col-span-2">
+              Aktuelles Passwort (Bestätigung)
+              <input
+                className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
+                value={currentPassword}
+                onChange={(event) => setCurrentPassword(event.target.value)}
+                type="password"
+                autoComplete="current-password"
+                required
+              />
+            </label>
+
+            <div className="sm:col-span-2">
+              <button
+                type="submit"
+                className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                disabled={isCredentialSubmitting}
+              >
+                Zugangsdaten aktualisieren
+              </button>
+            </div>
+          </form>
+
+          {credentialMessage ? (
+            <p className="mt-3 text-sm text-emerald-700">{credentialMessage}</p>
+          ) : null}
+          {credentialError ? (
+            <p className="mt-3 text-sm text-rose-700">{credentialError}</p>
+          ) : null}
+        </section>
 
         <section className="rounded-2xl bg-white p-6 shadow-lg">
           <h2 className="text-xl font-semibold">Enrollment Code erstellen</h2>

@@ -91,6 +91,12 @@ export interface AdminAuthStatusResponse {
   roles: string[];
 }
 
+export interface AdminCredentialUpdateRequest {
+  currentPassword: string;
+  newUsername?: string;
+  newPassword?: string;
+}
+
 interface CsrfTokenResponse {
   headerName: string;
   parameterName: string;
@@ -159,6 +165,28 @@ export async function getAdminAuthStatus(): Promise<AdminAuthStatusResponse> {
     }
     throw error;
   }
+}
+
+export async function updateAdminCredentials(
+  payload: AdminCredentialUpdateRequest,
+): Promise<AdminAuthStatusResponse> {
+  const headers = await getAdminCsrfHeaders({
+    "Content-Type": "application/json",
+  });
+
+  const response = await fetchJson<AdminAuthStatusResponse>(
+    "/admin/auth/credentials",
+    {
+      method: "POST",
+      headers,
+      body: JSON.stringify(payload),
+    },
+  );
+
+  if (!response) {
+    throw new Error("Credential update returned an empty response");
+  }
+  return response;
 }
 
 export async function createEnrollment(

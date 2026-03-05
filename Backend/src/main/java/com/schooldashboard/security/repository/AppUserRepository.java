@@ -12,6 +12,8 @@ public interface AppUserRepository extends JpaRepository<AppUserEntity, String> 
 
 	Optional<AppUserEntity> findByUsername(String username);
 
+	boolean existsByUsername(String username);
+
 	@Lock(LockModeType.PESSIMISTIC_WRITE)
 	@Query("select user from AppUserEntity user where user.username = :username")
 	Optional<AppUserEntity> findLockedByUsername(@Param("username") String username);

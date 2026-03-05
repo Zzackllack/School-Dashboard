@@ -4,6 +4,7 @@ import {
   approveDisplayEnrollment,
   createEnrollment,
   createEnrollmentCode,
+  updateAdminCredentials,
   validateDisplaySession,
 } from "./displays";
 
@@ -190,6 +191,55 @@ describe("display api client", () => {
 
     const [, init] = fetchSpy.mock.calls[1] ?? [];
     const headers = new Headers((init as RequestInit | undefined)?.headers);
+    expect(headers.get("x-csrf-token")).toBe("csrf-123");
+  });
+
+  it("updates admin credentials with csrf protection", async () => {
+    const fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            headerName: "X-CSRF-TOKEN",
+            parameterName: "_csrf",
+            token: "csrf-123",
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        ),
+      )
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            authenticated: true,
+            username: "renamed-admin",
+            roles: ["ROLE_ADMIN"],
+          }),
+          {
+            status: 200,
+            headers: { "Content-Type": "application/json" },
+          },
+        ),
+      );
+
+    const response = await updateAdminCredentials({
+      currentPassword: "old-password",
+      newUsername: "renamed-admin",
+      newPassword: "new-password",
+    });
+
+    expect(response.username).toBe("renamed-admin");
+    expect(fetchSpy).toHaveBeenNthCalledWith(
+      2,
+      "/api/admin/auth/credentials",
+      expect.objectContaining({ method: "POST" }),
+    );
+    const [, init] = fetchSpy.mock.calls[1] ?? [];
+    const requestInit = init as RequestInit;
+    expect(requestInit.body).toContain("renamed-admin");
+    const headers = new Headers(requestInit.headers);
     expect(headers.get("x-csrf-token")).toBe("csrf-123");
   });
 });

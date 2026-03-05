@@ -35,6 +35,7 @@ import { Route as ApiAdminAuthMeRouteImport } from './routes/api.admin.auth.me'
 import { Route as ApiAdminAuthLogoutRouteImport } from './routes/api.admin.auth.logout'
 import { Route as ApiAdminAuthLoginRouteImport } from './routes/api.admin.auth.login'
 import { Route as ApiAdminAuthCsrfRouteImport } from './routes/api.admin.auth.csrf'
+import { Route as ApiAdminAuthCredentialsRouteImport } from './routes/api.admin.auth.credentials'
 import { Route as ApiAdminDisplaysDisplayIdRevokeSessionRouteImport } from './routes/api.admin.displays.$displayId.revoke-session'
 import { Route as ApiAdminDisplaysEnrollmentsRequestIdRejectRouteImport } from './routes/api.admin.displays.enrollments.$requestId.reject'
 import { Route as ApiAdminDisplaysEnrollmentsRequestIdApproveRouteImport } from './routes/api.admin.displays.enrollments.$requestId.approve'
@@ -173,6 +174,11 @@ const ApiAdminAuthCsrfRoute = ApiAdminAuthCsrfRouteImport.update({
   path: '/api/admin/auth/csrf',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminAuthCredentialsRoute = ApiAdminAuthCredentialsRouteImport.update({
+  id: '/api/admin/auth/credentials',
+  path: '/api/admin/auth/credentials',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAdminDisplaysDisplayIdRevokeSessionRoute =
   ApiAdminDisplaysDisplayIdRevokeSessionRouteImport.update({
     id: '/revoke-session',
@@ -211,6 +217,7 @@ export interface FileRoutesByFullPath {
   '/api/displays/session': typeof ApiDisplaysSessionRoute
   '/api/substitution/plans': typeof ApiSubstitutionPlansRoute
   '/admin/displays/': typeof AdminDisplaysIndexRoute
+  '/api/admin/auth/credentials': typeof ApiAdminAuthCredentialsRoute
   '/api/admin/auth/csrf': typeof ApiAdminAuthCsrfRoute
   '/api/admin/auth/login': typeof ApiAdminAuthLoginRoute
   '/api/admin/auth/logout': typeof ApiAdminAuthLogoutRoute
@@ -239,6 +246,7 @@ export interface FileRoutesByTo {
   '/api/displays/session': typeof ApiDisplaysSessionRoute
   '/api/substitution/plans': typeof ApiSubstitutionPlansRoute
   '/admin/displays': typeof AdminDisplaysIndexRoute
+  '/api/admin/auth/credentials': typeof ApiAdminAuthCredentialsRoute
   '/api/admin/auth/csrf': typeof ApiAdminAuthCsrfRoute
   '/api/admin/auth/login': typeof ApiAdminAuthLoginRoute
   '/api/admin/auth/logout': typeof ApiAdminAuthLogoutRoute
@@ -271,6 +279,7 @@ export interface FileRoutesById {
   '/api/displays/session': typeof ApiDisplaysSessionRoute
   '/api/substitution/plans': typeof ApiSubstitutionPlansRoute
   '/admin/displays/': typeof AdminDisplaysIndexRoute
+  '/api/admin/auth/credentials': typeof ApiAdminAuthCredentialsRoute
   '/api/admin/auth/csrf': typeof ApiAdminAuthCsrfRoute
   '/api/admin/auth/login': typeof ApiAdminAuthLoginRoute
   '/api/admin/auth/logout': typeof ApiAdminAuthLogoutRoute
@@ -304,6 +313,7 @@ export interface FileRouteTypes {
     | '/api/displays/session'
     | '/api/substitution/plans'
     | '/admin/displays/'
+    | '/api/admin/auth/credentials'
     | '/api/admin/auth/csrf'
     | '/api/admin/auth/login'
     | '/api/admin/auth/logout'
@@ -332,6 +342,7 @@ export interface FileRouteTypes {
     | '/api/displays/session'
     | '/api/substitution/plans'
     | '/admin/displays'
+    | '/api/admin/auth/credentials'
     | '/api/admin/auth/csrf'
     | '/api/admin/auth/login'
     | '/api/admin/auth/logout'
@@ -363,6 +374,7 @@ export interface FileRouteTypes {
     | '/api/displays/session'
     | '/api/substitution/plans'
     | '/admin/displays/'
+    | '/api/admin/auth/credentials'
     | '/api/admin/auth/csrf'
     | '/api/admin/auth/login'
     | '/api/admin/auth/logout'
@@ -387,6 +399,7 @@ export interface RootRouteChildren {
   ApiDisplaysEnrollmentsRoute: typeof ApiDisplaysEnrollmentsRouteWithChildren
   ApiDisplaysSessionRoute: typeof ApiDisplaysSessionRoute
   ApiSubstitutionPlansRoute: typeof ApiSubstitutionPlansRoute
+  ApiAdminAuthCredentialsRoute: typeof ApiAdminAuthCredentialsRoute
   ApiAdminAuthCsrfRoute: typeof ApiAdminAuthCsrfRoute
   ApiAdminAuthLoginRoute: typeof ApiAdminAuthLoginRoute
   ApiAdminAuthLogoutRoute: typeof ApiAdminAuthLogoutRoute
@@ -577,6 +590,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminAuthCsrfRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/auth/credentials': {
+      id: '/api/admin/auth/credentials'
+      path: '/api/admin/auth/credentials'
+      fullPath: '/api/admin/auth/credentials'
+      preLoaderRoute: typeof ApiAdminAuthCredentialsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/admin/displays/$displayId/revoke-session': {
       id: '/api/admin/displays/$displayId/revoke-session'
       path: '/revoke-session'
@@ -717,6 +737,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiDisplaysEnrollmentsRoute: ApiDisplaysEnrollmentsRouteWithChildren,
   ApiDisplaysSessionRoute: ApiDisplaysSessionRoute,
   ApiSubstitutionPlansRoute: ApiSubstitutionPlansRoute,
+  ApiAdminAuthCredentialsRoute: ApiAdminAuthCredentialsRoute,
   ApiAdminAuthCsrfRoute: ApiAdminAuthCsrfRoute,
   ApiAdminAuthLoginRoute: ApiAdminAuthLoginRoute,
   ApiAdminAuthLogoutRoute: ApiAdminAuthLogoutRoute,

@@ -1,8 +1,11 @@
 package com.schooldashboard.security.auth;
 
 import com.schooldashboard.security.auth.dto.AdminAuthStatusResponse;
+import com.schooldashboard.security.auth.dto.AdminCredentialUpdateRequest;
 import com.schooldashboard.security.auth.dto.AdminLoginRequest;
 import com.schooldashboard.security.auth.dto.CsrfTokenResponse;
+import com.schooldashboard.security.entity.AppUserEntity;
+import com.schooldashboard.security.repository.AppUserRepository;
 import com.schooldashboard.security.metrics.SecurityMetricsService;
 import com.schooldashboard.security.web.SecurityErrorResponse;
 import jakarta.validation.Valid;
@@ -22,9 +25,11 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.security.web.csrf.CsrfToken;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -41,14 +46,19 @@ public class AdminAuthController {
 	private final SecurityContextRepository securityContextRepository;
 	private final AppUserDetailsService appUserDetailsService;
 	private final SecurityMetricsService securityMetricsService;
+	private final AppUserRepository appUserRepository;
+	private final PasswordEncoder passwordEncoder;
 
 	public AdminAuthController(AuthenticationManager authenticationManager,
-			SecurityContextRepository securityContextRepository, AppUserDetailsService appUserDetailsService,
-			SecurityMetricsService securityMetricsService) {
+			SecurityContextRepository securityContextRepository, AppUserDetailsService appUserDetailsService, 
+			SecurityMetricsService securityMetricsService, AppUserRepository appUserRepository,
+			PasswordEncoder passwordEncoder) {
 		this.authenticationManager = authenticationManager;
 		this.securityContextRepository = securityContextRepository;
 		this.appUserDetailsService = appUserDetailsService;
 		this.securityMetricsService = securityMetricsService;
+		this.appUserRepository = appUserRepository;
+		this.passwordEncoder = passwordEncoder;
 	}
 
 	@PostMapping("/login")
@@ -87,6 +97,58 @@ public class AdminAuthController {
 			HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
 		new SecurityContextLogoutHandler().logout(servletRequest, servletResponse, authentication);
 		return ResponseEntity.ok(new AdminAuthStatusResponse(false, null, List.of()));
+	}
+
+	@PostMapping("/credentials")
+	@Transactional
+	public ResponseEntity<?> updateCredentials(@Valid @RequestBody AdminCredentialUpdateRequest request,
+			Authentication authentication, HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+		if (authentication == null || !authentication.isAuthenticated()) {
+			throw new BadCredentialsException("Authentication is required");
+		}
+
+		AppUserEntity userEntity = appUserRepository.findLockedByUsername(authentication.getName())
+				.orElseThrow(() -> new BadCredentialsException("Authentication is required"));
+
+		if (!passwordEncoder.matches(request.currentPassword(), userEntity.getPasswordHash())) {
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
+					errorResponse("UNAUTHENTICATED", "Current password is invalid", servletRequest));
+		}
+
+		String normalizedUsername = normalize(request.newUsername());
+		String normalizedPassword = normalize(request.newPassword());
+		if (normalizedUsername == null && normalizedPassword == null) {
+			return ResponseEntity.badRequest()
+					.body(errorResponse("VALIDATION_ERROR", "Either newUsername or newPassword is required",
+							servletRequest));
+		}
+
+		if (normalizedUsername != null && !normalizedUsername.equals(userEntity.getUsername())
+				&& appUserRepository.existsByUsername(normalizedUsername)) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body(errorResponse("USERNAME_TAKEN", "Username is already in use", servletRequest));
+		}
+
+		if (normalizedUsername != null) {
+			userEntity.setUsername(normalizedUsername);
+		}
+		if (normalizedPassword != null) {
+			userEntity.setPasswordHash(passwordEncoder.encode(normalizedPassword));
+		}
+		appUserRepository.save(userEntity);
+
+		AppUserPrincipal principal = AppUserPrincipal.fromEntity(userEntity);
+		UsernamePasswordAuthenticationToken updatedAuthentication = UsernamePasswordAuthenticationToken
+				.authenticated(principal, null,
+				principal.getAuthorities());
+		updatedAuthentication.setDetails(authentication.getDetails());
+
+		SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
+		securityContext.setAuthentication(updatedAuthentication);
+		SecurityContextHolder.setContext(securityContext);
+		securityContextRepository.saveContext(securityContext, servletRequest, servletResponse);
+
+		return ResponseEntity.ok(toAuthStatusResponse(updatedAuthentication));
 	}
 
 	@GetMapping("/me")
