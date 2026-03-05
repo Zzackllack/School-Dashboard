@@ -514,7 +514,8 @@ public class DisplayEnrollmentService {
 		return sessionToken;
 	}
 
-	private DisplayEntity saveDisplayWithSlugRetry(DisplayEntity display, String resolvedDisplayName, String requestedSlug) {
+	private DisplayEntity saveDisplayWithSlugRetry(DisplayEntity display, String resolvedDisplayName,
+			String requestedSlug) {
 		String baseSlugInput = requestedSlug == null ? resolvedDisplayName : requestedSlug;
 		String candidateSlug = display.getSlug();
 		for (int attempt = 1; attempt <= 3; attempt++) {

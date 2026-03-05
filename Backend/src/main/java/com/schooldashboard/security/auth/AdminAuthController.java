@@ -50,7 +50,7 @@ public class AdminAuthController {
 	private final PasswordEncoder passwordEncoder;
 
 	public AdminAuthController(AuthenticationManager authenticationManager,
-			SecurityContextRepository securityContextRepository, AppUserDetailsService appUserDetailsService, 
+			SecurityContextRepository securityContextRepository, AppUserDetailsService appUserDetailsService,
 			SecurityMetricsService securityMetricsService, AppUserRepository appUserRepository,
 			PasswordEncoder passwordEncoder) {
 		this.authenticationManager = authenticationManager;
@@ -62,8 +62,8 @@ public class AdminAuthController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@Valid @RequestBody AdminLoginRequest request,
-			HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
+	public ResponseEntity<?> login(@Valid @RequestBody AdminLoginRequest request, HttpServletRequest servletRequest,
+			HttpServletResponse servletResponse) {
 		String username = normalize(request.username());
 		String password = normalize(request.password());
 
@@ -111,16 +111,15 @@ public class AdminAuthController {
 				.orElseThrow(() -> new BadCredentialsException("Authentication is required"));
 
 		if (!passwordEncoder.matches(request.currentPassword(), userEntity.getPasswordHash())) {
-			return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(
-					errorResponse("UNAUTHENTICATED", "Current password is invalid", servletRequest));
+			return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+					.body(errorResponse("UNAUTHENTICATED", "Current password is invalid", servletRequest));
 		}
 
 		String normalizedUsername = normalize(request.newUsername());
 		String normalizedPassword = normalize(request.newPassword());
 		if (normalizedUsername == null && normalizedPassword == null) {
-			return ResponseEntity.badRequest()
-					.body(errorResponse("VALIDATION_ERROR", "Either newUsername or newPassword is required",
-							servletRequest));
+			return ResponseEntity.badRequest().body(
+					errorResponse("VALIDATION_ERROR", "Either newUsername or newPassword is required", servletRequest));
 		}
 
 		if (normalizedUsername != null && !normalizedUsername.equals(userEntity.getUsername())
@@ -139,8 +138,7 @@ public class AdminAuthController {
 
 		AppUserPrincipal principal = AppUserPrincipal.fromEntity(userEntity);
 		UsernamePasswordAuthenticationToken updatedAuthentication = UsernamePasswordAuthenticationToken
-				.authenticated(principal, null,
-				principal.getAuthorities());
+				.authenticated(principal, null, principal.getAuthorities());
 		updatedAuthentication.setDetails(authentication.getDetails());
 
 		SecurityContext securityContext = SecurityContextHolder.createEmptyContext();

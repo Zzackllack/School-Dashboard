@@ -107,7 +107,8 @@ public class AdminSecurityIntegrationTest {
 		MockHttpSession adminSession = login("test-admin", "test-admin-password");
 
 		mockMvc.perform(post("/api/admin/auth/credentials").with(csrf()).session(adminSession)
-				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper.writeValueAsString(
 						new CredentialUpdatePayload("test-admin-password", "renamed-admin", "next-password"))))
 				.andExpect(status().isOk()).andExpect(jsonPath("$.authenticated").value(true))
 				.andExpect(jsonPath("$.username").value("renamed-admin"));
@@ -122,7 +123,8 @@ public class AdminSecurityIntegrationTest {
 		MockHttpSession adminSession = login("test-admin", "test-admin-password");
 
 		mockMvc.perform(post("/api/admin/auth/credentials").with(csrf()).session(adminSession)
-				.contentType(MediaType.APPLICATION_JSON).content(objectMapper
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(objectMapper
 						.writeValueAsString(new CredentialUpdatePayload("wrong-password", null, "next-password"))))
 				.andExpect(status().isUnauthorized()).andExpect(jsonPath("$.code").value("UNAUTHENTICATED"));
 

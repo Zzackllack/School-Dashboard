@@ -56,9 +56,8 @@ public class DisplayPublicController {
 			ResponseCookie cookie = ResponseCookie.from(DISPLAY_SESSION_COOKIE_NAME, response.displaySessionToken())
 					.httpOnly(true).secure(request.isSecure()).sameSite("Lax").path("/").maxAge(Duration.ofDays(30))
 					.build();
-			return ResponseEntity.ok().header("Set-Cookie", cookie.toString())
-					.body(new EnrollmentStatusResponse(response.requestId(), response.status(), response.displayId(),
-							null, response.pollAfterSeconds()));
+			return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(new EnrollmentStatusResponse(
+					response.requestId(), response.status(), response.displayId(), null, response.pollAfterSeconds()));
 		}
 		return ResponseEntity.ok(response);
 	}

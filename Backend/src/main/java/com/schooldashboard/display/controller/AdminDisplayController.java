@@ -38,8 +38,8 @@ public class AdminDisplayController {
 	}
 
 	@PostMapping("/enrollment-codes")
-	public CreateEnrollmentCodeResponse createEnrollmentCode(
-			@Valid @RequestBody CreateEnrollmentCodeRequest request, Authentication authentication) {
+	public CreateEnrollmentCodeResponse createEnrollmentCode(@Valid @RequestBody CreateEnrollmentCodeRequest request,
+			Authentication authentication) {
 		return enrollmentService.createEnrollmentCode(resolveAdminId(authentication), request);
 	}
 

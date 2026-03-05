@@ -51,9 +51,10 @@ public class DisplayEnrollmentFlowIntegrationTest {
 
 		Map<String, Object> createEnrollmentResponse = readMap(mockMvc
 				.perform(post("/api/displays/enrollments").contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(new CreateEnrollmentRequest(
-								asString(createdCode, "code"), "Main Hall Screen",
-								new DeviceInfoDto(null, "kiosk", null, "test-agent", null, "de-DE", "kiosk-os")))))
+						.content(objectMapper.writeValueAsString(
+								new CreateEnrollmentRequest(asString(createdCode, "code"), "Main Hall Screen",
+										new DeviceInfoDto(null, "kiosk", null, "test-agent", null, "de-DE",
+												"kiosk-os")))))
 				.andExpect(status().isCreated()).andReturn().getResponse().getContentAsString());
 		assertEquals("PENDING", asString(createEnrollmentResponse, "status"));
 

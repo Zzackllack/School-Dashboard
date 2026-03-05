@@ -18,7 +18,9 @@ function AdminDisplaysPage() {
   const [maxUses, setMaxUses] = useState("5");
   const [createdCode, setCreatedCode] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [credentialMessage, setCredentialMessage] = useState<string | null>(null);
+  const [credentialMessage, setCredentialMessage] = useState<string | null>(
+    null,
+  );
   const [credentialError, setCredentialError] = useState<string | null>(null);
   const [currentUsername, setCurrentUsername] = useState<string>("");
   const [newUsername, setNewUsername] = useState("");
@@ -154,7 +156,10 @@ function AdminDisplaysPage() {
 
         <section className="rounded-2xl bg-white p-6 shadow-lg">
           <h2 className="text-xl font-semibold">Admin-Zugangsdaten</h2>
-          <form className="mt-4 grid gap-4 sm:grid-cols-2" onSubmit={handleCredentialUpdate}>
+          <form
+            className="mt-4 grid gap-4 sm:grid-cols-2"
+            onSubmit={handleCredentialUpdate}
+          >
             <label className="text-sm font-semibold text-slate-700 sm:col-span-2">
               Aktueller Benutzername
               <input
