@@ -43,6 +43,9 @@ export function SetupPendingPage() {
     let timer: ReturnType<typeof setTimeout> | null = null;
 
     async function poll() {
+      if (cancelled) {
+        return;
+      }
       try {
         const response = await getEnrollmentStatus(stableRequestId);
         if (cancelled) {
@@ -55,7 +58,14 @@ export function SetupPendingPage() {
         if (response.status === "APPROVED" && response.displayId) {
           setDisplayIdHint(response.displayId);
           setPendingEnrollmentRequestId(null);
+          if (timer) {
+            clearTimeout(timer);
+            timer = null;
+          }
 
+          if (cancelled) {
+            return;
+          }
           await navigate({
             to: "/display/$displayId",
             params: { displayId: response.displayId },
@@ -66,11 +76,29 @@ export function SetupPendingPage() {
 
         if (response.status === "REJECTED" || response.status === "EXPIRED") {
           setPendingEnrollmentRequestId(null);
+          if (timer) {
+            clearTimeout(timer);
+            timer = null;
+          }
           return;
         }
 
-        const nextPollDelayMs = (response.pollAfterSeconds ?? 5) * 1000;
+        const pollAfterSeconds = Math.min(
+          60,
+          Math.max(1, response.pollAfterSeconds ?? 5),
+        );
+        const nextPollDelayMs = pollAfterSeconds * 1000;
+        if (timer) {
+          clearTimeout(timer);
+          timer = null;
+        }
+        if (cancelled) {
+          return;
+        }
         timer = setTimeout(() => {
+          if (cancelled) {
+            return;
+          }
           void poll();
         }, nextPollDelayMs);
       } catch (error) {
@@ -80,7 +108,14 @@ export function SetupPendingPage() {
               ? error.message
               : "Status konnte nicht geladen werden.",
           );
+          if (timer) {
+            clearTimeout(timer);
+            timer = null;
+          }
           timer = setTimeout(() => {
+            if (cancelled) {
+              return;
+            }
             void poll();
           }, 5000);
         }

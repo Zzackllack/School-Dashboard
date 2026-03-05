@@ -24,6 +24,7 @@ describe("bootstrap resolver", () => {
     });
 
     await expect(resolveBootstrapRedirect()).resolves.toEqual({ to: "/setup" });
+    expect(displaySessionModule.clearDisplaySessionStorage).toHaveBeenCalled();
   });
 
   it("routes to display when session validates", async () => {

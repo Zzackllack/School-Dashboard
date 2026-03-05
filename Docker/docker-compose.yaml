@@ -12,7 +12,7 @@ services:
       # DSB_USERNAME and DSB_PASSWORD override values in application.properties
       # - DSB_USERNAME=your-user
       # - DSB_PASSWORD=your-pass
-      SERVER_SERVLET_SESSION_COOKIE_SECURE: "true"
+      SERVER_SERVLET_SESSION_COOKIE_SECURE: "${SESSION_COOKIE_SECURE:-false}"
       SPRING_DATASOURCE_USERNAME: sa
       SPRING_DATASOURCE_PASSWORD: ""
     volumes:

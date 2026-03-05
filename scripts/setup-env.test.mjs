@@ -22,5 +22,19 @@ test("formatEnv renders key value pairs", () => {
     ["KEY_B", ""],
   ]);
 
-  assert.equal(rendered, "KEY_A=value-a\nKEY_B=\n");
+  assert.equal(rendered, 'KEY_A="value-a"\nKEY_B=""\n');
+});
+
+test("formatEnv escapes special characters", () => {
+  const rendered = formatEnv([
+    ["HASH", "#start"],
+    ["QUOTES", `"double'and'single"`],
+    ["SPACES", " leading and trailing "],
+    ["MULTILINE", "line1\nline2"],
+  ]);
+
+  assert.equal(
+    rendered,
+    'HASH="#start"\nQUOTES="\\"double\'and\'single\\""\nSPACES=" leading and trailing "\nMULTILINE="line1\\nline2"\n',
+  );
 });

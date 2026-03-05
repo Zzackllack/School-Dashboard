@@ -115,7 +115,11 @@ public class AdminSecurityIntegrationTest {
 
 		mockMvc.perform(post("/api/admin/auth/logout").session(adminSession).with(csrf())).andExpect(status().isOk());
 
-		login("renamed-admin", "next-password");
+		MockHttpSession renamedSession = login("renamed-admin", "next-password");
+		mockMvc.perform(post("/api/admin/auth/credentials").with(csrf()).session(renamedSession)
+				.contentType(MediaType.APPLICATION_JSON).content(objectMapper.writeValueAsString(
+						new CredentialUpdatePayload("next-password", "test-admin", "test-admin-password"))))
+				.andExpect(status().isOk()).andExpect(jsonPath("$.username").value("test-admin"));
 	}
 
 	@Test

@@ -31,6 +31,19 @@ public class RequestRateLimiter {
 	}
 
 	public boolean tryAcquire(String bucketName, String key, int maxRequests, Duration window) {
+		if (bucketName == null || bucketName.isBlank()) {
+			throw new IllegalArgumentException("bucketName must be non-empty");
+		}
+		if (key == null || key.isBlank()) {
+			throw new IllegalArgumentException("key must be non-empty");
+		}
+		if (maxRequests <= 0) {
+			throw new IllegalArgumentException("maxRequests must be > 0");
+		}
+		if (window == null || window.isZero() || window.isNegative()) {
+			throw new IllegalArgumentException("window must be non-null and positive");
+		}
+
 		String bucketKey = bucketName + ":" + key;
 		Instant now = Instant.now();
 		Instant threshold = now.minus(window);

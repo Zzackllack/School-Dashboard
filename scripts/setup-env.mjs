@@ -28,7 +28,13 @@ export function ensureHttpUrl(value, fallback) {
 export function formatEnv(entries) {
   const lines = [];
   for (const [key, value] of entries) {
-    lines.push(`${key}=${value ?? ""}`);
+    const normalizedValue = String(value ?? "");
+    const escapedValue = normalizedValue
+      .replace(/\\/g, "\\\\")
+      .replace(/"/g, '\\"')
+      .replace(/\n/g, "\\n")
+      .replace(/\r/g, "\\r");
+    lines.push(`${key}="${escapedValue}"`);
   }
   return `${lines.join("\n")}\n`;
 }
@@ -43,13 +49,33 @@ async function askInteractive() {
     input: process.stdin,
     output: process.stdout,
   });
+  const defaultWriteToOutput = rl._writeToOutput.bind(rl);
+
+  function withMaskedInput() {
+    rl._writeToOutput = (str) => {
+      if (str === "\n" || str === "\r" || str === "\r\n") {
+        return rl.output.write(str);
+      }
+      return rl.output.write("*");
+    };
+  }
+
+  function restoreOutput() {
+    rl._writeToOutput = defaultWriteToOutput;
+  }
 
   try {
     console.log("\nEnvironment bootstrap");
     console.log("This creates local .env files. Do not commit them.\n");
 
     const dsbUsername = (await rl.question("DSB username: ")).trim();
-    const dsbPassword = (await rl.question("DSB password: ")).trim();
+    let dsbPassword = "";
+    withMaskedInput();
+    try {
+      dsbPassword = (await rl.question("DSB password: ")).trim();
+    } finally {
+      restoreOutput();
+    }
     const calendarIcsUrl = (
       await rl.question("Calendar ICS URL (optional): ")
     ).trim();
@@ -64,9 +90,17 @@ async function askInteractive() {
           await rl.question("Bootstrap admin username (default: dev-admin): ")
         ).trim() || "dev-admin"
       : "";
-    const bootstrapPassword = enableBootstrapAdmin
-      ? (await rl.question("Bootstrap admin password: ")).trim()
-      : "";
+    let resolvedBootstrapPassword = "";
+    if (enableBootstrapAdmin) {
+      withMaskedInput();
+      try {
+        resolvedBootstrapPassword = (
+          await rl.question("Bootstrap admin password: ")
+        ).trim();
+      } finally {
+        restoreOutput();
+      }
+    }
 
     const backendUrl = ensureHttpUrl(
       await rl.question("Backend URL for frontend (default: http://localhost:8080): "),
@@ -91,12 +125,13 @@ async function askInteractive() {
       calendarIcsUrl,
       enableBootstrapAdmin,
       bootstrapUsername,
-      bootstrapPassword,
+      bootstrapPassword: resolvedBootstrapPassword,
       backendUrl,
       secureCookie,
       corsOriginsRaw,
     };
   } finally {
+    rl._writeToOutput = defaultWriteToOutput;
     rl.close();
   }
 }

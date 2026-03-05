@@ -1,5 +1,6 @@
 package com.schooldashboard.display.entity;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 import java.time.Instant;
@@ -22,7 +23,11 @@ public class DisplaySessionEntityTest {
 		Instant expiresAt = issuedAt.plusSeconds(60);
 		DisplaySessionEntity entity = new DisplaySessionEntity("display-1", "hash-1", issuedAt, expiresAt);
 
+		assertDoesNotThrow(() -> entity.setLastSeenAt(issuedAt));
+		assertDoesNotThrow(() -> entity.setLastSeenAt(expiresAt));
 		assertThrows(IllegalArgumentException.class, () -> entity.setLastSeenAt(issuedAt.minusSeconds(1)));
 		assertThrows(IllegalArgumentException.class, () -> entity.setLastSeenAt(expiresAt.plusSeconds(1)));
+		assertThrows(IllegalArgumentException.class,
+				() -> new DisplaySessionEntity("display-1", "hash-1", issuedAt, issuedAt));
 	}
 }

@@ -16,7 +16,11 @@ function readStorageValue(key: string): string | null {
   if (!storage || typeof storage.getItem !== "function") {
     return null;
   }
-  return storage.getItem(key);
+  try {
+    return storage.getItem(key);
+  } catch {
+    return null;
+  }
 }
 
 function writeStorageValue(key: string, value: string | null) {
@@ -26,14 +30,26 @@ function writeStorageValue(key: string, value: string | null) {
   }
   if (value === null || value.trim().length === 0) {
     if (typeof storage.removeItem === "function") {
-      storage.removeItem(key);
+      try {
+        storage.removeItem(key);
+      } catch {
+        // ignore storage write failures
+      }
     } else if (typeof storage.setItem === "function") {
-      storage.setItem(key, "");
+      try {
+        storage.setItem(key, "");
+      } catch {
+        // ignore storage write failures
+      }
     }
     return;
   }
   if (typeof storage.setItem === "function") {
-    storage.setItem(key, value.trim());
+    try {
+      storage.setItem(key, value.trim());
+    } catch {
+      // ignore storage write failures
+    }
   }
 }
 

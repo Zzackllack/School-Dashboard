@@ -172,7 +172,9 @@ Every runtime value is read from environment variables (with safe defaults where
   ```bash
   pnpm run setup
   ```
+
   If you need to regenerate credentials/URLs later, run:
+
   ```bash
   pnpm run setup:env
   ```

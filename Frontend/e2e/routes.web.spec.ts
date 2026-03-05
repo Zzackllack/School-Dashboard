@@ -226,6 +226,32 @@ test("completes setup -> pending -> approved -> display flow", async ({
       await route.continue();
       return;
     }
+    let payload: unknown;
+    try {
+      payload = route.request().postDataJSON();
+    } catch {
+      await route.fulfill({
+        status: 400,
+        contentType: "application/json",
+        body: JSON.stringify({ message: "Invalid JSON payload" }),
+      });
+      return;
+    }
+    const isValidPayload =
+      typeof payload === "object" &&
+      payload !== null &&
+      typeof (payload as { enrollmentCode?: unknown }).enrollmentCode ===
+        "string" &&
+      typeof (payload as { proposedDisplayName?: unknown }).proposedDisplayName ===
+        "string";
+    if (!isValidPayload) {
+      await route.fulfill({
+        status: 400,
+        contentType: "application/json",
+        body: JSON.stringify({ message: "Invalid enrollment payload" }),
+      });
+      return;
+    }
 
     await route.fulfill({
       status: 201,

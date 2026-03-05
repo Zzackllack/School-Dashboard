@@ -2,6 +2,7 @@ package com.schooldashboard.display.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -156,6 +157,11 @@ public class DisplayEnrollmentFlowIntegrationTest {
 				.perform(post("/api/admin/auth/login").with(csrf()).contentType(MediaType.APPLICATION_JSON).content(
 						objectMapper.writeValueAsString(new AdminLoginRequest("test-admin", "test-admin-password"))))
 				.andExpect(status().isOk()).andReturn();
+		String setCookieHeader = result.getResponse().getHeader("Set-Cookie");
+		if (setCookieHeader != null) {
+			assertTrue(setCookieHeader.contains("HttpOnly"));
+			assertTrue(setCookieHeader.toLowerCase().contains("samesite="));
+		}
 		return (MockHttpSession) result.getRequest().getSession(false);
 	}
 

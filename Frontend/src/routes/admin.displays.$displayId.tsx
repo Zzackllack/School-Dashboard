@@ -23,6 +23,9 @@ function AdminDisplayDetailPage() {
     status: "ACTIVE" as "ACTIVE" | "INACTIVE" | "REVOKED",
   });
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [statusType, setStatusType] = useState<
+    "success" | "error" | "neutral"
+  >("neutral");
   const [isDisplayLoaded, setIsDisplayLoaded] = useState(false);
 
   useEffect(() => {
@@ -42,10 +45,12 @@ function AdminDisplayDetailPage() {
           });
           setIsDisplayLoaded(true);
           setStatusMessage(null);
+          setStatusType("neutral");
         }
       } catch (error) {
         if (!cancelled) {
           setIsDisplayLoaded(false);
+          setStatusType("error");
           setStatusMessage(
             error instanceof Error
               ? error.message
@@ -77,8 +82,10 @@ function AdminDisplayDetailPage() {
         assignedProfileId: response.assignedProfileId ?? "",
         status: response.status,
       });
+      setStatusType("success");
       setStatusMessage("Display erfolgreich aktualisiert.");
     } catch (error) {
+      setStatusType("error");
       setStatusMessage(
         error instanceof Error
           ? error.message
@@ -91,11 +98,19 @@ function AdminDisplayDetailPage() {
     if (!isDisplayLoaded) {
       return;
     }
+    const confirmed = window.confirm(
+      "Session wirklich widerrufen? Das Display muss sich danach neu authentifizieren.",
+    );
+    if (!confirmed) {
+      return;
+    }
     try {
       const response = await revokeDisplaySession(displayId);
       setFormState((current) => ({ ...current, status: response.status }));
+      setStatusType("success");
       setStatusMessage("Display-Session wurde widerrufen.");
     } catch (error) {
+      setStatusType("error");
       setStatusMessage(
         error instanceof Error
           ? error.message
@@ -118,6 +133,7 @@ function AdminDisplayDetailPage() {
       await deleteDisplay(displayId);
       await navigate({ to: "/admin/displays", replace: true });
     } catch (error) {
+      setStatusType("error");
       setStatusMessage(
         error instanceof Error
           ? error.message
@@ -243,7 +259,15 @@ function AdminDisplayDetailPage() {
         </form>
 
         {statusMessage ? (
-          <p className="mt-4 rounded-md bg-slate-100 px-3 py-2 text-sm text-slate-700">
+          <p
+            className={`mt-4 rounded-md px-3 py-2 text-sm ${
+              statusType === "success"
+                ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
+                : statusType === "error"
+                  ? "border border-rose-200 bg-rose-50 text-rose-700"
+                  : "bg-slate-100 text-slate-700"
+            }`}
+          >
             {statusMessage}
           </p>
         ) : null}

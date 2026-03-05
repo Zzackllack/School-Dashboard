@@ -11,6 +11,15 @@ public class RandomTokenServiceTest {
 	public void rejectsNonPositiveLength() {
 		RandomTokenService service = new RandomTokenService();
 		assertThrows(IllegalArgumentException.class, () -> service.nextEnrollmentCode(0));
+		assertThrows(IllegalArgumentException.class, () -> service.nextEnrollmentCode(-1));
+		assertThrows(IllegalArgumentException.class, () -> service.nextSessionToken(-1));
+	}
+
+	@Test
+	public void rejectsOversizedLength() {
+		RandomTokenService service = new RandomTokenService();
+		assertThrows(IllegalArgumentException.class, () -> service.nextEnrollmentCode(Integer.MAX_VALUE));
+		assertThrows(IllegalArgumentException.class, () -> service.nextSessionToken(Integer.MAX_VALUE));
 	}
 
 	@Test

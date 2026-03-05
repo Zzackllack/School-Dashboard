@@ -11,6 +11,7 @@ import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
 import java.time.Instant;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
 import java.util.UUID;
@@ -163,10 +164,16 @@ public class AppUserEntity {
 	}
 
 	public Set<AppRoleEntity> getRoles() {
-		return roles;
+		if (roles == null) {
+			roles = new LinkedHashSet<>();
+		}
+		return Collections.unmodifiableSet(roles);
 	}
 
 	public void addRole(AppRoleEntity role) {
+		if (roles == null) {
+			roles = new LinkedHashSet<>();
+		}
 		roles.add(role);
 	}
 }

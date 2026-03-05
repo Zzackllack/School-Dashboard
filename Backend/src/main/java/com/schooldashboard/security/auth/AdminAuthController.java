@@ -64,7 +64,7 @@ public class AdminAuthController {
 	public ResponseEntity<?> login(@Valid @RequestBody AdminLoginRequest request, HttpServletRequest servletRequest,
 			HttpServletResponse servletResponse) {
 		String username = normalize(request.username());
-		String password = normalize(request.password());
+		String password = request.password();
 
 		try {
 			Authentication authentication = authenticationManager
@@ -115,8 +115,9 @@ public class AdminAuthController {
 		}
 
 		String normalizedUsername = normalize(request.newUsername());
-		String normalizedPassword = normalize(request.newPassword());
-		if (normalizedUsername == null && normalizedPassword == null) {
+		String rawNewPassword = request.newPassword();
+		boolean hasNewPassword = rawNewPassword != null && !rawNewPassword.isBlank();
+		if (normalizedUsername == null && !hasNewPassword) {
 			return ResponseEntity.badRequest().body(
 					errorResponse("VALIDATION_ERROR", "Either newUsername or newPassword is required", servletRequest));
 		}
@@ -130,8 +131,8 @@ public class AdminAuthController {
 		if (normalizedUsername != null) {
 			userEntity.setUsername(normalizedUsername);
 		}
-		if (normalizedPassword != null) {
-			userEntity.setPasswordHash(passwordEncoder.encode(normalizedPassword));
+		if (hasNewPassword) {
+			userEntity.setPasswordHash(passwordEncoder.encode(rawNewPassword));
 		}
 		appUserRepository.save(userEntity);
 

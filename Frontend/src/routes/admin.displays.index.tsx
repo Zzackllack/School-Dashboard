@@ -14,8 +14,8 @@ export const Route = createFileRoute("/admin/displays/")({
 });
 
 function AdminDisplaysPage() {
-  const [ttlSeconds, setTtlSeconds] = useState("900");
-  const [maxUses, setMaxUses] = useState("5");
+  const [ttlSeconds, setTtlSeconds] = useState<number | null>(900);
+  const [maxUses, setMaxUses] = useState<number | null>(5);
   const [createdCode, setCreatedCode] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [credentialMessage, setCredentialMessage] = useState<string | null>(
@@ -71,11 +71,23 @@ function AdminDisplaysPage() {
     event.preventDefault();
     setStatusMessage(null);
     setCreatedCode(null);
+    if (ttlSeconds === null || maxUses === null) {
+      setStatusMessage(
+        "TTL und Max Uses müssen positive ganze Zahlen größer als 0 sein.",
+      );
+      return;
+    }
+    if (!Number.isInteger(ttlSeconds) || !Number.isInteger(maxUses) || ttlSeconds <= 0 || maxUses <= 0) {
+      setStatusMessage(
+        "TTL und Max Uses müssen positive ganze Zahlen größer als 0 sein.",
+      );
+      return;
+    }
 
     try {
       const response = await createEnrollmentCode({
-        ttlSeconds: Number(ttlSeconds),
-        maxUses: Number(maxUses),
+        ttlSeconds,
+        maxUses,
       });
       setCreatedCode(response.code);
       setStatusMessage(
@@ -94,6 +106,12 @@ function AdminDisplaysPage() {
     event.preventDefault();
     setCredentialMessage(null);
     setCredentialError(null);
+    if (newUsername.trim().length === 0 && newPassword.trim().length === 0) {
+      setCredentialError(
+        "Bitte neuen Benutzernamen oder ein neues Passwort eingeben.",
+      );
+      return;
+    }
     setIsCredentialSubmitting(true);
 
     try {
@@ -233,8 +251,14 @@ function AdminDisplaysPage() {
               TTL (Sekunden)
               <input
                 className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
-                value={ttlSeconds}
-                onChange={(event) => setTtlSeconds(event.target.value)}
+                type="number"
+                min={1}
+                step={1}
+                value={ttlSeconds ?? ""}
+                onChange={(event) => {
+                  const parsed = Number.parseInt(event.target.value, 10);
+                  setTtlSeconds(Number.isFinite(parsed) ? parsed : null);
+                }}
               />
             </label>
 
@@ -242,8 +266,14 @@ function AdminDisplaysPage() {
               Max Uses
               <input
                 className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
-                value={maxUses}
-                onChange={(event) => setMaxUses(event.target.value)}
+                type="number"
+                min={1}
+                step={1}
+                value={maxUses ?? ""}
+                onChange={(event) => {
+                  const parsed = Number.parseInt(event.target.value, 10);
+                  setMaxUses(Number.isFinite(parsed) ? parsed : null);
+                }}
               />
             </label>
 

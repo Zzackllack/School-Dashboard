@@ -112,7 +112,7 @@ public class DisplayEnrollmentService {
 		}
 
 		DisplayEnrollmentCodeEntity codeEntity = enrollmentCodeRepository
-				.findByCodeHash(tokenHashService.hash(enrollmentCode))
+				.findLockedByCodeHash(tokenHashService.hash(enrollmentCode))
 				.orElseThrow(() -> new DisplayDomainException("ENROLLMENT_CODE_INVALID", HttpStatus.BAD_REQUEST,
 						"Enrollment code is invalid or expired"));
 
@@ -494,7 +494,7 @@ public class DisplayEnrollmentService {
 		cleanupIssuedSessionTokens();
 
 		String requestId = requestEntity.getId();
-		IssuedSessionToken cached = issuedSessionTokens.remove(requestId);
+		IssuedSessionToken cached = issuedSessionTokens.get(requestId);
 		if (cached != null && tokenHashService.hash(cached.token()).equals(requestEntity.getIssuedSessionTokenHash())) {
 			return cached.token();
 		}
