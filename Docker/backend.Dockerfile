@@ -30,6 +30,7 @@ EXPOSE 8080
 
 ENV SPRING_DATASOURCE_URL=jdbc:h2:file:/data/substitution-plans;DB_CLOSE_DELAY=-1 \
     SPRING_PROFILES_ACTIVE=prod \
+    SERVER_SERVLET_SESSION_COOKIE_SECURE=true \
     JAVA_OPTS=""
 
 ENTRYPOINT ["/entrypoint.sh"]

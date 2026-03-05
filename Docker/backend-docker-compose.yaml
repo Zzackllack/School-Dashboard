@@ -8,6 +8,7 @@ services:
     container_name: school-dashboard-backend
     restart: unless-stopped
     environment:
+      SERVER_SERVLET_SESSION_COOKIE_SECURE: "true"
       SPRING_DATASOURCE_USERNAME: sa
       SPRING_DATASOURCE_PASSWORD: ""
       H2_MIGRATE_ON_STARTUP: "true"
