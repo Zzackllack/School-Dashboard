@@ -1,7 +1,7 @@
 package com.schooldashboard.display.service;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,6 +26,6 @@ public class RandomTokenServiceTest {
 	public void generatesTokenOfRequestedLength() {
 		RandomTokenService service = new RandomTokenService();
 		String token = service.nextSessionToken(64);
-		assertTrue(token.length() == 64);
+		assertEquals(64, token.length());
 	}
 }

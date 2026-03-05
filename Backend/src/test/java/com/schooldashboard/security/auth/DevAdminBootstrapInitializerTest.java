@@ -1,6 +1,10 @@
 package com.schooldashboard.security.auth;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -67,8 +71,11 @@ public class DevAdminBootstrapInitializerTest {
 		initializer.run(new DefaultApplicationArguments(new String[0]));
 
 		ArgumentCaptor<AppUserEntity> userCaptor = ArgumentCaptor.forClass(AppUserEntity.class);
-		verify(appUserRepository).save(userCaptor.capture());
-		AppUserEntity savedUser = userCaptor.getValue();
-		org.junit.jupiter.api.Assertions.assertEquals("dev-admin", savedUser.getUsername());
+		verify(appUserRepository, atLeastOnce()).save(userCaptor.capture());
+		AppUserEntity savedUser = userCaptor.getAllValues().get(userCaptor.getAllValues().size() - 1);
+		assertEquals("dev-admin", savedUser.getUsername());
+		assertEquals("hashed-secret", savedUser.getPasswordHash());
+		assertNotEquals("secret", savedUser.getPasswordHash());
+		assertTrue(savedUser.getRoles().stream().map(AppRoleEntity::getName).anyMatch("ROLE_ADMIN"::equals));
 	}
 }

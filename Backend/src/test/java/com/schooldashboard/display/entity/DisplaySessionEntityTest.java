@@ -27,6 +27,11 @@ public class DisplaySessionEntityTest {
 		assertDoesNotThrow(() -> entity.setLastSeenAt(expiresAt));
 		assertThrows(IllegalArgumentException.class, () -> entity.setLastSeenAt(issuedAt.minusSeconds(1)));
 		assertThrows(IllegalArgumentException.class, () -> entity.setLastSeenAt(expiresAt.plusSeconds(1)));
+	}
+
+	@Test
+	public void rejectsZeroDurationSession() {
+		Instant issuedAt = Instant.now();
 		assertThrows(IllegalArgumentException.class,
 				() -> new DisplaySessionEntity("display-1", "hash-1", issuedAt, issuedAt));
 	}

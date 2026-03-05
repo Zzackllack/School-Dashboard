@@ -15,8 +15,10 @@ import java.util.List;
 import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -134,7 +136,12 @@ public class AdminAuthController {
 		if (hasNewPassword) {
 			userEntity.setPasswordHash(passwordEncoder.encode(rawNewPassword));
 		}
-		appUserRepository.save(userEntity);
+		try {
+			appUserRepository.save(userEntity);
+		} catch (DataIntegrityViolationException exception) {
+			return ResponseEntity.status(HttpStatus.CONFLICT)
+					.body(errorResponse("USERNAME_TAKEN", "Username is already in use", servletRequest));
+		}
 
 		AppUserPrincipal principal = AppUserPrincipal.fromEntity(userEntity);
 		UsernamePasswordAuthenticationToken updatedAuthentication = UsernamePasswordAuthenticationToken
@@ -151,7 +158,8 @@ public class AdminAuthController {
 
 	@GetMapping("/me")
 	public ResponseEntity<AdminAuthStatusResponse> me(Authentication authentication) {
-		if (authentication == null || !authentication.isAuthenticated()) {
+		if (authentication == null || !authentication.isAuthenticated()
+				|| authentication instanceof AnonymousAuthenticationToken) {
 			throw new BadCredentialsException("Authentication is required");
 		}
 		return ResponseEntity.ok(toAuthStatusResponse(authentication));

@@ -11,6 +11,7 @@ import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.core.env.Environment;
 import org.springframework.core.env.Profiles;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,11 +39,15 @@ public class DevAdminBootstrapInitializer implements ApplicationRunner {
 	@Override
 	@Transactional
 	public void run(ApplicationArguments args) {
-		AppRoleEntity adminRole = appRoleRepository.findByName("ROLE_ADMIN")
-				.orElseGet(() -> appRoleRepository.save(new AppRoleEntity("ROLE_ADMIN")));
+		AppRoleEntity adminRole = ensureAdminRole();
 
 		SecurityProperties.Bootstrap bootstrap = securityProperties.getAdmin().getBootstrap();
 		if (bootstrap.isEnabled()) {
+			if (isProdProfile()) {
+				logger.error("Refusing bootstrap admin creation in prod profile. configuredUsername='{}'",
+						bootstrap.getUsername());
+				throw new IllegalStateException("security.admin.bootstrap.enabled=true is not allowed in prod profile");
+			}
 			String username = trimToNull(bootstrap.getUsername());
 			String password = trimToNull(bootstrap.getPassword());
 			if (username == null || password == null) {
@@ -82,9 +87,14 @@ public class DevAdminBootstrapInitializer implements ApplicationRunner {
 		if (adminUser == null) {
 			adminUser = new AppUserEntity(username, passwordEncoder.encode(password));
 			adminUser.addRole(adminRole);
-			appUserRepository.save(adminUser);
+			try {
+				appUserRepository.save(adminUser);
+			} catch (DataIntegrityViolationException exception) {
+				adminUser = appUserRepository.findByUsername(username)
+						.orElseThrow(() -> new IllegalStateException(
+								"Concurrent bootstrap user creation detected but user reload failed", exception));
+			}
 			logger.warn("Bootstrapped initial admin account '{}'. Rotate credentials after first login.", username);
-			return;
 		}
 
 		boolean changed = false;
@@ -116,6 +126,17 @@ public class DevAdminBootstrapInitializer implements ApplicationRunner {
 		} else {
 			logger.info("Bootstrap admin '{}' already configured", username);
 		}
+	}
+
+	private AppRoleEntity ensureAdminRole() {
+		return appRoleRepository.findByName("ROLE_ADMIN").orElseGet(() -> {
+			try {
+				return appRoleRepository.save(new AppRoleEntity("ROLE_ADMIN"));
+			} catch (DataIntegrityViolationException exception) {
+				return appRoleRepository.findByName("ROLE_ADMIN").orElseThrow(
+						() -> new IllegalStateException("Concurrent admin role creation detected", exception));
+			}
+		});
 	}
 
 	private boolean isProdProfile() {

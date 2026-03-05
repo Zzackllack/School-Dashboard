@@ -61,8 +61,8 @@ public class AppUserEntity {
 
 	public AppUserEntity(String username, String passwordHash) {
 		this.id = UUID.randomUUID().toString();
-		this.username = username;
-		this.passwordHash = passwordHash;
+		setUsername(username);
+		setPasswordHash(passwordHash);
 		this.enabled = true;
 		this.locked = false;
 		this.failedLoginCount = 0;
@@ -109,7 +109,10 @@ public class AppUserEntity {
 	}
 
 	public void setPasswordHash(String passwordHash) {
-		this.passwordHash = passwordHash;
+		if (passwordHash == null || passwordHash.trim().isEmpty()) {
+			throw new IllegalArgumentException("passwordHash must not be null or blank");
+		}
+		this.passwordHash = passwordHash.trim();
 	}
 
 	public boolean isEnabled() {
@@ -171,6 +174,9 @@ public class AppUserEntity {
 	}
 
 	public void addRole(AppRoleEntity role) {
+		if (role == null) {
+			throw new IllegalArgumentException("addRole: role must not be null");
+		}
 		if (roles == null) {
 			roles = new LinkedHashSet<>();
 		}

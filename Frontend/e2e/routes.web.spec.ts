@@ -423,9 +423,10 @@ test("blocks direct /display/:displayId access when token is revoked", async ({
 
 test("admin pending page supports approval action", async ({ page }) => {
   let approved = false;
+  const expectedCsrfToken = "csrf-test-token";
 
   await page.route(
-    "**/api/admin/displays/enrollments?status=PENDING",
+    "**/api/admin/displays/enrollments?*",
     async (route) => {
       if (route.request().method() !== "GET") {
         await route.continue();
@@ -461,6 +462,15 @@ test("admin pending page supports approval action", async ({ page }) => {
         await route.continue();
         return;
       }
+      const csrfHeader = route.request().headers()["x-csrf-token"];
+      if (csrfHeader !== expectedCsrfToken) {
+        await route.fulfill({
+          status: 403,
+          contentType: "application/json",
+          body: JSON.stringify({ message: "Invalid CSRF token" }),
+        });
+        return;
+      }
       approved = true;
       await route.fulfill({
         status: 200,
@@ -485,9 +495,10 @@ test("admin pending page supports approval action", async ({ page }) => {
 
 test("admin pending page supports rejection action", async ({ page }) => {
   let rejected = false;
+  const expectedCsrfToken = "csrf-test-token";
 
   await page.route(
-    "**/api/admin/displays/enrollments?status=PENDING",
+    "**/api/admin/displays/enrollments?*",
     async (route) => {
       if (route.request().method() !== "GET") {
         await route.continue();
@@ -521,6 +532,15 @@ test("admin pending page supports rejection action", async ({ page }) => {
     async (route) => {
       if (route.request().method() !== "POST") {
         await route.continue();
+        return;
+      }
+      const csrfHeader = route.request().headers()["x-csrf-token"];
+      if (csrfHeader !== expectedCsrfToken) {
+        await route.fulfill({
+          status: 403,
+          contentType: "application/json",
+          body: JSON.stringify({ message: "Invalid CSRF token" }),
+        });
         return;
       }
       rejected = true;

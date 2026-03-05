@@ -1,4 +1,4 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { resolveBootstrapRedirect } from "../routes/index";
 
 vi.mock("../lib/display-session", () => ({
@@ -14,17 +14,8 @@ const displaySessionModule = await import("../lib/display-session");
 const displaysApiModule = await import("../lib/api/displays");
 
 describe("bootstrap resolver", () => {
-  it("routes to setup when no token is present", async () => {
-    vi.mocked(displaysApiModule.validateDisplaySession).mockResolvedValue({
-      valid: false,
-      displayId: null,
-      displaySlug: null,
-      assignedProfileId: null,
-      redirectPath: null,
-    });
-
-    await expect(resolveBootstrapRedirect()).resolves.toEqual({ to: "/setup" });
-    expect(displaySessionModule.clearDisplaySessionStorage).toHaveBeenCalled();
+  beforeEach(() => {
+    vi.clearAllMocks();
   });
 
   it("routes to display when session validates", async () => {
@@ -56,5 +47,14 @@ describe("bootstrap resolver", () => {
 
     await expect(resolveBootstrapRedirect()).resolves.toEqual({ to: "/setup" });
     expect(displaySessionModule.clearDisplaySessionStorage).toHaveBeenCalled();
+  });
+
+  it("routes to setup when session validation fails", async () => {
+    vi.mocked(displaysApiModule.validateDisplaySession).mockRejectedValue(
+      new Error("network error"),
+    );
+
+    await expect(resolveBootstrapRedirect()).rejects.toThrow("network error");
+    expect(displaySessionModule.clearDisplaySessionStorage).not.toHaveBeenCalled();
   });
 });

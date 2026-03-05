@@ -18,6 +18,9 @@ function AdminDisplaysPage() {
   const [maxUses, setMaxUses] = useState<number | null>(5);
   const [createdCode, setCreatedCode] = useState<string | null>(null);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [displayStatusMessage, setDisplayStatusMessage] = useState<
+    string | null
+  >(null);
   const [credentialMessage, setCredentialMessage] = useState<string | null>(
     null,
   );
@@ -27,6 +30,7 @@ function AdminDisplaysPage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [isCredentialSubmitting, setIsCredentialSubmitting] = useState(false);
+  const [isLoadingDisplays, setIsLoadingDisplays] = useState(true);
   const [displays, setDisplays] = useState<
     Array<{
       id: string;
@@ -40,6 +44,7 @@ function AdminDisplaysPage() {
     let cancelled = false;
 
     async function loadDisplays() {
+      setIsLoadingDisplays(true);
       try {
         const [response, authStatus] = await Promise.all([
           listDisplays(),
@@ -48,14 +53,19 @@ function AdminDisplaysPage() {
         if (!cancelled) {
           setDisplays(response);
           setCurrentUsername(authStatus.username ?? "");
+          setDisplayStatusMessage(null);
         }
       } catch (error) {
         if (!cancelled) {
-          setStatusMessage(
+          setDisplayStatusMessage(
             error instanceof Error
               ? error.message
               : "Displays konnten nicht geladen werden.",
           );
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingDisplays(false);
         }
       }
     }
@@ -261,8 +271,15 @@ function AdminDisplaysPage() {
                 step={1}
                 value={ttlSeconds ?? ""}
                 onChange={(event) => {
-                  const parsed = Number.parseInt(event.target.value, 10);
-                  setTtlSeconds(Number.isFinite(parsed) ? parsed : null);
+                  const { valueAsNumber } = event.currentTarget;
+                  if (
+                    Number.isFinite(valueAsNumber) &&
+                    Number.isInteger(valueAsNumber)
+                  ) {
+                    setTtlSeconds(valueAsNumber);
+                    return;
+                  }
+                  setTtlSeconds(null);
                 }}
               />
             </label>
@@ -276,8 +293,15 @@ function AdminDisplaysPage() {
                 step={1}
                 value={maxUses ?? ""}
                 onChange={(event) => {
-                  const parsed = Number.parseInt(event.target.value, 10);
-                  setMaxUses(Number.isFinite(parsed) ? parsed : null);
+                  const { valueAsNumber } = event.currentTarget;
+                  if (
+                    Number.isFinite(valueAsNumber) &&
+                    Number.isInteger(valueAsNumber)
+                  ) {
+                    setMaxUses(valueAsNumber);
+                    return;
+                  }
+                  setMaxUses(null);
                 }}
               />
             </label>
@@ -304,7 +328,9 @@ function AdminDisplaysPage() {
 
         <section className="rounded-2xl bg-white p-6 shadow-lg">
           <h2 className="text-xl font-semibold">Bekannte Displays</h2>
-          {displays.length === 0 ? (
+          {isLoadingDisplays ? (
+            <p className="mt-3 text-sm text-slate-600">Lade Displays...</p>
+          ) : displays.length === 0 ? (
             <p className="mt-3 text-sm text-slate-600">
               Keine Displays vorhanden.
             </p>
@@ -331,6 +357,9 @@ function AdminDisplaysPage() {
               ))}
             </ul>
           )}
+          {displayStatusMessage ? (
+            <p className="mt-3 text-sm text-rose-700">{displayStatusMessage}</p>
+          ) : null}
         </section>
       </section>
     </main>

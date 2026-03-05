@@ -40,8 +40,8 @@ export function formatEnv(entries) {
 }
 
 async function writeEnvFile(targetPath, entries) {
-  await mkdir(dirname(targetPath), { recursive: true });
-  await writeFile(targetPath, formatEnv(entries), "utf8");
+  await mkdir(dirname(targetPath), { recursive: true, mode: 0o700 });
+  await writeFile(targetPath, formatEnv(entries), { encoding: "utf8", mode: 0o600 });
 }
 
 async function askInteractive() {
@@ -56,7 +56,11 @@ async function askInteractive() {
       if (str === "\n" || str === "\r" || str === "\r\n") {
         return rl.output.write(str);
       }
-      return rl.output.write("*");
+      const prompt = rl.getPrompt();
+      if (prompt && str.startsWith(prompt)) {
+        return rl.output.write(`${prompt}${"*".repeat(rl.line.length)}`);
+      }
+      return rl.output.write(str);
     };
   }
 

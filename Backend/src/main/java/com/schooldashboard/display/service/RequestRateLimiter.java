@@ -7,6 +7,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -16,9 +17,9 @@ import org.springframework.stereotype.Service;
 public class RequestRateLimiter {
 
 	private static final Duration CLEANUP_INTERVAL = Duration.ofMinutes(5);
-	private static final Duration INACTIVITY_WINDOW = Duration.ofHours(1);
 
 	private final Map<String, Deque<Instant>> buckets = new ConcurrentHashMap<>();
+	private final AtomicReference<Duration> maxWindowSeen = new AtomicReference<>(Duration.ofSeconds(1));
 	private final ScheduledExecutorService cleanupExecutor = Executors.newSingleThreadScheduledExecutor(runnable -> {
 		Thread thread = new Thread(runnable, "request-rate-limiter-cleaner");
 		thread.setDaemon(true);
@@ -43,43 +44,44 @@ public class RequestRateLimiter {
 		if (window == null || window.isZero() || window.isNegative()) {
 			throw new IllegalArgumentException("window must be non-null and positive");
 		}
+		maxWindowSeen.getAndUpdate(current -> current.compareTo(window) >= 0 ? current : window);
 
 		String bucketKey = bucketName + ":" + key;
 		Instant now = Instant.now();
 		Instant threshold = now.minus(window);
+		AtomicReference<Boolean> granted = new AtomicReference<>(false);
 
-		Deque<Instant> bucket = buckets.computeIfAbsent(bucketKey, unused -> new ArrayDeque<>());
-		synchronized (bucket) {
+		buckets.compute(bucketKey, (unused, existingBucket) -> {
+			Deque<Instant> bucket = existingBucket == null ? new ArrayDeque<>() : existingBucket;
 			while (!bucket.isEmpty() && bucket.peekFirst().isBefore(threshold)) {
 				bucket.removeFirst();
 			}
 			if (bucket.size() >= maxRequests) {
-				return false;
+				granted.set(false);
+				return bucket;
 			}
 			bucket.addLast(now);
-		}
-		return true;
+			granted.set(true);
+			return bucket;
+		});
+		return granted.get();
 	}
 
 	@PreDestroy
-	void shutdown() {
+	public void shutdown() {
 		cleanupExecutor.shutdownNow();
 	}
 
 	private void cleanupInactiveBuckets() {
 		Instant now = Instant.now();
-		Instant threshold = now.minus(INACTIVITY_WINDOW);
-		for (Map.Entry<String, Deque<Instant>> entry : buckets.entrySet()) {
-			Deque<Instant> bucket = entry.getValue();
-			synchronized (bucket) {
-				while (!bucket.isEmpty() && bucket.peekFirst().isBefore(threshold)) {
-					bucket.removeFirst();
+		Instant threshold = now.minus(maxWindowSeen.get());
+		for (String bucketKey : buckets.keySet()) {
+			buckets.computeIfPresent(bucketKey, (unused, existingBucket) -> {
+				while (!existingBucket.isEmpty() && existingBucket.peekFirst().isBefore(threshold)) {
+					existingBucket.removeFirst();
 				}
-				Instant newest = bucket.peekLast();
-				if (bucket.isEmpty() || (newest != null && newest.isBefore(threshold))) {
-					buckets.remove(entry.getKey(), bucket);
-				}
-			}
+				return existingBucket.isEmpty() ? null : existingBucket;
+			});
 		}
 	}
 }

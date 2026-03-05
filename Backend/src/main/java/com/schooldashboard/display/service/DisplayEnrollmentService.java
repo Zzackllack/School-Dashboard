@@ -334,8 +334,12 @@ public class DisplayEnrollmentService {
 			displayEntity.setSlug(normalizedSlug);
 		}
 
-		displayEntity.setLocationLabel(trimToNull(request.locationLabel()));
-		displayEntity.setAssignedProfileId(trimToNull(request.assignedProfileId()));
+		if (request.locationLabel() != null) {
+			displayEntity.setLocationLabel(trimToNull(request.locationLabel()));
+		}
+		if (request.assignedProfileId() != null) {
+			displayEntity.setAssignedProfileId(trimToNull(request.assignedProfileId()));
+		}
 
 		DisplayStatus requestedStatus = request.status();
 		if (requestedStatus != null) {
@@ -511,6 +515,7 @@ public class DisplayEnrollmentService {
 		sessionRepository.save(sessionEntity);
 		requestEntity.setIssuedSessionTokenHash(tokenHashService.hash(sessionToken));
 		enrollmentRequestRepository.save(requestEntity);
+		issuedSessionTokens.put(requestId, new IssuedSessionToken(sessionToken, Instant.now()));
 		return sessionToken;
 	}
 
