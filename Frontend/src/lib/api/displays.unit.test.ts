@@ -125,7 +125,7 @@ describe("display api client", () => {
     expect(headers.get("x-csrf-token")).toBe("csrf-123");
   });
 
-  it("validates session with bearer token", async () => {
+  it("validates session with credentialed request", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(
         JSON.stringify({
@@ -142,7 +142,7 @@ describe("display api client", () => {
       ),
     );
 
-    const response = await validateDisplaySession("token-123");
+    const response = await validateDisplaySession();
 
     expect(response.valid).toBe(true);
     expect(response.displayId).toBe("display-1");

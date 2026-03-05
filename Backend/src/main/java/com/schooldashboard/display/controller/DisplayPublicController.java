@@ -8,10 +8,12 @@ import com.schooldashboard.display.dto.EnrollmentStatusResponse;
 import com.schooldashboard.display.service.DisplayEnrollmentService;
 import com.schooldashboard.display.service.RequestRateLimiter;
 import com.schooldashboard.display.web.DisplayDomainException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.ResponseCookie;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -23,6 +25,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/displays")
 public class DisplayPublicController {
+
+	private static final String DISPLAY_SESSION_COOKIE_NAME = "DISPLAY_SESSION_TOKEN";
 
 	private final DisplayEnrollmentService enrollmentService;
 	private final RequestRateLimiter rateLimiter;
@@ -45,8 +49,18 @@ public class DisplayPublicController {
 	}
 
 	@GetMapping("/enrollments/{requestId}")
-	public EnrollmentStatusResponse getEnrollmentStatus(@PathVariable String requestId) {
-		return enrollmentService.getEnrollmentStatus(requestId);
+	public ResponseEntity<EnrollmentStatusResponse> getEnrollmentStatus(@PathVariable String requestId,
+			HttpServletRequest request) {
+		EnrollmentStatusResponse response = enrollmentService.getEnrollmentStatus(requestId);
+		if ("APPROVED".equals(response.status()) && response.displaySessionToken() != null) {
+			ResponseCookie cookie = ResponseCookie.from(DISPLAY_SESSION_COOKIE_NAME, response.displaySessionToken())
+					.httpOnly(true).secure(request.isSecure()).sameSite("Lax").path("/").maxAge(Duration.ofDays(30))
+					.build();
+			return ResponseEntity.ok().header("Set-Cookie", cookie.toString())
+					.body(new EnrollmentStatusResponse(response.requestId(), response.status(), response.displayId(),
+							null, response.pollAfterSeconds()));
+		}
+		return ResponseEntity.ok(response);
 	}
 
 	@GetMapping("/session")
@@ -54,7 +68,7 @@ public class DisplayPublicController {
 			@RequestHeader(name = "Authorization", required = false) String authorization, HttpServletRequest request) {
 		enforceRateLimit("display-session-validation", resolveClientKey(request),
 				rateLimitProperties.getSessionValidationsPerMinute());
-		return enrollmentService.validateSession(extractBearerToken(authorization));
+		return enrollmentService.validateSession(resolveSessionToken(authorization, request));
 	}
 
 	private String resolveClientKey(HttpServletRequest request) {
@@ -77,6 +91,23 @@ public class DisplayPublicController {
 			return authorizationHeader.substring(7).trim();
 		}
 		return authorizationHeader.trim();
+	}
+
+	private String resolveSessionToken(String authorizationHeader, HttpServletRequest request) {
+		String bearerToken = extractBearerToken(authorizationHeader);
+		if (bearerToken != null && !bearerToken.isBlank()) {
+			return bearerToken;
+		}
+		Cookie[] cookies = request.getCookies();
+		if (cookies == null) {
+			return null;
+		}
+		for (Cookie cookie : cookies) {
+			if (DISPLAY_SESSION_COOKIE_NAME.equals(cookie.getName())) {
+				return cookie.getValue();
+			}
+		}
+		return null;
 	}
 
 	private void enforceRateLimit(String bucketName, String key, int maxPerMinute) {

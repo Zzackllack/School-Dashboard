@@ -64,7 +64,8 @@ public class SecurityConfiguration {
 		http.securityMatcher(EndpointRequest.toAnyEndpoint())
 				.authorizeHttpRequests(authorize -> authorize.requestMatchers(EndpointRequest.to("health", "info"))
 						.permitAll().anyRequest().hasRole("ADMIN"))
-				.httpBasic(Customizer.withDefaults()).csrf(AbstractHttpConfigurer::disable)
+				.httpBasic(Customizer.withDefaults())
+				.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse()))
 				.exceptionHandling(exceptionHandling -> exceptionHandling
 						.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler));
 
@@ -94,7 +95,10 @@ public class SecurityConfiguration {
 	@Bean
 	@Order(3)
 	public SecurityFilterChain applicationSecurityFilterChain(HttpSecurity http) throws Exception {
-		http.cors(Customizer.withDefaults()).csrf(AbstractHttpConfigurer::disable)
+		http.cors(Customizer.withDefaults())
+				.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+						.ignoringRequestMatchers("/api/displays/**", "/api/substitution/**", "/api/calendar/**",
+								"/api/dsb/**"))
 				.authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 						.requestMatchers("/error", "/health", "/css/**").permitAll()
 						.requestMatchers("/api/displays/**", "/api/substitution/**", "/api/calendar/**", "/api/dsb/**")

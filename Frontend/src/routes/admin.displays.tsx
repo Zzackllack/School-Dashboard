@@ -12,18 +12,23 @@ function AdminDisplaysLayout() {
     async function verifyAccess() {
       try {
         const authStatus = await getAdminAuthStatus();
+        if (cancelled) {
+          return;
+        }
         if (!authStatus.authenticated) {
+          if (cancelled) {
+            return;
+          }
           await navigate({ to: "/admin/login", replace: true });
           return;
         }
 
-        if (!cancelled) {
-          setReady(true);
-        }
+        setReady(true);
       } catch {
-        if (!cancelled) {
-          await navigate({ to: "/admin/login", replace: true });
+        if (cancelled) {
+          return;
         }
+        await navigate({ to: "/admin/login", replace: true });
       }
     }
 

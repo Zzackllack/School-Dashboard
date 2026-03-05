@@ -19,6 +19,12 @@ public class RandomTokenService {
 	}
 
 	private String nextToken(int length, String alphabet) {
+		if (length <= 0) {
+			throw new IllegalArgumentException("length must be greater than 0");
+		}
+		if (alphabet == null || alphabet.isEmpty()) {
+			throw new IllegalArgumentException("alphabet must not be null or empty");
+		}
 		StringBuilder builder = new StringBuilder(length);
 		for (int i = 0; i < length; i++) {
 			builder.append(alphabet.charAt(random.nextInt(alphabet.length())));

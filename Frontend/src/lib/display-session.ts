@@ -1,4 +1,3 @@
-const DISPLAY_SESSION_TOKEN_KEY = "display_session_token";
 const DISPLAY_ID_KEY = "display_id";
 const DISPLAY_PENDING_REQUEST_ID_KEY = "display_pending_request_id";
 
@@ -38,14 +37,6 @@ function writeStorageValue(key: string, value: string | null) {
   }
 }
 
-export function getDisplaySessionToken(): string | null {
-  return readStorageValue(DISPLAY_SESSION_TOKEN_KEY);
-}
-
-export function setDisplaySessionToken(value: string | null) {
-  writeStorageValue(DISPLAY_SESSION_TOKEN_KEY, value);
-}
-
 export function getDisplayIdHint(): string | null {
   return readStorageValue(DISPLAY_ID_KEY);
 }
@@ -63,7 +54,6 @@ export function setPendingEnrollmentRequestId(value: string | null) {
 }
 
 export function clearDisplaySessionStorage() {
-  setDisplaySessionToken(null);
   setDisplayIdHint(null);
   setPendingEnrollmentRequestId(null);
 }

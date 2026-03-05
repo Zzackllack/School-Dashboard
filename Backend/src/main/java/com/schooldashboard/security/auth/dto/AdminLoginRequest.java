@@ -1,4 +1,6 @@
 package com.schooldashboard.security.auth.dto;
 
-public record AdminLoginRequest(String username, String password) {
+import jakarta.validation.constraints.NotBlank;
+
+public record AdminLoginRequest(@NotBlank String username, @NotBlank String password) {
 }

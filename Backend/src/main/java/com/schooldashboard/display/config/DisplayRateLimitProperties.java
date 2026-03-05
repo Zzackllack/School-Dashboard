@@ -15,6 +15,9 @@ public class DisplayRateLimitProperties {
 	}
 
 	public void setEnrollmentsPerMinute(int enrollmentsPerMinute) {
+		if (enrollmentsPerMinute <= 0) {
+			throw new IllegalArgumentException("display.rate-limit.enrollments-per-minute must be greater than 0");
+		}
 		this.enrollmentsPerMinute = enrollmentsPerMinute;
 	}
 
@@ -23,6 +26,10 @@ public class DisplayRateLimitProperties {
 	}
 
 	public void setSessionValidationsPerMinute(int sessionValidationsPerMinute) {
+		if (sessionValidationsPerMinute <= 0) {
+			throw new IllegalArgumentException(
+					"display.rate-limit.session-validations-per-minute must be greater than 0");
+		}
 		this.sessionValidationsPerMinute = sessionValidationsPerMinute;
 	}
 }

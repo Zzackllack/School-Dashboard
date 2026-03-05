@@ -32,7 +32,7 @@ public class AppUserDetailsService implements UserDetailsService {
 
 	@Transactional
 	public void recordSuccessfulLogin(String username) {
-		appUserRepository.findByUsername(normalizeUsername(username)).ifPresent(userEntity -> {
+		appUserRepository.findLockedByUsername(normalizeUsername(username)).ifPresent(userEntity -> {
 			userEntity.setFailedLoginCount(0);
 			userEntity.setLastFailedLoginAt(null);
 			userEntity.setLockedUntil(null);
@@ -42,7 +42,7 @@ public class AppUserDetailsService implements UserDetailsService {
 
 	@Transactional
 	public void recordFailedLogin(String username) {
-		appUserRepository.findByUsername(normalizeUsername(username)).ifPresent(userEntity -> {
+		appUserRepository.findLockedByUsername(normalizeUsername(username)).ifPresent(userEntity -> {
 			int failedLoginCount = userEntity.getFailedLoginCount() + 1;
 			userEntity.setFailedLoginCount(failedLoginCount);
 			userEntity.setLastFailedLoginAt(Instant.now());

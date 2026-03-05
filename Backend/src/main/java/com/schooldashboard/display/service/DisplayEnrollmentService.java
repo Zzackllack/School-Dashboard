@@ -33,8 +33,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
@@ -55,6 +57,7 @@ public class DisplayEnrollmentService {
 	private final SlugService slugService;
 	private final AdminAuditLogService auditLogService;
 	private final ObjectMapper objectMapper;
+	private final Map<String, IssuedSessionToken> issuedSessionTokens = new ConcurrentHashMap<>();
 
 	public DisplayEnrollmentService(DisplayEnrollmentCodeRepository enrollmentCodeRepository,
 			DisplayEnrollmentRequestRepository enrollmentRequestRepository, DisplayRepository displayRepository,
@@ -76,8 +79,8 @@ public class DisplayEnrollmentService {
 	@Transactional
 	@PreAuthorize("hasRole('ADMIN')")
 	public CreateEnrollmentCodeResponse createEnrollmentCode(String adminId, CreateEnrollmentCodeRequest request) {
-		int ttlSeconds = normalizePositiveInt(request.ttlSeconds(), enrollmentProperties.getCodeTtlSeconds());
-		int maxUses = normalizePositiveInt(request.maxUses(), enrollmentProperties.getDefaultCodeMaxUses());
+		int ttlSeconds = request.ttlSeconds();
+		int maxUses = request.maxUses();
 		String code = randomTokenService.nextEnrollmentCode(Math.max(6, enrollmentProperties.getCodeLength()));
 		Instant now = Instant.now();
 		DisplayEnrollmentCodeEntity codeEntity = new DisplayEnrollmentCodeEntity(tokenHashService.hash(code), adminId,
@@ -151,8 +154,9 @@ public class DisplayEnrollmentService {
 		}
 
 		if (requestEntity.getStatus() == EnrollmentRequestStatus.APPROVED) {
+			String issuedSessionToken = issueSessionTokenForApprovedRequest(requestEntity);
 			return new EnrollmentStatusResponse(requestEntity.getId(), requestEntity.getStatus().name(),
-					requestEntity.getDisplayId(), requestEntity.getIssuedSessionToken(), null);
+					requestEntity.getDisplayId(), issuedSessionToken, null);
 		}
 
 		return new EnrollmentStatusResponse(requestEntity.getId(), requestEntity.getStatus().name(), null, null, null);
@@ -190,7 +194,7 @@ public class DisplayEnrollmentService {
 		DisplayEntity display = new DisplayEntity(resolvedDisplayName, resolvedSlug,
 				trimToNull(request == null ? null : request.locationLabel()),
 				trimToNull(request == null ? null : request.assignedProfileId()));
-		displayRepository.save(display);
+		display = saveDisplayWithSlugRetry(display, resolvedDisplayName, requestedSlug);
 
 		Instant now = Instant.now();
 		String sessionToken = randomTokenService.nextSessionToken(64);
@@ -200,10 +204,11 @@ public class DisplayEnrollmentService {
 
 		requestEntity.setStatus(EnrollmentRequestStatus.APPROVED);
 		requestEntity.setDisplayId(display.getId());
-		requestEntity.setIssuedSessionToken(sessionToken);
+		requestEntity.setIssuedSessionTokenHash(tokenHashService.hash(sessionToken));
 		requestEntity.setApprovedByAdminId(adminId);
 		requestEntity.setApprovedAt(now);
 		enrollmentRequestRepository.save(requestEntity);
+		issuedSessionTokens.put(requestEntity.getId(), new IssuedSessionToken(sessionToken, now));
 
 		auditLogService.log(adminId, "ENROLLMENT_REQUEST_APPROVED", "display_enrollment_request", requestEntity.getId(),
 				Map.of("displayId", display.getId(), "displaySlug", display.getSlug()));
@@ -332,15 +337,9 @@ public class DisplayEnrollmentService {
 		displayEntity.setLocationLabel(trimToNull(request.locationLabel()));
 		displayEntity.setAssignedProfileId(trimToNull(request.assignedProfileId()));
 
-		DisplayStatus requestedStatus = null;
-		if (trimToNull(request.status()) != null) {
-			try {
-				requestedStatus = DisplayStatus.valueOf(request.status().trim().toUpperCase());
-				displayEntity.setStatus(requestedStatus);
-			} catch (IllegalArgumentException exception) {
-				throw new DisplayDomainException("DISPLAY_STATUS_INVALID", HttpStatus.BAD_REQUEST,
-						"Display status must be ACTIVE, INACTIVE, or REVOKED");
-			}
+		DisplayStatus requestedStatus = request.status();
+		if (requestedStatus != null) {
+			displayEntity.setStatus(requestedStatus);
 		}
 
 		displayRepository.save(displayEntity);
@@ -436,13 +435,6 @@ public class DisplayEnrollmentService {
 		}
 	}
 
-	private int normalizePositiveInt(Integer value, int fallback) {
-		if (value == null || value.intValue() <= 0) {
-			return fallback;
-		}
-		return value.intValue();
-	}
-
 	private String serializeJson(Object value) {
 		if (value == null) {
 			return null;
@@ -493,5 +485,57 @@ public class DisplayEnrollmentService {
 
 	private DisplaySessionValidationResponse invalidSessionResponse() {
 		return new DisplaySessionValidationResponse(false, null, null, null, null);
+	}
+
+	private String issueSessionTokenForApprovedRequest(DisplayEnrollmentRequestEntity requestEntity) {
+		if (requestEntity.getDisplayId() == null) {
+			return null;
+		}
+		cleanupIssuedSessionTokens();
+
+		String requestId = requestEntity.getId();
+		IssuedSessionToken cached = issuedSessionTokens.remove(requestId);
+		if (cached != null && tokenHashService.hash(cached.token()).equals(requestEntity.getIssuedSessionTokenHash())) {
+			return cached.token();
+		}
+
+		DisplaySessionEntity sessionEntity = sessionRepository.findByDisplayId(requestEntity.getDisplayId()).stream()
+				.filter(session -> session.getRevokedAt() == null)
+				.max(Comparator.comparing(DisplaySessionEntity::getIssuedAt)).orElse(null);
+		if (sessionEntity == null) {
+			return null;
+		}
+
+		String sessionToken = randomTokenService.nextSessionToken(64);
+		sessionEntity.setTokenHash(tokenHashService.hash(sessionToken));
+		sessionRepository.save(sessionEntity);
+		requestEntity.setIssuedSessionTokenHash(tokenHashService.hash(sessionToken));
+		enrollmentRequestRepository.save(requestEntity);
+		return sessionToken;
+	}
+
+	private DisplayEntity saveDisplayWithSlugRetry(DisplayEntity display, String resolvedDisplayName, String requestedSlug) {
+		String baseSlugInput = requestedSlug == null ? resolvedDisplayName : requestedSlug;
+		String candidateSlug = display.getSlug();
+		for (int attempt = 1; attempt <= 3; attempt++) {
+			try {
+				display.setSlug(candidateSlug);
+				return displayRepository.save(display);
+			} catch (DataIntegrityViolationException ex) {
+				if (attempt == 3) {
+					throw ex;
+				}
+				candidateSlug = slugService.createUniqueSlug(baseSlugInput);
+			}
+		}
+		return display;
+	}
+
+	private void cleanupIssuedSessionTokens() {
+		Instant threshold = Instant.now().minusSeconds(Math.max(60, enrollmentProperties.getRequestTtlSeconds()));
+		issuedSessionTokens.entrySet().removeIf(entry -> entry.getValue().issuedAt().isBefore(threshold));
+	}
+
+	private record IssuedSessionToken(String token, Instant issuedAt) {
 	}
 }

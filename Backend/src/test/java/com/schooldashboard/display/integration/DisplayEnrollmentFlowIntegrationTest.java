@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.schooldashboard.display.dto.ApproveEnrollmentRequest;
 import com.schooldashboard.display.dto.CreateEnrollmentCodeRequest;
 import com.schooldashboard.display.dto.CreateEnrollmentRequest;
+import com.schooldashboard.display.dto.DeviceInfoDto;
 import com.schooldashboard.display.dto.RejectEnrollmentRequest;
 import com.schooldashboard.security.auth.dto.AdminLoginRequest;
 import java.util.Map;
@@ -51,7 +52,8 @@ public class DisplayEnrollmentFlowIntegrationTest {
 		Map<String, Object> createEnrollmentResponse = readMap(mockMvc
 				.perform(post("/api/displays/enrollments").contentType(MediaType.APPLICATION_JSON)
 						.content(objectMapper.writeValueAsString(new CreateEnrollmentRequest(
-								asString(createdCode, "code"), "Main Hall Screen", Map.of("userAgent", "kiosk")))))
+								asString(createdCode, "code"), "Main Hall Screen",
+								new DeviceInfoDto(null, "kiosk", null, "test-agent", null, "de-DE", "kiosk-os")))))
 				.andExpect(status().isCreated()).andReturn().getResponse().getContentAsString());
 		assertEquals("PENDING", asString(createEnrollmentResponse, "status"));
 
@@ -75,11 +77,10 @@ public class DisplayEnrollmentFlowIntegrationTest {
 				mockMvc.perform(get("/api/displays/enrollments/{requestId}", requestId)).andExpect(status().isOk())
 						.andReturn().getResponse().getContentAsString());
 		assertEquals("APPROVED", asString(approvedStatusResponse, "status"));
-		assertNotNull(asString(approvedStatusResponse, "displaySessionToken"));
 
 		Map<String, Object> validationResponse = readMap(mockMvc
 				.perform(get("/api/displays/session").header("Authorization",
-						"Bearer " + asString(approvedStatusResponse, "displaySessionToken")))
+						"Bearer " + asString(approveResponse, "displaySessionToken")))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals(Boolean.TRUE, validationResponse.get("valid"));
 		assertEquals(asString(approveResponse, "displayId"), asString(validationResponse, "displayId"));
@@ -92,7 +93,7 @@ public class DisplayEnrollmentFlowIntegrationTest {
 
 		Map<String, Object> revokedValidationResponse = readMap(mockMvc
 				.perform(get("/api/displays/session").header("Authorization",
-						"Bearer " + asString(approvedStatusResponse, "displaySessionToken")))
+						"Bearer " + asString(approveResponse, "displaySessionToken")))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals(Boolean.FALSE, revokedValidationResponse.get("valid"));
 
@@ -105,7 +106,7 @@ public class DisplayEnrollmentFlowIntegrationTest {
 
 		Map<String, Object> reactivatedValidationResponse = readMap(mockMvc
 				.perform(get("/api/displays/session").header("Authorization",
-						"Bearer " + asString(approvedStatusResponse, "displaySessionToken")))
+						"Bearer " + asString(approveResponse, "displaySessionToken")))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals(Boolean.TRUE, reactivatedValidationResponse.get("valid"));
 		assertEquals(asString(approveResponse, "displayId"), asString(reactivatedValidationResponse, "displayId"));
@@ -115,7 +116,7 @@ public class DisplayEnrollmentFlowIntegrationTest {
 
 		Map<String, Object> deletedValidationResponse = readMap(mockMvc
 				.perform(get("/api/displays/session").header("Authorization",
-						"Bearer " + asString(approvedStatusResponse, "displaySessionToken")))
+						"Bearer " + asString(approveResponse, "displaySessionToken")))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals(Boolean.FALSE, deletedValidationResponse.get("valid"));
 	}

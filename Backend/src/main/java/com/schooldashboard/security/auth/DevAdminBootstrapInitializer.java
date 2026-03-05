@@ -53,7 +53,7 @@ public class DevAdminBootstrapInitializer implements ApplicationRunner {
 			return;
 		}
 
-		if (appUserRepository.count() > 0) {
+		if (appUserRepository.existsByRoles_Name("ROLE_ADMIN")) {
 			return;
 		}
 
@@ -66,12 +66,8 @@ public class DevAdminBootstrapInitializer implements ApplicationRunner {
 	}
 
 	private void handleBootstrapMissingCredentials() {
-		if (isProdProfile()) {
-			throw new IllegalStateException(
-					"security.admin.bootstrap.enabled=true requires security.admin.bootstrap.username/password in prod profile");
-		}
-		logger.warn(
-				"security.admin.bootstrap.enabled=true but username/password are missing. Admin bootstrap skipped in non-prod profile.");
+		throw new IllegalStateException(
+				"security.admin.bootstrap.enabled=true requires non-empty security.admin.bootstrap.username/password");
 	}
 
 	private void ensureBootstrapAdmin(String username, String password, AppRoleEntity adminRole) {

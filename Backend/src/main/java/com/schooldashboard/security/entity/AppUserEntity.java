@@ -125,6 +125,9 @@ public class AppUserEntity {
 	}
 
 	public void setFailedLoginCount(int failedLoginCount) {
+		if (failedLoginCount < 0) {
+			throw new IllegalArgumentException("failedLoginCount must be greater than or equal to 0");
+		}
 		this.failedLoginCount = failedLoginCount;
 	}
 

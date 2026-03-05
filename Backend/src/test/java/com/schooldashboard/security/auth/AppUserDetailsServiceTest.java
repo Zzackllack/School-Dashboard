@@ -44,7 +44,7 @@ public class AppUserDetailsServiceTest {
 	@Test
 	public void recordFailedLoginLocksUserAfterThreshold() {
 		AppUserEntity userEntity = new AppUserEntity("admin", "encoded");
-		when(appUserRepository.findByUsername("admin")).thenReturn(Optional.of(userEntity));
+		when(appUserRepository.findLockedByUsername("admin")).thenReturn(Optional.of(userEntity));
 
 		for (int i = 0; i < 5; i++) {
 			appUserDetailsService.recordFailedLogin("admin");
@@ -63,7 +63,7 @@ public class AppUserDetailsServiceTest {
 		userEntity.setFailedLoginCount(3);
 		userEntity.setLastFailedLoginAt(Instant.now());
 		userEntity.setLockedUntil(Instant.now().plusSeconds(60));
-		when(appUserRepository.findByUsername("admin")).thenReturn(Optional.of(userEntity));
+		when(appUserRepository.findLockedByUsername("admin")).thenReturn(Optional.of(userEntity));
 
 		appUserDetailsService.recordSuccessfulLogin("admin");
 

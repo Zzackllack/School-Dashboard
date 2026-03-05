@@ -34,8 +34,8 @@ public class DisplayEnrollmentRequestEntity {
 	@Column(name = "display_id", length = 36)
 	private String displayId;
 
-	@Column(name = "issued_session_token", length = 256)
-	private String issuedSessionToken;
+	@Column(name = "issued_session_token_hash", length = 128)
+	private String issuedSessionTokenHash;
 
 	@Column(name = "approved_by_admin_id", length = 120)
 	private String approvedByAdminId;
@@ -113,12 +113,12 @@ public class DisplayEnrollmentRequestEntity {
 		this.displayId = displayId;
 	}
 
-	public String getIssuedSessionToken() {
-		return issuedSessionToken;
+	public String getIssuedSessionTokenHash() {
+		return issuedSessionTokenHash;
 	}
 
-	public void setIssuedSessionToken(String issuedSessionToken) {
-		this.issuedSessionToken = issuedSessionToken;
+	public void setIssuedSessionTokenHash(String issuedSessionTokenHash) {
+		this.issuedSessionTokenHash = issuedSessionTokenHash;
 	}
 
 	public String getApprovedByAdminId() {

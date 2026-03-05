@@ -3,10 +3,8 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   clearDisplaySessionStorage,
   getDisplayIdHint,
-  getDisplaySessionToken,
   getPendingEnrollmentRequestId,
   setDisplayIdHint,
-  setDisplaySessionToken,
   setPendingEnrollmentRequestId,
 } from "./display-session";
 
@@ -32,17 +30,14 @@ describe("display-session storage", () => {
   });
 
   it("stores and clears display session values", () => {
-    setDisplaySessionToken("token-123");
     setDisplayIdHint("display-1");
     setPendingEnrollmentRequestId("request-1");
 
-    expect(getDisplaySessionToken()).toBe("token-123");
     expect(getDisplayIdHint()).toBe("display-1");
     expect(getPendingEnrollmentRequestId()).toBe("request-1");
 
     clearDisplaySessionStorage();
 
-    expect(getDisplaySessionToken()).toBeNull();
     expect(getDisplayIdHint()).toBeNull();
     expect(getPendingEnrollmentRequestId()).toBeNull();
   });

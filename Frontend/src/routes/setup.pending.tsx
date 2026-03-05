@@ -4,7 +4,6 @@ import { getEnrollmentStatus } from "../lib/api/displays";
 import {
   getPendingEnrollmentRequestId,
   setDisplayIdHint,
-  setDisplaySessionToken,
   setPendingEnrollmentRequestId,
 } from "../lib/display-session";
 
@@ -50,14 +49,10 @@ export function SetupPendingPage() {
           return;
         }
 
+        setErrorMessage(null);
         setStatus(response.status);
 
-        if (
-          response.status === "APPROVED" &&
-          response.displayId &&
-          response.displaySessionToken
-        ) {
-          setDisplaySessionToken(response.displaySessionToken);
+        if (response.status === "APPROVED" && response.displayId) {
           setDisplayIdHint(response.displayId);
           setPendingEnrollmentRequestId(null);
 

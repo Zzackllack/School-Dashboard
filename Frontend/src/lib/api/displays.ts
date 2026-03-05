@@ -1,9 +1,19 @@
 import { fetchJson } from "./http";
 
+export interface DeviceInfo {
+  deviceId?: string;
+  deviceType?: string;
+  osVersion?: string;
+  userAgent?: string;
+  appVersion?: string;
+  language?: string;
+  platform?: string;
+}
+
 export interface CreateEnrollmentRequest {
   enrollmentCode: string;
   proposedDisplayName: string;
-  deviceInfo?: unknown;
+  deviceInfo?: DeviceInfo;
 }
 
 export interface CreateEnrollmentResponse {
@@ -183,15 +193,11 @@ export async function getEnrollmentStatus(
   return response;
 }
 
-export async function validateDisplaySession(
-  token: string,
-): Promise<DisplaySessionValidationResponse> {
+export async function validateDisplaySession(): Promise<DisplaySessionValidationResponse> {
   const response = await fetchJson<DisplaySessionValidationResponse>(
     "/displays/session",
     {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+      credentials: "include",
     },
   );
 

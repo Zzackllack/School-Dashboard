@@ -11,9 +11,11 @@ import com.schooldashboard.display.dto.UpdateDisplayRequest;
 import com.schooldashboard.display.entity.EnrollmentRequestStatus;
 import com.schooldashboard.display.service.DisplayEnrollmentService;
 import com.schooldashboard.display.web.DisplayDomainException;
+import jakarta.validation.Valid;
 import java.util.List;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -37,7 +39,7 @@ public class AdminDisplayController {
 
 	@PostMapping("/enrollment-codes")
 	public CreateEnrollmentCodeResponse createEnrollmentCode(
-			@RequestBody(required = false) CreateEnrollmentCodeRequest request, Authentication authentication) {
+			@Valid @RequestBody CreateEnrollmentCodeRequest request, Authentication authentication) {
 		return enrollmentService.createEnrollmentCode(resolveAdminId(authentication), request);
 	}
 
@@ -50,13 +52,13 @@ public class AdminDisplayController {
 
 	@PostMapping("/enrollments/{requestId}/approve")
 	public EnrollmentStatusResponse approveEnrollment(@PathVariable String requestId,
-			@RequestBody(required = false) ApproveEnrollmentRequest request, Authentication authentication) {
+			@Valid @RequestBody(required = false) ApproveEnrollmentRequest request, Authentication authentication) {
 		return enrollmentService.approveEnrollment(requestId, request, resolveAdminId(authentication));
 	}
 
 	@PostMapping("/enrollments/{requestId}/reject")
 	public EnrollmentStatusResponse rejectEnrollment(@PathVariable String requestId,
-			@RequestBody(required = false) RejectEnrollmentRequest request, Authentication authentication) {
+			@Valid @RequestBody RejectEnrollmentRequest request, Authentication authentication) {
 		return enrollmentService.rejectEnrollment(requestId, request, resolveAdminId(authentication));
 	}
 
@@ -77,7 +79,7 @@ public class AdminDisplayController {
 
 	@PatchMapping("/{displayId}")
 	public DisplaySummaryResponse updateDisplay(@PathVariable String displayId,
-			@RequestBody UpdateDisplayRequest request, Authentication authentication) {
+			@Valid @RequestBody UpdateDisplayRequest request, Authentication authentication) {
 		return enrollmentService.updateDisplay(displayId, request, resolveAdminId(authentication));
 	}
 
@@ -88,7 +90,10 @@ public class AdminDisplayController {
 	}
 
 	private String resolveAdminId(Authentication authentication) {
-		if (authentication == null || !authentication.isAuthenticated()) {
+		Object principal = authentication == null ? null : authentication.getPrincipal();
+		boolean anonymousPrincipal = principal instanceof String && "anonymousUser".equals(principal);
+		if (authentication == null || !authentication.isAuthenticated()
+				|| authentication instanceof AnonymousAuthenticationToken || anonymousPrincipal) {
 			throw new DisplayDomainException("ADMIN_UNAUTHORIZED", HttpStatus.UNAUTHORIZED,
 					"Authentication is required");
 		}

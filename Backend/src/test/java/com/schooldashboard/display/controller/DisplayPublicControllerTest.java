@@ -3,12 +3,14 @@ package com.schooldashboard.display.controller;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.schooldashboard.display.config.DisplayRateLimitProperties;
 import com.schooldashboard.display.dto.CreateEnrollmentResponse;
 import com.schooldashboard.display.dto.DisplaySessionValidationResponse;
+import com.schooldashboard.display.dto.EnrollmentStatusResponse;
 import com.schooldashboard.display.service.DisplayEnrollmentService;
 import com.schooldashboard.display.service.RequestRateLimiter;
 import org.junit.jupiter.api.Test;
@@ -73,5 +75,15 @@ public class DisplayPublicControllerTest {
 				.content("{\"enrollmentCode\":\"ABCD1234\",\"proposedDisplayName\":\"Lobby\"}"))
 				.andExpect(status().isTooManyRequests())
 				.andExpect(jsonPath("$.code").value("RATE_LIMIT_EXCEEDED"));
+	}
+
+	@Test
+	public void getEnrollmentStatusSetsHttpOnlySessionCookieWhenApproved() throws Exception {
+		when(enrollmentService.getEnrollmentStatus("req-1"))
+				.thenReturn(new EnrollmentStatusResponse("req-1", "APPROVED", "display-1", "session-123", null));
+
+		mockMvc.perform(get("/api/displays/enrollments/req-1")).andExpect(status().isOk())
+				.andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("DISPLAY_SESSION_TOKEN=")))
+				.andExpect(jsonPath("$.displaySessionToken").isEmpty());
 	}
 }

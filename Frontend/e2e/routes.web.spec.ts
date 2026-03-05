@@ -239,6 +239,10 @@ test("completes setup -> pending -> approved -> display flow", async ({
   });
 
   await page.route("**/api/displays/enrollments/req-1", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
     pollCount += 1;
 
     if (pollCount < 2) {
@@ -270,6 +274,10 @@ test("completes setup -> pending -> approved -> display flow", async ({
   });
 
   await page.route("**/api/displays/session", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -296,11 +304,11 @@ test("completes setup -> pending -> approved -> display flow", async ({
 test("restores approved display from stored session token on reboot", async ({
   page,
 }) => {
-  await page.addInitScript(() => {
-    window.localStorage.setItem("display_session_token", "token-reboot");
-  });
-
   await page.route("**/api/displays/session", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -321,11 +329,11 @@ test("restores approved display from stored session token on reboot", async ({
 });
 
 test("falls back to setup when stored token is revoked", async ({ page }) => {
-  await page.addInitScript(() => {
-    window.localStorage.setItem("display_session_token", "revoked-token");
-  });
-
   await page.route("**/api/displays/session", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -361,11 +369,11 @@ test("blocks direct /display/:displayId access without a session token", async (
 test("blocks direct /display/:displayId access when token is revoked", async ({
   page,
 }) => {
-  await page.addInitScript(() => {
-    window.localStorage.setItem("display_session_token", "revoked-token");
-  });
-
   await page.route("**/api/displays/session", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
     await route.fulfill({
       status: 200,
       contentType: "application/json",
@@ -393,6 +401,10 @@ test("admin pending page supports approval action", async ({ page }) => {
   await page.route(
     "**/api/admin/displays/enrollments?status=PENDING",
     async (route) => {
+      if (route.request().method() !== "GET") {
+        await route.continue();
+        return;
+      }
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -419,6 +431,10 @@ test("admin pending page supports approval action", async ({ page }) => {
   await page.route(
     "**/api/admin/displays/enrollments/req-approve/approve",
     async (route) => {
+      if (route.request().method() !== "POST") {
+        await route.continue();
+        return;
+      }
       approved = true;
       await route.fulfill({
         status: 200,
@@ -447,6 +463,10 @@ test("admin pending page supports rejection action", async ({ page }) => {
   await page.route(
     "**/api/admin/displays/enrollments?status=PENDING",
     async (route) => {
+      if (route.request().method() !== "GET") {
+        await route.continue();
+        return;
+      }
       await route.fulfill({
         status: 200,
         contentType: "application/json",
@@ -473,6 +493,10 @@ test("admin pending page supports rejection action", async ({ page }) => {
   await page.route(
     "**/api/admin/displays/enrollments/req-reject/reject",
     async (route) => {
+      if (route.request().method() !== "POST") {
+        await route.continue();
+        return;
+      }
       rejected = true;
       await route.fulfill({
         status: 200,

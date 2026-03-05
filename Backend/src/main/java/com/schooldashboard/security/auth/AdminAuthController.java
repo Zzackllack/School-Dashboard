@@ -5,6 +5,7 @@ import com.schooldashboard.security.auth.dto.AdminLoginRequest;
 import com.schooldashboard.security.auth.dto.CsrfTokenResponse;
 import com.schooldashboard.security.metrics.SecurityMetricsService;
 import com.schooldashboard.security.web.SecurityErrorResponse;
+import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.Instant;
@@ -51,14 +52,10 @@ public class AdminAuthController {
 	}
 
 	@PostMapping("/login")
-	public ResponseEntity<?> login(@RequestBody(required = false) AdminLoginRequest request,
+	public ResponseEntity<?> login(@Valid @RequestBody AdminLoginRequest request,
 			HttpServletRequest servletRequest, HttpServletResponse servletResponse) {
-		String username = normalize(request == null ? null : request.username());
-		String password = normalize(request == null ? null : request.password());
-		if (username == null || password == null) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-					.body(errorResponse("AUTH_REQUEST_INVALID", "Username and password are required", servletRequest));
-		}
+		String username = normalize(request.username());
+		String password = normalize(request.password());
 
 		try {
 			Authentication authentication = authenticationManager

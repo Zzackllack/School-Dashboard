@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { DisplayPage } from "../components/display/DisplayPage";
 import { validateDisplaySession } from "../lib/api/displays";
 import {
-  getDisplaySessionToken,
+  clearDisplaySessionStorage,
   setDisplayIdHint,
 } from "../lib/display-session";
 
@@ -15,13 +15,9 @@ type DisplayAccessResult =
 export async function resolveDisplayAccess(
   requestedDisplayId: string,
 ): Promise<DisplayAccessResult> {
-  const displaySessionToken = getDisplaySessionToken();
-  if (!displaySessionToken) {
-    return { kind: "redirect-setup" };
-  }
-
-  const sessionValidation = await validateDisplaySession(displaySessionToken);
+  const sessionValidation = await validateDisplaySession();
   if (!sessionValidation.valid || !sessionValidation.displayId) {
+    clearDisplaySessionStorage();
     return { kind: "redirect-setup" };
   }
 
@@ -40,6 +36,7 @@ function GuardedDisplayRoute() {
 
   useEffect(() => {
     let cancelled = false;
+    setAccessAllowed(false);
 
     async function guardDisplayAccess() {
       try {

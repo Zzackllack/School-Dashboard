@@ -5,7 +5,6 @@ import { describe, expect, it, vi } from "vitest";
 import { getRouter } from "../../router";
 
 vi.mock("../../lib/display-session", () => ({
-  getDisplaySessionToken: vi.fn(() => "valid-token"),
   clearDisplaySessionStorage: vi.fn(),
   setDisplayIdHint: vi.fn(),
 }));

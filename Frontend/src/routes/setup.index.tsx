@@ -1,10 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
 import type { FormEvent } from "react";
+import type { DeviceInfo } from "../lib/api/displays";
 import { createEnrollment } from "../lib/api/displays";
 import { setPendingEnrollmentRequestId } from "../lib/display-session";
 
-function readDeviceInfo(): Record<string, unknown> | undefined {
+function readDeviceInfo(): DeviceInfo | undefined {
   if (typeof navigator === "undefined") {
     return undefined;
   }

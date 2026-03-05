@@ -1,4 +1,7 @@
 package com.schooldashboard.display.dto;
 
-public record CreateEnrollmentCodeRequest(Integer ttlSeconds, Integer maxUses) {
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
+
+public record CreateEnrollmentCodeRequest(@NotNull @Min(1) Integer ttlSeconds, @NotNull @Min(1) Integer maxUses) {
 }

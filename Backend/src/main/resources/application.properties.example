@@ -26,7 +26,8 @@ security.session.idle-timeout=30m
 server.servlet.session.timeout=${security.session.idle-timeout}
 server.servlet.session.cookie.http-only=true
 server.servlet.session.cookie.same-site=lax
-server.servlet.session.cookie.secure=false
+# Keep secure in shared/staging/prod environments. Override to false only for local HTTP dev.
+server.servlet.session.cookie.secure=true
 
 # Admin bootstrap account controls (dev/local only)
 security.admin.bootstrap.enabled=false

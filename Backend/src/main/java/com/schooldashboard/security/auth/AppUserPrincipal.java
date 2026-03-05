@@ -28,9 +28,9 @@ public class AppUserPrincipal implements UserDetails {
 	}
 
 	public static AppUserPrincipal fromEntity(AppUserEntity userEntity) {
-		boolean lockExpired = userEntity.getLockedUntil() == null
-				|| userEntity.getLockedUntil().isBefore(Instant.now());
-		boolean accountNonLocked = !userEntity.isLocked() && lockExpired;
+		boolean activeLock = userEntity.isLocked() && userEntity.getLockedUntil() != null
+				&& userEntity.getLockedUntil().isAfter(Instant.now());
+		boolean accountNonLocked = !activeLock;
 		List<GrantedAuthority> resolvedAuthorities = userEntity.getRoles().stream()
 				.map(role -> new SimpleGrantedAuthority(role.getName())).map(GrantedAuthority.class::cast).toList();
 		return new AppUserPrincipal(userEntity.getId(), userEntity.getUsername(), userEntity.getPasswordHash(),

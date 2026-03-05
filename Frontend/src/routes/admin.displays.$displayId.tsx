@@ -23,9 +23,11 @@ function AdminDisplayDetailPage() {
     status: "ACTIVE" as "ACTIVE" | "INACTIVE" | "REVOKED",
   });
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [isDisplayLoaded, setIsDisplayLoaded] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
+    setIsDisplayLoaded(false);
 
     async function loadDisplay() {
       try {
@@ -38,10 +40,12 @@ function AdminDisplayDetailPage() {
             assignedProfileId: display.assignedProfileId ?? "",
             status: display.status,
           });
+          setIsDisplayLoaded(true);
           setStatusMessage(null);
         }
       } catch (error) {
         if (!cancelled) {
+          setIsDisplayLoaded(false);
           setStatusMessage(
             error instanceof Error
               ? error.message
@@ -60,6 +64,9 @@ function AdminDisplayDetailPage() {
 
   async function handleUpdate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!isDisplayLoaded) {
+      return;
+    }
 
     try {
       const response = await updateDisplay(displayId, formState);
@@ -81,6 +88,9 @@ function AdminDisplayDetailPage() {
   }
 
   async function handleRevoke() {
+    if (!isDisplayLoaded) {
+      return;
+    }
     try {
       const response = await revokeDisplaySession(displayId);
       setFormState((current) => ({ ...current, status: response.status }));
@@ -95,6 +105,9 @@ function AdminDisplayDetailPage() {
   }
 
   async function handleDelete() {
+    if (!isDisplayLoaded) {
+      return;
+    }
     const confirmed = window.confirm(
       "Display wirklich löschen? Dieser Schritt kann nicht rückgängig gemacht werden.",
     );
@@ -125,6 +138,7 @@ function AdminDisplayDetailPage() {
             <input
               className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
               value={formState.name}
+              disabled={!isDisplayLoaded}
               onChange={(event) =>
                 setFormState((current) => ({
                   ...current,
@@ -139,6 +153,7 @@ function AdminDisplayDetailPage() {
             <input
               className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
               value={formState.slug}
+              disabled={!isDisplayLoaded}
               onChange={(event) =>
                 setFormState((current) => ({
                   ...current,
@@ -153,6 +168,7 @@ function AdminDisplayDetailPage() {
             <input
               className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
               value={formState.locationLabel}
+              disabled={!isDisplayLoaded}
               onChange={(event) =>
                 setFormState((current) => ({
                   ...current,
@@ -167,6 +183,7 @@ function AdminDisplayDetailPage() {
             <input
               className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
               value={formState.assignedProfileId}
+              disabled={!isDisplayLoaded}
               onChange={(event) =>
                 setFormState((current) => ({
                   ...current,
@@ -181,6 +198,7 @@ function AdminDisplayDetailPage() {
             <select
               className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
               value={formState.status}
+              disabled={!isDisplayLoaded}
               onChange={(event) =>
                 setFormState((current) => ({
                   ...current,
@@ -200,12 +218,14 @@ function AdminDisplayDetailPage() {
           <div className="flex gap-3">
             <button
               className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+              disabled={!isDisplayLoaded}
               type="submit"
             >
               Änderungen speichern
             </button>
             <button
               className="rounded-lg bg-rose-600 px-4 py-2 text-sm font-semibold text-white"
+              disabled={!isDisplayLoaded}
               type="button"
               onClick={() => void handleRevoke()}
             >
@@ -213,6 +233,7 @@ function AdminDisplayDetailPage() {
             </button>
             <button
               className="rounded-lg bg-red-800 px-4 py-2 text-sm font-semibold text-white"
+              disabled={!isDisplayLoaded}
               type="button"
               onClick={() => void handleDelete()}
             >

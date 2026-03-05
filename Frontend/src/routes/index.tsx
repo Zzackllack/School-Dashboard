@@ -2,7 +2,7 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { validateDisplaySession } from "../lib/api/displays";
 import {
-  getDisplaySessionToken,
+  clearDisplaySessionStorage,
   setDisplayIdHint,
 } from "../lib/display-session";
 
@@ -12,12 +12,7 @@ export interface BootstrapRedirectTarget {
 }
 
 export async function resolveBootstrapRedirect(): Promise<BootstrapRedirectTarget> {
-  const displaySessionToken = getDisplaySessionToken();
-  if (!displaySessionToken) {
-    return { to: "/setup" };
-  }
-
-  const sessionValidation = await validateDisplaySession(displaySessionToken);
+  const sessionValidation = await validateDisplaySession();
   if (sessionValidation.valid && sessionValidation.displayId) {
     setDisplayIdHint(sessionValidation.displayId);
     return {
@@ -26,6 +21,7 @@ export async function resolveBootstrapRedirect(): Promise<BootstrapRedirectTarge
     };
   }
 
+  clearDisplaySessionStorage();
   return { to: "/setup" };
 }
 
