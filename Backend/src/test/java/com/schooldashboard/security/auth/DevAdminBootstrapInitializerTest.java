@@ -36,8 +36,8 @@ public class DevAdminBootstrapInitializerTest {
 		securityProperties.getAdmin().getBootstrap().setUsername("dev-admin");
 		securityProperties.getAdmin().getBootstrap().setPassword("secret");
 
-		DevAdminBootstrapInitializer initializer = new DevAdminBootstrapInitializer(appUserRepository, appRoleRepository,
-				passwordEncoder, securityProperties, environment);
+		DevAdminBootstrapInitializer initializer = new DevAdminBootstrapInitializer(appUserRepository,
+				appRoleRepository, passwordEncoder, securityProperties, environment);
 
 		initializer.run(new DefaultApplicationArguments(new String[0]));
 
@@ -61,8 +61,8 @@ public class DevAdminBootstrapInitializerTest {
 		securityProperties.getAdmin().getBootstrap().setUsername("dev-admin");
 		securityProperties.getAdmin().getBootstrap().setPassword("secret");
 
-		DevAdminBootstrapInitializer initializer = new DevAdminBootstrapInitializer(appUserRepository, appRoleRepository,
-				passwordEncoder, securityProperties, environment);
+		DevAdminBootstrapInitializer initializer = new DevAdminBootstrapInitializer(appUserRepository,
+				appRoleRepository, passwordEncoder, securityProperties, environment);
 
 		initializer.run(new DefaultApplicationArguments(new String[0]));
 

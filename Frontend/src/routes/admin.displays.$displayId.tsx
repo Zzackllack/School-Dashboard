@@ -23,9 +23,9 @@ function AdminDisplayDetailPage() {
     status: "ACTIVE" as "ACTIVE" | "INACTIVE" | "REVOKED",
   });
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const [statusType, setStatusType] = useState<
-    "success" | "error" | "neutral"
-  >("neutral");
+  const [statusType, setStatusType] = useState<"success" | "error" | "neutral">(
+    "neutral",
+  );
   const [isDisplayLoaded, setIsDisplayLoaded] = useState(false);
 
   useEffect(() => {

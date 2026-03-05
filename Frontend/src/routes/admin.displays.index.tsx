@@ -77,7 +77,12 @@ function AdminDisplaysPage() {
       );
       return;
     }
-    if (!Number.isInteger(ttlSeconds) || !Number.isInteger(maxUses) || ttlSeconds <= 0 || maxUses <= 0) {
+    if (
+      !Number.isInteger(ttlSeconds) ||
+      !Number.isInteger(maxUses) ||
+      ttlSeconds <= 0 ||
+      maxUses <= 0
+    ) {
       setStatusMessage(
         "TTL und Max Uses müssen positive ganze Zahlen größer als 0 sein.",
       );

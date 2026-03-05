@@ -14,13 +14,11 @@ public class RequestRateLimiterTest {
 
 		assertThrows(IllegalArgumentException.class, () -> limiter.tryAcquire(null, "key", 1, Duration.ofSeconds(1)));
 		assertThrows(IllegalArgumentException.class, () -> limiter.tryAcquire("", "key", 1, Duration.ofSeconds(1)));
-		assertThrows(IllegalArgumentException.class,
-				() -> limiter.tryAcquire("bucket", " ", 1, Duration.ofSeconds(1)));
+		assertThrows(IllegalArgumentException.class, () -> limiter.tryAcquire("bucket", " ", 1, Duration.ofSeconds(1)));
 		assertThrows(IllegalArgumentException.class,
 				() -> limiter.tryAcquire("bucket", "key", 0, Duration.ofSeconds(1)));
 		assertThrows(IllegalArgumentException.class, () -> limiter.tryAcquire("bucket", "key", 1, null));
-		assertThrows(IllegalArgumentException.class,
-				() -> limiter.tryAcquire("bucket", "key", 1, Duration.ZERO));
+		assertThrows(IllegalArgumentException.class, () -> limiter.tryAcquire("bucket", "key", 1, Duration.ZERO));
 	}
 
 	@Test

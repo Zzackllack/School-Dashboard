@@ -242,8 +242,8 @@ test("completes setup -> pending -> approved -> display flow", async ({
       payload !== null &&
       typeof (payload as { enrollmentCode?: unknown }).enrollmentCode ===
         "string" &&
-      typeof (payload as { proposedDisplayName?: unknown }).proposedDisplayName ===
-        "string";
+      typeof (payload as { proposedDisplayName?: unknown })
+        .proposedDisplayName === "string";
     if (!isValidPayload) {
       await route.fulfill({
         status: 400,
