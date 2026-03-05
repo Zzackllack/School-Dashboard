@@ -113,8 +113,14 @@ async function main() {
 
   const backendEnvPath = resolve(process.cwd(), "Backend/.env");
   const frontendEnvPath = resolve(process.cwd(), "Frontend/.env");
+  const backendDataDbPath = resolve(
+    process.cwd(),
+    "Backend/data/substitution-plans",
+  );
+  const datasourceUrl = `jdbc:h2:file:${backendDataDbPath};DB_CLOSE_DELAY=-1`;
 
   await writeEnvFile(backendEnvPath, [
+    ["SPRING_DATASOURCE_URL", datasourceUrl],
     ["DSB_USERNAME", answers.dsbUsername],
     ["DSB_PASSWORD", answers.dsbPassword],
     ["CALENDAR_ICS_URL", answers.calendarIcsUrl],
