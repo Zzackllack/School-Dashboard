@@ -7,7 +7,6 @@ import com.schooldashboard.security.auth.dto.CsrfTokenResponse;
 import com.schooldashboard.security.entity.AppUserEntity;
 import com.schooldashboard.security.repository.AppUserRepository;
 import com.schooldashboard.security.metrics.SecurityMetricsService;
-import com.schooldashboard.security.web.SecurityErrorResponse;
 import jakarta.validation.Valid;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -168,8 +167,8 @@ public class AdminAuthController {
 		return new AdminAuthStatusResponse(authentication.isAuthenticated(), authentication.getName(), roles);
 	}
 
-	private SecurityErrorResponse errorResponse(String code, String message, HttpServletRequest request) {
-		return new SecurityErrorResponse(code, message, resolveRequestId(request), Instant.now().toString());
+	private AdminAuthErrorResponse errorResponse(String code, String message, HttpServletRequest request) {
+		return new AdminAuthErrorResponse(code, message, resolveRequestId(request), Instant.now().toString());
 	}
 
 	private String resolveRequestId(HttpServletRequest request) {
@@ -189,5 +188,8 @@ public class AdminAuthController {
 			return null;
 		}
 		return trimmed;
+	}
+
+	private record AdminAuthErrorResponse(String code, String message, String requestId, String timestamp) {
 	}
 }

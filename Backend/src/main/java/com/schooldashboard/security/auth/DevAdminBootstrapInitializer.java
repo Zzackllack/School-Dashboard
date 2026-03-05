@@ -49,6 +49,13 @@ public class DevAdminBootstrapInitializer implements ApplicationRunner {
 				handleBootstrapMissingCredentials();
 				return;
 			}
+			if (appUserRepository.existsByRoles_Name("ROLE_ADMIN")
+					&& appUserRepository.findByUsername(username).isEmpty()) {
+				logger.warn(
+						"Bootstrap admin is enabled, but an admin account already exists and bootstrap username '{}' was not found. Skipping bootstrap user creation to avoid duplicate admin accounts.",
+						username);
+				return;
+			}
 			ensureBootstrapAdmin(username, password, adminRole);
 			return;
 		}
