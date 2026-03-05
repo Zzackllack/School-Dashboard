@@ -90,9 +90,8 @@ public class DevAdminBootstrapInitializer implements ApplicationRunner {
 			try {
 				appUserRepository.save(adminUser);
 			} catch (DataIntegrityViolationException exception) {
-				adminUser = appUserRepository.findByUsername(username)
-						.orElseThrow(() -> new IllegalStateException(
-								"Concurrent bootstrap user creation detected but user reload failed", exception));
+				adminUser = appUserRepository.findByUsername(username).orElseThrow(() -> new IllegalStateException(
+						"Concurrent bootstrap user creation detected but user reload failed", exception));
 			}
 			logger.warn("Bootstrapped initial admin account '{}'. Rotate credentials after first login.", username);
 		}

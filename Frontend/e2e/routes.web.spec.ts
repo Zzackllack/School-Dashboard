@@ -425,35 +425,32 @@ test("admin pending page supports approval action", async ({ page }) => {
   let approved = false;
   const expectedCsrfToken = "csrf-test-token";
 
-  await page.route(
-    "**/api/admin/displays/enrollments?*",
-    async (route) => {
-      if (route.request().method() !== "GET") {
-        await route.continue();
-        return;
-      }
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(
-          !approved
-            ? [
-                {
-                  requestId: "req-approve",
-                  enrollmentCodeId: "code-1",
-                  proposedDisplayName: "North Wing",
-                  deviceInfo: null,
-                  status: "PENDING",
-                  displayId: null,
-                  createdAt: "2026-03-01T10:00:00Z",
-                  expiresAt: "2026-03-02T10:00:00Z",
-                },
-              ]
-            : [],
-        ),
-      });
-    },
-  );
+  await page.route("**/api/admin/displays/enrollments?*", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(
+        !approved
+          ? [
+              {
+                requestId: "req-approve",
+                enrollmentCodeId: "code-1",
+                proposedDisplayName: "North Wing",
+                deviceInfo: null,
+                status: "PENDING",
+                displayId: null,
+                createdAt: "2026-03-01T10:00:00Z",
+                expiresAt: "2026-03-02T10:00:00Z",
+              },
+            ]
+          : [],
+      ),
+    });
+  });
 
   await page.route(
     "**/api/admin/displays/enrollments/req-approve/approve",
@@ -497,35 +494,32 @@ test("admin pending page supports rejection action", async ({ page }) => {
   let rejected = false;
   const expectedCsrfToken = "csrf-test-token";
 
-  await page.route(
-    "**/api/admin/displays/enrollments?*",
-    async (route) => {
-      if (route.request().method() !== "GET") {
-        await route.continue();
-        return;
-      }
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(
-          !rejected
-            ? [
-                {
-                  requestId: "req-reject",
-                  enrollmentCodeId: "code-2",
-                  proposedDisplayName: "South Wing",
-                  deviceInfo: null,
-                  status: "PENDING",
-                  displayId: null,
-                  createdAt: "2026-03-01T11:00:00Z",
-                  expiresAt: "2026-03-02T11:00:00Z",
-                },
-              ]
-            : [],
-        ),
-      });
-    },
-  );
+  await page.route("**/api/admin/displays/enrollments?*", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(
+        !rejected
+          ? [
+              {
+                requestId: "req-reject",
+                enrollmentCodeId: "code-2",
+                proposedDisplayName: "South Wing",
+                deviceInfo: null,
+                status: "PENDING",
+                displayId: null,
+                createdAt: "2026-03-01T11:00:00Z",
+                expiresAt: "2026-03-02T11:00:00Z",
+              },
+            ]
+          : [],
+      ),
+    });
+  });
 
   await page.route(
     "**/api/admin/displays/enrollments/req-reject/reject",

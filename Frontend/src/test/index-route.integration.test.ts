@@ -55,6 +55,8 @@ describe("bootstrap resolver", () => {
     );
 
     await expect(resolveBootstrapRedirect()).rejects.toThrow("network error");
-    expect(displaySessionModule.clearDisplaySessionStorage).not.toHaveBeenCalled();
+    expect(
+      displaySessionModule.clearDisplaySessionStorage,
+    ).not.toHaveBeenCalled();
   });
 });
