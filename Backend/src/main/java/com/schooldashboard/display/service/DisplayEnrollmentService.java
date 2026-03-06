@@ -163,9 +163,9 @@ public class DisplayEnrollmentService {
 	}
 
 	@Transactional(readOnly = true)
+	@PreAuthorize("hasRole('ADMIN')")
 	public List<PendingEnrollmentResponse> listEnrollments(EnrollmentRequestStatus status) {
 		return enrollmentRequestRepository.findByStatusOrderByCreatedAtAsc(status).stream()
-				.sorted(Comparator.comparing(DisplayEnrollmentRequestEntity::getCreatedAt))
 				.map(request -> new PendingEnrollmentResponse(request.getId(), request.getEnrollmentCodeId(),
 						request.getProposedDisplayName(), parseJsonObject(request.getDeviceInfoJson()),
 						request.getStatus().name(), request.getDisplayId(), request.getCreatedAt(),
@@ -396,7 +396,6 @@ public class DisplayEnrollmentService {
 				Map.of("enrollmentRequestsUpdated", linkedRequests.size()));
 	}
 
-	@Transactional(readOnly = true)
 	public EnrollmentRequestStatus parseEnrollmentStatus(String status) {
 		if (status == null || status.isBlank()) {
 			return EnrollmentRequestStatus.PENDING;
@@ -534,7 +533,6 @@ public class DisplayEnrollmentService {
 				candidateSlug = slugService.createUniqueSlug(baseSlugInput);
 			}
 		}
-		return display;
 	}
 
 	private void cleanupIssuedSessionTokens() {

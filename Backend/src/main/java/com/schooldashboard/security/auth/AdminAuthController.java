@@ -137,7 +137,7 @@ public class AdminAuthController {
 			userEntity.setPasswordHash(passwordEncoder.encode(rawNewPassword));
 		}
 		try {
-			appUserRepository.save(userEntity);
+			appUserRepository.saveAndFlush(userEntity);
 		} catch (DataIntegrityViolationException exception) {
 			return ResponseEntity.status(HttpStatus.CONFLICT)
 					.body(errorResponse("USERNAME_TAKEN", "Username is already in use", servletRequest));

@@ -34,6 +34,9 @@ describe("bootstrap resolver", () => {
     expect(displaySessionModule.setDisplayIdHint).toHaveBeenCalledWith(
       "display-1",
     );
+    expect(
+      displaySessionModule.clearDisplaySessionStorage,
+    ).not.toHaveBeenCalled();
   });
 
   it("routes to setup when session is invalid", async () => {
@@ -47,6 +50,7 @@ describe("bootstrap resolver", () => {
 
     await expect(resolveBootstrapRedirect()).resolves.toEqual({ to: "/setup" });
     expect(displaySessionModule.clearDisplaySessionStorage).toHaveBeenCalled();
+    expect(displaySessionModule.setDisplayIdHint).not.toHaveBeenCalled();
   });
 
   it("routes to setup when session validation fails", async () => {
@@ -58,5 +62,6 @@ describe("bootstrap resolver", () => {
     expect(
       displaySessionModule.clearDisplaySessionStorage,
     ).not.toHaveBeenCalled();
+    expect(displaySessionModule.setDisplayIdHint).not.toHaveBeenCalled();
   });
 });

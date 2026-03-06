@@ -4,8 +4,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -59,6 +59,7 @@ public class DevAdminBootstrapInitializerTest {
 		when(appUserRepository.existsByRoles_Name("ROLE_ADMIN")).thenReturn(false);
 		when(appUserRepository.findByUsername("dev-admin")).thenReturn(Optional.empty());
 		when(passwordEncoder.encode("secret")).thenReturn("hashed-secret");
+		when(passwordEncoder.matches("secret", "hashed-secret")).thenReturn(true);
 
 		SecurityProperties securityProperties = new SecurityProperties();
 		securityProperties.getAdmin().getBootstrap().setEnabled(true);
@@ -71,8 +72,8 @@ public class DevAdminBootstrapInitializerTest {
 		initializer.run(new DefaultApplicationArguments(new String[0]));
 
 		ArgumentCaptor<AppUserEntity> userCaptor = ArgumentCaptor.forClass(AppUserEntity.class);
-		verify(appUserRepository, atLeastOnce()).save(userCaptor.capture());
-		AppUserEntity savedUser = userCaptor.getAllValues().get(userCaptor.getAllValues().size() - 1);
+		verify(appUserRepository, times(1)).save(userCaptor.capture());
+		AppUserEntity savedUser = userCaptor.getValue();
 		assertEquals("dev-admin", savedUser.getUsername());
 		assertEquals("hashed-secret", savedUser.getPasswordHash());
 		assertNotEquals("secret", savedUser.getPasswordHash());

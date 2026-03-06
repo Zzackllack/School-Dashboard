@@ -1,7 +1,6 @@
 package com.schooldashboard.security.auth;
 
 import com.schooldashboard.security.entity.AppUserEntity;
-import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import org.springframework.security.core.GrantedAuthority;
@@ -28,9 +27,7 @@ public class AppUserPrincipal implements UserDetails {
 	}
 
 	public static AppUserPrincipal fromEntity(AppUserEntity userEntity) {
-		boolean activeLock = userEntity.isLocked() && userEntity.getLockedUntil() != null
-				&& userEntity.getLockedUntil().isAfter(Instant.now());
-		boolean accountNonLocked = !activeLock;
+		boolean accountNonLocked = !userEntity.isLocked();
 		List<GrantedAuthority> resolvedAuthorities = userEntity.getRoles().stream()
 				.map(role -> new SimpleGrantedAuthority(role.getName())).map(GrantedAuthority.class::cast).toList();
 		return new AppUserPrincipal(userEntity.getId(), userEntity.getUsername(), userEntity.getPasswordHash(),

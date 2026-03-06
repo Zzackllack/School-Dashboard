@@ -81,13 +81,9 @@ function AdminDisplaysPage() {
     event.preventDefault();
     setStatusMessage(null);
     setCreatedCode(null);
-    if (ttlSeconds === null || maxUses === null) {
-      setStatusMessage(
-        "TTL und Max Uses müssen positive ganze Zahlen größer als 0 sein.",
-      );
-      return;
-    }
     if (
+      ttlSeconds === null ||
+      maxUses === null ||
       !Number.isInteger(ttlSeconds) ||
       !Number.isInteger(maxUses) ||
       ttlSeconds <= 0 ||

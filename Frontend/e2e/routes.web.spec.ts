@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import {
   createServer,
   type IncomingMessage,
@@ -134,6 +134,21 @@ async function stopMockBackend(server: Server) {
       resolve();
     });
   });
+}
+
+async function seedDisplaySessionTokenCookie(page: Page, token: string) {
+  const baseURL = test.info().project.use.baseURL;
+  if (!baseURL) {
+    throw new Error("Playwright baseURL must be configured for cookie seeding.");
+  }
+
+  await page.context().addCookies([
+    {
+      name: "DISPLAY_SESSION_TOKEN",
+      value: token,
+      url: `${new URL(baseURL).origin}/`,
+    },
+  ]);
 }
 
 test.beforeEach(async ({ page }) => {
@@ -330,6 +345,8 @@ test("completes setup -> pending -> approved -> display flow", async ({
 test("restores approved display from stored session token on reboot", async ({
   page,
 }) => {
+  await seedDisplaySessionTokenCookie(page, "token-reboot");
+
   await page.route("**/api/displays/session", async (route) => {
     if (route.request().method() !== "GET") {
       await route.continue();
@@ -355,6 +372,8 @@ test("restores approved display from stored session token on reboot", async ({
 });
 
 test("falls back to setup when stored token is revoked", async ({ page }) => {
+  await seedDisplaySessionTokenCookie(page, "token-revoked");
+
   await page.route("**/api/displays/session", async (route) => {
     if (route.request().method() !== "GET") {
       await route.continue();
@@ -384,6 +403,24 @@ test("falls back to setup when stored token is revoked", async ({ page }) => {
 test("blocks direct /display/:displayId access without a session token", async ({
   page,
 }) => {
+  await page.route("**/api/displays/session", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        valid: false,
+        displayId: null,
+        displaySlug: null,
+        assignedProfileId: null,
+        redirectPath: null,
+      }),
+    });
+  });
+
   await page.goto("/display/direct-access");
 
   await expect(page).toHaveURL(/\/setup/);

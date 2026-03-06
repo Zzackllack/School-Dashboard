@@ -12,7 +12,7 @@ public class AppUserPrincipalTest {
 	@Test
 	public void accountIsUnlockedWhenLockHasExpired() {
 		AppUserEntity user = new AppUserEntity("admin", "encoded");
-		user.setLocked(true);
+		user.setLocked(false);
 		user.setLockedUntil(Instant.now().minusSeconds(60));
 
 		AppUserPrincipal principal = AppUserPrincipal.fromEntity(user);
@@ -21,10 +21,21 @@ public class AppUserPrincipalTest {
 	}
 
 	@Test
-	public void accountIsLockedWhenLockIsActive() {
+	public void accountIsLockedWhenLockIsActiveUntilFuture() {
+		AppUserEntity user = new AppUserEntity("admin", "encoded");
+		user.setLocked(false);
+		user.setLockedUntil(Instant.now().plusSeconds(60));
+
+		AppUserPrincipal principal = AppUserPrincipal.fromEntity(user);
+
+		assertFalse(principal.isAccountNonLocked());
+	}
+
+	@Test
+	public void accountIsLockedWhenBooleanLockFlagIsSet() {
 		AppUserEntity user = new AppUserEntity("admin", "encoded");
 		user.setLocked(true);
-		user.setLockedUntil(Instant.now().plusSeconds(60));
+		user.setLockedUntil(Instant.now().minusSeconds(60));
 
 		AppUserPrincipal principal = AppUserPrincipal.fromEntity(user);
 

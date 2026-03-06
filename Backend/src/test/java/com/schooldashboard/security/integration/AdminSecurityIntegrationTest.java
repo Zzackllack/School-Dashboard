@@ -106,22 +106,31 @@ public class AdminSecurityIntegrationTest {
 	@Test
 	public void adminCanChangeUsernameAndPassword() throws Exception {
 		MockHttpSession adminSession = login("test-admin", "test-admin-password");
+		MockHttpSession renamedSession = null;
 
-		mockMvc.perform(post("/api/admin/auth/credentials").with(csrf()).session(adminSession)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(
-						new CredentialUpdatePayload("test-admin-password", "renamed-admin", "next-password"))))
-				.andExpect(status().isOk()).andExpect(jsonPath("$.authenticated").value(true))
-				.andExpect(jsonPath("$.username").value("renamed-admin"));
+		try {
+			mockMvc.perform(post("/api/admin/auth/credentials").with(csrf()).session(adminSession)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(
+							new CredentialUpdatePayload("test-admin-password", "renamed-admin", "next-password"))))
+					.andExpect(status().isOk()).andExpect(jsonPath("$.authenticated").value(true))
+					.andExpect(jsonPath("$.username").value("renamed-admin"));
 
-		mockMvc.perform(post("/api/admin/auth/logout").session(adminSession).with(csrf())).andExpect(status().isOk());
+			mockMvc.perform(post("/api/admin/auth/logout").session(adminSession).with(csrf())).andExpect(status().isOk());
 
-		MockHttpSession renamedSession = login("renamed-admin", "next-password");
-		mockMvc.perform(post("/api/admin/auth/credentials").with(csrf()).session(renamedSession)
-				.contentType(MediaType.APPLICATION_JSON)
-				.content(objectMapper.writeValueAsString(
-						new CredentialUpdatePayload("next-password", "test-admin", "test-admin-password"))))
-				.andExpect(status().isOk()).andExpect(jsonPath("$.username").value("test-admin"));
+			renamedSession = login("renamed-admin", "next-password");
+		} finally {
+			if (renamedSession == null) {
+				renamedSession = login("renamed-admin", "next-password");
+			}
+			mockMvc.perform(post("/api/admin/auth/credentials").with(csrf()).session(renamedSession)
+					.contentType(MediaType.APPLICATION_JSON)
+					.content(objectMapper.writeValueAsString(
+							new CredentialUpdatePayload("next-password", "test-admin", "test-admin-password"))))
+					.andExpect(status().isOk()).andExpect(jsonPath("$.username").value("test-admin"));
+			mockMvc.perform(post("/api/admin/auth/logout").session(renamedSession).with(csrf()))
+					.andExpect(status().isOk());
+		}
 	}
 
 	@Test

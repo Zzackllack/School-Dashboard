@@ -124,7 +124,7 @@ public class AppUserEntity {
 	}
 
 	public boolean isLocked() {
-		return locked;
+		return locked || (lockedUntil != null && lockedUntil.isAfter(Instant.now()));
 	}
 
 	public void setLocked(boolean locked) {
