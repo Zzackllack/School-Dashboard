@@ -77,7 +77,7 @@ CREATE TEMP TABLE import_substitution_plan_documents (
   page_number INTEGER,
   page_count INTEGER
 );
-\copy import_substitution_plan_documents FROM '${TMP_DIR}/substitution_plan_documents.csv' WITH (FORMAT csv)
+\copy import_substitution_plan_documents FROM '${TMP_DIR}/substitution_plan_documents.csv' WITH (FORMAT csv, HEADER true)
 
 INSERT INTO substitution_plan_documents (
   id, plan_uuid, group_name, plan_date, title, detail_url, raw_html, content_hash,
@@ -118,7 +118,7 @@ CREATE TEMP TABLE import_api_response_cache (
   updated_at TIMESTAMP,
   version BIGINT
 );
-\copy import_api_response_cache FROM '${TMP_DIR}/api_response_cache.csv' WITH (FORMAT csv)
+\copy import_api_response_cache FROM '${TMP_DIR}/api_response_cache.csv' WITH (FORMAT csv, HEADER true)
 
 INSERT INTO api_response_cache (cache_key, json_body, content_hash, updated_at, version)
 SELECT cache_key, json_body, content_hash, updated_at, version
