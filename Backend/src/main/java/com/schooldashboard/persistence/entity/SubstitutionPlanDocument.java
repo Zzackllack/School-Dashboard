@@ -5,7 +5,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -42,8 +41,7 @@ public class SubstitutionPlanDocument {
 	@Column(name = "detail_url", nullable = false, length = 1024)
 	private String detailUrl;
 
-	@Lob
-	@Column(name = "raw_html", nullable = false)
+	@Column(name = "raw_html", nullable = false, columnDefinition = "TEXT")
 	private String rawHtml;
 
 	@Column(name = "content_hash", nullable = false, length = 64)

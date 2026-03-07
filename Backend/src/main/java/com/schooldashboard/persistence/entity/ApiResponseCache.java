@@ -3,7 +3,6 @@ package com.schooldashboard.persistence.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.persistence.Lob;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.PreUpdate;
 import jakarta.persistence.Table;
@@ -18,8 +17,7 @@ public class ApiResponseCache {
 	@Column(name = "cache_key", nullable = false, length = 128)
 	private String cacheKey;
 
-	@Lob
-	@Column(name = "json_body", nullable = false)
+	@Column(name = "json_body", nullable = false, columnDefinition = "TEXT")
 	private String jsonBody;
 
 	@Column(name = "content_hash", nullable = false, length = 64)
