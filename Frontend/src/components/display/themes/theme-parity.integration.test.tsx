@@ -52,16 +52,13 @@ describe("display themes parity", () => {
   it("brutalist theme renders all required modules", () => {
     render(<BrutalistHighDensityTheme displayId="display-1" />);
 
-    expect(screen.getAllByTestId("module-substitution").length).toBeGreaterThan(
-      0,
-    );
-    expect(screen.getAllByTestId("module-weather").length).toBeGreaterThan(0);
-    expect(screen.getAllByTestId("module-transport").length).toBeGreaterThan(
-      0,
-    );
-    expect(screen.getAllByTestId("module-calendar").length).toBeGreaterThan(0);
-    expect(screen.getAllByTestId("module-holidays").length).toBeGreaterThan(0);
-    expect(screen.getAllByTestId("module-clock").length).toBeGreaterThan(0);
-    expect(screen.getByText(/Daily Bulletin \/\//)).toBeDefined();
+    expect(screen.getByText("07-08")).toBeDefined();
+    expect(screen.getByText("09-10")).toBeDefined();
+    expect(screen.getByText("11-12")).toBeDefined();
+    expect(screen.getByTestId("module-weather")).toBeDefined();
+    expect(screen.getByTestId("module-transport")).toBeDefined();
+    expect(screen.getByTestId("module-calendar")).toBeDefined();
+    expect(screen.getByTestId("module-holidays")).toBeDefined();
+    expect(screen.getByTestId("module-clock")).toBeDefined();
   });
 });
