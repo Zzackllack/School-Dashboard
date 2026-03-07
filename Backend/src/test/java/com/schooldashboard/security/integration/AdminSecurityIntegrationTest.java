@@ -116,7 +116,8 @@ public class AdminSecurityIntegrationTest {
 					.andExpect(status().isOk()).andExpect(jsonPath("$.authenticated").value(true))
 					.andExpect(jsonPath("$.username").value("renamed-admin"));
 
-			mockMvc.perform(post("/api/admin/auth/logout").session(adminSession).with(csrf())).andExpect(status().isOk());
+			mockMvc.perform(post("/api/admin/auth/logout").session(adminSession).with(csrf()))
+					.andExpect(status().isOk());
 
 			renamedSession = login("renamed-admin", "next-password");
 		} finally {

@@ -139,7 +139,9 @@ async function stopMockBackend(server: Server) {
 async function seedDisplaySessionTokenCookie(page: Page, token: string) {
   const baseURL = test.info().project.use.baseURL;
   if (!baseURL) {
-    throw new Error("Playwright baseURL must be configured for cookie seeding.");
+    throw new Error(
+      "Playwright baseURL must be configured for cookie seeding.",
+    );
   }
 
   await page.context().addCookies([
