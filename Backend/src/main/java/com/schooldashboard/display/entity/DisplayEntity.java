@@ -35,6 +35,9 @@ public class DisplayEntity {
 	@Column(name = "assigned_profile_id", length = 120)
 	private String assignedProfileId;
 
+	@Column(name = "theme_id", nullable = false, length = 80)
+	private String themeId;
+
 	@Column(name = "created_at", nullable = false)
 	private Instant createdAt;
 
@@ -52,6 +55,7 @@ public class DisplayEntity {
 		this.locationLabel = locationLabel;
 		this.status = DisplayStatus.ACTIVE;
 		this.assignedProfileId = assignedProfileId;
+		this.themeId = "default";
 		this.createdAt = Instant.now();
 		this.updatedAt = this.createdAt;
 	}
@@ -70,6 +74,9 @@ public class DisplayEntity {
 		}
 		if (status == null) {
 			status = DisplayStatus.ACTIVE;
+		}
+		if (themeId == null || themeId.isBlank()) {
+			themeId = "default";
 		}
 	}
 
@@ -121,6 +128,14 @@ public class DisplayEntity {
 
 	public void setAssignedProfileId(String assignedProfileId) {
 		this.assignedProfileId = assignedProfileId;
+	}
+
+	public String getThemeId() {
+		return themeId;
+	}
+
+	public void setThemeId(String themeId) {
+		this.themeId = themeId;
 	}
 
 	public Instant getCreatedAt() {

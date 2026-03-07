@@ -24,6 +24,7 @@ describe("bootstrap resolver", () => {
       displayId: "display-1",
       displaySlug: "lobby",
       assignedProfileId: "default",
+      themeId: "default",
       redirectPath: "/display/display-1",
     });
 
@@ -45,6 +46,7 @@ describe("bootstrap resolver", () => {
       displayId: null,
       displaySlug: null,
       assignedProfileId: null,
+      themeId: null,
       redirectPath: null,
     });
 

@@ -20,6 +20,7 @@ describe("display route guard", () => {
       displayId: null,
       displaySlug: null,
       assignedProfileId: null,
+      themeId: null,
       redirectPath: null,
     });
 
@@ -34,6 +35,7 @@ describe("display route guard", () => {
       displayId: null,
       displaySlug: null,
       assignedProfileId: null,
+      themeId: null,
       redirectPath: null,
     });
 
@@ -49,12 +51,14 @@ describe("display route guard", () => {
       displayId: "display-1",
       displaySlug: "lobby",
       assignedProfileId: "default",
+      themeId: "default",
       redirectPath: "/display/display-1",
     });
 
     await expect(resolveDisplayAccess("display-1")).resolves.toEqual({
       kind: "allow",
       displayId: "display-1",
+      themeId: "default",
     });
     expect(displaySessionModule.setDisplayIdHint).toHaveBeenCalledWith(
       "display-1",
@@ -67,6 +71,7 @@ describe("display route guard", () => {
       displayId: "display-2",
       displaySlug: "hall",
       assignedProfileId: "default",
+      themeId: "default",
       redirectPath: "/display/display-2",
     });
 

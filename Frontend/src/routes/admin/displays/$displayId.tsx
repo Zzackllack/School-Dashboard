@@ -7,12 +7,13 @@ import {
   revokeDisplaySession,
   updateDisplay,
 } from "#/lib/api/displays";
+import { DISPLAY_THEME_CATALOG } from "#/components/display/themes/catalog";
 
 export const Route = createFileRoute("/admin/displays/$displayId")({
   component: AdminDisplayDetailPage,
 });
 
-function AdminDisplayDetailPage() {
+export function AdminDisplayDetailPage() {
   const navigate = useNavigate();
   const { displayId } = Route.useParams();
   const [formState, setFormState] = useState({
@@ -20,6 +21,7 @@ function AdminDisplayDetailPage() {
     slug: "",
     locationLabel: "",
     assignedProfileId: "",
+    themeId: "default",
     status: "ACTIVE" as "ACTIVE" | "INACTIVE" | "REVOKED",
   });
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
@@ -41,6 +43,7 @@ function AdminDisplayDetailPage() {
             slug: display.slug,
             locationLabel: display.locationLabel ?? "",
             assignedProfileId: display.assignedProfileId ?? "",
+            themeId: display.themeId,
             status: display.status,
           });
           setIsDisplayLoaded(true);
@@ -80,6 +83,7 @@ function AdminDisplayDetailPage() {
         slug: response.slug,
         locationLabel: response.locationLabel ?? "",
         assignedProfileId: response.assignedProfileId ?? "",
+        themeId: response.themeId,
         status: response.status,
       });
       setStatusType("success");
@@ -207,6 +211,27 @@ function AdminDisplayDetailPage() {
                 }))
               }
             />
+          </label>
+
+          <label className="block text-sm font-semibold text-slate-700">
+            Theme
+            <select
+              className="mt-2 w-full rounded-lg border border-slate-300 px-3 py-2"
+              value={formState.themeId}
+              disabled={!isDisplayLoaded}
+              onChange={(event) =>
+                setFormState((current) => ({
+                  ...current,
+                  themeId: event.target.value,
+                }))
+              }
+            >
+              {DISPLAY_THEME_CATALOG.map((theme) => (
+                <option key={theme.id} value={theme.id}>
+                  {theme.label}
+                </option>
+              ))}
+            </select>
           </label>
 
           <label className="block text-sm font-semibold text-slate-700">

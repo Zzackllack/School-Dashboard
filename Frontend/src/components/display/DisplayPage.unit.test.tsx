@@ -4,18 +4,28 @@ import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { DisplayPage } from "./DisplayPage";
 
 const useParamsMock = vi.fn();
+const resolveDisplayThemeMock = vi.fn();
 
 vi.mock("@tanstack/react-router", () => ({
   useParams: () => useParamsMock(),
 }));
 
-vi.mock("../DashboardPage", () => ({
-  default: () => <div data-testid="dashboard-page">Dashboard</div>,
+vi.mock("#/components/display/themes/registry", () => ({
+  resolveDisplayTheme: (...args: unknown[]) => resolveDisplayThemeMock(...args),
 }));
 
 describe("DisplayPage", () => {
   beforeEach(() => {
     useParamsMock.mockClear();
+    resolveDisplayThemeMock.mockReset();
+    resolveDisplayThemeMock.mockReturnValue({
+      theme: {
+        id: "default",
+        Renderer: () => <div data-testid="dashboard-page">Dashboard</div>,
+      },
+      fallbackUsed: false,
+      requestedThemeId: "default",
+    });
   });
 
   afterEach(() => {
@@ -25,7 +35,7 @@ describe("DisplayPage", () => {
   it("renders display id header and dashboard content", () => {
     useParamsMock.mockReturnValue({ displayId: "display-42" });
 
-    render(<DisplayPage />);
+    render(<DisplayPage themeId="default" />);
 
     expect(screen.getByText(/Display: display-42/)).toBeDefined();
     expect(screen.getByTestId("dashboard-page")).toBeDefined();
@@ -34,7 +44,7 @@ describe("DisplayPage", () => {
   it("renders gracefully when displayId is empty", () => {
     useParamsMock.mockReturnValue({ displayId: "" });
 
-    render(<DisplayPage />);
+    render(<DisplayPage themeId={null} />);
 
     expect(screen.getByText(/Display:/)).toBeDefined();
   });

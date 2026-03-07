@@ -8,7 +8,7 @@ import {
 } from "#/lib/display-session";
 
 type DisplayAccessResult =
-  | { kind: "allow"; displayId: string }
+  | { kind: "allow"; displayId: string; themeId: string | null }
   | { kind: "redirect-setup" }
   | { kind: "redirect-display"; displayId: string };
 
@@ -26,13 +26,18 @@ export async function resolveDisplayAccess(
     return { kind: "redirect-display", displayId: sessionValidation.displayId };
   }
 
-  return { kind: "allow", displayId: sessionValidation.displayId };
+  return {
+    kind: "allow",
+    displayId: sessionValidation.displayId,
+    themeId: sessionValidation.themeId,
+  };
 }
 
 function GuardedDisplayRoute() {
   const navigate = useNavigate();
   const { displayId } = Route.useParams();
   const [accessAllowed, setAccessAllowed] = useState(false);
+  const [resolvedThemeId, setResolvedThemeId] = useState<string | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -46,6 +51,7 @@ function GuardedDisplayRoute() {
         }
 
         if (access.kind === "allow") {
+          setResolvedThemeId(access.themeId);
           setAccessAllowed(true);
           return;
         }
@@ -86,7 +92,7 @@ function GuardedDisplayRoute() {
     );
   }
 
-  return <DisplayPage />;
+  return <DisplayPage themeId={resolvedThemeId} />;
 }
 
 export const Route = createFileRoute("/display/$displayId")({

@@ -135,6 +135,7 @@ describe("display api client", () => {
           displayId: "display-1",
           displaySlug: "lobby",
           assignedProfileId: "default",
+          themeId: "default",
           redirectPath: "/display/display-1",
         }),
         {
@@ -148,6 +149,7 @@ describe("display api client", () => {
 
     expect(response.valid).toBe(true);
     expect(response.displayId).toBe("display-1");
+    expect(response.themeId).toBe("default");
   });
 
   it("approves enrollment request via csrf-protected admin endpoint", async () => {

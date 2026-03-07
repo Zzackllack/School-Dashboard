@@ -1,0 +1,2 @@
+ALTER TABLE display
+    ADD COLUMN IF NOT EXISTS theme_id VARCHAR(80) NOT NULL DEFAULT 'default';

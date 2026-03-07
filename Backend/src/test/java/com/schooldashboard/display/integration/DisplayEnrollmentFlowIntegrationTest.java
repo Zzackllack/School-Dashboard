@@ -95,6 +95,19 @@ public class DisplayEnrollmentFlowIntegrationTest {
 						.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals(Boolean.TRUE, validationResponse.get("valid"));
 		assertEquals(asString(approveResponse, "displayId"), asString(validationResponse, "displayId"));
+		assertEquals("default", asString(validationResponse, "themeId"));
+
+		Map<String, Object> themeUpdateResponse = readMap(mockMvc
+				.perform(patch("/api/admin/displays/{displayId}", asString(approveResponse, "displayId"))
+						.session(adminSession).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+						.content("{\"themeId\":\"brutalist-high-density\"}"))
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+		assertEquals("brutalist-high-density", asString(themeUpdateResponse, "themeId"));
+
+		Map<String, Object> validationAfterThemeUpdate = readMap(
+				mockMvc.perform(get("/api/displays/session").header("Authorization", "Bearer " + approvedSessionToken))
+						.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+		assertEquals("brutalist-high-density", asString(validationAfterThemeUpdate, "themeId"));
 
 		Map<String, Object> revokeResponse = readMap(mockMvc
 				.perform(post("/api/admin/displays/{displayId}/revoke-session", asString(approveResponse, "displayId"))
@@ -155,6 +168,34 @@ public class DisplayEnrollmentFlowIntegrationTest {
 				mockMvc.perform(get("/api/displays/enrollments/{requestId}", asString(enrollmentResponse, "requestId")))
 						.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals("REJECTED", asString(statusAfterReject, "status"));
+	}
+
+	@Test
+	public void updateDisplayRejectsUnknownThemeId() throws Exception {
+		MockHttpSession adminSession = loginAsAdmin();
+
+		Map<String, Object> createdCode = readMap(mockMvc
+				.perform(post("/api/admin/displays/enrollment-codes").session(adminSession).with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(new CreateEnrollmentCodeRequest(300, 1))))
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+
+		Map<String, Object> createEnrollmentResponse = readMap(mockMvc
+				.perform(post("/api/displays/enrollments").contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(new CreateEnrollmentRequest(asString(createdCode, "code"),
+								"Theme Validation Screen", null))))
+				.andExpect(status().isCreated()).andReturn().getResponse().getContentAsString());
+
+		Map<String, Object> approveResponse = readMap(mockMvc
+				.perform(post("/api/admin/displays/enrollments/{requestId}/approve",
+						asString(createEnrollmentResponse, "requestId")).session(adminSession).with(csrf())
+						.contentType(MediaType.APPLICATION_JSON)
+						.content(objectMapper.writeValueAsString(new ApproveEnrollmentRequest(null, null, null, null))))
+				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+
+		mockMvc.perform(patch("/api/admin/displays/{displayId}", asString(approveResponse, "displayId"))
+				.session(adminSession).with(csrf()).contentType(MediaType.APPLICATION_JSON)
+				.content("{\"themeId\":\"unknown-theme\"}")).andExpect(status().isBadRequest());
 	}
 
 	private MockHttpSession loginAsAdmin() throws Exception {

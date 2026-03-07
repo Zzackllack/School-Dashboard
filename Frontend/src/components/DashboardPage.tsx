@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import CalendarEvents from "./CalendarEvents";
 import Clock from "./Clock";
 import Credits from "./Credits";
@@ -7,7 +6,7 @@ import SubstitutionPlanDisplay from "./SubstitutionPlanDisplay";
 import Transportation from "./Transportation";
 import Weather from "./Weather";
 import schoolLogo from "../assets/Goethe-Logo.webp";
-import useAutoScroll from "../hooks/useAutoScroll";
+import { useDisplayRuntime } from "./display/useDisplayRuntime";
 
 const FOOTER_DATETIME_OPTIONS: Intl.DateTimeFormatOptions = {
   year: "numeric",
@@ -20,27 +19,7 @@ const FOOTER_DATETIME_OPTIONS: Intl.DateTimeFormatOptions = {
 };
 
 const DashboardPage = () => {
-  const [currentTime, setCurrentTime] = useState<Date | null>(null);
-  const [isHydrated, setIsHydrated] = useState(false);
-
-  useAutoScroll(5, 80);
-
-  useEffect(() => {
-    setIsHydrated(true);
-
-    const clockTimer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    const refreshTimer = setInterval(() => {
-      window.location.reload();
-    }, 300000);
-
-    return () => {
-      clearInterval(clockTimer);
-      clearInterval(refreshTimer);
-    };
-  }, []);
+  const { currentTime, isHydrated } = useDisplayRuntime();
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-gradient-to-b from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800">
