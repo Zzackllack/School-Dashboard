@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { resolveDisplayAccess } from "../routes/display.$displayId";
+import { resolveDisplayAccess } from "../routes/display/$displayId";
 
 vi.mock("../lib/display-session", () => ({
   clearDisplaySessionStorage: vi.fn(),

@@ -1,4 +1,4 @@
-import { Route } from "../../routes/api.calendar.events";
+import { Route } from "../../routes/api/calendar/events";
 
 export function getCalendarEventsGetHandler() {
   const handlers = (Route.options.server as { handlers?: unknown } | undefined)

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { Route } from "../routes/api.substitution.plans";
+import { Route } from "../routes/api/substitution/plans";
 
 function getSubstitutionPlansGetHandler() {
   const handlers = (Route.options.server as { handlers?: unknown } | undefined)
