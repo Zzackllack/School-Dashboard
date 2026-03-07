@@ -439,8 +439,7 @@ function AdminDisplaysPage() {
                     Admin: {entry.adminId} ·{" "}
                     {formatAuditTimestamp(entry.createdAt)}
                   </p>
-                  {entry.metadata &&
-                  Object.keys(entry.metadata).length > 0 ? (
+                  {entry.metadata && Object.keys(entry.metadata).length > 0 ? (
                     <pre className="mt-2 overflow-x-auto rounded-md bg-slate-100 p-2 text-xs text-slate-700">
                       {JSON.stringify(entry.metadata, null, 2)}
                     </pre>

@@ -35,9 +35,9 @@ public class AdminAuditLogService {
 	public List<AdminAuditLogResponse> listRecent(int limit) {
 		int normalizedLimit = Math.max(1, Math.min(limit, 200));
 		return auditLogRepository.findAllByOrderByCreatedAtDesc(PageRequest.of(0, normalizedLimit)).stream()
-				.map(logEntry -> new AdminAuditLogResponse(logEntry.getId(), logEntry.getAdminId(), logEntry.getAction(),
-						logEntry.getTargetType(), logEntry.getTargetId(), deserialize(logEntry.getMetadataJson()),
-						logEntry.getCreatedAt()))
+				.map(logEntry -> new AdminAuditLogResponse(logEntry.getId(), logEntry.getAdminId(),
+						logEntry.getAction(), logEntry.getTargetType(), logEntry.getTargetId(),
+						deserialize(logEntry.getMetadataJson()), logEntry.getCreatedAt()))
 				.toList();
 	}
 

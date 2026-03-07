@@ -36,7 +36,8 @@ public class AdminDisplayController {
 	private final DisplayEnrollmentService enrollmentService;
 	private final AdminAuditLogService adminAuditLogService;
 
-	public AdminDisplayController(DisplayEnrollmentService enrollmentService, AdminAuditLogService adminAuditLogService) {
+	public AdminDisplayController(DisplayEnrollmentService enrollmentService,
+			AdminAuditLogService adminAuditLogService) {
 		this.enrollmentService = enrollmentService;
 		this.adminAuditLogService = adminAuditLogService;
 	}
