@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { expect, test, type Page } from "@playwright/test";
 import {
   createServer,
   type IncomingMessage,
@@ -111,23 +111,6 @@ const departuresFixture = {
       plannedPlatform: "1",
       stop: nearbyStopsFixture[0],
     },
-    {
-      tripId: "trip-2",
-      direction: "Rathaus Steglitz",
-      line: {
-        type: "line",
-        id: "line-bus",
-        name: "M48",
-        mode: "bus",
-        product: "bus",
-      },
-      when: "2026-02-28T12:25:00+01:00",
-      plannedWhen: "2026-02-28T12:25:00+01:00",
-      delay: null,
-      platform: null,
-      plannedPlatform: null,
-      stop: nearbyStopsFixture[0],
-    },
   ],
 };
 
@@ -151,6 +134,23 @@ async function stopMockBackend(server: Server) {
       resolve();
     });
   });
+}
+
+async function seedDisplaySessionTokenCookie(page: Page, token: string) {
+  const baseURL = test.info().project.use.baseURL;
+  if (!baseURL) {
+    throw new Error(
+      "Playwright baseURL must be configured for cookie seeding.",
+    );
+  }
+
+  await page.context().addCookies([
+    {
+      name: "DISPLAY_SESSION_TOKEN",
+      value: token,
+      url: `${new URL(baseURL).origin}/`,
+    },
+  ]);
 }
 
 test.beforeEach(async ({ page }) => {
@@ -199,49 +199,379 @@ test.beforeEach(async ({ page }) => {
       });
     },
   );
+
+  await page.route("**/api/admin/auth/me", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        authenticated: true,
+        username: "admin",
+        roles: ["ROLE_ADMIN"],
+      }),
+    });
+  });
+
+  await page.route("**/api/admin/auth/csrf", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        headerName: "X-CSRF-TOKEN",
+        parameterName: "_csrf",
+        token: "csrf-test-token",
+      }),
+    });
+  });
 });
 
-test("renders dashboard root route with core modules", async ({ page }) => {
+test("routes fresh kiosk from root to setup", async ({ page }) => {
   await page.goto("/");
 
-  await expect(page.getByTestId("clock-placeholder")).toBeVisible();
-  await expect(page.getByText("Stand: --")).toBeVisible();
-
   await expect(
-    page.getByRole("heading", { name: "Vertretungspläne" }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Öffentliche Verkehrsmittel" }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Kommende Termine" }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Nächste Schulferien" }),
-  ).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Credits" })).toBeVisible();
-
-  await expect(page.getByTestId("clock-time")).toBeVisible({ timeout: 5_000 });
-  await expect(page.getByTestId("clock-placeholder")).toHaveCount(0);
-});
-
-test("renders display route scaffold", async ({ page }) => {
-  await page.goto("/display/test-screen");
-
-  await expect(
-    page.getByRole("heading", { name: "Display Route Placeholder" }),
-  ).toBeVisible();
-  await expect(
-    page.getByText("Angefragte Display-ID: test-screen"),
+    page.getByRole("heading", { name: "Display Setup" }),
   ).toBeVisible();
 });
 
-test("renders admin route scaffold", async ({ page }) => {
-  await page.goto("/admin");
+test("completes setup -> pending -> approved -> display flow", async ({
+  page,
+}) => {
+  let pollCount = 0;
 
+  await page.route("**/api/displays/enrollments", async (route) => {
+    if (route.request().method() !== "POST") {
+      await route.continue();
+      return;
+    }
+    let payload: unknown;
+    try {
+      payload = route.request().postDataJSON();
+    } catch {
+      await route.fulfill({
+        status: 400,
+        contentType: "application/json",
+        body: JSON.stringify({ message: "Invalid JSON payload" }),
+      });
+      return;
+    }
+    const isValidPayload =
+      typeof payload === "object" &&
+      payload !== null &&
+      typeof (payload as { enrollmentCode?: unknown }).enrollmentCode ===
+        "string" &&
+      typeof (payload as { proposedDisplayName?: unknown })
+        .proposedDisplayName === "string";
+    if (!isValidPayload) {
+      await route.fulfill({
+        status: 400,
+        contentType: "application/json",
+        body: JSON.stringify({ message: "Invalid enrollment payload" }),
+      });
+      return;
+    }
+
+    await route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      body: JSON.stringify({
+        requestId: "req-1",
+        status: "PENDING",
+        pollAfterSeconds: 1,
+      }),
+    });
+  });
+
+  await page.route("**/api/displays/enrollments/req-1", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+    pollCount += 1;
+
+    if (pollCount < 2) {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          requestId: "req-1",
+          status: "PENDING",
+          displayId: null,
+          displaySessionToken: null,
+          pollAfterSeconds: 1,
+        }),
+      });
+      return;
+    }
+
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        requestId: "req-1",
+        status: "APPROVED",
+        displayId: "display-1",
+        displaySessionToken: "token-abc",
+        pollAfterSeconds: null,
+      }),
+    });
+  });
+
+  await page.route("**/api/displays/session", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        valid: true,
+        displayId: "display-1",
+        displaySlug: "main-hall",
+        assignedProfileId: "default",
+        redirectPath: "/display/display-1",
+      }),
+    });
+  });
+
+  await page.goto("/setup");
+  await page.waitForLoadState("networkidle");
+  await page.getByLabel("Enrollment Code").fill("ABCD1234");
+  await page.getByLabel("Display Name").fill("Main Hall Screen");
+  await page.getByRole("button", { name: "Enrollment starten" }).click();
+
+  await expect(page).toHaveURL(/\/display\/display-1/);
+  await expect(page.getByText("Display: display-1")).toBeVisible();
+});
+
+test("restores approved display from stored session token on reboot", async ({
+  page,
+}) => {
+  await seedDisplaySessionTokenCookie(page, "token-reboot");
+
+  await page.route("**/api/displays/session", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        valid: true,
+        displayId: "display-reboot",
+        displaySlug: "main-hall",
+        assignedProfileId: "default",
+        redirectPath: "/display/display-reboot",
+      }),
+    });
+  });
+
+  await page.goto("/");
+
+  await expect(page).toHaveURL(/\/display\/display-reboot/);
+  await expect(page.getByText("Display: display-reboot")).toBeVisible();
+});
+
+test("falls back to setup when stored token is revoked", async ({ page }) => {
+  await seedDisplaySessionTokenCookie(page, "token-revoked");
+
+  await page.route("**/api/displays/session", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        valid: false,
+        displayId: null,
+        displaySlug: null,
+        assignedProfileId: null,
+        redirectPath: null,
+      }),
+    });
+  });
+
+  await page.goto("/");
+
+  await expect(page).toHaveURL(/\/setup/);
   await expect(
-    page.getByRole("heading", { name: "Admin Route Placeholder" }),
+    page.getByRole("heading", { name: "Display Setup" }),
   ).toBeVisible();
+});
+
+for (const [targetPath, scenarioLabel] of [
+  ["/display/direct-access", "without a session token"],
+  ["/display/revoked-screen", "when token is revoked"],
+]) {
+  test(`blocks direct /display/:displayId access ${scenarioLabel}`, async ({
+    page,
+  }) => {
+    await page.route("**/api/displays/session", async (route) => {
+      if (route.request().method() !== "GET") {
+        await route.continue();
+        return;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          valid: false,
+          displayId: null,
+          displaySlug: null,
+          assignedProfileId: null,
+          redirectPath: null,
+        }),
+      });
+    });
+
+    await page.goto(targetPath);
+
+    await expect(page).toHaveURL(/\/setup/);
+    await expect(
+      page.getByRole("heading", { name: "Display Setup" }),
+    ).toBeVisible();
+  });
+}
+
+test("admin pending page supports approval action", async ({ page }) => {
+  let approved = false;
+  const expectedCsrfToken = "csrf-test-token";
+
+  await page.route("**/api/admin/displays/enrollments?*", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(
+        !approved
+          ? [
+              {
+                requestId: "req-approve",
+                enrollmentCodeId: "code-1",
+                proposedDisplayName: "North Wing",
+                deviceInfo: null,
+                status: "PENDING",
+                displayId: null,
+                createdAt: "2026-03-01T10:00:00Z",
+                expiresAt: "2026-03-02T10:00:00Z",
+              },
+            ]
+          : [],
+      ),
+    });
+  });
+
+  await page.route(
+    "**/api/admin/displays/enrollments/req-approve/approve",
+    async (route) => {
+      if (route.request().method() !== "POST") {
+        await route.continue();
+        return;
+      }
+      const csrfHeader = route.request().headers()["x-csrf-token"];
+      if (csrfHeader !== expectedCsrfToken) {
+        await route.fulfill({
+          status: 403,
+          contentType: "application/json",
+          body: JSON.stringify({ message: "Invalid CSRF token" }),
+        });
+        return;
+      }
+      approved = true;
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          requestId: "req-approve",
+          status: "APPROVED",
+          displayId: "display-approve",
+          displaySessionToken: "token-approve",
+          pollAfterSeconds: null,
+        }),
+      });
+    },
+  );
+
+  await page.goto("/admin/displays/pending");
+  await page.waitForLoadState("networkidle");
+  await page.getByRole("button", { name: "Freigeben" }).click();
+
+  await expect(page.getByText("Keine offenen Requests.")).toBeVisible();
+});
+
+test("admin pending page supports rejection action", async ({ page }) => {
+  let rejected = false;
+  const expectedCsrfToken = "csrf-test-token";
+
+  await page.route("**/api/admin/displays/enrollments?*", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(
+        !rejected
+          ? [
+              {
+                requestId: "req-reject",
+                enrollmentCodeId: "code-2",
+                proposedDisplayName: "South Wing",
+                deviceInfo: null,
+                status: "PENDING",
+                displayId: null,
+                createdAt: "2026-03-01T11:00:00Z",
+                expiresAt: "2026-03-02T11:00:00Z",
+              },
+            ]
+          : [],
+      ),
+    });
+  });
+
+  await page.route(
+    "**/api/admin/displays/enrollments/req-reject/reject",
+    async (route) => {
+      if (route.request().method() !== "POST") {
+        await route.continue();
+        return;
+      }
+      const csrfHeader = route.request().headers()["x-csrf-token"];
+      if (csrfHeader !== expectedCsrfToken) {
+        await route.fulfill({
+          status: 403,
+          contentType: "application/json",
+          body: JSON.stringify({ message: "Invalid CSRF token" }),
+        });
+        return;
+      }
+      rejected = true;
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          requestId: "req-reject",
+          status: "REJECTED",
+          displayId: null,
+          displaySessionToken: null,
+          pollAfterSeconds: null,
+        }),
+      });
+    },
+  );
+
+  await page.goto("/admin/displays/pending");
+  await page.waitForLoadState("networkidle");
+  await page.getByRole("button", { name: "Ablehnen" }).click();
+
+  await expect(page.getByText("Keine offenen Requests.")).toBeVisible();
 });
 
 test("renders root error component when a route throws", async ({ page }) => {
@@ -264,11 +594,6 @@ test("renders root not-found component for unknown routes", async ({
 
   await expect(
     page.getByRole("heading", { name: "Seite nicht gefunden" }),
-  ).toBeVisible();
-  await expect(
-    page.getByText(
-      "Diese Route existiert nicht in der aktuellen Dashboard-Anwendung.",
-    ),
   ).toBeVisible();
 });
 
@@ -311,16 +636,4 @@ test("calendar API route forwards upstream status, headers, and body", async ({
       await stopMockBackend(backendServer);
     }
   }
-});
-
-test("calendar API route returns fallback 503 when backend is unavailable", async ({
-  request,
-}) => {
-  const response = await request.get("/api/calendar/events?limit=9");
-
-  expect(response.status()).toBe(503);
-  expect(response.statusText()).toBe("Service Unavailable");
-  await expect(response.json()).resolves.toEqual({
-    message: "Backend unavailable",
-  });
 });

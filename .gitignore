@@ -8,7 +8,6 @@
 *.class
 
 # Ignore files containing sensitive information
-Backend/src/main/resources/application.properties
 der-andere-fotograf_JOB00841_x_P1128956_Original.JPEG
 IMG_0380.JPEG
 Frontend/src/components/Credits.tsx
@@ -86,10 +85,6 @@ Frontend/playwright-report
 # ───── VSCode ─────
 .vscode/
 
-# ───── Java Spring Boot ─────
-application.properties
-!Backend/src/test/resources/application.properties
-
 # ───── Eclipse ─────
 .settings/
 .classpath
@@ -105,3 +100,6 @@ mvnw.cmd
 
 # ───── Cloudflare ─────
 .wrangler/
+
+
+/Backend/data

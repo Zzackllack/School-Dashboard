@@ -1,33 +1,30 @@
 package com.schooldashboard.config;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.lang.reflect.Method;
-import java.util.Map;
+import com.schooldashboard.security.config.SecurityProperties;
+import java.util.List;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 public class CorsConfigTest {
 
 	@Test
-	public void corsConfigurerAddsGlobalMapping() throws Exception {
+	public void corsConfigurationSourceUsesSecurityProperties() {
+		SecurityProperties securityProperties = new SecurityProperties();
+		securityProperties.getCors().setAllowedOrigins(List.of("http://localhost:5173"));
+		securityProperties.getCors().setAllowedMethods(List.of("GET", "POST"));
+
 		CorsConfig config = new CorsConfig();
-		WebMvcConfigurer configurer = config.corsConfigurer();
-		CorsRegistry registry = new CorsRegistry();
-		configurer.addCorsMappings(registry);
+		CorsConfigurationSource source = config.corsConfigurationSource(securityProperties);
+		CorsConfiguration cors = ((UrlBasedCorsConfigurationSource) source)
+				.getCorsConfiguration(new MockHttpServletRequest("GET", "/api/test"));
 
-		// use reflection to access protected method getCorsConfigurations
-		Method method = CorsRegistry.class.getDeclaredMethod("getCorsConfigurations");
-		method.setAccessible(true);
-		@SuppressWarnings("unchecked")
-		Map<String, CorsConfiguration> configs = (Map<String, CorsConfiguration>) method.invoke(registry);
-
-		assertTrue(configs.containsKey("/**"));
-		CorsConfiguration cors = configs.get("/**");
-		assertEquals("*", cors.getAllowedOrigins().get(0));
-		assertTrue(cors.getAllowedMethods()
-				.containsAll(java.util.Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS")));
+		assertEquals(List.of("http://localhost:5173"), cors.getAllowedOrigins());
+		assertTrue(cors.getAllowedMethods().containsAll(List.of("GET", "POST")));
 	}
 }

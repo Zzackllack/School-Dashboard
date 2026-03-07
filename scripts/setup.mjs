@@ -51,6 +51,16 @@ async function main() {
     process.exit(wrapperCode);
   }
 
+  const envCode = await run(
+    process.execPath,
+    ['./scripts/setup-env.mjs'],
+    'Collecting local credentials and writing .env files...'
+  );
+
+  if (envCode !== 0) {
+    process.exit(envCode);
+  }
+
   console.log('Setup completed. You can now run `pnpm run dev`.');
 }
 

@@ -21,6 +21,11 @@ This spec starts after Spec 001 (TanStack Start parity migration) is completed.
 4. [04-implementation-plan.md](./04-implementation-plan.md)
 5. [05-testing-risk-rollout.md](./05-testing-risk-rollout.md)
 
+## Operational Docs
+
+- [Display Admin Access](../../src/display-admin-access.md)
+- [Display Device Enrollment Workflow](../../src/display-device-enrollment.md)
+
 ## Backend Scope
 
 Unlike Spec 001, this spec requires backend additions (new APIs, persistence, and admin workflows).
