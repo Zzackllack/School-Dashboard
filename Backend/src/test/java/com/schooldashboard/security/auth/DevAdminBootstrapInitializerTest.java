@@ -129,7 +129,8 @@ public class DevAdminBootstrapInitializerTest {
 		DevAdminBootstrapInitializer initializer = new DevAdminBootstrapInitializer(appUserRepository,
 				appRoleRepository, passwordEncoder, securityProperties, environment);
 
-		assertThrows(IllegalStateException.class, () -> initializer.run(new DefaultApplicationArguments(new String[0])));
+		assertThrows(IllegalStateException.class,
+				() -> initializer.run(new DefaultApplicationArguments(new String[0])));
 		verify(appUserRepository, never()).save(any(AppUserEntity.class));
 	}
 }
