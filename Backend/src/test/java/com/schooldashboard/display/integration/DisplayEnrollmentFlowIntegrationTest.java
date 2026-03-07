@@ -90,10 +90,9 @@ public class DisplayEnrollmentFlowIntegrationTest {
 						.andReturn().getResponse().getContentAsString());
 		assertNull(approvedStatusSecondPollResponse.get("displaySessionToken"));
 
-		Map<String, Object> validationResponse = readMap(mockMvc
-				.perform(get("/api/displays/session").header("Authorization",
-						"Bearer " + approvedSessionToken))
-				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+		Map<String, Object> validationResponse = readMap(
+				mockMvc.perform(get("/api/displays/session").header("Authorization", "Bearer " + approvedSessionToken))
+						.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals(Boolean.TRUE, validationResponse.get("valid"));
 		assertEquals(asString(approveResponse, "displayId"), asString(validationResponse, "displayId"));
 
@@ -103,10 +102,9 @@ public class DisplayEnrollmentFlowIntegrationTest {
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals("REVOKED", asString(revokeResponse, "status"));
 
-		Map<String, Object> revokedValidationResponse = readMap(mockMvc
-				.perform(get("/api/displays/session").header("Authorization",
-						"Bearer " + approvedSessionToken))
-				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+		Map<String, Object> revokedValidationResponse = readMap(
+				mockMvc.perform(get("/api/displays/session").header("Authorization", "Bearer " + approvedSessionToken))
+						.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals(Boolean.FALSE, revokedValidationResponse.get("valid"));
 
 		Map<String, Object> reactivateResponse = readMap(mockMvc
@@ -116,19 +114,17 @@ public class DisplayEnrollmentFlowIntegrationTest {
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals("ACTIVE", asString(reactivateResponse, "status"));
 
-		Map<String, Object> reactivatedValidationResponse = readMap(mockMvc
-				.perform(get("/api/displays/session").header("Authorization",
-						"Bearer " + approvedSessionToken))
-				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+		Map<String, Object> reactivatedValidationResponse = readMap(
+				mockMvc.perform(get("/api/displays/session").header("Authorization", "Bearer " + approvedSessionToken))
+						.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals(Boolean.FALSE, reactivatedValidationResponse.get("valid"));
 
 		mockMvc.perform(delete("/api/admin/displays/{displayId}", asString(approveResponse, "displayId"))
 				.session(adminSession).with(csrf())).andExpect(status().isNoContent());
 
-		Map<String, Object> deletedValidationResponse = readMap(mockMvc
-				.perform(get("/api/displays/session").header("Authorization",
-						"Bearer " + approvedSessionToken))
-				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+		Map<String, Object> deletedValidationResponse = readMap(
+				mockMvc.perform(get("/api/displays/session").header("Authorization", "Bearer " + approvedSessionToken))
+						.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals(Boolean.FALSE, deletedValidationResponse.get("valid"));
 	}
 

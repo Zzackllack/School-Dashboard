@@ -28,8 +28,8 @@ public class AppUserPrincipal implements UserDetails {
 
 	public static AppUserPrincipal fromEntity(AppUserEntity userEntity) {
 		boolean accountNonLocked = !userEntity.isLocked();
-		List<GrantedAuthority> resolvedAuthorities = userEntity.getRoles().stream().map(
-				role -> (GrantedAuthority) new SimpleGrantedAuthority(role.getName())).toList();
+		List<GrantedAuthority> resolvedAuthorities = userEntity.getRoles().stream()
+				.map(role -> (GrantedAuthority) new SimpleGrantedAuthority(role.getName())).toList();
 		return new AppUserPrincipal(userEntity.getId(), userEntity.getUsername(), userEntity.getPasswordHash(),
 				userEntity.isEnabled(), accountNonLocked, resolvedAuthorities);
 	}
