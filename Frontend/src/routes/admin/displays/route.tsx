@@ -1,5 +1,5 @@
 import { Outlet, createFileRoute, redirect } from "@tanstack/react-router";
-import { getAdminAuthStatus } from "../lib/api/displays";
+import { getAdminAuthStatus } from "#/lib/api/displays";
 
 function AdminDisplaysLayout() {
   return <Outlet />;

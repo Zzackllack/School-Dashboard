@@ -1,10 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { validateDisplaySession } from "../lib/api/displays";
+import { validateDisplaySession } from "#/lib/api/displays";
 import {
   clearDisplaySessionStorage,
   setDisplayIdHint,
-} from "../lib/display-session";
+} from "#/lib/display-session";
 
 export interface BootstrapRedirectTarget {
   to: "/setup" | "/display/$displayId";

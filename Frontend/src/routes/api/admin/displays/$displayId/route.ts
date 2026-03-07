@@ -3,7 +3,7 @@ import {
   createProxyDeleteHandler,
   createProxyGetHandler,
   createProxyPatchHandler,
-} from "../lib/proxy/proxy-get-handler";
+} from "#/lib/proxy/proxy-get-handler";
 
 export const Route = createFileRoute("/api/admin/displays/$displayId")({
   server: {

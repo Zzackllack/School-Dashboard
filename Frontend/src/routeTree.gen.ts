@@ -10,48 +10,48 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ThrowErrorRouteImport } from './routes/throw-error'
-import { Route as SetupRouteImport } from './routes/setup'
-import { Route as AdminRouteImport } from './routes/admin'
+import { Route as SetupRouteRouteImport } from './routes/setup/route'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SetupIndexRouteImport } from './routes/setup.index'
-import { Route as AdminIndexRouteImport } from './routes/admin.index'
-import { Route as SetupPendingRouteImport } from './routes/setup.pending'
-import { Route as DisplayDisplayIdRouteImport } from './routes/display.$displayId'
-import { Route as AdminLoginRouteImport } from './routes/admin.login'
-import { Route as AdminDisplaysRouteImport } from './routes/admin.displays'
-import { Route as AdminDisplaysIndexRouteImport } from './routes/admin.displays.index'
-import { Route as ApiSubstitutionPlansRouteImport } from './routes/api.substitution.plans'
-import { Route as ApiDisplaysSessionRouteImport } from './routes/api.displays.session'
-import { Route as ApiDisplaysEnrollmentsRouteImport } from './routes/api.displays.enrollments'
-import { Route as ApiCalendarEventsRouteImport } from './routes/api.calendar.events'
-import { Route as ApiAdminDisplaysRouteImport } from './routes/api.admin.displays'
-import { Route as AdminDisplaysPendingRouteImport } from './routes/admin.displays.pending'
-import { Route as AdminDisplaysDisplayIdRouteImport } from './routes/admin.displays.$displayId'
-import { Route as ApiDisplaysEnrollmentsRequestIdRouteImport } from './routes/api.displays.enrollments.$requestId'
-import { Route as ApiAdminDisplaysEnrollmentsRouteImport } from './routes/api.admin.displays.enrollments'
-import { Route as ApiAdminDisplaysEnrollmentCodesRouteImport } from './routes/api.admin.displays.enrollment-codes'
-import { Route as ApiAdminDisplaysAuditLogsRouteImport } from './routes/api.admin.displays.audit-logs'
-import { Route as ApiAdminDisplaysDisplayIdRouteImport } from './routes/api.admin.displays.$displayId'
-import { Route as ApiAdminAuthMeRouteImport } from './routes/api.admin.auth.me'
-import { Route as ApiAdminAuthLogoutRouteImport } from './routes/api.admin.auth.logout'
-import { Route as ApiAdminAuthLoginRouteImport } from './routes/api.admin.auth.login'
-import { Route as ApiAdminAuthCsrfRouteImport } from './routes/api.admin.auth.csrf'
-import { Route as ApiAdminAuthCredentialsRouteImport } from './routes/api.admin.auth.credentials'
-import { Route as ApiAdminDisplaysDisplayIdRevokeSessionRouteImport } from './routes/api.admin.displays.$displayId.revoke-session'
-import { Route as ApiAdminDisplaysEnrollmentsRequestIdRejectRouteImport } from './routes/api.admin.displays.enrollments.$requestId.reject'
-import { Route as ApiAdminDisplaysEnrollmentsRequestIdApproveRouteImport } from './routes/api.admin.displays.enrollments.$requestId.approve'
+import { Route as SetupIndexRouteImport } from './routes/setup/index'
+import { Route as AdminIndexRouteImport } from './routes/admin/index'
+import { Route as SetupPendingRouteImport } from './routes/setup/pending'
+import { Route as DisplayDisplayIdRouteImport } from './routes/display/$displayId'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminDisplaysRouteRouteImport } from './routes/admin/displays/route'
+import { Route as AdminDisplaysIndexRouteImport } from './routes/admin/displays/index'
+import { Route as ApiSubstitutionPlansRouteImport } from './routes/api/substitution/plans'
+import { Route as ApiDisplaysSessionRouteImport } from './routes/api/displays/session'
+import { Route as ApiCalendarEventsRouteImport } from './routes/api/calendar/events'
+import { Route as AdminDisplaysPendingRouteImport } from './routes/admin/displays/pending'
+import { Route as AdminDisplaysDisplayIdRouteImport } from './routes/admin/displays/$displayId'
+import { Route as ApiAdminDisplaysRouteRouteImport } from './routes/api/admin/displays/route'
+import { Route as ApiDisplaysEnrollmentsIndexRouteImport } from './routes/api/displays/enrollments/index'
+import { Route as ApiDisplaysEnrollmentsRequestIdRouteImport } from './routes/api/displays/enrollments/$requestId'
+import { Route as ApiAdminDisplaysEnrollmentCodesRouteImport } from './routes/api/admin/displays/enrollment-codes'
+import { Route as ApiAdminDisplaysAuditLogsRouteImport } from './routes/api/admin/displays/audit-logs'
+import { Route as ApiAdminAuthMeRouteImport } from './routes/api/admin/auth/me'
+import { Route as ApiAdminAuthLogoutRouteImport } from './routes/api/admin/auth/logout'
+import { Route as ApiAdminAuthLoginRouteImport } from './routes/api/admin/auth/login'
+import { Route as ApiAdminAuthCsrfRouteImport } from './routes/api/admin/auth/csrf'
+import { Route as ApiAdminAuthCredentialsRouteImport } from './routes/api/admin/auth/credentials'
+import { Route as ApiAdminDisplaysEnrollmentsRouteRouteImport } from './routes/api/admin/displays/enrollments/route'
+import { Route as ApiAdminDisplaysDisplayIdRouteRouteImport } from './routes/api/admin/displays/$displayId/route'
+import { Route as ApiAdminDisplaysDisplayIdRevokeSessionRouteImport } from './routes/api/admin/displays/$displayId/revoke-session'
+import { Route as ApiAdminDisplaysEnrollmentsRequestIdRejectRouteImport } from './routes/api/admin/displays/enrollments/$requestId/reject'
+import { Route as ApiAdminDisplaysEnrollmentsRequestIdApproveRouteImport } from './routes/api/admin/displays/enrollments/$requestId/approve'
 
 const ThrowErrorRoute = ThrowErrorRouteImport.update({
   id: '/throw-error',
   path: '/throw-error',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SetupRoute = SetupRouteImport.update({
+const SetupRouteRoute = SetupRouteRouteImport.update({
   id: '/setup',
   path: '/setup',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AdminRoute = AdminRouteImport.update({
+const AdminRouteRoute = AdminRouteRouteImport.update({
   id: '/admin',
   path: '/admin',
   getParentRoute: () => rootRouteImport,
@@ -64,17 +64,17 @@ const IndexRoute = IndexRouteImport.update({
 const SetupIndexRoute = SetupIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => SetupRoute,
+  getParentRoute: () => SetupRouteRoute,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const SetupPendingRoute = SetupPendingRouteImport.update({
   id: '/pending',
   path: '/pending',
-  getParentRoute: () => SetupRoute,
+  getParentRoute: () => SetupRouteRoute,
 } as any)
 const DisplayDisplayIdRoute = DisplayDisplayIdRouteImport.update({
   id: '/display/$displayId',
@@ -84,17 +84,17 @@ const DisplayDisplayIdRoute = DisplayDisplayIdRouteImport.update({
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminDisplaysRoute = AdminDisplaysRouteImport.update({
+const AdminDisplaysRouteRoute = AdminDisplaysRouteRouteImport.update({
   id: '/displays',
   path: '/displays',
-  getParentRoute: () => AdminRoute,
+  getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminDisplaysIndexRoute = AdminDisplaysIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AdminDisplaysRoute,
+  getParentRoute: () => AdminDisplaysRouteRoute,
 } as any)
 const ApiSubstitutionPlansRoute = ApiSubstitutionPlansRouteImport.update({
   id: '/api/substitution/plans',
@@ -106,60 +106,49 @@ const ApiDisplaysSessionRoute = ApiDisplaysSessionRouteImport.update({
   path: '/api/displays/session',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiDisplaysEnrollmentsRoute = ApiDisplaysEnrollmentsRouteImport.update({
-  id: '/api/displays/enrollments',
-  path: '/api/displays/enrollments',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiCalendarEventsRoute = ApiCalendarEventsRouteImport.update({
   id: '/api/calendar/events',
   path: '/api/calendar/events',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiAdminDisplaysRoute = ApiAdminDisplaysRouteImport.update({
-  id: '/api/admin/displays',
-  path: '/api/admin/displays',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AdminDisplaysPendingRoute = AdminDisplaysPendingRouteImport.update({
   id: '/pending',
   path: '/pending',
-  getParentRoute: () => AdminDisplaysRoute,
+  getParentRoute: () => AdminDisplaysRouteRoute,
 } as any)
 const AdminDisplaysDisplayIdRoute = AdminDisplaysDisplayIdRouteImport.update({
   id: '/$displayId',
   path: '/$displayId',
-  getParentRoute: () => AdminDisplaysRoute,
+  getParentRoute: () => AdminDisplaysRouteRoute,
 } as any)
+const ApiAdminDisplaysRouteRoute = ApiAdminDisplaysRouteRouteImport.update({
+  id: '/api/admin/displays',
+  path: '/api/admin/displays',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDisplaysEnrollmentsIndexRoute =
+  ApiDisplaysEnrollmentsIndexRouteImport.update({
+    id: '/api/displays/enrollments/',
+    path: '/api/displays/enrollments/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiDisplaysEnrollmentsRequestIdRoute =
   ApiDisplaysEnrollmentsRequestIdRouteImport.update({
-    id: '/$requestId',
-    path: '/$requestId',
-    getParentRoute: () => ApiDisplaysEnrollmentsRoute,
-  } as any)
-const ApiAdminDisplaysEnrollmentsRoute =
-  ApiAdminDisplaysEnrollmentsRouteImport.update({
-    id: '/enrollments',
-    path: '/enrollments',
-    getParentRoute: () => ApiAdminDisplaysRoute,
+    id: '/api/displays/enrollments/$requestId',
+    path: '/api/displays/enrollments/$requestId',
+    getParentRoute: () => rootRouteImport,
   } as any)
 const ApiAdminDisplaysEnrollmentCodesRoute =
   ApiAdminDisplaysEnrollmentCodesRouteImport.update({
     id: '/enrollment-codes',
     path: '/enrollment-codes',
-    getParentRoute: () => ApiAdminDisplaysRoute,
+    getParentRoute: () => ApiAdminDisplaysRouteRoute,
   } as any)
 const ApiAdminDisplaysAuditLogsRoute =
   ApiAdminDisplaysAuditLogsRouteImport.update({
     id: '/audit-logs',
     path: '/audit-logs',
-    getParentRoute: () => ApiAdminDisplaysRoute,
-  } as any)
-const ApiAdminDisplaysDisplayIdRoute =
-  ApiAdminDisplaysDisplayIdRouteImport.update({
-    id: '/$displayId',
-    path: '/$displayId',
-    getParentRoute: () => ApiAdminDisplaysRoute,
+    getParentRoute: () => ApiAdminDisplaysRouteRoute,
   } as any)
 const ApiAdminAuthMeRoute = ApiAdminAuthMeRouteImport.update({
   id: '/api/admin/auth/me',
@@ -186,54 +175,66 @@ const ApiAdminAuthCredentialsRoute = ApiAdminAuthCredentialsRouteImport.update({
   path: '/api/admin/auth/credentials',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ApiAdminDisplaysEnrollmentsRouteRoute =
+  ApiAdminDisplaysEnrollmentsRouteRouteImport.update({
+    id: '/enrollments',
+    path: '/enrollments',
+    getParentRoute: () => ApiAdminDisplaysRouteRoute,
+  } as any)
+const ApiAdminDisplaysDisplayIdRouteRoute =
+  ApiAdminDisplaysDisplayIdRouteRouteImport.update({
+    id: '/$displayId',
+    path: '/$displayId',
+    getParentRoute: () => ApiAdminDisplaysRouteRoute,
+  } as any)
 const ApiAdminDisplaysDisplayIdRevokeSessionRoute =
   ApiAdminDisplaysDisplayIdRevokeSessionRouteImport.update({
     id: '/revoke-session',
     path: '/revoke-session',
-    getParentRoute: () => ApiAdminDisplaysDisplayIdRoute,
+    getParentRoute: () => ApiAdminDisplaysDisplayIdRouteRoute,
   } as any)
 const ApiAdminDisplaysEnrollmentsRequestIdRejectRoute =
   ApiAdminDisplaysEnrollmentsRequestIdRejectRouteImport.update({
     id: '/$requestId/reject',
     path: '/$requestId/reject',
-    getParentRoute: () => ApiAdminDisplaysEnrollmentsRoute,
+    getParentRoute: () => ApiAdminDisplaysEnrollmentsRouteRoute,
   } as any)
 const ApiAdminDisplaysEnrollmentsRequestIdApproveRoute =
   ApiAdminDisplaysEnrollmentsRequestIdApproveRouteImport.update({
     id: '/$requestId/approve',
     path: '/$requestId/approve',
-    getParentRoute: () => ApiAdminDisplaysEnrollmentsRoute,
+    getParentRoute: () => ApiAdminDisplaysEnrollmentsRouteRoute,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
-  '/setup': typeof SetupRouteWithChildren
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/setup': typeof SetupRouteRouteWithChildren
   '/throw-error': typeof ThrowErrorRoute
-  '/admin/displays': typeof AdminDisplaysRouteWithChildren
+  '/admin/displays': typeof AdminDisplaysRouteRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/display/$displayId': typeof DisplayDisplayIdRoute
   '/setup/pending': typeof SetupPendingRoute
   '/admin/': typeof AdminIndexRoute
   '/setup/': typeof SetupIndexRoute
+  '/api/admin/displays': typeof ApiAdminDisplaysRouteRouteWithChildren
   '/admin/displays/$displayId': typeof AdminDisplaysDisplayIdRoute
   '/admin/displays/pending': typeof AdminDisplaysPendingRoute
-  '/api/admin/displays': typeof ApiAdminDisplaysRouteWithChildren
   '/api/calendar/events': typeof ApiCalendarEventsRoute
-  '/api/displays/enrollments': typeof ApiDisplaysEnrollmentsRouteWithChildren
   '/api/displays/session': typeof ApiDisplaysSessionRoute
   '/api/substitution/plans': typeof ApiSubstitutionPlansRoute
   '/admin/displays/': typeof AdminDisplaysIndexRoute
+  '/api/admin/displays/$displayId': typeof ApiAdminDisplaysDisplayIdRouteRouteWithChildren
+  '/api/admin/displays/enrollments': typeof ApiAdminDisplaysEnrollmentsRouteRouteWithChildren
   '/api/admin/auth/credentials': typeof ApiAdminAuthCredentialsRoute
   '/api/admin/auth/csrf': typeof ApiAdminAuthCsrfRoute
   '/api/admin/auth/login': typeof ApiAdminAuthLoginRoute
   '/api/admin/auth/logout': typeof ApiAdminAuthLogoutRoute
   '/api/admin/auth/me': typeof ApiAdminAuthMeRoute
-  '/api/admin/displays/$displayId': typeof ApiAdminDisplaysDisplayIdRouteWithChildren
   '/api/admin/displays/audit-logs': typeof ApiAdminDisplaysAuditLogsRoute
   '/api/admin/displays/enrollment-codes': typeof ApiAdminDisplaysEnrollmentCodesRoute
-  '/api/admin/displays/enrollments': typeof ApiAdminDisplaysEnrollmentsRouteWithChildren
   '/api/displays/enrollments/$requestId': typeof ApiDisplaysEnrollmentsRequestIdRoute
+  '/api/displays/enrollments/': typeof ApiDisplaysEnrollmentsIndexRoute
   '/api/admin/displays/$displayId/revoke-session': typeof ApiAdminDisplaysDisplayIdRevokeSessionRoute
   '/api/admin/displays/enrollments/$requestId/approve': typeof ApiAdminDisplaysEnrollmentsRequestIdApproveRoute
   '/api/admin/displays/enrollments/$requestId/reject': typeof ApiAdminDisplaysEnrollmentsRequestIdRejectRoute
@@ -246,24 +247,24 @@ export interface FileRoutesByTo {
   '/setup/pending': typeof SetupPendingRoute
   '/admin': typeof AdminIndexRoute
   '/setup': typeof SetupIndexRoute
+  '/api/admin/displays': typeof ApiAdminDisplaysRouteRouteWithChildren
   '/admin/displays/$displayId': typeof AdminDisplaysDisplayIdRoute
   '/admin/displays/pending': typeof AdminDisplaysPendingRoute
-  '/api/admin/displays': typeof ApiAdminDisplaysRouteWithChildren
   '/api/calendar/events': typeof ApiCalendarEventsRoute
-  '/api/displays/enrollments': typeof ApiDisplaysEnrollmentsRouteWithChildren
   '/api/displays/session': typeof ApiDisplaysSessionRoute
   '/api/substitution/plans': typeof ApiSubstitutionPlansRoute
   '/admin/displays': typeof AdminDisplaysIndexRoute
+  '/api/admin/displays/$displayId': typeof ApiAdminDisplaysDisplayIdRouteRouteWithChildren
+  '/api/admin/displays/enrollments': typeof ApiAdminDisplaysEnrollmentsRouteRouteWithChildren
   '/api/admin/auth/credentials': typeof ApiAdminAuthCredentialsRoute
   '/api/admin/auth/csrf': typeof ApiAdminAuthCsrfRoute
   '/api/admin/auth/login': typeof ApiAdminAuthLoginRoute
   '/api/admin/auth/logout': typeof ApiAdminAuthLogoutRoute
   '/api/admin/auth/me': typeof ApiAdminAuthMeRoute
-  '/api/admin/displays/$displayId': typeof ApiAdminDisplaysDisplayIdRouteWithChildren
   '/api/admin/displays/audit-logs': typeof ApiAdminDisplaysAuditLogsRoute
   '/api/admin/displays/enrollment-codes': typeof ApiAdminDisplaysEnrollmentCodesRoute
-  '/api/admin/displays/enrollments': typeof ApiAdminDisplaysEnrollmentsRouteWithChildren
   '/api/displays/enrollments/$requestId': typeof ApiDisplaysEnrollmentsRequestIdRoute
+  '/api/displays/enrollments': typeof ApiDisplaysEnrollmentsIndexRoute
   '/api/admin/displays/$displayId/revoke-session': typeof ApiAdminDisplaysDisplayIdRevokeSessionRoute
   '/api/admin/displays/enrollments/$requestId/approve': typeof ApiAdminDisplaysEnrollmentsRequestIdApproveRoute
   '/api/admin/displays/enrollments/$requestId/reject': typeof ApiAdminDisplaysEnrollmentsRequestIdRejectRoute
@@ -271,33 +272,33 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/admin': typeof AdminRouteWithChildren
-  '/setup': typeof SetupRouteWithChildren
+  '/admin': typeof AdminRouteRouteWithChildren
+  '/setup': typeof SetupRouteRouteWithChildren
   '/throw-error': typeof ThrowErrorRoute
-  '/admin/displays': typeof AdminDisplaysRouteWithChildren
+  '/admin/displays': typeof AdminDisplaysRouteRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/display/$displayId': typeof DisplayDisplayIdRoute
   '/setup/pending': typeof SetupPendingRoute
   '/admin/': typeof AdminIndexRoute
   '/setup/': typeof SetupIndexRoute
+  '/api/admin/displays': typeof ApiAdminDisplaysRouteRouteWithChildren
   '/admin/displays/$displayId': typeof AdminDisplaysDisplayIdRoute
   '/admin/displays/pending': typeof AdminDisplaysPendingRoute
-  '/api/admin/displays': typeof ApiAdminDisplaysRouteWithChildren
   '/api/calendar/events': typeof ApiCalendarEventsRoute
-  '/api/displays/enrollments': typeof ApiDisplaysEnrollmentsRouteWithChildren
   '/api/displays/session': typeof ApiDisplaysSessionRoute
   '/api/substitution/plans': typeof ApiSubstitutionPlansRoute
   '/admin/displays/': typeof AdminDisplaysIndexRoute
+  '/api/admin/displays/$displayId': typeof ApiAdminDisplaysDisplayIdRouteRouteWithChildren
+  '/api/admin/displays/enrollments': typeof ApiAdminDisplaysEnrollmentsRouteRouteWithChildren
   '/api/admin/auth/credentials': typeof ApiAdminAuthCredentialsRoute
   '/api/admin/auth/csrf': typeof ApiAdminAuthCsrfRoute
   '/api/admin/auth/login': typeof ApiAdminAuthLoginRoute
   '/api/admin/auth/logout': typeof ApiAdminAuthLogoutRoute
   '/api/admin/auth/me': typeof ApiAdminAuthMeRoute
-  '/api/admin/displays/$displayId': typeof ApiAdminDisplaysDisplayIdRouteWithChildren
   '/api/admin/displays/audit-logs': typeof ApiAdminDisplaysAuditLogsRoute
   '/api/admin/displays/enrollment-codes': typeof ApiAdminDisplaysEnrollmentCodesRoute
-  '/api/admin/displays/enrollments': typeof ApiAdminDisplaysEnrollmentsRouteWithChildren
   '/api/displays/enrollments/$requestId': typeof ApiDisplaysEnrollmentsRequestIdRoute
+  '/api/displays/enrollments/': typeof ApiDisplaysEnrollmentsIndexRoute
   '/api/admin/displays/$displayId/revoke-session': typeof ApiAdminDisplaysDisplayIdRevokeSessionRoute
   '/api/admin/displays/enrollments/$requestId/approve': typeof ApiAdminDisplaysEnrollmentsRequestIdApproveRoute
   '/api/admin/displays/enrollments/$requestId/reject': typeof ApiAdminDisplaysEnrollmentsRequestIdRejectRoute
@@ -315,24 +316,24 @@ export interface FileRouteTypes {
     | '/setup/pending'
     | '/admin/'
     | '/setup/'
+    | '/api/admin/displays'
     | '/admin/displays/$displayId'
     | '/admin/displays/pending'
-    | '/api/admin/displays'
     | '/api/calendar/events'
-    | '/api/displays/enrollments'
     | '/api/displays/session'
     | '/api/substitution/plans'
     | '/admin/displays/'
+    | '/api/admin/displays/$displayId'
+    | '/api/admin/displays/enrollments'
     | '/api/admin/auth/credentials'
     | '/api/admin/auth/csrf'
     | '/api/admin/auth/login'
     | '/api/admin/auth/logout'
     | '/api/admin/auth/me'
-    | '/api/admin/displays/$displayId'
     | '/api/admin/displays/audit-logs'
     | '/api/admin/displays/enrollment-codes'
-    | '/api/admin/displays/enrollments'
     | '/api/displays/enrollments/$requestId'
+    | '/api/displays/enrollments/'
     | '/api/admin/displays/$displayId/revoke-session'
     | '/api/admin/displays/enrollments/$requestId/approve'
     | '/api/admin/displays/enrollments/$requestId/reject'
@@ -345,24 +346,24 @@ export interface FileRouteTypes {
     | '/setup/pending'
     | '/admin'
     | '/setup'
+    | '/api/admin/displays'
     | '/admin/displays/$displayId'
     | '/admin/displays/pending'
-    | '/api/admin/displays'
     | '/api/calendar/events'
-    | '/api/displays/enrollments'
     | '/api/displays/session'
     | '/api/substitution/plans'
     | '/admin/displays'
+    | '/api/admin/displays/$displayId'
+    | '/api/admin/displays/enrollments'
     | '/api/admin/auth/credentials'
     | '/api/admin/auth/csrf'
     | '/api/admin/auth/login'
     | '/api/admin/auth/logout'
     | '/api/admin/auth/me'
-    | '/api/admin/displays/$displayId'
     | '/api/admin/displays/audit-logs'
     | '/api/admin/displays/enrollment-codes'
-    | '/api/admin/displays/enrollments'
     | '/api/displays/enrollments/$requestId'
+    | '/api/displays/enrollments'
     | '/api/admin/displays/$displayId/revoke-session'
     | '/api/admin/displays/enrollments/$requestId/approve'
     | '/api/admin/displays/enrollments/$requestId/reject'
@@ -378,24 +379,24 @@ export interface FileRouteTypes {
     | '/setup/pending'
     | '/admin/'
     | '/setup/'
+    | '/api/admin/displays'
     | '/admin/displays/$displayId'
     | '/admin/displays/pending'
-    | '/api/admin/displays'
     | '/api/calendar/events'
-    | '/api/displays/enrollments'
     | '/api/displays/session'
     | '/api/substitution/plans'
     | '/admin/displays/'
+    | '/api/admin/displays/$displayId'
+    | '/api/admin/displays/enrollments'
     | '/api/admin/auth/credentials'
     | '/api/admin/auth/csrf'
     | '/api/admin/auth/login'
     | '/api/admin/auth/logout'
     | '/api/admin/auth/me'
-    | '/api/admin/displays/$displayId'
     | '/api/admin/displays/audit-logs'
     | '/api/admin/displays/enrollment-codes'
-    | '/api/admin/displays/enrollments'
     | '/api/displays/enrollments/$requestId'
+    | '/api/displays/enrollments/'
     | '/api/admin/displays/$displayId/revoke-session'
     | '/api/admin/displays/enrollments/$requestId/approve'
     | '/api/admin/displays/enrollments/$requestId/reject'
@@ -403,13 +404,12 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  AdminRoute: typeof AdminRouteWithChildren
-  SetupRoute: typeof SetupRouteWithChildren
+  AdminRouteRoute: typeof AdminRouteRouteWithChildren
+  SetupRouteRoute: typeof SetupRouteRouteWithChildren
   ThrowErrorRoute: typeof ThrowErrorRoute
   DisplayDisplayIdRoute: typeof DisplayDisplayIdRoute
-  ApiAdminDisplaysRoute: typeof ApiAdminDisplaysRouteWithChildren
+  ApiAdminDisplaysRouteRoute: typeof ApiAdminDisplaysRouteRouteWithChildren
   ApiCalendarEventsRoute: typeof ApiCalendarEventsRoute
-  ApiDisplaysEnrollmentsRoute: typeof ApiDisplaysEnrollmentsRouteWithChildren
   ApiDisplaysSessionRoute: typeof ApiDisplaysSessionRoute
   ApiSubstitutionPlansRoute: typeof ApiSubstitutionPlansRoute
   ApiAdminAuthCredentialsRoute: typeof ApiAdminAuthCredentialsRoute
@@ -417,6 +417,8 @@ export interface RootRouteChildren {
   ApiAdminAuthLoginRoute: typeof ApiAdminAuthLoginRoute
   ApiAdminAuthLogoutRoute: typeof ApiAdminAuthLogoutRoute
   ApiAdminAuthMeRoute: typeof ApiAdminAuthMeRoute
+  ApiDisplaysEnrollmentsRequestIdRoute: typeof ApiDisplaysEnrollmentsRequestIdRoute
+  ApiDisplaysEnrollmentsIndexRoute: typeof ApiDisplaysEnrollmentsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -432,14 +434,14 @@ declare module '@tanstack/react-router' {
       id: '/setup'
       path: '/setup'
       fullPath: '/setup'
-      preLoaderRoute: typeof SetupRouteImport
+      preLoaderRoute: typeof SetupRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
       id: '/admin'
       path: '/admin'
       fullPath: '/admin'
-      preLoaderRoute: typeof AdminRouteImport
+      preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -454,21 +456,21 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/setup/'
       preLoaderRoute: typeof SetupIndexRouteImport
-      parentRoute: typeof SetupRoute
+      parentRoute: typeof SetupRouteRoute
     }
     '/admin/': {
       id: '/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof AdminRouteRoute
     }
     '/setup/pending': {
       id: '/setup/pending'
       path: '/pending'
       fullPath: '/setup/pending'
       preLoaderRoute: typeof SetupPendingRouteImport
-      parentRoute: typeof SetupRoute
+      parentRoute: typeof SetupRouteRoute
     }
     '/display/$displayId': {
       id: '/display/$displayId'
@@ -482,21 +484,21 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/admin/login'
       preLoaderRoute: typeof AdminLoginRouteImport
-      parentRoute: typeof AdminRoute
+      parentRoute: typeof AdminRouteRoute
     }
     '/admin/displays': {
       id: '/admin/displays'
       path: '/displays'
       fullPath: '/admin/displays'
-      preLoaderRoute: typeof AdminDisplaysRouteImport
-      parentRoute: typeof AdminRoute
+      preLoaderRoute: typeof AdminDisplaysRouteRouteImport
+      parentRoute: typeof AdminRouteRoute
     }
     '/admin/displays/': {
       id: '/admin/displays/'
       path: '/'
       fullPath: '/admin/displays/'
       preLoaderRoute: typeof AdminDisplaysIndexRouteImport
-      parentRoute: typeof AdminDisplaysRoute
+      parentRoute: typeof AdminDisplaysRouteRoute
     }
     '/api/substitution/plans': {
       id: '/api/substitution/plans'
@@ -512,13 +514,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiDisplaysSessionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/displays/enrollments': {
-      id: '/api/displays/enrollments'
-      path: '/api/displays/enrollments'
-      fullPath: '/api/displays/enrollments'
-      preLoaderRoute: typeof ApiDisplaysEnrollmentsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/calendar/events': {
       id: '/api/calendar/events'
       path: '/api/calendar/events'
@@ -526,61 +521,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiCalendarEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/admin/displays': {
-      id: '/api/admin/displays'
-      path: '/api/admin/displays'
-      fullPath: '/api/admin/displays'
-      preLoaderRoute: typeof ApiAdminDisplaysRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/admin/displays/pending': {
       id: '/admin/displays/pending'
       path: '/pending'
       fullPath: '/admin/displays/pending'
       preLoaderRoute: typeof AdminDisplaysPendingRouteImport
-      parentRoute: typeof AdminDisplaysRoute
+      parentRoute: typeof AdminDisplaysRouteRoute
     }
     '/admin/displays/$displayId': {
       id: '/admin/displays/$displayId'
       path: '/$displayId'
       fullPath: '/admin/displays/$displayId'
       preLoaderRoute: typeof AdminDisplaysDisplayIdRouteImport
-      parentRoute: typeof AdminDisplaysRoute
+      parentRoute: typeof AdminDisplaysRouteRoute
+    }
+    '/api/admin/displays': {
+      id: '/api/admin/displays'
+      path: '/api/admin/displays'
+      fullPath: '/api/admin/displays'
+      preLoaderRoute: typeof ApiAdminDisplaysRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/displays/enrollments/': {
+      id: '/api/displays/enrollments/'
+      path: '/api/displays/enrollments'
+      fullPath: '/api/displays/enrollments/'
+      preLoaderRoute: typeof ApiDisplaysEnrollmentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/displays/enrollments/$requestId': {
       id: '/api/displays/enrollments/$requestId'
-      path: '/$requestId'
+      path: '/api/displays/enrollments/$requestId'
       fullPath: '/api/displays/enrollments/$requestId'
       preLoaderRoute: typeof ApiDisplaysEnrollmentsRequestIdRouteImport
-      parentRoute: typeof ApiDisplaysEnrollmentsRoute
-    }
-    '/api/admin/displays/enrollments': {
-      id: '/api/admin/displays/enrollments'
-      path: '/enrollments'
-      fullPath: '/api/admin/displays/enrollments'
-      preLoaderRoute: typeof ApiAdminDisplaysEnrollmentsRouteImport
-      parentRoute: typeof ApiAdminDisplaysRoute
+      parentRoute: typeof rootRouteImport
     }
     '/api/admin/displays/enrollment-codes': {
       id: '/api/admin/displays/enrollment-codes'
       path: '/enrollment-codes'
       fullPath: '/api/admin/displays/enrollment-codes'
       preLoaderRoute: typeof ApiAdminDisplaysEnrollmentCodesRouteImport
-      parentRoute: typeof ApiAdminDisplaysRoute
+      parentRoute: typeof ApiAdminDisplaysRouteRoute
     }
     '/api/admin/displays/audit-logs': {
       id: '/api/admin/displays/audit-logs'
       path: '/audit-logs'
       fullPath: '/api/admin/displays/audit-logs'
       preLoaderRoute: typeof ApiAdminDisplaysAuditLogsRouteImport
-      parentRoute: typeof ApiAdminDisplaysRoute
-    }
-    '/api/admin/displays/$displayId': {
-      id: '/api/admin/displays/$displayId'
-      path: '/$displayId'
-      fullPath: '/api/admin/displays/$displayId'
-      preLoaderRoute: typeof ApiAdminDisplaysDisplayIdRouteImport
-      parentRoute: typeof ApiAdminDisplaysRoute
+      parentRoute: typeof ApiAdminDisplaysRouteRoute
     }
     '/api/admin/auth/me': {
       id: '/api/admin/auth/me'
@@ -617,93 +605,110 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminAuthCredentialsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/admin/displays/enrollments': {
+      id: '/api/admin/displays/enrollments'
+      path: '/enrollments'
+      fullPath: '/api/admin/displays/enrollments'
+      preLoaderRoute: typeof ApiAdminDisplaysEnrollmentsRouteRouteImport
+      parentRoute: typeof ApiAdminDisplaysRouteRoute
+    }
+    '/api/admin/displays/$displayId': {
+      id: '/api/admin/displays/$displayId'
+      path: '/$displayId'
+      fullPath: '/api/admin/displays/$displayId'
+      preLoaderRoute: typeof ApiAdminDisplaysDisplayIdRouteRouteImport
+      parentRoute: typeof ApiAdminDisplaysRouteRoute
+    }
     '/api/admin/displays/$displayId/revoke-session': {
       id: '/api/admin/displays/$displayId/revoke-session'
       path: '/revoke-session'
       fullPath: '/api/admin/displays/$displayId/revoke-session'
       preLoaderRoute: typeof ApiAdminDisplaysDisplayIdRevokeSessionRouteImport
-      parentRoute: typeof ApiAdminDisplaysDisplayIdRoute
+      parentRoute: typeof ApiAdminDisplaysDisplayIdRouteRoute
     }
     '/api/admin/displays/enrollments/$requestId/reject': {
       id: '/api/admin/displays/enrollments/$requestId/reject'
       path: '/$requestId/reject'
       fullPath: '/api/admin/displays/enrollments/$requestId/reject'
       preLoaderRoute: typeof ApiAdminDisplaysEnrollmentsRequestIdRejectRouteImport
-      parentRoute: typeof ApiAdminDisplaysEnrollmentsRoute
+      parentRoute: typeof ApiAdminDisplaysEnrollmentsRouteRoute
     }
     '/api/admin/displays/enrollments/$requestId/approve': {
       id: '/api/admin/displays/enrollments/$requestId/approve'
       path: '/$requestId/approve'
       fullPath: '/api/admin/displays/enrollments/$requestId/approve'
       preLoaderRoute: typeof ApiAdminDisplaysEnrollmentsRequestIdApproveRouteImport
-      parentRoute: typeof ApiAdminDisplaysEnrollmentsRoute
+      parentRoute: typeof ApiAdminDisplaysEnrollmentsRouteRoute
     }
   }
 }
 
-interface AdminDisplaysRouteChildren {
+interface AdminDisplaysRouteRouteChildren {
   AdminDisplaysDisplayIdRoute: typeof AdminDisplaysDisplayIdRoute
   AdminDisplaysPendingRoute: typeof AdminDisplaysPendingRoute
   AdminDisplaysIndexRoute: typeof AdminDisplaysIndexRoute
 }
 
-const AdminDisplaysRouteChildren: AdminDisplaysRouteChildren = {
+const AdminDisplaysRouteRouteChildren: AdminDisplaysRouteRouteChildren = {
   AdminDisplaysDisplayIdRoute: AdminDisplaysDisplayIdRoute,
   AdminDisplaysPendingRoute: AdminDisplaysPendingRoute,
   AdminDisplaysIndexRoute: AdminDisplaysIndexRoute,
 }
 
-const AdminDisplaysRouteWithChildren = AdminDisplaysRoute._addFileChildren(
-  AdminDisplaysRouteChildren,
-)
+const AdminDisplaysRouteRouteWithChildren =
+  AdminDisplaysRouteRoute._addFileChildren(AdminDisplaysRouteRouteChildren)
 
-interface AdminRouteChildren {
-  AdminDisplaysRoute: typeof AdminDisplaysRouteWithChildren
+interface AdminRouteRouteChildren {
+  AdminDisplaysRouteRoute: typeof AdminDisplaysRouteRouteWithChildren
   AdminLoginRoute: typeof AdminLoginRoute
   AdminIndexRoute: typeof AdminIndexRoute
 }
 
-const AdminRouteChildren: AdminRouteChildren = {
-  AdminDisplaysRoute: AdminDisplaysRouteWithChildren,
+const AdminRouteRouteChildren: AdminRouteRouteChildren = {
+  AdminDisplaysRouteRoute: AdminDisplaysRouteRouteWithChildren,
   AdminLoginRoute: AdminLoginRoute,
   AdminIndexRoute: AdminIndexRoute,
 }
 
-const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
+const AdminRouteRouteWithChildren = AdminRouteRoute._addFileChildren(
+  AdminRouteRouteChildren,
+)
 
-interface SetupRouteChildren {
+interface SetupRouteRouteChildren {
   SetupPendingRoute: typeof SetupPendingRoute
   SetupIndexRoute: typeof SetupIndexRoute
 }
 
-const SetupRouteChildren: SetupRouteChildren = {
+const SetupRouteRouteChildren: SetupRouteRouteChildren = {
   SetupPendingRoute: SetupPendingRoute,
   SetupIndexRoute: SetupIndexRoute,
 }
 
-const SetupRouteWithChildren = SetupRoute._addFileChildren(SetupRouteChildren)
+const SetupRouteRouteWithChildren = SetupRouteRoute._addFileChildren(
+  SetupRouteRouteChildren,
+)
 
-interface ApiAdminDisplaysDisplayIdRouteChildren {
+interface ApiAdminDisplaysDisplayIdRouteRouteChildren {
   ApiAdminDisplaysDisplayIdRevokeSessionRoute: typeof ApiAdminDisplaysDisplayIdRevokeSessionRoute
 }
 
-const ApiAdminDisplaysDisplayIdRouteChildren: ApiAdminDisplaysDisplayIdRouteChildren =
+const ApiAdminDisplaysDisplayIdRouteRouteChildren: ApiAdminDisplaysDisplayIdRouteRouteChildren =
   {
     ApiAdminDisplaysDisplayIdRevokeSessionRoute:
       ApiAdminDisplaysDisplayIdRevokeSessionRoute,
   }
 
-const ApiAdminDisplaysDisplayIdRouteWithChildren =
-  ApiAdminDisplaysDisplayIdRoute._addFileChildren(
-    ApiAdminDisplaysDisplayIdRouteChildren,
+const ApiAdminDisplaysDisplayIdRouteRouteWithChildren =
+  ApiAdminDisplaysDisplayIdRouteRoute._addFileChildren(
+    ApiAdminDisplaysDisplayIdRouteRouteChildren,
   )
 
-interface ApiAdminDisplaysEnrollmentsRouteChildren {
+interface ApiAdminDisplaysEnrollmentsRouteRouteChildren {
   ApiAdminDisplaysEnrollmentsRequestIdApproveRoute: typeof ApiAdminDisplaysEnrollmentsRequestIdApproveRoute
   ApiAdminDisplaysEnrollmentsRequestIdRejectRoute: typeof ApiAdminDisplaysEnrollmentsRequestIdRejectRoute
 }
 
-const ApiAdminDisplaysEnrollmentsRouteChildren: ApiAdminDisplaysEnrollmentsRouteChildren =
+const ApiAdminDisplaysEnrollmentsRouteRouteChildren: ApiAdminDisplaysEnrollmentsRouteRouteChildren =
   {
     ApiAdminDisplaysEnrollmentsRequestIdApproveRoute:
       ApiAdminDisplaysEnrollmentsRequestIdApproveRoute,
@@ -711,52 +716,40 @@ const ApiAdminDisplaysEnrollmentsRouteChildren: ApiAdminDisplaysEnrollmentsRoute
       ApiAdminDisplaysEnrollmentsRequestIdRejectRoute,
   }
 
-const ApiAdminDisplaysEnrollmentsRouteWithChildren =
-  ApiAdminDisplaysEnrollmentsRoute._addFileChildren(
-    ApiAdminDisplaysEnrollmentsRouteChildren,
+const ApiAdminDisplaysEnrollmentsRouteRouteWithChildren =
+  ApiAdminDisplaysEnrollmentsRouteRoute._addFileChildren(
+    ApiAdminDisplaysEnrollmentsRouteRouteChildren,
   )
 
-interface ApiAdminDisplaysRouteChildren {
-  ApiAdminDisplaysDisplayIdRoute: typeof ApiAdminDisplaysDisplayIdRouteWithChildren
+interface ApiAdminDisplaysRouteRouteChildren {
+  ApiAdminDisplaysDisplayIdRouteRoute: typeof ApiAdminDisplaysDisplayIdRouteRouteWithChildren
+  ApiAdminDisplaysEnrollmentsRouteRoute: typeof ApiAdminDisplaysEnrollmentsRouteRouteWithChildren
   ApiAdminDisplaysAuditLogsRoute: typeof ApiAdminDisplaysAuditLogsRoute
   ApiAdminDisplaysEnrollmentCodesRoute: typeof ApiAdminDisplaysEnrollmentCodesRoute
-  ApiAdminDisplaysEnrollmentsRoute: typeof ApiAdminDisplaysEnrollmentsRouteWithChildren
 }
 
-const ApiAdminDisplaysRouteChildren: ApiAdminDisplaysRouteChildren = {
-  ApiAdminDisplaysDisplayIdRoute: ApiAdminDisplaysDisplayIdRouteWithChildren,
+const ApiAdminDisplaysRouteRouteChildren: ApiAdminDisplaysRouteRouteChildren = {
+  ApiAdminDisplaysDisplayIdRouteRoute:
+    ApiAdminDisplaysDisplayIdRouteRouteWithChildren,
+  ApiAdminDisplaysEnrollmentsRouteRoute:
+    ApiAdminDisplaysEnrollmentsRouteRouteWithChildren,
   ApiAdminDisplaysAuditLogsRoute: ApiAdminDisplaysAuditLogsRoute,
   ApiAdminDisplaysEnrollmentCodesRoute: ApiAdminDisplaysEnrollmentCodesRoute,
-  ApiAdminDisplaysEnrollmentsRoute:
-    ApiAdminDisplaysEnrollmentsRouteWithChildren,
 }
 
-const ApiAdminDisplaysRouteWithChildren =
-  ApiAdminDisplaysRoute._addFileChildren(ApiAdminDisplaysRouteChildren)
-
-interface ApiDisplaysEnrollmentsRouteChildren {
-  ApiDisplaysEnrollmentsRequestIdRoute: typeof ApiDisplaysEnrollmentsRequestIdRoute
-}
-
-const ApiDisplaysEnrollmentsRouteChildren: ApiDisplaysEnrollmentsRouteChildren =
-  {
-    ApiDisplaysEnrollmentsRequestIdRoute: ApiDisplaysEnrollmentsRequestIdRoute,
-  }
-
-const ApiDisplaysEnrollmentsRouteWithChildren =
-  ApiDisplaysEnrollmentsRoute._addFileChildren(
-    ApiDisplaysEnrollmentsRouteChildren,
+const ApiAdminDisplaysRouteRouteWithChildren =
+  ApiAdminDisplaysRouteRoute._addFileChildren(
+    ApiAdminDisplaysRouteRouteChildren,
   )
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  AdminRoute: AdminRouteWithChildren,
-  SetupRoute: SetupRouteWithChildren,
+  AdminRouteRoute: AdminRouteRouteWithChildren,
+  SetupRouteRoute: SetupRouteRouteWithChildren,
   ThrowErrorRoute: ThrowErrorRoute,
   DisplayDisplayIdRoute: DisplayDisplayIdRoute,
-  ApiAdminDisplaysRoute: ApiAdminDisplaysRouteWithChildren,
+  ApiAdminDisplaysRouteRoute: ApiAdminDisplaysRouteRouteWithChildren,
   ApiCalendarEventsRoute: ApiCalendarEventsRoute,
-  ApiDisplaysEnrollmentsRoute: ApiDisplaysEnrollmentsRouteWithChildren,
   ApiDisplaysSessionRoute: ApiDisplaysSessionRoute,
   ApiSubstitutionPlansRoute: ApiSubstitutionPlansRoute,
   ApiAdminAuthCredentialsRoute: ApiAdminAuthCredentialsRoute,
@@ -764,6 +757,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminAuthLoginRoute: ApiAdminAuthLoginRoute,
   ApiAdminAuthLogoutRoute: ApiAdminAuthLogoutRoute,
   ApiAdminAuthMeRoute: ApiAdminAuthMeRoute,
+  ApiDisplaysEnrollmentsRequestIdRoute: ApiDisplaysEnrollmentsRequestIdRoute,
+  ApiDisplaysEnrollmentsIndexRoute: ApiDisplaysEnrollmentsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

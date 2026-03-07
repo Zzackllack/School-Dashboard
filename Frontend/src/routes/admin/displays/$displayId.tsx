@@ -6,7 +6,7 @@ import {
   getDisplay,
   revokeDisplaySession,
   updateDisplay,
-} from "../lib/api/displays";
+} from "#/lib/api/displays";
 
 export const Route = createFileRoute("/admin/displays/$displayId")({
   component: AdminDisplayDetailPage,

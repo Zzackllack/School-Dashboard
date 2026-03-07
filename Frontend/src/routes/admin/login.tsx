@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
-import { adminLogin, getAdminAuthStatus } from "../lib/api/displays";
+import { adminLogin, getAdminAuthStatus } from "#/lib/api/displays";
 
 export const Route = createFileRoute("/admin/login")({
   component: AdminLoginPage,

@@ -1,11 +1,11 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { DisplayPage } from "../components/display/DisplayPage";
-import { validateDisplaySession } from "../lib/api/displays";
+import { DisplayPage } from "#/components/display/DisplayPage";
+import { validateDisplaySession } from "#/lib/api/displays";
 import {
   clearDisplaySessionStorage,
   setDisplayIdHint,
-} from "../lib/display-session";
+} from "#/lib/display-session";
 
 type DisplayAccessResult =
   | { kind: "allow"; displayId: string }

@@ -1,11 +1,11 @@
 import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
-import { getEnrollmentStatus } from "../lib/api/displays";
+import { getEnrollmentStatus } from "#/lib/api/displays";
 import {
   getPendingEnrollmentRequestId,
   setDisplayIdHint,
   setPendingEnrollmentRequestId,
-} from "../lib/display-session";
+} from "#/lib/display-session";
 
 export const Route = createFileRoute("/setup/pending")({
   validateSearch: (search: Record<string, unknown>) => ({

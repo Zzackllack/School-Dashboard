@@ -4,7 +4,7 @@ import {
   approveDisplayEnrollment,
   listDisplayEnrollments,
   rejectDisplayEnrollment,
-} from "../lib/api/displays";
+} from "#/lib/api/displays";
 
 export const Route = createFileRoute("/admin/displays/pending")({
   component: AdminPendingDisplaysPage,

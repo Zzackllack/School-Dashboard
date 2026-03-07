@@ -8,7 +8,7 @@ import {
   listAdminAuditLogs,
   listDisplays,
   updateAdminCredentials,
-} from "../lib/api/displays";
+} from "#/lib/api/displays";
 
 export const Route = createFileRoute("/admin/displays/")({
   component: AdminDisplaysPage,

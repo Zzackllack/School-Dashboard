@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import * as displaysApi from "../lib/api/displays";
-import { Route } from "./admin.displays";
+import * as displaysApi from "#/lib/api/displays";
+import { Route } from "./route";
 
 describe("admin displays route guard", () => {
   beforeEach(() => {

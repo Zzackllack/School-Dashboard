@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { getCalendarEventsGetHandler } from "../test/helpers/getCalendarEventsGetHandler";
+import { getCalendarEventsGetHandler } from "#/test/helpers/getCalendarEventsGetHandler";
 
 const originalBackendUrl = process.env.BACKEND_URL;
 
