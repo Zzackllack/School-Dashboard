@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>School Substitution Dashboard - Column Flip State</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link href="https://fonts.googleapis.com" rel="preconnect" />
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#eb4d42", // Red for alerts/cancellations
+              "background-light": "#F4F4F0", // Warm Off-White/Newsprint
+              "background-dark": "#211211",
+              ink: "#000000",
+              "grade-7-8": "#FFD60A", // Safety Yellow
+              "grade-9-10": "#32D74B", // Terminal Green
+              "grade-11-12": "#FF9F0A", // International Orange
+              "info-blue": "#0055FF",
+            },
+            fontFamily: {
+              display: ["Space Grotesk", "sans-serif"],
+              mono: ["Space Grotesk", "monospace"], // Using Space Grotesk as mono substitute for consistency
+            },
+            borderWidth: {
+              3: "3px",
+              4: "4px",
+            },
+            borderRadius: {
+              DEFAULT: "0px",
+              lg: "0px",
+              xl: "0px",
+              full: "0px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      /* Custom scrollbar hiding for cleaner display look */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      /* Brutalist Layout Helpers */
+      .border-thick {
+        border: 4px solid #000000;
+      }
+      .border-r-thick {
+        border-right: 4px solid #000000;
+      }
+      .border-b-thick {
+        border-bottom: 4px solid #000000;
+      }
+      .border-t-thick {
+        border-top: 4px solid #000000;
+      }
+
+      /* Animation simulation for "Flip State" */
+      @keyframes slideUpEnter {
+        0% {
+          transform: translateY(100%);
+          opacity: 0;
+        }
+        100% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      @keyframes slideUpExit {
+        0% {
+          transform: translateY(0);
+          opacity: 1;
+        }
+        100% {
+          transform: translateY(-100%);
+          opacity: 0;
+        }
+      }
+
+      .animate-enter-active {
+        animation: slideUpEnter 0.6s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+      }
+
+      /* Pattern for idle/empty areas */
+      .bg-pattern-dots {
+        background-image: radial-gradient(#000000 1px, transparent 1px);
+        background-size: 20px 20px;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-background-light text-ink font-display overflow-hidden h-screen w-screen flex flex-col"
+  >
+    <!-- Top Status Bar -->
+    <header
+      class="flex-none h-16 w-full flex border-b-thick bg-background-light z-50"
+    >
+      <div class="flex-1 flex items-center px-6 border-r-thick">
+        <span class="material-symbols-outlined text-4xl mr-4">grid_view</span>
+        <h1 class="text-2xl font-bold tracking-tight">DAILY BULLETIN</h1>
+      </div>
+      <div class="w-[30%] flex border-l-thick border-l-transparent">
+        <!-- Spacer to align with grid split -->
+        <div
+          class="flex-1 flex items-center justify-center border-l-thick bg-white"
+        >
+          <span class="text-xl font-bold tracking-widest">MON 23 OCT</span>
+        </div>
+        <div
+          class="flex-none w-32 flex items-center justify-center bg-ink text-white"
+        >
+          <span class="text-xl font-bold">08:14</span>
+        </div>
+      </div>
+    </header>
+    <!-- Main Content Area -->
+    <main class="flex-1 flex w-full overflow-hidden">
+      <!-- LEFT: Substitution Grid (70%) -->
+      <section class="w-[70%] h-full flex divide-x-4 divide-black">
+        <!-- Column 1: Grades 7-8 (Static) -->
+        <div
+          class="flex-1 flex flex-col h-full bg-background-light relative group"
+        >
+          <!-- Sticky Header -->
+          <div
+            class="h-16 bg-grade-7-8 border-b-thick flex items-center justify-between px-4 sticky top-0 z-10"
+          >
+            <h2 class="text-2xl font-bold tracking-tighter">07 — 08</h2>
+            <div class="flex gap-1">
+              <div class="w-2 h-2 bg-black"></div>
+            </div>
+          </div>
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto no-scrollbar p-0">
+            <!-- Card 1 -->
+            <div class="h-[110px] w-full border-b border-black flex bg-white">
+              <div class="w-2 bg-grade-7-8 h-full"></div>
+              <div class="flex-1 p-3 flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                  <span class="text-2xl font-bold leading-none"
+                    >7B History</span
+                  >
+                  <span
+                    class="text-sm font-mono font-bold bg-black text-white px-1"
+                    >ROOM CHANGE</span
+                  >
+                </div>
+                <div class="text-lg leading-tight">Mr. Smith → Rm 104</div>
+              </div>
+            </div>
+            <!-- Card 2 -->
+            <div class="h-[110px] w-full border-b border-black flex bg-white">
+              <div class="w-2 bg-grade-7-8 h-full"></div>
+              <div class="flex-1 p-3 flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                  <span class="text-2xl font-bold leading-none">8A Math</span>
+                  <span class="text-sm font-mono font-bold text-primary"
+                    >CANCELLED</span
+                  >
+                </div>
+                <div class="text-lg leading-tight">Mrs. Jones</div>
+              </div>
+            </div>
+            <!-- Card 3 -->
+            <div class="h-[110px] w-full border-b border-black flex bg-white">
+              <div class="w-2 bg-grade-7-8 h-full"></div>
+              <div class="flex-1 p-3 flex flex-col justify-between">
+                <div class="flex justify-between items-start">
+                  <span class="text-2xl font-bold leading-none"
+                    >7C Science</span
+                  >
+                  <span
+                    class="text-sm font-mono font-bold bg-info-blue text-white px-1"
+                    >SUBSTITUTE</span
+                  >
+                </div>
+                <div class="text-lg leading-tight">Mr. Doe → Ms. Allen</div>
+              </div>
+            </div>
+            <!-- Empty State Fill -->
+            <div class="flex-1 bg-pattern-dots opacity-20 min-h-[200px]"></div>
+          </div>
+        </div>
+        <!-- Column 2: Grades 9-10 (FLIP STATE ACTIVE) -->
+        <div
+          class="flex-1 flex flex-col h-full bg-background-light relative overflow-hidden"
+        >
+          <!-- Sticky Header -->
+          <div
+            class="h-16 bg-grade-9-10 border-b-thick flex items-center justify-between px-4 sticky top-0 z-20 shadow-xl"
+          >
+            <h2 class="text-2xl font-bold tracking-tighter">09 — 10</h2>
+            <div class="flex gap-1 items-center">
+              <span class="text-xs font-bold mr-1">PG 2/2</span>
+              <div class="w-2 h-2 border border-black"></div>
+              <div class="w-2 h-2 bg-black"></div>
+            </div>
+          </div>
+          <!-- Animated Content Container -->
+          <div class="relative flex-1 bg-background-light overflow-hidden">
+            <!-- Simulating the "Exit" of Page 1 (fading out/sliding up) -->
+            <!-- In a real app this would be keyframed out, here we show the top clipped to imply motion -->
+            <!-- Simulating "Enter" of Page 2 (sliding in from bottom) -->
+            <div
+              class="absolute inset-0 w-full animate-enter-active flex flex-col"
+            >
+              <!-- Card 1 (New Page) -->
+              <div
+                class="h-[110px] w-full border-b border-black flex bg-white shadow-sm"
+              >
+                <div class="w-2 bg-grade-9-10 h-full"></div>
+                <div class="flex-1 p-3 flex flex-col justify-between">
+                  <div class="flex justify-between items-start">
+                    <span class="text-2xl font-bold leading-none"
+                      >9B Physics</span
+                    >
+                    <span
+                      class="text-sm font-mono font-bold text-primary border border-primary px-1"
+                      >CANCELLED</span
+                    >
+                  </div>
+                  <div class="text-lg leading-tight">Dr. Brown</div>
+                </div>
+              </div>
+              <!-- Card 2 -->
+              <div
+                class="h-[110px] w-full border-b border-black flex bg-white shadow-sm"
+              >
+                <div class="w-2 bg-grade-9-10 h-full"></div>
+                <div class="flex-1 p-3 flex flex-col justify-between">
+                  <div class="flex justify-between items-start">
+                    <span class="text-2xl font-bold leading-none"
+                      >10A English</span
+                    >
+                    <span
+                      class="text-sm font-mono font-bold bg-black text-white px-1"
+                      >ROOM 304</span
+                    >
+                  </div>
+                  <div class="text-lg leading-tight">Ms. Taylor → Library</div>
+                </div>
+              </div>
+              <!-- Card 3 -->
+              <div
+                class="h-[110px] w-full border-b border-black flex bg-white shadow-sm"
+              >
+                <div class="w-2 bg-grade-9-10 h-full"></div>
+                <div class="flex-1 p-3 flex flex-col justify-between">
+                  <div class="flex justify-between items-start">
+                    <span class="text-2xl font-bold leading-none">9C Art</span>
+                    <span
+                      class="text-sm font-mono font-bold bg-info-blue text-white px-1"
+                      >SUPPLIES</span
+                    >
+                  </div>
+                  <div class="text-lg leading-tight">Bring Sketchbook</div>
+                </div>
+              </div>
+              <!-- Card 4 -->
+              <div
+                class="h-[110px] w-full border-b border-black flex bg-white shadow-sm"
+              >
+                <div class="w-2 bg-grade-9-10 h-full"></div>
+                <div class="flex-1 p-3 flex flex-col justify-between">
+                  <div class="flex justify-between items-start">
+                    <span class="text-2xl font-bold leading-none"
+                      >10B History</span
+                    >
+                    <span
+                      class="text-sm font-mono font-bold border border-black px-1"
+                      >DELAYED</span
+                    >
+                  </div>
+                  <div class="text-lg leading-tight">Start: 09:15 AM</div>
+                </div>
+              </div>
+              <!-- Card 5 (Cutoff implication) -->
+              <div
+                class="h-[110px] w-full border-b border-black flex bg-white opacity-50"
+              >
+                <div class="w-2 bg-grade-9-10 h-full"></div>
+                <div class="flex-1 p-3 flex flex-col justify-between">
+                  <div class="flex justify-between items-start">
+                    <span class="text-2xl font-bold leading-none">10C PE</span>
+                  </div>
+                  <div class="text-lg leading-tight">Gym Hall B</div>
+                </div>
+              </div>
+            </div>
+            <!-- Visual cue for motion blur / transition overlay -->
+            <div
+              class="absolute top-0 left-0 w-full h-8 bg-gradient-to-b from-black/5 to-transparent pointer-events-none z-10"
+            ></div>
+          </div>
+        </div>
+        <!-- Column 3: Grades 11-12 (Static) -->
+        <div class="flex-1 flex flex-col h-full bg-background-light relative">
+          <!-- Sticky Header -->
+          <div
+            class="h-16 bg-grade-11-12 border-b-thick flex items-center justify-between px-4 sticky top-0 z-10"
+          >
+            <h2 class="text-2xl font-bold tracking-tighter">11 — 12</h2>
+            <div class="flex gap-1">
+              <div class="w-2 h-2 bg-black"></div>
+            </div>
+          </div>
+          <!-- Content -->
+          <div class="flex-1 overflow-y-auto no-scrollbar p-0">
+            <div
+              class="flex flex-col items-center justify-center h-64 text-center p-6 opacity-60"
+            >
+              <span class="material-symbols-outlined text-6xl mb-2"
+                >sentiment_satisfied</span
+              >
+              <span class="text-xl font-bold uppercase">No Changes</span>
+              <span class="text-sm">Enjoy your day</span>
+            </div>
+            <!-- Decorative filler -->
+            <div class="flex-1 bg-pattern-dots opacity-10"></div>
+          </div>
+        </div>
+      </section>
+      <!-- RIGHT: Sidebar (30%) -->
+      <aside
+        class="w-[30%] h-full bg-background-light flex flex-col overflow-hidden border-l-4 border-black"
+      >
+        <!-- Module 1: Weather -->
+        <div
+          class="bg-white border-b-thick p-6 flex flex-col relative overflow-hidden"
+        >
+          <div class="flex justify-between items-start mb-2">
+            <h3 class="text-lg font-black uppercase tracking-wider">Weather</h3>
+            <span class="material-symbols-outlined text-4xl"
+              >partly_cloudy_day</span
+            >
+          </div>
+          <div class="flex items-baseline gap-2">
+            <span class="text-6xl font-black">14°</span>
+            <span class="text-xl font-medium text-gray-500">Cloudy</span>
+          </div>
+          <div
+            class="mt-4 flex gap-4 text-sm font-bold border-t border-black pt-3"
+          >
+            <div class="flex flex-col">
+              <span class="text-gray-500 text-xs">HUMIDITY</span>
+              <span>64%</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-gray-500 text-xs">WIND</span>
+              <span>12km/h</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-gray-500 text-xs">RAIN</span>
+              <span>20%</span>
+            </div>
+          </div>
+        </div>
+        <!-- Module 2: Departures -->
+        <div class="bg-white border-b-thick flex flex-col flex-1 min-h-[300px]">
+          <div class="p-4 border-b-4 border-black bg-background-light">
+            <h3
+              class="text-lg font-black uppercase tracking-wider flex items-center gap-2"
+            >
+              <span class="material-symbols-outlined">directions_bus</span>
+              Departures
+            </h3>
+          </div>
+          <!-- Bus Table -->
+          <div class="flex flex-col">
+            <!-- Row 1 -->
+            <div
+              class="flex items-center p-3 border-b border-black hover:bg-yellow-50"
+            >
+              <div class="w-12 font-bold text-xl">41</div>
+              <div class="flex-1 px-3 font-medium truncate">
+                Central Station
+              </div>
+              <div
+                class="font-mono font-bold bg-black text-white px-2 py-0.5 text-sm"
+              >
+                3 min
+              </div>
+            </div>
+            <!-- Row 2 -->
+            <div
+              class="flex items-center p-3 border-b border-black hover:bg-yellow-50"
+            >
+              <div class="w-12 font-bold text-xl">S2</div>
+              <div class="flex-1 px-3 font-medium truncate">Airport Loop</div>
+              <div
+                class="font-mono font-bold bg-background-light border border-black px-2 py-0.5 text-sm"
+              >
+                8 min
+              </div>
+            </div>
+            <!-- Row 3 -->
+            <div
+              class="flex items-center p-3 border-b border-black hover:bg-yellow-50"
+            >
+              <div class="w-12 font-bold text-xl">41</div>
+              <div class="flex-1 px-3 font-medium truncate">West Park</div>
+              <div
+                class="font-mono font-bold bg-background-light border border-black px-2 py-0.5 text-sm"
+              >
+                15 min
+              </div>
+            </div>
+            <!-- Row 4 -->
+            <div
+              class="flex items-center p-3 border-b border-black hover:bg-yellow-50"
+            >
+              <div class="w-12 font-bold text-xl">12</div>
+              <div class="flex-1 px-3 font-medium truncate">North Campus</div>
+              <div
+                class="font-mono font-bold bg-primary text-white px-2 py-0.5 text-sm"
+              >
+                DELAY
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- Module 3: Calendar / Upcoming -->
+        <div
+          class="bg-grade-11-12 p-5 flex-1 border-b-thick flex flex-col justify-center"
+        >
+          <h3
+            class="text-lg font-black uppercase tracking-wider mb-3 border-b-2 border-black pb-1"
+          >
+            Upcoming Exams
+          </h3>
+          <div class="flex flex-col gap-3">
+            <div
+              class="bg-white border-2 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+            >
+              <div class="flex justify-between items-baseline mb-1">
+                <span class="font-bold">Mathematics</span>
+                <span
+                  class="text-xs font-mono font-bold bg-black text-white px-1"
+                  >TOMORROW</span
+                >
+              </div>
+              <div class="text-sm">Grade 10 - All Classes</div>
+            </div>
+            <div
+              class="bg-white border-2 border-black p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-75"
+            >
+              <div class="flex justify-between items-baseline mb-1">
+                <span class="font-bold">History</span>
+                <span
+                  class="text-xs font-mono font-bold border border-black px-1"
+                  >FRI 27</span
+                >
+              </div>
+              <div class="text-sm">Grade 9 - Chapter 4</div>
+            </div>
+          </div>
+        </div>
+        <!-- Footer / Credits -->
+        <div class="bg-black text-white p-3 text-center">
+          <p class="text-xs font-mono uppercase tracking-widest">
+            System by Student Council
+          </p>
+        </div>
+      </aside>
+    </main>
+    <!-- Urgent Alert Overlay (Hidden by default, showing structure for completeness of concept from PRD, but inactive) -->
+    <!-- 
+    <div class="fixed inset-0 z-[100] bg-black/80 flex items-center justify-center hidden">
+        <div class="bg-white border-thick p-10 max-w-4xl w-full text-center shadow-2xl relative">
+             <div class="absolute top-0 left-0 w-full h-4 bg-[repeating-linear-gradient(45deg,#000,#000_20px,#FFD60A_20px,#FFD60A_40px)]"></div>
+             <h1 class="text-8xl font-black text-primary mb-4">ATTENTION</h1>
+             <p class="text-4xl font-bold mb-8">FIRE ALARM TESTING IN PROGRESS</p>
+             <p class="text-xl font-mono">10:42 AM</p>
+             <div class="absolute bottom-0 left-0 w-full h-4 bg-[repeating-linear-gradient(45deg,#000,#000_20px,#FFD60A_20px,#FFD60A_40px)]"></div>
+        </div>
+    </div>
+    -->
+  </body>
+</html>

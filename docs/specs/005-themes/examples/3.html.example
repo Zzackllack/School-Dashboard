@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>School Dashboard - Sidebar Scroll State</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#eb4d42",
+              "background-light": "#f8f6f6",
+              "background-dark": "#211211",
+              "grade-7-8": "#FFD60A",
+              "grade-9-10": "#32D74B",
+              "grade-11-12": "#FF9F0A",
+            },
+            fontFamily: {
+              display: ["Space Grotesk", "sans-serif"],
+              mono: ["Space Grotesk", "monospace"], // Using Space Grotesk for mono feel as per strict font rule, usually you'd want a real mono
+            },
+            borderRadius: {
+              DEFAULT: "0.125rem",
+              sm: "0.125rem",
+              lg: "0.25rem",
+              xl: "0.5rem",
+              full: "0.75rem",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      /* Custom scrollbar hiding for the clean look */
+      .no-scrollbar::-webkit-scrollbar {
+        display: none;
+      }
+      .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+
+      /* Brutalist borders */
+      .border-thick {
+        border-width: 4px;
+      }
+    </style>
+  </head>
+  <body
+    class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-slate-100 font-display overflow-hidden h-screen w-screen flex flex-col"
+  >
+    <!-- Top Bar -->
+    <header
+      class="h-16 shrink-0 flex items-center justify-between px-6 border-b-4 border-slate-900 bg-background-light dark:bg-background-dark z-20"
+    >
+      <div class="flex items-center gap-4">
+        <span
+          class="material-symbols-outlined text-4xl text-slate-900 dark:text-white"
+          >school</span
+        >
+        <h1
+          class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white uppercase"
+        >
+          St. Mary's HS <span class="text-primary mx-2">//</span> Daily Bulletin
+        </h1>
+      </div>
+      <div class="flex items-center gap-6">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary"
+            >calendar_today</span
+          >
+          <span class="text-xl font-medium">WED, OCT 24</span>
+        </div>
+        <div class="h-8 w-1 bg-slate-900"></div>
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary">schedule</span>
+          <span class="text-xl font-bold font-mono">08:42:15</span>
+        </div>
+      </div>
+    </header>
+    <!-- Main Content Area -->
+    <main class="flex flex-1 overflow-hidden">
+      <!-- Left: Substitution Grid (Static for this view context, simplified for visual context) -->
+      <section
+        class="w-[70%] flex flex-col border-r-4 border-slate-900 h-full relative"
+      >
+        <!-- Grid Header -->
+        <div class="grid grid-cols-3 border-b-4 border-slate-900">
+          <div class="p-4 bg-grade-7-8 border-r-4 border-slate-900">
+            <h2 class="text-4xl font-black text-slate-900">07—08</h2>
+          </div>
+          <div class="p-4 bg-grade-9-10 border-r-4 border-slate-900">
+            <h2 class="text-4xl font-black text-slate-900">09—10</h2>
+          </div>
+          <div class="p-4 bg-grade-11-12">
+            <h2 class="text-4xl font-black text-slate-900">11—12</h2>
+          </div>
+        </div>
+        <!-- Grid Content (Faded/Static representation) -->
+        <div class="grid grid-cols-3 h-full bg-[#fcf8f8]">
+          <!-- Column 1 -->
+          <div
+            class="border-r-4 border-slate-900 p-4 flex flex-col gap-4 opacity-40"
+          >
+            <div
+              class="h-28 border border-slate-900 p-3 bg-white flex flex-col justify-between rounded-sm"
+            >
+              <div class="flex justify-between items-start">
+                <span class="font-bold text-xl">7B HISTORY</span>
+                <span
+                  class="bg-primary text-white text-xs font-bold px-2 py-1 rounded-sm"
+                  >CANCELLED</span
+                >
+              </div>
+              <div class="text-slate-500 font-medium">Mr. Smith</div>
+            </div>
+            <div
+              class="h-28 border border-slate-900 p-3 bg-white flex flex-col justify-between rounded-sm"
+            >
+              <div class="flex justify-between items-start">
+                <span class="font-bold text-xl">8A MATH</span>
+                <span
+                  class="bg-blue-600 text-white text-xs font-bold px-2 py-1 rounded-sm"
+                  >ROOM 104</span
+                >
+              </div>
+              <div class="text-slate-500 font-medium">Mrs. Jones</div>
+            </div>
+          </div>
+          <!-- Column 2 -->
+          <div
+            class="border-r-4 border-slate-900 p-4 flex flex-col gap-4 opacity-40"
+          >
+            <div class="h-full flex items-center justify-center flex-col gap-4">
+              <span class="material-symbols-outlined text-6xl text-slate-300"
+                >check_circle</span
+              >
+              <span class="text-2xl font-bold text-slate-300">NO CHANGES</span>
+            </div>
+          </div>
+          <!-- Column 3 -->
+          <div class="p-4 flex flex-col gap-4 opacity-40">
+            <div
+              class="h-28 border border-slate-900 p-3 bg-white flex flex-col justify-between rounded-sm"
+            >
+              <div class="flex justify-between items-start">
+                <span class="font-bold text-xl">11C BIO</span>
+                <span
+                  class="bg-primary text-white text-xs font-bold px-2 py-1 rounded-sm"
+                  >DELAYED</span
+                >
+              </div>
+              <div class="text-slate-500 font-medium">Dr. Al-Fayed</div>
+            </div>
+          </div>
+        </div>
+        <!-- Context Label -->
+        <div
+          class="absolute bottom-8 left-8 bg-slate-900 text-white px-4 py-2 font-bold text-lg rounded-sm opacity-50"
+        >
+          GRID STATE: PASSIVE
+        </div>
+      </section>
+      <!-- Right: Sidebar Scroll State (Focus Area) -->
+      <aside class="w-[30%] bg-white flex flex-col relative h-full">
+        <!-- Scroll Indicator / Progress Bar -->
+        <div class="absolute right-0 top-0 bottom-0 w-2 bg-slate-100 z-10">
+          <div
+            class="w-full bg-slate-900 h-[30%] absolute top-[20%] rounded-full opacity-30"
+          ></div>
+        </div>
+        <!-- Scroll Container (Simulating the scroll position) -->
+        <div
+          class="flex-1 overflow-y-auto no-scrollbar p-6 flex flex-col gap-8 pb-20"
+          style="scroll-behavior: smooth"
+        >
+          <!-- Module 1: Weather (Scrolled slightly past) -->
+          <div class="flex flex-col gap-2 border-b-4 border-slate-900 pb-6">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-2xl font-black uppercase tracking-tight">
+                Weather
+              </h3>
+              <span
+                class="text-sm font-bold bg-slate-900 text-white px-2 py-1 rounded-sm"
+                >LIVE</span
+              >
+            </div>
+            <div
+              class="flex items-center justify-between bg-blue-50 p-4 border border-slate-900 rounded-sm"
+            >
+              <div class="flex flex-col">
+                <span class="text-6xl font-bold tracking-tighter">14°</span>
+                <span class="text-lg font-medium text-slate-600"
+                  >Light Rain</span
+                >
+              </div>
+              <div class="bg-primary/10 p-4 rounded-full">
+                <span class="material-symbols-outlined text-6xl text-primary"
+                  >rainy</span
+                >
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2 mt-2">
+              <div
+                class="text-center p-2 bg-slate-50 border border-slate-200 rounded-sm"
+              >
+                <span class="block text-xs font-bold text-slate-500"
+                  >10 AM</span
+                >
+                <span class="material-symbols-outlined text-slate-700 text-lg"
+                  >cloud</span
+                >
+                <span class="block text-sm font-bold">15°</span>
+              </div>
+              <div
+                class="text-center p-2 bg-slate-50 border border-slate-200 rounded-sm"
+              >
+                <span class="block text-xs font-bold text-slate-500"
+                  >12 PM</span
+                >
+                <span class="material-symbols-outlined text-slate-700 text-lg"
+                  >partly_cloudy_day</span
+                >
+                <span class="block text-sm font-bold">17°</span>
+              </div>
+              <div
+                class="text-center p-2 bg-slate-50 border border-slate-200 rounded-sm"
+              >
+                <span class="block text-xs font-bold text-slate-500">2 PM</span>
+                <span class="material-symbols-outlined text-slate-700 text-lg"
+                  >sunny</span
+                >
+                <span class="block text-sm font-bold">19°</span>
+              </div>
+            </div>
+          </div>
+          <!-- Module 2: Departures (Active View) -->
+          <div class="flex flex-col gap-2 border-b-4 border-slate-900 pb-6">
+            <div class="flex justify-between items-end mb-2">
+              <h3 class="text-2xl font-black uppercase tracking-tight">
+                Departures
+              </h3>
+              <span class="text-sm font-mono text-slate-500"
+                >Station: Main St.</span
+              >
+            </div>
+            <div class="border border-slate-900 rounded-sm overflow-hidden">
+              <!-- Table Header -->
+              <div
+                class="grid grid-cols-[80px_60px_1fr_80px] bg-slate-900 text-white font-bold text-sm p-3"
+              >
+                <span>TIME</span>
+                <span>LINE</span>
+                <span>DESTINATION</span>
+                <span class="text-right">STATUS</span>
+              </div>
+              <!-- Row 1 -->
+              <div
+                class="grid grid-cols-[80px_60px_1fr_80px] border-b border-slate-200 bg-white p-3 items-center"
+              >
+                <span
+                  class="font-mono text-lg font-bold text-primary animate-pulse"
+                  >08:45</span
+                >
+                <span
+                  class="bg-blue-600 text-white text-xs font-bold px-1 py-0.5 rounded w-fit text-center"
+                  >BUS 4</span
+                >
+                <span class="truncate font-medium">Central Station</span>
+                <span class="text-right text-xs font-bold text-slate-400"
+                  >ON TIME</span
+                >
+              </div>
+              <!-- Row 2 -->
+              <div
+                class="grid grid-cols-[80px_60px_1fr_80px] border-b border-slate-200 bg-slate-50 p-3 items-center"
+              >
+                <span class="font-mono text-lg font-bold">08:48</span>
+                <span
+                  class="bg-green-600 text-white text-xs font-bold px-1 py-0.5 rounded w-fit text-center"
+                  >TRAM 1</span
+                >
+                <span class="truncate font-medium">North Campus</span>
+                <span class="text-right text-xs font-bold text-primary"
+                  >DELAY 2m</span
+                >
+              </div>
+              <!-- Row 3 -->
+              <div
+                class="grid grid-cols-[80px_60px_1fr_80px] border-b border-slate-200 bg-white p-3 items-center"
+              >
+                <span class="font-mono text-lg font-bold">08:55</span>
+                <span
+                  class="bg-blue-600 text-white text-xs font-bold px-1 py-0.5 rounded w-fit text-center"
+                  >BUS 9</span
+                >
+                <span class="truncate font-medium">Sports Complex</span>
+                <span class="text-right text-xs font-bold text-slate-400"
+                  >ON TIME</span
+                >
+              </div>
+              <!-- Row 4 -->
+              <div
+                class="grid grid-cols-[80px_60px_1fr_80px] border-b border-slate-200 bg-slate-50 p-3 items-center"
+              >
+                <span class="font-mono text-lg font-bold">09:05</span>
+                <span
+                  class="bg-orange-500 text-white text-xs font-bold px-1 py-0.5 rounded w-fit text-center"
+                  >BUS 12</span
+                >
+                <span class="truncate font-medium">Downtown</span>
+                <span class="text-right text-xs font-bold text-slate-400"
+                  >ON TIME</span
+                >
+              </div>
+              <!-- Row 5 -->
+              <div
+                class="grid grid-cols-[80px_60px_1fr_80px] bg-white p-3 items-center"
+              >
+                <span class="font-mono text-lg font-bold">09:15</span>
+                <span
+                  class="bg-blue-600 text-white text-xs font-bold px-1 py-0.5 rounded w-fit text-center"
+                  >BUS 4</span
+                >
+                <span class="truncate font-medium">Central Station</span>
+                <span class="text-right text-xs font-bold text-slate-400"
+                  >ON TIME</span
+                >
+              </div>
+            </div>
+          </div>
+          <!-- Module 3: Upcoming Exams (Partial View / Emerging) -->
+          <div class="flex flex-col gap-2">
+            <div class="flex justify-between items-center mb-2">
+              <h3
+                class="text-2xl font-black uppercase tracking-tight text-primary"
+              >
+                Important Dates
+              </h3>
+            </div>
+            <div class="flex flex-col gap-3">
+              <!-- Card 1 -->
+              <div
+                class="flex bg-white border border-slate-900 rounded-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+              >
+                <div
+                  class="bg-slate-900 text-white p-4 flex flex-col items-center justify-center w-20 shrink-0"
+                >
+                  <span class="text-xs font-bold uppercase opacity-80"
+                    >OCT</span
+                  >
+                  <span class="text-2xl font-bold">28</span>
+                </div>
+                <div class="p-3 flex flex-col justify-center">
+                  <span class="font-bold text-lg leading-tight"
+                    >Mid-Term Exams Begin</span
+                  >
+                  <span class="text-sm text-slate-500"
+                    >Grades 9-12 • Main Hall</span
+                  >
+                </div>
+              </div>
+              <!-- Card 2 (Cut off to show scrolling) -->
+              <div
+                class="flex bg-white border border-slate-900 rounded-sm shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] opacity-70"
+              >
+                <div
+                  class="bg-slate-900 text-white p-4 flex flex-col items-center justify-center w-20 shrink-0"
+                >
+                  <span class="text-xs font-bold uppercase opacity-80"
+                    >NOV</span
+                  >
+                  <span class="text-2xl font-bold">02</span>
+                </div>
+                <div class="p-3 flex flex-col justify-center">
+                  <span class="font-bold text-lg leading-tight"
+                    >School Photo Day</span
+                  >
+                  <span class="text-sm text-slate-500">All Grades • Gym</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Module 4: Footer/Credits (Hidden, implies more scroll) -->
+          <div class="pt-8 opacity-20 text-center">
+            <p class="font-bold text-slate-400 text-sm">
+              SCROLLING FOR MORE INFO...
+            </p>
+          </div>
+        </div>
+        <!-- Bottom Fade Overlay for scroll hint -->
+        <div
+          class="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white to-transparent pointer-events-none z-10"
+        ></div>
+      </aside>
+    </main>
+  </body>
+</html>
