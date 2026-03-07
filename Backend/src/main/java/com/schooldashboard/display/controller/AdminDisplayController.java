@@ -1,6 +1,7 @@
 package com.schooldashboard.display.controller;
 
 import com.schooldashboard.display.dto.ApproveEnrollmentRequest;
+import com.schooldashboard.display.dto.AdminAuditLogResponse;
 import com.schooldashboard.display.dto.CreateEnrollmentCodeRequest;
 import com.schooldashboard.display.dto.CreateEnrollmentCodeResponse;
 import com.schooldashboard.display.dto.DisplaySummaryResponse;
@@ -9,6 +10,7 @@ import com.schooldashboard.display.dto.PendingEnrollmentResponse;
 import com.schooldashboard.display.dto.RejectEnrollmentRequest;
 import com.schooldashboard.display.dto.UpdateDisplayRequest;
 import com.schooldashboard.display.entity.EnrollmentRequestStatus;
+import com.schooldashboard.display.service.AdminAuditLogService;
 import com.schooldashboard.display.service.DisplayEnrollmentService;
 import com.schooldashboard.display.web.DisplayDomainException;
 import jakarta.validation.Valid;
@@ -32,9 +34,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AdminDisplayController {
 
 	private final DisplayEnrollmentService enrollmentService;
+	private final AdminAuditLogService adminAuditLogService;
 
-	public AdminDisplayController(DisplayEnrollmentService enrollmentService) {
+	public AdminDisplayController(DisplayEnrollmentService enrollmentService, AdminAuditLogService adminAuditLogService) {
 		this.enrollmentService = enrollmentService;
+		this.adminAuditLogService = adminAuditLogService;
 	}
 
 	@PostMapping("/enrollment-codes")
@@ -65,6 +69,11 @@ public class AdminDisplayController {
 	@GetMapping
 	public List<DisplaySummaryResponse> listDisplays() {
 		return enrollmentService.listDisplays();
+	}
+
+	@GetMapping("/audit-logs")
+	public List<AdminAuditLogResponse> listAuditLogs(@RequestParam(name = "limit", defaultValue = "50") int limit) {
+		return adminAuditLogService.listRecent(limit);
 	}
 
 	@GetMapping("/{displayId}")

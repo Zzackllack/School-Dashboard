@@ -22,7 +22,7 @@
     "pretest:scripts": "node ./scripts/require-pnpm.mjs",
     "test:scripts": "node --test ./scripts/*.test.mjs",
     "predev": "node ./scripts/require-pnpm.mjs",
-    "dev": "node ./scripts/announce-and-wait.mjs \"Starting frontend [0] and backend [1] development servers in 3 seconds...\" 3000 && concurrently \"pnpm --dir Frontend run dev\" \"pnpm run dev:backend\"",
+    "dev": "node ./scripts/announce-and-wait.mjs \"Starting frontend [0] and backend [1] development servers in 1 second...\" 1000 && concurrently \"pnpm --dir Frontend run dev\" \"pnpm run dev:backend\"",
     "predev:frontend": "node ./scripts/require-pnpm.mjs",
     "dev:frontend": "pnpm --dir Frontend run dev",
     "predev:backend": "node ./scripts/require-pnpm.mjs",

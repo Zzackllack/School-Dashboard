@@ -59,6 +59,16 @@ export interface DisplaySummaryResponse {
   updatedAt: string;
 }
 
+export interface AdminAuditLogResponse {
+  id: string;
+  adminId: string;
+  action: string;
+  targetType: string;
+  targetId: string;
+  metadata: Record<string, unknown> | null;
+  createdAt: string;
+}
+
 export interface CreateEnrollmentCodeResponse {
   codeId: string;
   code: string;
@@ -260,6 +270,16 @@ export async function createEnrollmentCode(payload: {
     throw new Error("Enrollment code creation returned an empty response");
   }
   return response;
+}
+
+export async function listAdminAuditLogs(
+  limit = 50,
+): Promise<AdminAuditLogResponse[]> {
+  const params = new URLSearchParams({ limit: String(limit) });
+  const response = await fetchJson<AdminAuditLogResponse[]>(
+    `/admin/displays/audit-logs?${params.toString()}`,
+  );
+  return response ?? [];
 }
 
 export async function listDisplayEnrollments(

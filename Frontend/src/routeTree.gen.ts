@@ -30,6 +30,7 @@ import { Route as AdminDisplaysDisplayIdRouteImport } from './routes/admin.displ
 import { Route as ApiDisplaysEnrollmentsRequestIdRouteImport } from './routes/api.displays.enrollments.$requestId'
 import { Route as ApiAdminDisplaysEnrollmentsRouteImport } from './routes/api.admin.displays.enrollments'
 import { Route as ApiAdminDisplaysEnrollmentCodesRouteImport } from './routes/api.admin.displays.enrollment-codes'
+import { Route as ApiAdminDisplaysAuditLogsRouteImport } from './routes/api.admin.displays.audit-logs'
 import { Route as ApiAdminDisplaysDisplayIdRouteImport } from './routes/api.admin.displays.$displayId'
 import { Route as ApiAdminAuthMeRouteImport } from './routes/api.admin.auth.me'
 import { Route as ApiAdminAuthLogoutRouteImport } from './routes/api.admin.auth.logout'
@@ -148,6 +149,12 @@ const ApiAdminDisplaysEnrollmentCodesRoute =
     path: '/enrollment-codes',
     getParentRoute: () => ApiAdminDisplaysRoute,
   } as any)
+const ApiAdminDisplaysAuditLogsRoute =
+  ApiAdminDisplaysAuditLogsRouteImport.update({
+    id: '/audit-logs',
+    path: '/audit-logs',
+    getParentRoute: () => ApiAdminDisplaysRoute,
+  } as any)
 const ApiAdminDisplaysDisplayIdRoute =
   ApiAdminDisplaysDisplayIdRouteImport.update({
     id: '/$displayId',
@@ -223,6 +230,7 @@ export interface FileRoutesByFullPath {
   '/api/admin/auth/logout': typeof ApiAdminAuthLogoutRoute
   '/api/admin/auth/me': typeof ApiAdminAuthMeRoute
   '/api/admin/displays/$displayId': typeof ApiAdminDisplaysDisplayIdRouteWithChildren
+  '/api/admin/displays/audit-logs': typeof ApiAdminDisplaysAuditLogsRoute
   '/api/admin/displays/enrollment-codes': typeof ApiAdminDisplaysEnrollmentCodesRoute
   '/api/admin/displays/enrollments': typeof ApiAdminDisplaysEnrollmentsRouteWithChildren
   '/api/displays/enrollments/$requestId': typeof ApiDisplaysEnrollmentsRequestIdRoute
@@ -252,6 +260,7 @@ export interface FileRoutesByTo {
   '/api/admin/auth/logout': typeof ApiAdminAuthLogoutRoute
   '/api/admin/auth/me': typeof ApiAdminAuthMeRoute
   '/api/admin/displays/$displayId': typeof ApiAdminDisplaysDisplayIdRouteWithChildren
+  '/api/admin/displays/audit-logs': typeof ApiAdminDisplaysAuditLogsRoute
   '/api/admin/displays/enrollment-codes': typeof ApiAdminDisplaysEnrollmentCodesRoute
   '/api/admin/displays/enrollments': typeof ApiAdminDisplaysEnrollmentsRouteWithChildren
   '/api/displays/enrollments/$requestId': typeof ApiDisplaysEnrollmentsRequestIdRoute
@@ -285,6 +294,7 @@ export interface FileRoutesById {
   '/api/admin/auth/logout': typeof ApiAdminAuthLogoutRoute
   '/api/admin/auth/me': typeof ApiAdminAuthMeRoute
   '/api/admin/displays/$displayId': typeof ApiAdminDisplaysDisplayIdRouteWithChildren
+  '/api/admin/displays/audit-logs': typeof ApiAdminDisplaysAuditLogsRoute
   '/api/admin/displays/enrollment-codes': typeof ApiAdminDisplaysEnrollmentCodesRoute
   '/api/admin/displays/enrollments': typeof ApiAdminDisplaysEnrollmentsRouteWithChildren
   '/api/displays/enrollments/$requestId': typeof ApiDisplaysEnrollmentsRequestIdRoute
@@ -319,6 +329,7 @@ export interface FileRouteTypes {
     | '/api/admin/auth/logout'
     | '/api/admin/auth/me'
     | '/api/admin/displays/$displayId'
+    | '/api/admin/displays/audit-logs'
     | '/api/admin/displays/enrollment-codes'
     | '/api/admin/displays/enrollments'
     | '/api/displays/enrollments/$requestId'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '/api/admin/auth/logout'
     | '/api/admin/auth/me'
     | '/api/admin/displays/$displayId'
+    | '/api/admin/displays/audit-logs'
     | '/api/admin/displays/enrollment-codes'
     | '/api/admin/displays/enrollments'
     | '/api/displays/enrollments/$requestId'
@@ -380,6 +392,7 @@ export interface FileRouteTypes {
     | '/api/admin/auth/logout'
     | '/api/admin/auth/me'
     | '/api/admin/displays/$displayId'
+    | '/api/admin/displays/audit-logs'
     | '/api/admin/displays/enrollment-codes'
     | '/api/admin/displays/enrollments'
     | '/api/displays/enrollments/$requestId'
@@ -555,6 +568,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminDisplaysEnrollmentCodesRouteImport
       parentRoute: typeof ApiAdminDisplaysRoute
     }
+    '/api/admin/displays/audit-logs': {
+      id: '/api/admin/displays/audit-logs'
+      path: '/audit-logs'
+      fullPath: '/api/admin/displays/audit-logs'
+      preLoaderRoute: typeof ApiAdminDisplaysAuditLogsRouteImport
+      parentRoute: typeof ApiAdminDisplaysRoute
+    }
     '/api/admin/displays/$displayId': {
       id: '/api/admin/displays/$displayId'
       path: '/$displayId'
@@ -698,12 +718,14 @@ const ApiAdminDisplaysEnrollmentsRouteWithChildren =
 
 interface ApiAdminDisplaysRouteChildren {
   ApiAdminDisplaysDisplayIdRoute: typeof ApiAdminDisplaysDisplayIdRouteWithChildren
+  ApiAdminDisplaysAuditLogsRoute: typeof ApiAdminDisplaysAuditLogsRoute
   ApiAdminDisplaysEnrollmentCodesRoute: typeof ApiAdminDisplaysEnrollmentCodesRoute
   ApiAdminDisplaysEnrollmentsRoute: typeof ApiAdminDisplaysEnrollmentsRouteWithChildren
 }
 
 const ApiAdminDisplaysRouteChildren: ApiAdminDisplaysRouteChildren = {
   ApiAdminDisplaysDisplayIdRoute: ApiAdminDisplaysDisplayIdRouteWithChildren,
+  ApiAdminDisplaysAuditLogsRoute: ApiAdminDisplaysAuditLogsRoute,
   ApiAdminDisplaysEnrollmentCodesRoute: ApiAdminDisplaysEnrollmentCodesRoute,
   ApiAdminDisplaysEnrollmentsRoute:
     ApiAdminDisplaysEnrollmentsRouteWithChildren,

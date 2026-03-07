@@ -5,6 +5,7 @@ import {
   adminLogout,
   createEnrollmentCode,
   getAdminAuthStatus,
+  listAdminAuditLogs,
   listDisplays,
   updateAdminCredentials,
 } from "../lib/api/displays";
@@ -32,6 +33,21 @@ function AdminDisplaysPage() {
   const [isCredentialSubmitting, setIsCredentialSubmitting] = useState(false);
   const [isCreatingCode, setIsCreatingCode] = useState(false);
   const [isLoadingDisplays, setIsLoadingDisplays] = useState(true);
+  const [isLoadingAuditLogs, setIsLoadingAuditLogs] = useState(true);
+  const [auditStatusMessage, setAuditStatusMessage] = useState<string | null>(
+    null,
+  );
+  const [auditLogs, setAuditLogs] = useState<
+    Array<{
+      id: string;
+      adminId: string;
+      action: string;
+      targetType: string;
+      targetId: string;
+      metadata: Record<string, unknown> | null;
+      createdAt: string;
+    }>
+  >([]);
   const [displays, setDisplays] = useState<
     Array<{
       id: string;
@@ -44,8 +60,9 @@ function AdminDisplaysPage() {
   useEffect(() => {
     let cancelled = false;
 
-    async function loadDisplays() {
+    async function loadPageData() {
       setIsLoadingDisplays(true);
+      setIsLoadingAuditLogs(true);
       try {
         const [response, authStatus] = await Promise.all([
           listDisplays(),
@@ -69,9 +86,29 @@ function AdminDisplaysPage() {
           setIsLoadingDisplays(false);
         }
       }
+
+      try {
+        const logs = await listAdminAuditLogs(100);
+        if (!cancelled) {
+          setAuditLogs(logs);
+          setAuditStatusMessage(null);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          setAuditStatusMessage(
+            error instanceof Error
+              ? error.message
+              : "Audit-Log konnte nicht geladen werden.",
+          );
+        }
+      } finally {
+        if (!cancelled) {
+          setIsLoadingAuditLogs(false);
+        }
+      }
     }
 
-    void loadDisplays();
+    void loadPageData();
 
     return () => {
       cancelled = true;
@@ -162,6 +199,18 @@ function AdminDisplaysPage() {
       // ignore and continue to login page
     }
     window.location.href = "/admin/login";
+  }
+
+  function formatAuditTimestamp(value: string) {
+    return new Date(value).toLocaleString("de-DE", {
+      dateStyle: "medium",
+      timeStyle: "short",
+      hour12: false,
+    });
+  }
+
+  function formatAuditAction(action: string) {
+    return action.toLowerCase().replaceAll("_", " ");
   }
 
   return (
@@ -359,6 +408,43 @@ function AdminDisplaysPage() {
                   >
                     Details öffnen
                   </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+
+        <section className="rounded-2xl bg-white p-6 shadow-lg">
+          <h2 className="text-xl font-semibold">Admin Audit-Log</h2>
+          {isLoadingAuditLogs ? (
+            <p className="mt-3 text-sm text-slate-600">Lade Audit-Log...</p>
+          ) : auditStatusMessage ? (
+            <p className="mt-3 text-sm text-rose-700">{auditStatusMessage}</p>
+          ) : auditLogs.length === 0 ? (
+            <p className="mt-3 text-sm text-slate-600">
+              Noch keine Audit-Einträge vorhanden.
+            </p>
+          ) : (
+            <ul className="mt-4 space-y-3">
+              {auditLogs.map((entry) => (
+                <li
+                  key={entry.id}
+                  className="rounded-lg border border-slate-200 px-4 py-3"
+                >
+                  <p className="font-semibold">
+                    {formatAuditAction(entry.action)} · {entry.targetType} (
+                    {entry.targetId})
+                  </p>
+                  <p className="text-sm text-slate-600">
+                    Admin: {entry.adminId} ·{" "}
+                    {formatAuditTimestamp(entry.createdAt)}
+                  </p>
+                  {entry.metadata &&
+                  Object.keys(entry.metadata).length > 0 ? (
+                    <pre className="mt-2 overflow-x-auto rounded-md bg-slate-100 p-2 text-xs text-slate-700">
+                      {JSON.stringify(entry.metadata, null, 2)}
+                    </pre>
+                  ) : null}
                 </li>
               ))}
             </ul>

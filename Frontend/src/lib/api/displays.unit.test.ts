@@ -4,6 +4,7 @@ import {
   approveDisplayEnrollment,
   createEnrollment,
   createEnrollmentCode,
+  listAdminAuditLogs,
   updateAdminCredentials,
   validateDisplaySession,
 } from "./displays";
@@ -241,5 +242,36 @@ describe("display api client", () => {
     expect(requestInit.body).toContain("renamed-admin");
     const headers = new Headers(requestInit.headers);
     expect(headers.get("x-csrf-token")).toBe("csrf-123");
+  });
+
+  it("lists admin audit logs with limit query", async () => {
+    const fetchSpy = vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          {
+            id: "audit-1",
+            adminId: "admin-user",
+            action: "DISPLAY_UPDATED",
+            targetType: "display",
+            targetId: "display-1",
+            metadata: { status: "ACTIVE" },
+            createdAt: "2026-03-07T18:00:00Z",
+          },
+        ]),
+        {
+          status: 200,
+          headers: { "Content-Type": "application/json" },
+        },
+      ),
+    );
+
+    const response = await listAdminAuditLogs(25);
+
+    expect(response).toHaveLength(1);
+    expect(response[0]?.id).toBe("audit-1");
+    expect(fetchSpy).toHaveBeenCalledWith(
+      "/api/admin/displays/audit-logs?limit=25",
+      undefined,
+    );
   });
 });

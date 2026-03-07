@@ -10,6 +10,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.schooldashboard.display.dto.CreateEnrollmentCodeResponse;
+import com.schooldashboard.display.dto.AdminAuditLogResponse;
+import com.schooldashboard.display.service.AdminAuditLogService;
 import com.schooldashboard.display.service.DisplayEnrollmentService;
 import java.time.Instant;
 import java.util.List;
@@ -29,6 +31,9 @@ public class AdminDisplayControllerTest {
 
 	@MockitoBean
 	private DisplayEnrollmentService enrollmentService;
+
+	@MockitoBean
+	private AdminAuditLogService adminAuditLogService;
 
 	@MockitoBean
 	@SuppressWarnings("unused")
@@ -51,5 +56,19 @@ public class AdminDisplayControllerTest {
 		when(enrollmentService.listDisplays()).thenReturn(List.of());
 
 		mockMvc.perform(get("/api/admin/displays")).andExpect(status().isOk());
+	}
+
+	@Test
+	@WithMockUser(username = "school-admin", roles = "ADMIN")
+	public void listAuditLogsReturnsRecentEntries() throws Exception {
+		Instant createdAt = Instant.parse("2026-03-07T12:00:00Z");
+		when(adminAuditLogService.listRecent(10))
+				.thenReturn(List.of(new AdminAuditLogResponse("audit-1", "school-admin", "DISPLAY_UPDATED", "display",
+						"display-1", null, createdAt)));
+
+		mockMvc.perform(get("/api/admin/displays/audit-logs").param("limit", "10")).andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].id").value("audit-1"))
+				.andExpect(jsonPath("$[0].action").value("DISPLAY_UPDATED"))
+				.andExpect(jsonPath("$[0].createdAt").value("2026-03-07T12:00:00Z"));
 	}
 }
