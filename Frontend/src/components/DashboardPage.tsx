@@ -9,6 +9,16 @@ import Weather from "./Weather";
 import schoolLogo from "../assets/Goethe-Logo.webp";
 import useAutoScroll from "../hooks/useAutoScroll";
 
+const FOOTER_DATETIME_OPTIONS: Intl.DateTimeFormatOptions = {
+  year: "numeric",
+  month: "2-digit",
+  day: "2-digit",
+  hour: "2-digit",
+  minute: "2-digit",
+  second: "2-digit",
+  hour12: false,
+};
+
 const DashboardPage = () => {
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
   const [isHydrated, setIsHydrated] = useState(false);
@@ -74,7 +84,9 @@ const DashboardPage = () => {
         </p>
         <p>
           Stand:{" "}
-          {isHydrated && currentTime ? currentTime.toLocaleString() : "--"}
+          {isHydrated && currentTime
+            ? currentTime.toLocaleString("de-DE", FOOTER_DATETIME_OPTIONS)
+            : "--"}
         </p>
       </footer>
     </div>

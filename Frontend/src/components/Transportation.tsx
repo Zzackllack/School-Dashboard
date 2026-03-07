@@ -55,6 +55,12 @@ interface DeparturesResponse {
   realtimeDataUpdatedAt?: number;
 }
 
+const GERMAN_TIME_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
+  hour: "2-digit",
+  minute: "2-digit",
+  hour12: false,
+};
+
 const Transportation = () => {
   const [departures, setDepartures] = useState<Departure[]>([]);
   const [sBahnDepartures, setSBahnDepartures] = useState<Departure[]>([]);
@@ -164,7 +170,7 @@ const Transportation = () => {
     setLastUpdated(new Date());
     console.log(
       "Transportation data updated at",
-      new Date().toLocaleTimeString(),
+      new Date().toLocaleTimeString("de-DE", GERMAN_TIME_FORMAT_OPTIONS),
     );
   }, [currentStop, currentSBahnStop, fetchDepartures, fetchSBahnDepartures]);
 
@@ -226,7 +232,7 @@ const Transportation = () => {
   // Format time to display only hours and minutes
   const formatTime = (timeString: string) => {
     const date = new Date(timeString);
-    return date.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    return date.toLocaleTimeString("de-DE", GERMAN_TIME_FORMAT_OPTIONS);
   };
 
   // Get delay in minutes and format it
@@ -420,7 +426,8 @@ const Transportation = () => {
           <code className="bg-gray-100/80 px-1 rounded">
             v6.bvg.transport.rest
           </code>{" "}
-          - Zuletzt aktualisiert: {lastUpdated.toLocaleTimeString()}
+          - Zuletzt aktualisiert:{" "}
+          {lastUpdated.toLocaleTimeString("de-DE", GERMAN_TIME_FORMAT_OPTIONS)}
         </p>
       </div>
     </div>
