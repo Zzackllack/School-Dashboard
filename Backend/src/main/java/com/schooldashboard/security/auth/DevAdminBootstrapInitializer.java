@@ -5,6 +5,9 @@ import com.schooldashboard.security.entity.AppRoleEntity;
 import com.schooldashboard.security.entity.AppUserEntity;
 import com.schooldashboard.security.repository.AppRoleRepository;
 import com.schooldashboard.security.repository.AppUserRepository;
+import java.security.SecureRandom;
+import java.util.Base64;
+import java.util.UUID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.ApplicationArguments;
@@ -20,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class DevAdminBootstrapInitializer implements ApplicationRunner {
 
 	private static final Logger logger = LoggerFactory.getLogger(DevAdminBootstrapInitializer.class);
+	private static final SecureRandom secureRandom = new SecureRandom();
 
 	private final AppUserRepository appUserRepository;
 	private final AppRoleRepository appRoleRepository;
@@ -70,8 +74,12 @@ public class DevAdminBootstrapInitializer implements ApplicationRunner {
 		}
 
 		if (isProdProfile()) {
-			throw new IllegalStateException(
-					"No admin user exists while security.admin.bootstrap.enabled=false in prod profile");
+			if (appUserRepository.count() > 0) {
+				throw new IllegalStateException(
+						"No admin user exists while security.admin.bootstrap.enabled=false in prod profile");
+			}
+			createRandomInitialAdmin(adminRole);
+			return;
 		}
 
 		logger.info("No admin user exists yet. Enable security.admin.bootstrap.* to create one for non-prod usage.");
@@ -151,5 +159,25 @@ public class DevAdminBootstrapInitializer implements ApplicationRunner {
 			return null;
 		}
 		return trimmed;
+	}
+
+	private void createRandomInitialAdmin(AppRoleEntity adminRole) {
+		String username = "admin-" + UUID.randomUUID().toString().substring(0, 8);
+		byte[] passwordBytes = new byte[24];
+		secureRandom.nextBytes(passwordBytes);
+		String rawPassword = Base64.getUrlEncoder().withoutPadding().encodeToString(passwordBytes);
+
+		AppUserEntity adminUser = new AppUserEntity(username, passwordEncoder.encode(rawPassword));
+		adminUser.addRole(adminRole);
+		adminUser.setEnabled(true);
+		adminUser.setLocked(false);
+		adminUser.setFailedLoginCount(0);
+		adminUser.setLockedUntil(null);
+		adminUser.setLastFailedLoginAt(null);
+		appUserRepository.save(adminUser);
+
+		logger.error(
+				"Created one-time initial admin for fresh prod database. username='{}' password='{}'. Rotate immediately and disable this account after creating permanent admins.",
+				username, rawPassword);
 	}
 }
