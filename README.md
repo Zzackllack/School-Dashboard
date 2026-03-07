@@ -181,11 +181,18 @@ Every runtime value is read from environment variables (with safe defaults where
 
  You can override any Spring property using environment variables (Spring Boot relaxed binding).
   Examples:
-  - `DSB_USERNAME` -> `dsb.username`
-  - `DSB_PASSWORD` -> `dsb.password`
-  - `CALENDAR_ICS_URL` -> `calendar.ics-url`
-  - `SPRING_DATASOURCE_URL` -> `spring.datasource.url`
-  - `SERVER_SERVLET_SESSION_COOKIE_SECURE` -> `server.servlet.session.cookie.secure`
+
+- `DSB_USERNAME` -> `dsb.username`
+- `DSB_PASSWORD` -> `dsb.password`
+- `CALENDAR_ICS_URL` -> `calendar.ics-url`
+- `SPRING_DATASOURCE_URL` -> `spring.datasource.url`
+- `SERVER_SERVLET_SESSION_COOKIE_SECURE` -> `server.servlet.session.cookie.secure`
+
+  Session timeout/cookie notes:
+
+- `SECURITY_SESSION_IDLE_TIMEOUT` controls app-level idle invalidation.
+- `SERVER_SERVLET_SESSION_TIMEOUT` optionally sets container session timeout; the shorter timeout effectively applies.
+- If `SECURITY_CORS_ALLOWED_ORIGINS` includes `http://localhost`, set `SERVER_SERVLET_SESSION_COOKIE_SECURE=false` for local HTTP cookie-based auth.
 
 - **Database migrations** – Flyway runs automatically on startup. Migration scripts live under `Backend/src/main/resources/db/migration`. To apply new schema changes, add a `V{next}__description.sql` file and restart the backend.
 

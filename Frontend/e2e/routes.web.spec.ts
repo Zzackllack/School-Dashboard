@@ -402,63 +402,39 @@ test("falls back to setup when stored token is revoked", async ({ page }) => {
   ).toBeVisible();
 });
 
-test("blocks direct /display/:displayId access without a session token", async ({
-  page,
-}) => {
-  await page.route("**/api/displays/session", async (route) => {
-    if (route.request().method() !== "GET") {
-      await route.continue();
-      return;
-    }
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        valid: false,
-        displayId: null,
-        displaySlug: null,
-        assignedProfileId: null,
-        redirectPath: null,
-      }),
+for (const [targetPath, scenarioLabel] of [
+  ["/display/direct-access", "without a session token"],
+  ["/display/revoked-screen", "when token is revoked"],
+]) {
+  test(`blocks direct /display/:displayId access ${scenarioLabel}`, async ({
+    page,
+  }) => {
+    await page.route("**/api/displays/session", async (route) => {
+      if (route.request().method() !== "GET") {
+        await route.continue();
+        return;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          valid: false,
+          displayId: null,
+          displaySlug: null,
+          assignedProfileId: null,
+          redirectPath: null,
+        }),
+      });
     });
+
+    await page.goto(targetPath);
+
+    await expect(page).toHaveURL(/\/setup/);
+    await expect(
+      page.getByRole("heading", { name: "Display Setup" }),
+    ).toBeVisible();
   });
-
-  await page.goto("/display/direct-access");
-
-  await expect(page).toHaveURL(/\/setup/);
-  await expect(
-    page.getByRole("heading", { name: "Display Setup" }),
-  ).toBeVisible();
-});
-
-test("blocks direct /display/:displayId access when token is revoked", async ({
-  page,
-}) => {
-  await page.route("**/api/displays/session", async (route) => {
-    if (route.request().method() !== "GET") {
-      await route.continue();
-      return;
-    }
-    await route.fulfill({
-      status: 200,
-      contentType: "application/json",
-      body: JSON.stringify({
-        valid: false,
-        displayId: null,
-        displaySlug: null,
-        assignedProfileId: null,
-        redirectPath: null,
-      }),
-    });
-  });
-
-  await page.goto("/display/revoked-screen");
-
-  await expect(page).toHaveURL(/\/setup/);
-  await expect(
-    page.getByRole("heading", { name: "Display Setup" }),
-  ).toBeVisible();
-});
+}
 
 test("admin pending page supports approval action", async ({ page }) => {
   let approved = false;

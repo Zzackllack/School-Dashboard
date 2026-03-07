@@ -53,7 +53,7 @@ describe("bootstrap resolver", () => {
     expect(displaySessionModule.setDisplayIdHint).not.toHaveBeenCalled();
   });
 
-  it("routes to setup when session validation fails", async () => {
+  it("propagates error when session validation fails", async () => {
     vi.mocked(displaysApiModule.validateDisplaySession).mockRejectedValue(
       new Error("network error"),
     );

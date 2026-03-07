@@ -30,6 +30,7 @@ function AdminDisplaysPage() {
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [isCredentialSubmitting, setIsCredentialSubmitting] = useState(false);
+  const [isCreatingCode, setIsCreatingCode] = useState(false);
   const [isLoadingDisplays, setIsLoadingDisplays] = useState(true);
   const [displays, setDisplays] = useState<
     Array<{
@@ -79,6 +80,9 @@ function AdminDisplaysPage() {
 
   async function handleCodeCreate(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (isCreatingCode) {
+      return;
+    }
     setStatusMessage(null);
     setCreatedCode(null);
     if (
@@ -95,6 +99,7 @@ function AdminDisplaysPage() {
       return;
     }
 
+    setIsCreatingCode(true);
     try {
       const response = await createEnrollmentCode({
         ttlSeconds,
@@ -110,6 +115,8 @@ function AdminDisplaysPage() {
           ? error.message
           : "Enrollment-Code konnte nicht erstellt werden.",
       );
+    } finally {
+      setIsCreatingCode(false);
     }
   }
 
@@ -305,9 +312,10 @@ function AdminDisplaysPage() {
             <div className="flex items-end">
               <button
                 type="submit"
-                className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white"
+                className="rounded-lg bg-slate-900 px-4 py-2 text-sm font-semibold text-white disabled:opacity-60"
+                disabled={isCreatingCode}
               >
-                Code erstellen
+                {isCreatingCode ? "Wird erstellt..." : "Code erstellen"}
               </button>
             </div>
           </form>
@@ -326,6 +334,8 @@ function AdminDisplaysPage() {
           <h2 className="text-xl font-semibold">Bekannte Displays</h2>
           {isLoadingDisplays ? (
             <p className="mt-3 text-sm text-slate-600">Lade Displays...</p>
+          ) : displayStatusMessage ? (
+            <p className="mt-3 text-sm text-rose-700">{displayStatusMessage}</p>
           ) : displays.length === 0 ? (
             <p className="mt-3 text-sm text-slate-600">
               Keine Displays vorhanden.
@@ -353,9 +363,6 @@ function AdminDisplaysPage() {
               ))}
             </ul>
           )}
-          {displayStatusMessage ? (
-            <p className="mt-3 text-sm text-rose-700">{displayStatusMessage}</p>
-          ) : null}
         </section>
       </section>
     </main>

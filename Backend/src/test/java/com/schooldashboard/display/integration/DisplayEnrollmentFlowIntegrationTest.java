@@ -2,6 +2,7 @@ package com.schooldashboard.display.integration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
@@ -73,16 +74,25 @@ public class DisplayEnrollmentFlowIntegrationTest {
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals("APPROVED", asString(approveResponse, "status"));
 		assertNotNull(asString(approveResponse, "displayId"));
-		assertNotNull(asString(approveResponse, "displaySessionToken"));
+		assertNull(approveResponse.get("displaySessionToken"));
 
-		Map<String, Object> approvedStatusResponse = readMap(
+		MvcResult approvedStatusResult = mockMvc.perform(get("/api/displays/enrollments/{requestId}", requestId))
+				.andExpect(status().isOk()).andReturn();
+		Map<String, Object> approvedStatusResponse = readMap(approvedStatusResult.getResponse().getContentAsString());
+		assertEquals("APPROVED", asString(approvedStatusResponse, "status"));
+		assertNull(approvedStatusResponse.get("displaySessionToken"));
+		String approvedSessionToken = approvedStatusResult.getResponse().getCookie("DISPLAY_SESSION_TOKEN") == null
+				? null
+				: approvedStatusResult.getResponse().getCookie("DISPLAY_SESSION_TOKEN").getValue();
+		assertNotNull(approvedSessionToken);
+		Map<String, Object> approvedStatusSecondPollResponse = readMap(
 				mockMvc.perform(get("/api/displays/enrollments/{requestId}", requestId)).andExpect(status().isOk())
 						.andReturn().getResponse().getContentAsString());
-		assertEquals("APPROVED", asString(approvedStatusResponse, "status"));
+		assertNull(approvedStatusSecondPollResponse.get("displaySessionToken"));
 
 		Map<String, Object> validationResponse = readMap(mockMvc
 				.perform(get("/api/displays/session").header("Authorization",
-						"Bearer " + asString(approveResponse, "displaySessionToken")))
+						"Bearer " + approvedSessionToken))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals(Boolean.TRUE, validationResponse.get("valid"));
 		assertEquals(asString(approveResponse, "displayId"), asString(validationResponse, "displayId"));
@@ -95,7 +105,7 @@ public class DisplayEnrollmentFlowIntegrationTest {
 
 		Map<String, Object> revokedValidationResponse = readMap(mockMvc
 				.perform(get("/api/displays/session").header("Authorization",
-						"Bearer " + asString(approveResponse, "displaySessionToken")))
+						"Bearer " + approvedSessionToken))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals(Boolean.FALSE, revokedValidationResponse.get("valid"));
 
@@ -108,17 +118,16 @@ public class DisplayEnrollmentFlowIntegrationTest {
 
 		Map<String, Object> reactivatedValidationResponse = readMap(mockMvc
 				.perform(get("/api/displays/session").header("Authorization",
-						"Bearer " + asString(approveResponse, "displaySessionToken")))
+						"Bearer " + approvedSessionToken))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
-		assertEquals(Boolean.TRUE, reactivatedValidationResponse.get("valid"));
-		assertEquals(asString(approveResponse, "displayId"), asString(reactivatedValidationResponse, "displayId"));
+		assertEquals(Boolean.FALSE, reactivatedValidationResponse.get("valid"));
 
 		mockMvc.perform(delete("/api/admin/displays/{displayId}", asString(approveResponse, "displayId"))
 				.session(adminSession).with(csrf())).andExpect(status().isNoContent());
 
 		Map<String, Object> deletedValidationResponse = readMap(mockMvc
 				.perform(get("/api/displays/session").header("Authorization",
-						"Bearer " + asString(approveResponse, "displaySessionToken")))
+						"Bearer " + approvedSessionToken))
 				.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
 		assertEquals(Boolean.FALSE, deletedValidationResponse.get("valid"));
 	}

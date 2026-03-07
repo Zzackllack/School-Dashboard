@@ -8,6 +8,7 @@ import com.schooldashboard.security.entity.AppUserEntity;
 import com.schooldashboard.security.repository.AppUserRepository;
 import com.schooldashboard.security.metrics.SecurityMetricsService;
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpSession;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.time.Instant;
@@ -151,6 +152,10 @@ public class AdminAuthController {
 		SecurityContext securityContext = SecurityContextHolder.createEmptyContext();
 		securityContext.setAuthentication(updatedAuthentication);
 		SecurityContextHolder.setContext(securityContext);
+		HttpSession existingSession = servletRequest.getSession(false);
+		if (existingSession != null) {
+			servletRequest.changeSessionId();
+		}
 		securityContextRepository.saveContext(securityContext, servletRequest, servletResponse);
 
 		return ResponseEntity.ok(toAuthStatusResponse(updatedAuthentication));

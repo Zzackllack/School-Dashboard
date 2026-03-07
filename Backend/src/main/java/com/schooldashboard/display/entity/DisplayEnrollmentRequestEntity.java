@@ -37,6 +37,9 @@ public class DisplayEnrollmentRequestEntity {
 	@Column(name = "issued_session_token_hash", length = 128)
 	private String issuedSessionTokenHash;
 
+	@Column(name = "one_time_handoff_token_hash", length = 128)
+	private String oneTimeHandoffTokenHash;
+
 	@Column(name = "approved_by_admin_id", length = 120)
 	private String approvedByAdminId;
 
@@ -119,6 +122,14 @@ public class DisplayEnrollmentRequestEntity {
 
 	public void setIssuedSessionTokenHash(String issuedSessionTokenHash) {
 		this.issuedSessionTokenHash = issuedSessionTokenHash;
+	}
+
+	public String getOneTimeHandoffTokenHash() {
+		return oneTimeHandoffTokenHash;
+	}
+
+	public void setOneTimeHandoffTokenHash(String oneTimeHandoffTokenHash) {
+		this.oneTimeHandoffTokenHash = oneTimeHandoffTokenHash;
 	}
 
 	public String getApprovedByAdminId() {
