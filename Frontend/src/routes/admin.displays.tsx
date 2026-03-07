@@ -7,6 +7,9 @@ function AdminDisplaysLayout() {
 
 export const Route = createFileRoute("/admin/displays")({
   beforeLoad: async () => {
+    if (typeof window === "undefined") {
+      return;
+    }
     const authStatus = await getAdminAuthStatus();
     if (!authStatus.authenticated) {
       throw redirect({ to: "/admin/login" });
