@@ -194,7 +194,7 @@ Every runtime value is read from environment variables (with safe defaults where
 - `SERVER_SERVLET_SESSION_TIMEOUT` optionally sets container session timeout; the shorter timeout effectively applies.
 - If `SECURITY_CORS_ALLOWED_ORIGINS` includes `http://localhost`, set `SERVER_SERVLET_SESSION_COOKIE_SECURE=false` for local HTTP cookie-based auth.
 
-- **Database migrations** – Flyway runs automatically on startup. Migration scripts live under `Backend/src/main/resources/db/migration`. To apply new schema changes, add a `V{next}__description.sql` file and restart the backend.
+- **Database migrations** – Flyway runs automatically on startup. Production PostgreSQL migrations live under `Backend/src/main/resources/db/migration/postgresql`, local H2 migrations under `Backend/src/main/resources/db/migration/h2`. To apply schema changes, add matching `V{next}__description.sql` files and restart the backend.
 
 - **Start the dev server** (hot reload, no jar required)
 
@@ -214,7 +214,7 @@ Every runtime value is read from environment variables (with safe defaults where
   mvn clean package -DskipTests
   ```
 
-  The H2 database persists plan snapshots under `Backend/data/`.
+  The local H2 database persists plan snapshots under `Backend/data/`.
 
 ### Backend API Endpoints
 
@@ -314,12 +314,30 @@ Cloudflare-managed build/deploy (Workers Builds):
 1. **Configure the Backend**:
 
 - Provide required credentials through environment variables (e.g. add a `.env` file in the `Docker/` directory or inject values in your CI/CD system). Typical variables include `DSB_USERNAME`, `DSB_PASSWORD`, and any optional Spring overrides.
-- Persistent storage for the H2 database is already wired via the `backend-data` volume (mounted at `/data`). Create regular backups of this volume if the substitution history is important for you.
-- If you upgraded from Spring Boot 2.x to 3.x, H2 requires a one-time file format migration. Set `H2_MIGRATE_ON_STARTUP=true` for the backend container to auto-migrate the file on startup (creates a `.bak` and `.sql` export in `/data`).
+- Configure PostgreSQL connectivity for backend:
+  - `SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/school_dashboard`
+  - `SPRING_DATASOURCE_USERNAME=school_dashboard`
+  - `SPRING_DATASOURCE_PASSWORD=<strong-password>`
+  - `SPRING_FLYWAY_LOCATIONS=classpath:db/migration/postgresql`
+- Persistent storage for PostgreSQL is wired via the `postgres-data` volume. Create regular backups of that volume (or pg dumps).
 
 2. **Configure the Frontend**:
 
 - Set `BACKEND_URL` for the frontend runtime (for example `http://backend:8080` in Docker Compose). The TanStack Start server routes under `/api/*` forward requests to this backend origin.
+
+3. **Optional: import legacy H2 data into PostgreSQL**:
+
+- For legacy backups, run:
+
+  ```bash
+  PG_URL="postgresql://localhost:5432/school_dashboard" \
+  PG_USER="school_dashboard" \
+  PG_PASSWORD="<strong-password>" \
+  H2_PASSWORD="" \
+  ./scripts/prod/import-h2-legacy-to-postgres.bash Backend/data/backup/20260307-181933
+  ```
+
+- The script imports `SUBSTITUTION_PLAN_DOCUMENTS` and (if present) `API_RESPONSE_CACHE`.
 
 ### Deployment Steps
 
@@ -351,22 +369,6 @@ Cloudflare-managed build/deploy (Workers Builds):
 2. **Access the Application**:
 
   Open your browser and navigate to the domain or IP address where your application is deployed.
-
-### HTTPS Configuration (Optional)
-
-If you need HTTPS, you can configure Traefik (or another reverse proxy) to handle SSL termination. Here’s an example using Traefik labels in your `docker-compose.yaml`:
-
-```yaml
-frontend:
-  # ... other configurations ...
-  labels:
-  - "traefik.enable=true"
-  - "traefik.http.routers.school-dashboard-secure.rule=Host(`your-domain.com`)"
-  - "traefik.http.routers.school-dashboard-secure.entrypoints=https"
-  - "traefik.http.routers.school-dashboard-secure.tls.certresolver=letsencrypt"
-```
-
-Make sure Traefik is properly configured to use Let's Encrypt for SSL certificate generation.
 
 ---
 

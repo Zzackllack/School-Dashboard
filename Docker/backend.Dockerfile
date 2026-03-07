@@ -25,10 +25,12 @@ RUN apk add --no-cache su-exec=~0.3 \
 COPY Docker/backend-entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
-VOLUME /data
 EXPOSE 8080
 
-ENV SPRING_DATASOURCE_URL=jdbc:h2:file:/data/substitution-plans;DB_CLOSE_DELAY=-1 \
+ENV SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/school_dashboard \
+    SPRING_DATASOURCE_USERNAME=school_dashboard \
+    SPRING_DATASOURCE_PASSWORD=change-me \
+    SPRING_FLYWAY_LOCATIONS=classpath:db/migration/postgresql \
     SPRING_PROFILES_ACTIVE=prod \
     SERVER_SERVLET_SESSION_COOKIE_SECURE=true \
     JAVA_OPTS=""

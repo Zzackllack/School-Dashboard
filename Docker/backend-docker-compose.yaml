@@ -1,24 +1,42 @@
 version: '3.8'
 
 services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: school-dashboard-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: "${POSTGRES_DB:-school_dashboard}"
+      POSTGRES_USER: "${POSTGRES_USER:-school_dashboard}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD:-change-me}"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-school_dashboard} -d ${POSTGRES_DB:-school_dashboard}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   backend:
     build:
       context: ..
       dockerfile: Docker/backend.Dockerfile
     container_name: school-dashboard-backend
     restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
     environment:
       SERVER_SERVLET_SESSION_COOKIE_SECURE: "true"
-      SPRING_DATASOURCE_USERNAME: sa
-      SPRING_DATASOURCE_PASSWORD: ""
-      H2_MIGRATE_ON_STARTUP: "false"
+      SPRING_DATASOURCE_URL: "jdbc:postgresql://postgres:5432/${POSTGRES_DB:-school_dashboard}"
+      SPRING_DATASOURCE_USERNAME: "${POSTGRES_USER:-school_dashboard}"
+      SPRING_DATASOURCE_PASSWORD: "${POSTGRES_PASSWORD:-change-me}"
+      SPRING_FLYWAY_LOCATIONS: "classpath:db/migration/postgresql"
       # Uncomment and supply credentials for production use
       # DSB_USERNAME: your-user
       # DSB_PASSWORD: your-pass
     # ports: - Uncomment to expose the backend service (not needed if using a reverse proxy)
     #  - "8080:8080"
-    volumes:
-      - backend-data:/data
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/health || exit 1"]
       interval: 30s
@@ -27,4 +45,4 @@ services:
       start_period: 40s
 
 volumes:
-  backend-data:
+  postgres-data:
