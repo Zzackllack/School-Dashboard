@@ -1,9 +1,5 @@
-import {
-  lineBadgeCls,
-  minsUntil,
-  ModuleHeader,
-  useTransport,
-} from "../BrutalistHighDensityTheme";
+import { ModuleHeader } from "../ModuleHeader";
+import { lineBadgeCls, minsUntil, useTransport } from "../themeShared";
 
 // ─── Transport module ─────────────────────────────────────────────────────────────
 export function TransportModule() {

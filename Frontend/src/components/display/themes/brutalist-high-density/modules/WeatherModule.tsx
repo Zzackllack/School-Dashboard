@@ -1,10 +1,5 @@
-import {
-  ModuleHeader,
-  nearestHourIdx,
-  useWeather,
-  weatherDesc,
-  weatherSymbol,
-} from "../BrutalistHighDensityTheme";
+import { ModuleHeader } from "../ModuleHeader";
+import { nearestHourIdx, useWeather, weatherDesc, weatherSymbol } from "../themeShared";
 
 // ─── Weather module ───────────────────────────────────────────────────────────────
 export function WeatherModule() {

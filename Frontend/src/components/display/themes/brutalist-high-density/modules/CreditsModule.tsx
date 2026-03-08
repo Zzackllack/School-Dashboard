@@ -1,4 +1,4 @@
-import { ModuleHeader } from "../BrutalistHighDensityTheme";
+import { ModuleHeader } from "../ModuleHeader";
 
 // ─── Credits module ───────────────────────────────────────────────────────────────
 export function CreditsModule() {

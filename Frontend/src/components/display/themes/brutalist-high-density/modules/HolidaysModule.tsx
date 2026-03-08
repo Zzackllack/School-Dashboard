@@ -1,7 +1,7 @@
-import { ModuleHeader } from "../BrutalistHighDensityTheme";
+import { ModuleHeader } from "../ModuleHeader";
 import { useMemo } from "react";
 import holidaysData from "../../../../../assets/holidays.json";
-import { daysUntil } from "../utils/daysUntil";
+import { daysUntil } from "../themeShared";
 
 interface HolidayEntry {
   name: string;

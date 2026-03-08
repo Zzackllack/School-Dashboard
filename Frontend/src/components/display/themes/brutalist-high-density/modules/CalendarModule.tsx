@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
-import { daysUntil } from "../utils/daysUntil";
-import { ModuleHeader } from "../BrutalistHighDensityTheme";
+import { daysUntil } from "../themeShared";
+import { ModuleHeader } from "../ModuleHeader";
 import {
   calendarEventsQueryOptions,
   type CalendarEvent,
@@ -42,7 +42,7 @@ export function CalendarModule() {
                     : `${days}d`;
             return (
               <div key={i} className="flex items-start gap-2.5 px-3 py-2">
-                <div className="shrink-0 bg-black px-2 py-1 text-center min-w-[2.25rem]">
+                <div className="shrink-0 bg-black px-2 py-1 text-center min-w-9">
                   <span className="block font-mono text-[9px] font-black uppercase text-white/50">
                     {start
                       .toLocaleDateString("de-DE", { month: "short" })
