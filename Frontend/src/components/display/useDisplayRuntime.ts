@@ -9,6 +9,7 @@ export function useDisplayRuntime() {
 
   useEffect(() => {
     setIsHydrated(true);
+    setCurrentTime(new Date());
 
     const clockTimer = setInterval(() => {
       setCurrentTime(new Date());

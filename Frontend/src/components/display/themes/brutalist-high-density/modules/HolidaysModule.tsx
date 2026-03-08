@@ -24,7 +24,12 @@ export function HolidaysModule() {
     const data = holidaysData as Record<string, HolidayEntry[]>;
     const yr = now.getFullYear();
     return [...(data[yr] ?? []), ...(data[yr + 1] ?? [])]
-      .filter((h) => h.end && new Date(h.end) >= now)
+      .filter((h) => {
+        if (!h.end) return false;
+        const endOfDay = new Date(h.end);
+        endOfDay.setHours(23, 59, 59, 999);
+        return endOfDay >= now;
+      })
       .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
       .slice(0, 3);
   }, []);
@@ -41,7 +46,7 @@ export function HolidaysModule() {
       className="shrink-0 border-b-2 border-black"
       data-testid="module-holidays"
     >
-      <ModuleHeader title="Schulferien" />
+      <ModuleHeader title="Nächste Schulferien" />
       {!next ? (
         <div className="px-3 py-3 font-mono text-[11px] text-black/40">
           Keine Feriendaten

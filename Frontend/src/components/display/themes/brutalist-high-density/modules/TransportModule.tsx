@@ -13,7 +13,7 @@ export function TransportModule() {
       className="shrink-0 border-b-2 border-black"
       data-testid="module-transport"
     >
-      <ModuleHeader title="Abfahrten" sub={stopName || undefined} live />
+      <ModuleHeader title="Öffentliche Verkehrsmittel" sub={stopName || undefined} live />
       {loading && departures.length === 0 ? (
         <div className="px-3 py-4 font-mono text-[11px] uppercase tracking-wide text-black/40">
           Lade Abfahrten…

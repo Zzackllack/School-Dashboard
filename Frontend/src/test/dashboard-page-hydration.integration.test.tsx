@@ -22,7 +22,7 @@ vi.mock("../components/Weather", () => ({ default: () => <div>Weather</div> }));
 vi.mock("../hooks/useAutoScroll", () => ({ default: () => undefined }));
 
 describe("DashboardPage hydration", () => {
-  it("hydrates without mismatch and starts the client clock after mount", async () => {
+  it("hydrates without mismatch and initializes the client clock on mount", async () => {
     let root: ReturnType<typeof hydrateRoot> | null = null;
     let consoleErrorSpy: ReturnType<typeof vi.spyOn> | null = null;
 
@@ -42,10 +42,8 @@ describe("DashboardPage hydration", () => {
 
       await act(async () => {});
 
-      expect(
-        container.querySelector('[data-testid="clock-placeholder"]'),
-      ).not.toBeNull();
-      expect(container.textContent).toContain("Stand: --");
+      expect(container.querySelector('[data-testid="clock-time"]')).not.toBeNull();
+      expect(container.textContent).not.toContain("Stand: --");
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(1_000);

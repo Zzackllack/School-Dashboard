@@ -56,6 +56,7 @@ export function WeatherModule() {
           {(() => {
             const base = nearestHourIdx(data.hourly.time);
             const slots = [1, 2, 3].map((o) => ({
+              id: base + o,
               time: data.hourly.time[base + o]
                 ? new Date(data.hourly.time[base + o]).toLocaleTimeString(
                     "de-DE",
@@ -67,7 +68,7 @@ export function WeatherModule() {
             return (
               <div className="mt-3 grid grid-cols-3 gap-1 border-t border-black/10 pt-2">
                 {slots.map((s) => (
-                  <div key={s.time} className="text-center">
+                  <div key={s.id} className="text-center">
                     <div className="font-mono text-[9px] text-black/40">
                       {s.time}
                     </div>

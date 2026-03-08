@@ -48,8 +48,15 @@ export function resolveDisplayTheme(themeId: string | null | undefined) {
     `Unknown display theme id '${normalizedThemeId}', falling back to '${DEFAULT_DISPLAY_THEME_ID}'.`,
   );
 
+  const defaultTheme = DISPLAY_THEME_REGISTRY_MAP.get(DEFAULT_DISPLAY_THEME_ID);
+  if (!defaultTheme) {
+    throw new Error(
+      `Default display theme '${DEFAULT_DISPLAY_THEME_ID}' is not registered.`,
+    );
+  }
+
   return {
-    theme: DISPLAY_THEME_REGISTRY_MAP.get(DEFAULT_DISPLAY_THEME_ID)!,
+    theme: defaultTheme,
     fallbackUsed: true,
     requestedThemeId: normalizedThemeId,
   };

@@ -582,8 +582,9 @@ test("admin can switch display theme and display route keeps module parity", asy
   page,
 }) => {
   let selectedThemeId = "default";
+  const expectedCsrfToken = "csrf-test-token";
 
-  await page.route("**/api/admin/displays/display-1", async (route) => {
+  await page.route("**/api/admin/displays/display-1*", async (route) => {
     if (route.request().method() === "GET") {
       await route.fulfill({
         status: 200,
@@ -603,6 +604,16 @@ test("admin can switch display theme and display route keeps module parity", asy
     }
 
     if (route.request().method() === "PATCH") {
+      const csrfHeader = route.request().headers()["x-csrf-token"];
+      if (csrfHeader !== expectedCsrfToken) {
+        await route.fulfill({
+          status: 403,
+          contentType: "application/json",
+          body: JSON.stringify({ message: "Invalid CSRF token" }),
+        });
+        return;
+      }
+
       const payload = route.request().postDataJSON() as { themeId?: string };
       if (payload.themeId) {
         selectedThemeId = payload.themeId;

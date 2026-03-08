@@ -76,25 +76,21 @@ function getTypeBadge(type: string): { label: string; variant: BadgeVariant } {
   return { label: type.toUpperCase(), variant: "gray" };
 }
 
-function getGradeNum(classes: string): number | null {
-  const parts = classes
-    .trim()
-    .split(/[,;\s]+/)
-    .filter(Boolean);
-  for (const p of parts) {
-    const n = parseInt(p.replace(/\D/g, ""), 10);
-    if (!isNaN(n) && n >= 5 && n <= 13) return n;
-  }
-  return null;
+function getGradeNums(classes: string | null | undefined): number[] {
+  if (!classes) return [];
+  return (classes.match(/\d+/g) ?? [])
+    .map((token) => Number.parseInt(token, 10))
+    .filter((n) => Number.isInteger(n) && n >= 5 && n <= 13);
 }
 
 function filterByGrades(
   entries: SubstitutionEntry[],
   grades: readonly number[],
 ): SubstitutionEntry[] {
+  const gradeSet = new Set(grades);
   return entries.filter((e) => {
-    const g = getGradeNum(e.classes);
-    return g !== null && (grades as number[]).includes(g);
+    const parsedGrades = getGradeNums(e.classes);
+    return parsedGrades.some((grade) => gradeSet.has(grade));
   });
 }
 
@@ -370,6 +366,7 @@ export function BrutalistHighDensityTheme({ displayId }: DisplayThemeProps) {
       <div className="flex min-h-0 flex-1">
         {/* Grade columns – 70% */}
         <section className="flex min-h-0 flex-1 overflow-hidden border-r-4 border-black">
+          <h2 className="sr-only">Vertretungspläne</h2>
           {GRADE_COLUMNS.map((col, idx) => (
             <GradeColumn
               key={col.id}

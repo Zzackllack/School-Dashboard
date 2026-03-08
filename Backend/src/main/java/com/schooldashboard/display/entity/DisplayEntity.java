@@ -83,6 +83,9 @@ public class DisplayEntity {
 	@PreUpdate
 	@SuppressWarnings("unused")
 	void onUpdate() {
+		if (themeId == null || themeId.isBlank()) {
+			themeId = "default";
+		}
 		updatedAt = Instant.now();
 	}
 
@@ -135,7 +138,7 @@ public class DisplayEntity {
 	}
 
 	public void setThemeId(String themeId) {
-		this.themeId = themeId;
+		this.themeId = (themeId == null || themeId.isBlank()) ? "default" : themeId;
 	}
 
 	public Instant getCreatedAt() {

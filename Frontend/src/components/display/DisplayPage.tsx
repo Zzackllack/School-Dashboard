@@ -1,4 +1,5 @@
 import { useParams } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { resolveDisplayTheme } from "#/components/display/themes/registry";
 
 interface DisplayPageProps {
@@ -7,7 +8,7 @@ interface DisplayPageProps {
 
 export function DisplayPage({ themeId }: DisplayPageProps) {
   const { displayId } = useParams({ from: "/display/$displayId" });
-  const resolvedTheme = resolveDisplayTheme(themeId);
+  const resolvedTheme = useMemo(() => resolveDisplayTheme(themeId), [themeId]);
   const ThemeRenderer = resolvedTheme.theme.Renderer;
 
   return (
