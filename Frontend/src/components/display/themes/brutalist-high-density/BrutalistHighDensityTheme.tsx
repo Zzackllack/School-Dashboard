@@ -2,14 +2,16 @@ import Clock from "#/components/Clock";
 import type { DisplayThemeProps } from "#/components/display/themes/types";
 import { useDisplayRuntime } from "#/components/display/useDisplayRuntime";
 import {
-  calendarEventsQueryOptions,
   substitutionPlansQueryOptions,
-  type CalendarEvent,
   type SubstitutionEntry,
 } from "#/lib/api/dashboard";
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import holidaysData from "../../../../assets/holidays.json";
+import { CreditsModule } from "./modules/CreditsModule";
+import { TransportModule } from "./modules/TransportModule";
+import { WeatherModule } from "./modules/WeatherModule";
+import { HolidaysModule } from "./modules/HolidaysModule";
+import { CalendarModule } from "./modules/CalendarModule";
 
 // ─── Constants ──────────────────────────────────────────────────────────────────
 
@@ -28,9 +30,9 @@ const FOOTER_OPTIONS: Intl.DateTimeFormatOptions = {
 };
 
 const GRADE_COLUMNS = [
-  { id: "07-08", label: "07—08", color: "bg-[#FFD60A]", grades: [7, 8] },
-  { id: "09-10", label: "09—10", color: "bg-[#32D74B]", grades: [9, 10] },
-  { id: "11-12", label: "11—12", color: "bg-[#FF9F0A]", grades: [11, 12] },
+  { id: "07-08", label: "07-08", color: "bg-[#FFD60A]", grades: [7, 8] },
+  { id: "09-10", label: "09-10", color: "bg-[#32D74B]", grades: [9, 10] },
+  { id: "11-12", label: "11-12", color: "bg-[#FF9F0A]", grades: [11, 12] },
 ] as const;
 
 // ─── Types ───────────────────────────────────────────────────────────────────────
@@ -67,13 +69,6 @@ interface BvgDeparture {
   when: string | null;
   plannedWhen: string;
   delay: number | null;
-}
-
-interface HolidayEntry {
-  name: string;
-  start: string;
-  end: string;
-  type: string;
 }
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────────
@@ -140,7 +135,7 @@ function filterByGrades(
   });
 }
 
-function weatherDesc(code: number): string {
+export function weatherDesc(code: number): string {
   if (code === 0) return "Klarer Himmel";
   if (code === 1) return "Überwiegend klar";
   if (code === 2) return "Teilweise bewölkt";
@@ -155,7 +150,7 @@ function weatherDesc(code: number): string {
   return "Unbekannt";
 }
 
-function weatherSymbol(code: number): string {
+export function weatherSymbol(code: number): string {
   if (code === 0) return "☀";
   if (code === 1) return "🌤";
   if (code === 2) return "⛅";
@@ -170,7 +165,7 @@ function weatherSymbol(code: number): string {
   return "○";
 }
 
-function lineBadgeCls(product: string): string {
+export function lineBadgeCls(product: string): string {
   switch (product) {
     case "suburban":
       return "bg-[#009252] text-white";
@@ -189,27 +184,12 @@ function lineBadgeCls(product: string): string {
   }
 }
 
-function minsUntil(isoOrNull: string | null): number {
+export function minsUntil(isoOrNull: string | null): number {
   if (!isoOrNull) return 0;
   return Math.ceil((new Date(isoOrNull).getTime() - Date.now()) / 60_000);
 }
 
-function daysUntil(dateStr: string): number {
-  const now = new Date();
-  now.setHours(0, 0, 0, 0);
-  const d = new Date(dateStr);
-  d.setHours(0, 0, 0, 0);
-  return Math.ceil((d.getTime() - now.getTime()) / 86_400_000);
-}
-
-function fmtHolidayName(name: string): string {
-  return name
-    .replace(/\s+(berlin|hamburg|bremen|sachsen|nrw)$/i, "")
-    .trim()
-    .replace(/^\w/, (c) => c.toUpperCase());
-}
-
-function nearestHourIdx(times: string[]): number {
+export function nearestHourIdx(times: string[]): number {
   const now = new Date();
   const hourStr = `${now.toISOString().substring(0, 13)}:00`;
   const exact = times.indexOf(hourStr);
@@ -299,7 +279,7 @@ function useContainerAutoScroll(
 
 // ─── Data hooks ───────────────────────────────────────────────────────────────────
 
-function useWeather() {
+export function useWeather() {
   return useQuery<WeatherApiResponse>({
     queryKey: ["weather-bru", SCHOOL_LAT, SCHOOL_LNG],
     queryFn: async () => {
@@ -321,7 +301,7 @@ function useWeather() {
   });
 }
 
-function useTransport() {
+export function useTransport() {
   const [stop, setStop] = useState<BvgStop | null>(null);
   const [departures, setDepartures] = useState<BvgDeparture[]>([]);
   const [loading, setLoading] = useState(false);
@@ -393,7 +373,7 @@ function LiveDot() {
   );
 }
 
-function ModuleHeader({
+export function ModuleHeader({
   title,
   sub,
   live,
@@ -495,7 +475,7 @@ function SubstCard({ entry }: { entry: SubstitutionEntry }) {
           </span>
         )}
         {hasComment && (
-          <span className="font-mono text-[11px] italic text-black/35 truncate max-w-[12rem]">
+          <span className="font-mono text-[11px] italic text-black/35 truncate max-w-48">
             {entry.comment}
           </span>
         )}
@@ -560,343 +540,6 @@ function GradeColumn({
             />
           ))
         )}
-      </div>
-    </div>
-  );
-}
-
-// ─── Weather module ───────────────────────────────────────────────────────────────
-
-function WeatherModule() {
-  const { data, isLoading } = useWeather();
-
-  return (
-    <div
-      className="shrink-0 border-b-2 border-black"
-      data-testid="module-weather"
-    >
-      <ModuleHeader title="Wetter" live />
-      {isLoading || !data ? (
-        <div className="px-3 py-4 font-mono text-[11px] uppercase tracking-wide text-black/40">
-          {isLoading ? "Lade Wetterdaten…" : "Keine Wetterdaten"}
-        </div>
-      ) : (
-        <div className="px-3 py-3">
-          {/* Current */}
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <div
-                className="font-black leading-none tracking-tighter"
-                style={{ fontSize: "clamp(2.5rem, 4vw, 3rem)" }}
-              >
-                {Math.round(data.current_weather.temperature)}°
-              </div>
-              <div className="mt-1 font-mono text-xs uppercase tracking-wide text-black/60">
-                {weatherDesc(data.current_weather.weathercode)}
-              </div>
-              <div className="mt-0.5 font-mono text-[10px] text-black/40">
-                Wind {Math.round(data.current_weather.windspeed)}&thinsp;km/h
-                {(() => {
-                  const idx = nearestHourIdx(data.hourly.time);
-                  const hum = data.hourly.relativehumidity_2m[idx];
-                  return hum !== undefined ? ` · Feuchte ${hum}%` : "";
-                })()}
-              </div>
-            </div>
-            <span
-              className="text-4xl leading-none"
-              role="img"
-              aria-label={weatherDesc(data.current_weather.weathercode)}
-            >
-              {weatherSymbol(data.current_weather.weathercode)}
-            </span>
-          </div>
-
-          {/* 3-hour forecast */}
-          {(() => {
-            const base = nearestHourIdx(data.hourly.time);
-            const slots = [1, 2, 3].map((o) => ({
-              time: data.hourly.time[base + o]
-                ? new Date(data.hourly.time[base + o]).toLocaleTimeString(
-                    "de-DE",
-                    { hour: "2-digit", minute: "2-digit" },
-                  )
-                : "--:--",
-              temp: data.hourly.temperature_2m[base + o],
-            }));
-            return (
-              <div className="mt-3 grid grid-cols-3 gap-1 border-t border-black/10 pt-2">
-                {slots.map((s) => (
-                  <div key={s.time} className="text-center">
-                    <div className="font-mono text-[9px] text-black/40">
-                      {s.time}
-                    </div>
-                    <div className="font-black text-sm">
-                      {s.temp !== undefined ? `${Math.round(s.temp)}°` : "—"}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            );
-          })()}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Transport module ─────────────────────────────────────────────────────────────
-
-function TransportModule() {
-  const { stopName, departures, loading } = useTransport();
-  const upcoming = departures
-    .filter((d) => minsUntil(d.when ?? d.plannedWhen) >= -1)
-    .slice(0, 8);
-
-  return (
-    <div
-      className="shrink-0 border-b-2 border-black"
-      data-testid="module-transport"
-    >
-      <ModuleHeader title="Abfahrten" sub={stopName || undefined} live />
-      {loading && departures.length === 0 ? (
-        <div className="px-3 py-4 font-mono text-[11px] uppercase tracking-wide text-black/40">
-          Lade Abfahrten…
-        </div>
-      ) : upcoming.length === 0 ? (
-        <div className="px-3 py-3 font-mono text-[11px] uppercase tracking-wide text-black/40">
-          Keine Abfahrten verfügbar
-        </div>
-      ) : (
-        <div className="divide-y divide-black/10">
-          {upcoming.map((dep, i) => {
-            const mins = minsUntil(dep.when ?? dep.plannedWhen);
-            const delay = dep.delay ? Math.round(dep.delay / 60) : 0;
-            return (
-              <div
-                key={`${dep.tripId}-${i}`}
-                className="flex items-center gap-2 px-3 py-1.5"
-              >
-                <span
-                  className={`shrink-0 min-w-[2.8rem] px-1.5 py-0.5 text-center font-mono text-[10px] font-black tracking-wide ${lineBadgeCls(dep.line.product)}`}
-                >
-                  {dep.line.name}
-                </span>
-                <span className="min-w-0 flex-1 truncate font-mono text-[11px] text-black/65">
-                  {dep.direction}
-                </span>
-                <span
-                  className={`shrink-0 font-black text-sm tabular-nums ${delay > 0 ? "text-red-600" : ""}`}
-                >
-                  {mins <= 0 ? "JETZT" : `${mins}`}
-                </span>
-                <span className="shrink-0 font-mono text-[9px] text-black/40 w-5 text-right">
-                  {mins > 0 ? "MIN" : ""}
-                </span>
-                {delay > 0 && (
-                  <span className="shrink-0 font-mono text-[9px] text-red-400">
-                    +{delay}'
-                  </span>
-                )}
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Calendar events module ───────────────────────────────────────────────────────
-
-function CalendarModule() {
-  const { data: events = [], isLoading } = useQuery(
-    calendarEventsQueryOptions(6),
-  );
-
-  return (
-    <div
-      className="shrink-0 border-b-2 border-black"
-      data-testid="module-calendar"
-    >
-      <ModuleHeader title="Kommende Termine" />
-      {isLoading ? (
-        <div className="px-3 py-4 font-mono text-[11px] uppercase tracking-wide text-black/40">
-          Lade Termine…
-        </div>
-      ) : events.length === 0 ? (
-        <div className="px-3 py-3 font-mono text-[11px] uppercase tracking-wide text-black/40">
-          Keine Termine vorhanden
-        </div>
-      ) : (
-        <div className="divide-y divide-black/10">
-          {(events as CalendarEvent[]).map((ev, i) => {
-            const start = new Date(ev.startDate * 1_000);
-            const days = daysUntil(start.toISOString().split("T")[0]);
-            const dayLabel =
-              days === 0
-                ? "Heute"
-                : days === 1
-                  ? "Morgen"
-                  : days < 0
-                    ? "Läuft"
-                    : `${days}d`;
-            return (
-              <div key={i} className="flex items-start gap-2.5 px-3 py-2">
-                <div className="shrink-0 bg-black px-2 py-1 text-center min-w-[2.25rem]">
-                  <span className="block font-mono text-[9px] font-black uppercase text-white/50">
-                    {start
-                      .toLocaleDateString("de-DE", { month: "short" })
-                      .toUpperCase()
-                      .replace(".", "")}
-                  </span>
-                  <span className="block font-black text-base leading-none text-white">
-                    {start.getDate()}
-                  </span>
-                </div>
-                <div className="min-w-0 flex-1">
-                  <div className="font-semibold text-xs leading-tight text-black line-clamp-2">
-                    {ev.summary}
-                  </div>
-                  <div className="mt-0.5 font-mono text-[10px] text-black/40">
-                    {start.toLocaleDateString("de-DE", {
-                      day: "2-digit",
-                      month: "2-digit",
-                    })}{" "}
-                    · {dayLabel}
-                  </div>
-                </div>
-              </div>
-            );
-          })}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Holidays module ──────────────────────────────────────────────────────────────
-
-function HolidaysModule() {
-  const holidays = useMemo(() => {
-    const now = new Date();
-    const data = holidaysData as Record<string, HolidayEntry[]>;
-    const yr = now.getFullYear();
-    return [...(data[yr] ?? []), ...(data[yr + 1] ?? [])]
-      .filter((h) => h.end && new Date(h.end) >= now)
-      .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
-      .slice(0, 3);
-  }, []);
-
-  const next = holidays[0];
-  const days = next ? daysUntil(next.start) : null;
-  const pct =
-    days !== null && days > 0
-      ? Math.max(0, Math.min(100, ((60 - days) / 60) * 100))
-      : null;
-
-  return (
-    <div
-      className="shrink-0 border-b-2 border-black"
-      data-testid="module-holidays"
-    >
-      <ModuleHeader title="Schulferien" />
-      {!next ? (
-        <div className="px-3 py-3 font-mono text-[11px] text-black/40">
-          Keine Feriendaten
-        </div>
-      ) : (
-        <div className="px-3 py-3">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <div className="font-black text-sm uppercase tracking-tight">
-                {fmtHolidayName(next.name)}
-              </div>
-              <div className="mt-0.5 font-mono text-[10px] text-black/40">
-                {new Date(next.start).toLocaleDateString("de-DE", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                })}
-                {" – "}
-                {new Date(next.end).toLocaleDateString("de-DE", {
-                  day: "2-digit",
-                  month: "2-digit",
-                  year: "numeric",
-                })}
-              </div>
-            </div>
-            {days !== null && (
-              <div className="shrink-0 text-right">
-                <div
-                  className="font-black leading-none"
-                  style={{ fontSize: "clamp(1.5rem, 2.5vw, 2rem)" }}
-                >
-                  {days <= 0 ? "Jetzt" : days}
-                </div>
-                {days > 0 && (
-                  <div className="font-mono text-[9px] uppercase text-black/40">
-                    Tage
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {pct !== null && days !== null && days > 0 && (
-            <div className="mt-2">
-              <div className="h-1.5 w-full bg-black/10">
-                <div className="h-full bg-black" style={{ width: `${pct}%` }} />
-              </div>
-              <p className="mt-0.5 font-mono text-[9px] text-black/30">
-                Noch {days} {days === 1 ? "Tag" : "Tage"}
-              </p>
-            </div>
-          )}
-
-          {holidays.length > 1 && (
-            <div className="mt-2 space-y-0.5 border-t border-black/10 pt-2">
-              {holidays.slice(1).map((h) => (
-                <div
-                  key={h.name + h.start}
-                  className="flex justify-between font-mono text-[10px] text-black/40"
-                >
-                  <span>{fmtHolidayName(h.name)}</span>
-                  <span>
-                    {new Date(h.start).toLocaleDateString("de-DE", {
-                      day: "2-digit",
-                      month: "2-digit",
-                    })}
-                  </span>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
-      )}
-    </div>
-  );
-}
-
-// ─── Credits module ───────────────────────────────────────────────────────────────
-
-function CreditsModule() {
-  return (
-    <div className="shrink-0" data-testid="module-credits">
-      <ModuleHeader title="System" />
-      <div className="px-3 py-3">
-        <p className="font-mono text-[10px] uppercase tracking-wide text-black/50 leading-relaxed">
-          Entwickelt mit ♥ von{" "}
-          <span className="font-black text-black">Cédric</span> &amp; dem
-          Informatik‑LK&thinsp;24/26
-        </p>
-        <div className="mt-2 flex items-center gap-2">
-          <div className="h-px flex-1 bg-black/10" />
-          <span className="font-mono text-[9px] uppercase tracking-widest text-black/20">
-            GGL · Lichterfelde
-          </span>
-          <div className="h-px flex-1 bg-black/10" />
-        </div>
       </div>
     </div>
   );
