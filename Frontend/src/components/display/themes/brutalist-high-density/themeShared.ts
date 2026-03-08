@@ -100,7 +100,6 @@ export function daysUntil(dateStr: string): number {
   return Math.ceil((d.getTime() - now.getTime()) / 86_400_000);
 }
 
-
 export function nearestHourIdx(times: string[]): number {
   const now = new Date();
   const hourStr = `${now.toISOString().substring(0, 13)}:00`;

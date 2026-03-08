@@ -6,11 +6,10 @@ const getDisplayMock = vi.fn();
 const updateDisplayMock = vi.fn();
 
 vi.mock("@tanstack/react-router", () => ({
-  createFileRoute: () =>
-    (config: { component: unknown }) => ({
-      ...config,
-      useParams: () => ({ displayId: "display-1" }),
-    }),
+  createFileRoute: () => (config: { component: unknown }) => ({
+    ...config,
+    useParams: () => ({ displayId: "display-1" }),
+  }),
   useNavigate: () => vi.fn(),
 }));
 

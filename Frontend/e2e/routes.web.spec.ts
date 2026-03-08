@@ -646,15 +646,17 @@ test("admin can switch display theme and display route keeps module parity", asy
   await page.waitForLoadState("networkidle");
   await page.getByLabel("Theme").selectOption("brutalist-high-density");
   await page.getByRole("button", { name: "Änderungen speichern" }).click();
-  await expect(page.getByText("Display erfolgreich aktualisiert.")).toBeVisible();
+  await expect(
+    page.getByText("Display erfolgreich aktualisiert."),
+  ).toBeVisible();
 
   await page.goto("/display/display-1");
   await expect(page.getByText("Display: display-1")).toBeVisible();
-  await expect(
-    page.getByTestId("theme-brutalist-high-density"),
-  ).toBeVisible();
+  await expect(page.getByTestId("theme-brutalist-high-density")).toBeVisible();
 
-  await expect(page.getByRole("heading", { name: "Vertretungspläne" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Vertretungspläne" }),
+  ).toBeVisible();
   await expect(page.getByRole("heading", { name: "Wetter" })).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Öffentliche Verkehrsmittel" }),

@@ -1,5 +1,10 @@
 import { ModuleHeader } from "../ModuleHeader";
-import { nearestHourIdx, useWeather, weatherDesc, weatherSymbol } from "../themeShared";
+import {
+  nearestHourIdx,
+  useWeather,
+  weatherDesc,
+  weatherSymbol,
+} from "../themeShared";
 
 // ─── Weather module ───────────────────────────────────────────────────────────────
 export function WeatherModule() {

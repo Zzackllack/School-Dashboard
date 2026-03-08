@@ -28,7 +28,9 @@ describe("display theme registry", () => {
   it("keeps registry entries in sync with renderer map", () => {
     expect(DISPLAY_THEME_REGISTRY.length).toBeGreaterThanOrEqual(2);
     expect(
-      DISPLAY_THEME_REGISTRY.every((theme) => typeof theme.Renderer === "function"),
+      DISPLAY_THEME_REGISTRY.every(
+        (theme) => typeof theme.Renderer === "function",
+      ),
     ).toBe(true);
   });
 });

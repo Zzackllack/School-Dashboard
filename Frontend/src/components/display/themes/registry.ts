@@ -14,7 +14,10 @@ export interface DisplayThemeDefinition {
   Renderer: ComponentType<DisplayThemeProps>;
 }
 
-const DISPLAY_THEME_RENDERERS: Record<string, ComponentType<DisplayThemeProps>> = {
+const DISPLAY_THEME_RENDERERS: Record<
+  string,
+  ComponentType<DisplayThemeProps>
+> = {
   [DEFAULT_DISPLAY_THEME_ID]: DefaultDisplayTheme,
   "brutalist-high-density": BrutalistHighDensityTheme,
 };

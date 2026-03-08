@@ -182,8 +182,8 @@ public class DisplayEnrollmentFlowIntegrationTest {
 
 		Map<String, Object> createEnrollmentResponse = readMap(mockMvc
 				.perform(post("/api/displays/enrollments").contentType(MediaType.APPLICATION_JSON)
-						.content(objectMapper.writeValueAsString(new CreateEnrollmentRequest(asString(createdCode, "code"),
-								"Theme Validation Screen", null))))
+						.content(objectMapper.writeValueAsString(new CreateEnrollmentRequest(
+								asString(createdCode, "code"), "Theme Validation Screen", null))))
 				.andExpect(status().isCreated()).andReturn().getResponse().getContentAsString());
 
 		Map<String, Object> approveResponse = readMap(mockMvc
