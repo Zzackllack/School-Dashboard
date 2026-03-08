@@ -59,11 +59,13 @@ public class DisplayPublicControllerTest {
 		when(rateLimitProperties.getSessionValidationsPerMinute()).thenReturn(120);
 		when(rateLimiter.tryAcquire(anyString(), anyString(), eq(120), any())).thenReturn(true);
 		when(enrollmentService.validateSession("token-123")).thenReturn(
-				new DisplaySessionValidationResponse(true, "display-1", "lobby", "default", "/display/display-1"));
+				new DisplaySessionValidationResponse(true, "display-1", "lobby", "default", "default",
+						"/display/display-1"));
 
 		mockMvc.perform(get("/api/displays/session").header("Authorization", "Bearer token-123"))
 				.andExpect(status().isOk()).andExpect(jsonPath("$.valid").value(true))
-				.andExpect(jsonPath("$.displayId").value("display-1"));
+				.andExpect(jsonPath("$.displayId").value("display-1"))
+				.andExpect(jsonPath("$.themeId").value("default"));
 	}
 
 	@Test

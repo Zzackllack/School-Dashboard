@@ -15,7 +15,12 @@ vi.mock("./Transportation", () => ({
   default: () => <div>Transportation</div>,
 }));
 vi.mock("./Weather", () => ({ default: () => <div>Weather</div> }));
-vi.mock("../hooks/useAutoScroll", () => ({ default: () => undefined }));
+vi.mock("./display/useDisplayRuntime", () => ({
+  useDisplayRuntime: () => ({
+    isHydrated: false,
+    currentTime: null,
+  }),
+}));
 
 describe("DashboardPage", () => {
   it("renders a non-time placeholder before the client clock is ready", () => {

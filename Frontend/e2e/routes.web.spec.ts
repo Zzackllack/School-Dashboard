@@ -329,6 +329,7 @@ test("completes setup -> pending -> approved -> display flow", async ({
         displayId: "display-1",
         displaySlug: "main-hall",
         assignedProfileId: "default",
+        themeId: "default",
         redirectPath: "/display/display-1",
       }),
     });
@@ -362,6 +363,7 @@ test("restores approved display from stored session token on reboot", async ({
         displayId: "display-reboot",
         displaySlug: "main-hall",
         assignedProfileId: "default",
+        themeId: "default",
         redirectPath: "/display/display-reboot",
       }),
     });
@@ -389,6 +391,7 @@ test("falls back to setup when stored token is revoked", async ({ page }) => {
         displayId: null,
         displaySlug: null,
         assignedProfileId: null,
+        themeId: null,
         redirectPath: null,
       }),
     });
@@ -422,6 +425,7 @@ for (const [targetPath, scenarioLabel] of [
           displayId: null,
           displaySlug: null,
           assignedProfileId: null,
+          themeId: null,
           redirectPath: null,
         }),
       });
@@ -572,6 +576,108 @@ test("admin pending page supports rejection action", async ({ page }) => {
   await page.getByRole("button", { name: "Ablehnen" }).click();
 
   await expect(page.getByText("Keine offenen Requests.")).toBeVisible();
+});
+
+test("admin can switch display theme and display route keeps module parity", async ({
+  page,
+}) => {
+  let selectedThemeId = "default";
+  const expectedCsrfToken = "csrf-test-token";
+
+  await page.route("**/api/admin/displays/display-1*", async (route) => {
+    if (route.request().method() === "GET") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          id: "display-1",
+          name: "Main Hall Screen",
+          slug: "main-hall-screen",
+          locationLabel: "Main Entrance",
+          status: "ACTIVE",
+          assignedProfileId: "default",
+          themeId: selectedThemeId,
+          updatedAt: "2026-03-07T10:00:00Z",
+        }),
+      });
+      return;
+    }
+
+    if (route.request().method() === "PATCH") {
+      const csrfHeader = route.request().headers()["x-csrf-token"];
+      if (csrfHeader !== expectedCsrfToken) {
+        await route.fulfill({
+          status: 403,
+          contentType: "application/json",
+          body: JSON.stringify({ message: "Invalid CSRF token" }),
+        });
+        return;
+      }
+
+      const payload = route.request().postDataJSON() as { themeId?: string };
+      if (payload.themeId) {
+        selectedThemeId = payload.themeId;
+      }
+      await route.fulfill({
+        status: 200,
+        contentType: "application/json",
+        body: JSON.stringify({
+          id: "display-1",
+          name: "Main Hall Screen",
+          slug: "main-hall-screen",
+          locationLabel: "Main Entrance",
+          status: "ACTIVE",
+          assignedProfileId: "default",
+          themeId: selectedThemeId,
+          updatedAt: "2026-03-07T10:01:00Z",
+        }),
+      });
+      return;
+    }
+
+    await route.continue();
+  });
+
+  await page.route("**/api/displays/session", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        valid: true,
+        displayId: "display-1",
+        displaySlug: "main-hall-screen",
+        assignedProfileId: "default",
+        themeId: selectedThemeId,
+        redirectPath: "/display/display-1",
+      }),
+    });
+  });
+
+  await page.goto("/admin/displays/display-1");
+  await page.waitForLoadState("networkidle");
+  await page.getByLabel("Theme").selectOption("brutalist-high-density");
+  await page.getByRole("button", { name: "Änderungen speichern" }).click();
+  await expect(
+    page.getByText("Display erfolgreich aktualisiert."),
+  ).toBeVisible();
+
+  await page.goto("/display/display-1");
+  await expect(page.getByText("Display: display-1")).toBeVisible();
+  await expect(page.getByTestId("theme-brutalist-high-density")).toBeVisible();
+
+  await expect(
+    page.getByRole("heading", { name: "Vertretungspläne" }),
+  ).toHaveCount(1);
+  await expect(page.getByRole("heading", { name: "Wetter" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Öffentliche Verkehrsmittel" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Kommende Termine" }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Nächste Schulferien" }),
+  ).toBeVisible();
 });
 
 test("renders root error component when a route throws", async ({ page }) => {

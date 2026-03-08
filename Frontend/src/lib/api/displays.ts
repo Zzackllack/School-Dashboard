@@ -35,6 +35,7 @@ export interface DisplaySessionValidationResponse {
   displayId: string | null;
   displaySlug: string | null;
   assignedProfileId: string | null;
+  themeId: string | null;
   redirectPath: string | null;
 }
 
@@ -56,6 +57,7 @@ export interface DisplaySummaryResponse {
   locationLabel: string | null;
   status: "ACTIVE" | "INACTIVE" | "REVOKED";
   assignedProfileId: string | null;
+  themeId: string;
   updatedAt: string;
 }
 
@@ -93,6 +95,7 @@ export interface UpdateDisplayRequest {
   locationLabel?: string;
   assignedProfileId?: string;
   status?: "ACTIVE" | "INACTIVE" | "REVOKED";
+  themeId?: string;
 }
 
 export interface AdminAuthStatusResponse {
@@ -245,6 +248,7 @@ export async function validateDisplaySession(): Promise<DisplaySessionValidation
       displayId: null,
       displaySlug: null,
       assignedProfileId: null,
+      themeId: null,
       redirectPath: null,
     };
   }

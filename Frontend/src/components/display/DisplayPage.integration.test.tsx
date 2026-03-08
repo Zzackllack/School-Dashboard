@@ -15,12 +15,20 @@ vi.mock("../../lib/api/displays", () => ({
     displayId: "test-screen",
     displaySlug: "test",
     assignedProfileId: "default",
+    themeId: "default",
     redirectPath: "/display/test-screen",
   }),
 }));
 
-vi.mock("../DashboardPage", () => ({
-  default: () => <div data-testid="dashboard-page">Dashboard</div>,
+vi.mock("#/components/display/themes/registry", () => ({
+  resolveDisplayTheme: vi.fn().mockReturnValue({
+    theme: {
+      id: "default",
+      Renderer: () => <div data-testid="dashboard-page">Dashboard</div>,
+    },
+    fallbackUsed: false,
+    requestedThemeId: "default",
+  }),
 }));
 
 describe("DisplayPage integration", () => {

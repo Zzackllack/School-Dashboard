@@ -45,6 +45,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class DisplayEnrollmentService {
 
 	private static final Logger logger = LoggerFactory.getLogger(DisplayEnrollmentService.class);
+	private static final String DEFAULT_THEME_ID = "default";
+	private static final List<String> ALLOWED_THEME_IDS = List.of(DEFAULT_THEME_ID, "brutalist-high-density");
 
 	private final DisplayEnrollmentCodeRepository enrollmentCodeRepository;
 	private final DisplayEnrollmentRequestRepository enrollmentRequestRepository;
@@ -270,7 +272,7 @@ public class DisplayEnrollmentService {
 		logger.debug("Display session validated for displayId={}", displayEntity.getId());
 
 		return new DisplaySessionValidationResponse(true, displayEntity.getId(), displayEntity.getSlug(),
-				displayEntity.getAssignedProfileId(), "/display/" + displayEntity.getId());
+				displayEntity.getAssignedProfileId(), displayEntity.getThemeId(), "/display/" + displayEntity.getId());
 	}
 
 	@Transactional
@@ -333,6 +335,9 @@ public class DisplayEnrollmentService {
 		if (request.assignedProfileId() != null) {
 			displayEntity.setAssignedProfileId(trimToNull(request.assignedProfileId()));
 		}
+		if (request.themeId() != null) {
+			displayEntity.setThemeId(validateThemeId(request.themeId()));
+		}
 
 		DisplayStatus requestedStatus = request.status();
 		if (requestedStatus != null) {
@@ -344,6 +349,7 @@ public class DisplayEnrollmentService {
 		Map<String, Object> auditMetadata = new HashMap<>();
 		auditMetadata.put("status", displayEntity.getStatus().name());
 		auditMetadata.put("slug", displayEntity.getSlug());
+		auditMetadata.put("themeId", displayEntity.getThemeId());
 
 		auditLogService.log(adminId, "DISPLAY_UPDATED", "display", displayId, auditMetadata);
 
@@ -396,7 +402,7 @@ public class DisplayEnrollmentService {
 
 	private DisplaySummaryResponse mapDisplay(DisplayEntity entity) {
 		return new DisplaySummaryResponse(entity.getId(), entity.getName(), entity.getSlug(), entity.getLocationLabel(),
-				entity.getStatus().name(), entity.getAssignedProfileId(), entity.getUpdatedAt());
+				entity.getStatus().name(), entity.getAssignedProfileId(), entity.getThemeId(), entity.getUpdatedAt());
 	}
 
 	private DisplayEnrollmentRequestEntity findEnrollmentRequest(String requestId) {
@@ -458,7 +464,20 @@ public class DisplayEnrollmentService {
 	}
 
 	private DisplaySessionValidationResponse invalidSessionResponse() {
-		return new DisplaySessionValidationResponse(false, null, null, null, null);
+		return new DisplaySessionValidationResponse(false, null, null, null, null, null);
+	}
+
+	private String validateThemeId(String themeId) {
+		String normalizedThemeId = trimToNull(themeId);
+		if (normalizedThemeId == null) {
+			throw new DisplayDomainException("DISPLAY_THEME_INVALID", HttpStatus.BAD_REQUEST,
+					"Display theme id must not be blank");
+		}
+		if (!ALLOWED_THEME_IDS.contains(normalizedThemeId)) {
+			throw new DisplayDomainException("DISPLAY_THEME_INVALID", HttpStatus.BAD_REQUEST,
+					"Display theme id is not supported");
+		}
+		return normalizedThemeId;
 	}
 
 	private String issueSessionTokenForApprovedRequest(DisplayEnrollmentRequestEntity requestEntity) {

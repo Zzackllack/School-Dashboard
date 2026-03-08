@@ -1,0 +1,491 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>School Substitution Dashboard - High Density</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;900&amp;family=Archivo+Black&amp;family=Archivo+Narrow:wght@400;500;600;700&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap"
+      rel="stylesheet"
+    />
+    <script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              primary: "#000000",
+              "background-light": "#F4F4F0", // Newsprint/Paper
+              "background-dark": "#1A1A1A",
+              paper: "#F4F4F0",
+              ink: "#000000",
+              "grade-78": "#FFD60A",
+              "grade-910": "#32D74B",
+              "grade-1112": "#FF9F0A",
+              alert: "#FF3B30",
+              info: "#0055FF",
+            },
+            fontFamily: {
+              display: ["Archivo", "sans-serif"],
+              "archivo-black": ["Archivo Black", "sans-serif"],
+              mono: [
+                "ui-monospace",
+                "SFMono-Regular",
+                "Menlo",
+                "Monaco",
+                "Consolas",
+                "Liberation Mono",
+                "Courier New",
+                "monospace",
+              ],
+            },
+            borderWidth: {
+              3: "3px",
+              4: "4px",
+            },
+            borderRadius: {
+              DEFAULT: "0px",
+              lg: "0px",
+              xl: "0px",
+              full: "0px",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      body {
+        font-family: "Archivo", sans-serif;
+        overflow: hidden; /* Fixed TV display */
+        background-color: #f4f4f0;
+      }
+      .archivo-black {
+        font-family: "Archivo Black", sans-serif;
+      }
+      .archivo-mono {
+        font-family: "ui-monospace", monospace;
+      }
+
+      /* High density card height constraint from PRD */
+      .sub-card {
+        height: 110px;
+      }
+    </style>
+  </head>
+  <body class="bg-paper text-ink selection:bg-primary selection:text-white">
+    <!-- 1920x1080 Container -->
+    <div
+      class="w-[1920px] h-[1080px] flex flex-col overflow-hidden border-4 border-black"
+    >
+      <!-- Top Bar (64px) -->
+      <header
+        class="h-16 flex items-center justify-between px-6 border-b-4 border-black bg-white"
+      >
+        <div class="flex items-center gap-6">
+          <span class="archivo-mono text-2xl font-bold tracking-tighter"
+            >MONDAY, OCT 21</span
+          >
+          <div class="h-8 w-px bg-black"></div>
+          <h1 class="archivo-black text-2xl uppercase tracking-[2px]">
+            Daily Bulletin
+          </h1>
+        </div>
+        <div class="flex items-center gap-6">
+          <div class="h-8 w-px bg-black"></div>
+          <span class="archivo-mono text-2xl font-bold">10:42:15 AM</span>
+        </div>
+      </header>
+      <!-- Main Content Area (Split 70/30) -->
+      <main class="flex flex-1 overflow-hidden">
+        <!-- Substitution Zone (70% - ~1344px) -->
+        <section class="w-[70%] flex flex-col border-r-4 border-black h-full">
+          <div class="grid grid-cols-3 h-full divide-x-4 divide-black">
+            <!-- Column: Grades 7-8 -->
+            <div class="flex flex-col bg-white/50">
+              <div
+                class="h-40 bg-grade-78 border-b-4 border-black p-4 flex flex-col justify-between relative"
+              >
+                <h2
+                  class="archivo-black text-[100px] leading-none -ml-2 select-none opacity-90"
+                >
+                  07—08
+                </h2>
+                <div class="flex justify-between items-center">
+                  <span class="archivo-black text-xl uppercase tracking-widest"
+                    >Substitution</span
+                  >
+                  <!-- Pagination Dots -->
+                  <div class="flex gap-2">
+                    <div class="w-3 h-3 bg-black"></div>
+                    <div class="w-3 h-3 bg-black/20"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-col">
+                <!-- Cards -->
+                <div
+                  class="sub-card flex border-b border-black bg-white group hover:bg-black hover:text-white transition-colors"
+                >
+                  <div class="w-2 bg-grade-78 h-full"></div>
+                  <div class="flex-1 p-3 flex flex-col justify-center">
+                    <div class="flex justify-between items-start mb-1">
+                      <h3 class="archivo-black text-2xl uppercase">
+                        7B HISTORY
+                      </h3>
+                      <span
+                        class="archivo-mono text-xs font-bold text-alert border border-alert px-1 py-0.5 group-hover:bg-alert group-hover:text-white"
+                        >CANCELLED</span
+                      >
+                    </div>
+                    <p class="text-xl font-medium">Mr. Smith → Mrs. Jones</p>
+                    <p class="text-sm font-mono opacity-70">Room 101</p>
+                  </div>
+                </div>
+                <div
+                  class="sub-card flex border-b border-black bg-white group hover:bg-black hover:text-white transition-colors"
+                >
+                  <div class="w-2 bg-grade-78 h-full"></div>
+                  <div class="flex-1 p-3 flex flex-col justify-center">
+                    <div class="flex justify-between items-start mb-1">
+                      <h3 class="archivo-black text-2xl uppercase">8A MATH</h3>
+                      <span
+                        class="archivo-mono text-xs font-bold text-info border border-info px-1 py-0.5 group-hover:bg-info group-hover:text-white"
+                        >ROOM CHANGE</span
+                      >
+                    </div>
+                    <p class="text-xl font-medium">Room 204 → Room 305</p>
+                    <p class="text-sm font-mono opacity-70">Mrs. Patterson</p>
+                  </div>
+                </div>
+                <div
+                  class="sub-card flex border-b border-black bg-white group hover:bg-black hover:text-white transition-colors"
+                >
+                  <div class="w-2 bg-grade-78 h-full"></div>
+                  <div class="flex-1 p-3 flex flex-col justify-center">
+                    <div class="flex justify-between items-start mb-1">
+                      <h3 class="archivo-black text-2xl uppercase">
+                        7C ENGLISH
+                      </h3>
+                      <span
+                        class="archivo-mono text-xs font-bold border border-black px-1 py-0.5 group-hover:border-white"
+                        >SUBSTITUTION</span
+                      >
+                    </div>
+                    <p class="text-xl font-medium">Ms. Weber → Mr. Klein</p>
+                    <p class="text-sm font-mono opacity-70">Room 112</p>
+                  </div>
+                </div>
+                <!-- No more items placeholder -->
+                <div
+                  class="p-8 text-center opacity-20 flex flex-col items-center justify-center"
+                >
+                  <span class="material-symbols-outlined text-6xl"
+                    >sentiment_satisfied</span
+                  >
+                  <p class="archivo-black text-sm uppercase mt-2">
+                    End of list
+                  </p>
+                </div>
+              </div>
+            </div>
+            <!-- Column: Grades 9-10 -->
+            <div class="flex flex-col bg-white/50">
+              <div
+                class="h-40 bg-grade-910 border-b-4 border-black p-4 flex flex-col justify-between relative"
+              >
+                <h2
+                  class="archivo-black text-[100px] leading-none -ml-2 select-none opacity-90"
+                >
+                  09—10
+                </h2>
+                <div class="flex justify-between items-center">
+                  <span class="archivo-black text-xl uppercase tracking-widest"
+                    >Substitution</span
+                  >
+                  <div class="flex gap-2">
+                    <div class="w-3 h-3 bg-black/20"></div>
+                    <div class="w-3 h-3 bg-black"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-col">
+                <div
+                  class="sub-card flex border-b border-black bg-white group hover:bg-black hover:text-white transition-colors"
+                >
+                  <div class="w-2 bg-grade-910 h-full"></div>
+                  <div class="flex-1 p-3 flex flex-col justify-center">
+                    <div class="flex justify-between items-start mb-1">
+                      <h3 class="archivo-black text-2xl uppercase">
+                        9B PHYSICS
+                      </h3>
+                      <span
+                        class="archivo-mono text-xs font-bold text-alert border border-alert px-1 py-0.5 group-hover:bg-alert group-hover:text-white"
+                        >CANCELLED</span
+                      >
+                    </div>
+                    <p class="text-xl font-medium">Periods 3 &amp; 4</p>
+                    <p class="text-sm font-mono opacity-70">No replacement</p>
+                  </div>
+                </div>
+                <div
+                  class="sub-card flex border-b border-black bg-white group hover:bg-black hover:text-white transition-colors"
+                >
+                  <div class="w-2 bg-grade-910 h-full"></div>
+                  <div class="flex-1 p-3 flex flex-col justify-center">
+                    <div class="flex justify-between items-start mb-1">
+                      <h3 class="archivo-black text-2xl uppercase">
+                        10C GERMAN
+                      </h3>
+                      <span
+                        class="archivo-mono text-xs font-bold text-info border border-info px-1 py-0.5 group-hover:bg-info group-hover:text-white"
+                        >SELF-STUDY</span
+                      >
+                    </div>
+                    <p class="text-xl font-medium">Mrs. Müller (Illness)</p>
+                    <p class="text-sm font-mono opacity-70">Library Hall</p>
+                  </div>
+                </div>
+                <div
+                  class="sub-card flex border-b border-black bg-white group hover:bg-black hover:text-white transition-colors"
+                >
+                  <div class="w-2 bg-grade-910 h-full"></div>
+                  <div class="flex-1 p-3 flex flex-col justify-center">
+                    <div class="flex justify-between items-start mb-1">
+                      <h3 class="archivo-black text-2xl uppercase">9A MATH</h3>
+                      <span
+                        class="archivo-mono text-xs font-bold border border-black px-1 py-0.5 group-hover:border-white"
+                        >SUBSTITUTION</span
+                      >
+                    </div>
+                    <p class="text-xl font-medium">Mr. Davis → Ms. Prince</p>
+                    <p class="text-sm font-mono opacity-70">Room 402</p>
+                  </div>
+                </div>
+                <div
+                  class="sub-card flex border-b border-black bg-white group hover:bg-black hover:text-white transition-colors"
+                >
+                  <div class="w-2 bg-grade-910 h-full"></div>
+                  <div class="flex-1 p-3 flex flex-col justify-center">
+                    <div class="flex justify-between items-start mb-1">
+                      <h3 class="archivo-black text-2xl uppercase">
+                        10B BIOLOGY
+                      </h3>
+                      <span
+                        class="archivo-mono text-xs font-bold text-info border border-info px-1 py-0.5 group-hover:bg-info group-hover:text-white"
+                        >ROOM CHANGE</span
+                      >
+                    </div>
+                    <p class="text-xl font-medium">Room 112 → Lab 02</p>
+                    <p class="text-sm font-mono opacity-70">Mr. Klein</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- Column: Grades 11-12 -->
+            <div class="flex flex-col bg-white/50">
+              <div
+                class="h-40 bg-grade-1112 border-b-4 border-black p-4 flex flex-col justify-between relative"
+              >
+                <h2
+                  class="archivo-black text-[100px] leading-none -ml-2 select-none opacity-90"
+                >
+                  11—12
+                </h2>
+                <div class="flex justify-between items-center">
+                  <span class="archivo-black text-xl uppercase tracking-widest"
+                    >Substitution</span
+                  >
+                  <div class="flex gap-2">
+                    <div class="w-3 h-3 bg-black"></div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-col">
+                <div
+                  class="sub-card flex border-b border-black bg-white group hover:bg-black hover:text-white transition-colors"
+                >
+                  <div class="w-2 bg-grade-1112 h-full"></div>
+                  <div class="flex-1 p-3 flex flex-col justify-center">
+                    <div class="flex justify-between items-start mb-1">
+                      <h3 class="archivo-black text-2xl uppercase">
+                        12 ADV. ART
+                      </h3>
+                      <span
+                        class="archivo-mono text-xs font-bold text-alert border border-alert px-1 py-0.5 group-hover:bg-alert group-hover:text-white"
+                        >CANCELLED</span
+                      >
+                    </div>
+                    <p class="text-xl font-medium">Excursion to Museum</p>
+                    <p class="text-sm font-mono opacity-70">
+                      Meeting Point: Lobby 09:00
+                    </p>
+                  </div>
+                </div>
+                <div
+                  class="sub-card flex border-b border-black bg-white group hover:bg-black hover:text-white transition-colors"
+                >
+                  <div class="w-2 bg-grade-1112 h-full"></div>
+                  <div class="flex-1 p-3 flex flex-col justify-center">
+                    <div class="flex justify-between items-start mb-1">
+                      <h3 class="archivo-black text-2xl uppercase">11 PE</h3>
+                      <span
+                        class="archivo-mono text-xs font-bold text-info border border-info px-1 py-0.5 group-hover:bg-info group-hover:text-white"
+                        >LOCATION</span
+                      >
+                    </div>
+                    <p class="text-xl font-medium">
+                      Gymnasium A → Outdoor Field
+                    </p>
+                    <p class="text-sm font-mono opacity-70">Coach Carter</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+        <!-- Sidebar (30% - ~576px) -->
+        <aside class="w-[30%] h-full flex flex-col bg-white overflow-y-auto">
+          <!-- Weather Module -->
+          <div class="p-6 border-b-4 border-black bg-white">
+            <h4 class="archivo-black text-2xl uppercase tracking-tighter mb-4">
+              Current Weather
+            </h4>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="archivo-black text-7xl">14°C</p>
+                <p class="archivo-mono text-xl uppercase font-bold text-info">
+                  Cloudy / Wind 12km/h
+                </p>
+              </div>
+              <span class="material-symbols-outlined text-8xl text-info"
+                >cloud</span
+              >
+            </div>
+          </div>
+          <!-- Departures Module -->
+          <div class="p-6 border-b-4 border-black bg-white">
+            <div class="flex justify-between items-center mb-4">
+              <h4 class="archivo-black text-2xl uppercase tracking-tighter">
+                Public Transport
+              </h4>
+              <span
+                class="archivo-mono text-sm font-bold bg-black text-white px-2 py-1"
+                >LIVE</span
+              >
+            </div>
+            <table class="w-full text-left archivo-mono border-collapse">
+              <thead class="border-b-2 border-black">
+                <tr>
+                  <th class="py-2 text-xs opacity-60 uppercase">Line</th>
+                  <th class="py-2 text-xs opacity-60 uppercase">Direction</th>
+                  <th class="py-2 text-xs opacity-60 uppercase text-right">
+                    Time
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-black/10">
+                <tr>
+                  <td class="py-3 font-bold text-info">Bus 142</td>
+                  <td class="py-3">Central Station</td>
+                  <td class="py-3 text-right font-black">2 MIN</td>
+                </tr>
+                <tr>
+                  <td class="py-3 font-bold text-info">S7</td>
+                  <td class="py-3">Potsdam Hbf</td>
+                  <td class="py-3 text-right font-black">5 MIN</td>
+                </tr>
+                <tr>
+                  <td class="py-3 font-bold text-info">Bus 142</td>
+                  <td class="py-3">East Side Gallery</td>
+                  <td class="py-3 text-right font-black">12 MIN</td>
+                </tr>
+                <tr>
+                  <td class="py-3 font-bold text-info">S7</td>
+                  <td class="py-3">Ahrensfelde</td>
+                  <td class="py-3 text-right font-black">15 MIN</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <!-- Exam Calendar Module -->
+          <div class="p-6 border-b-4 border-black bg-white">
+            <h4 class="archivo-black text-2xl uppercase tracking-tighter mb-4">
+              Upcoming Exams
+            </h4>
+            <div class="space-y-4">
+              <div class="flex border-l-4 border-grade-1112 pl-4 py-1">
+                <div class="flex-1">
+                  <p class="archivo-mono text-sm font-bold opacity-60">
+                    OCT 24, 08:00
+                  </p>
+                  <p class="text-xl font-black uppercase">
+                    Advanced Biology (GK)
+                  </p>
+                </div>
+              </div>
+              <div class="flex border-l-4 border-grade-910 pl-4 py-1">
+                <div class="flex-1">
+                  <p class="archivo-mono text-sm font-bold opacity-60">
+                    OCT 25, 10:30
+                  </p>
+                  <p class="text-xl font-black uppercase">Math Foundations</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- Holidays Module -->
+          <div class="p-6 border-b-4 border-black bg-white">
+            <h4 class="archivo-black text-2xl uppercase tracking-tighter mb-2">
+              Autumn Break
+            </h4>
+            <div class="flex items-baseline gap-2">
+              <p class="archivo-black text-5xl">12</p>
+              <p class="archivo-black text-2xl uppercase">Days to go</p>
+            </div>
+            <div class="w-full bg-black/10 h-6 mt-4 relative overflow-hidden">
+              <div class="bg-primary h-full w-[80%]"></div>
+            </div>
+          </div>
+          <!-- Credits Module -->
+          <div class="p-8 bg-paper text-center">
+            <p class="archivo-mono text-xs opacity-40 uppercase tracking-[4px]">
+              System by Student Council
+            </p>
+            <p class="archivo-mono text-[10px] opacity-30 mt-1 uppercase">
+              v2.4.0-brutalist
+            </p>
+          </div>
+        </aside>
+      </main>
+      <!-- Footer / Status Strip -->
+      <footer
+        class="h-8 bg-black text-white flex items-center px-4 justify-between archivo-mono text-[10px] uppercase tracking-widest"
+      >
+        <div class="flex gap-4">
+          <span>System Status: Online</span>
+          <span>Data Refresh: 30s</span>
+        </div>
+        <div>All updates final as of 10:40 AM</div>
+      </footer>
+    </div>
+    <!-- Background Decoration (Abstract Grid) -->
+    <div
+      class="fixed inset-0 -z-10 pointer-events-none opacity-[0.03]"
+      data-alt="Minimalist dot grid background pattern"
+      style="
+        background-image: radial-gradient(#000 1px, transparent 1px);
+        background-size: 20px 20px;
+      "
+    ></div>
+  </body>
+</html>

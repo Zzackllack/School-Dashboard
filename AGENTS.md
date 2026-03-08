@@ -4,7 +4,7 @@ A modern, intuitive dashboard designed originally for Goethe Gymnasium Lichterfe
 
 ## Technology Stack
 
-- Backend: Maven + Java 21 with Spring Boot + H2 as the embedded database.
+- Backend: Maven + Java 21 with Spring Boot + Flyway for migration, H2 as the embedded database for development, PostgreSQL 17 for production.
 - Frontend: React 19 with TypeScript + TanStack Start (TanStack Query, TanStack Router) + Tailwind CSS + Vite + Nitro.
 - Testing: Vitest + Playwright for frontend, JUnit 5 + Mockito for backend.
 - Deployment: Backend via Docker, Frontend via Cloudflare Workers (see `Frontend/wrangler.toml`).
