@@ -340,10 +340,15 @@ export function BrutalistHighDensityTheme({ displayId }: DisplayThemeProps) {
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   // Fetch substitution data
-  const { data: plans, isLoading, isError } = useQuery(
-    substitutionPlansQueryOptions,
+  const {
+    data: plans,
+    isLoading,
+    isError,
+  } = useQuery(substitutionPlansQueryOptions);
+  const allEntries = useMemo(
+    () => (plans ?? []).flatMap((p) => p.entries),
+    [plans],
   );
-  const allEntries = useMemo(() => (plans ?? []).flatMap((p) => p.entries), [plans]);
 
   useContainerAutoScroll(sidebarRef, []);
 
