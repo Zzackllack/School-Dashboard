@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from "react";
+import { useCallback, useState, useEffect, useRef } from "react";
 
 // Custom hook for auto-scrolling with adaptive duration based on content
 const useAutoScroll = (basePauseDuration = 500, baseScrollSpeed = 40) => {
@@ -7,12 +7,15 @@ const useAutoScroll = (basePauseDuration = 500, baseScrollSpeed = 40) => {
 
   // Calculate the appropriate scroll duration based on content height
   // We use pixels-per-second as the base unit so scrolling speed feels consistent
-  const calculateScrollDuration = (height: number, viewportHeight: number) => {
-    const scrollableDistance = Math.max(0, height - viewportHeight);
-    // baseScrollSpeed is pixels per second (e.g., 40px/s)
-    // Min duration of 3000ms, or calculated based on content
-    return Math.max(3000, (scrollableDistance * 1000) / baseScrollSpeed);
-  };
+  const calculateScrollDuration = useCallback(
+    (height: number, viewportHeight: number) => {
+      const scrollableDistance = Math.max(0, height - viewportHeight);
+      // baseScrollSpeed is pixels per second (e.g., 40px/s)
+      // Min duration of 3000ms, or calculated based on content
+      return Math.max(3000, (scrollableDistance * 1000) / baseScrollSpeed);
+    },
+    [baseScrollSpeed],
+  );
 
   // Update document height when content changes
   useEffect(() => {
@@ -161,7 +164,7 @@ const useAutoScroll = (basePauseDuration = 500, baseScrollSpeed = 40) => {
       isActive = false;
       clearTimeout(initialTimer);
     };
-  }, [documentHeight, basePauseDuration, baseScrollSpeed]);
+  }, [documentHeight, basePauseDuration, calculateScrollDuration]);
 };
 
 export default useAutoScroll;

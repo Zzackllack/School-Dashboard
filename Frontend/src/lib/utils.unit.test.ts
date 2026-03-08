@@ -4,7 +4,8 @@ import { cn } from "./utils";
 
 describe("cn", () => {
   it("concatenates conditional class names", () => {
-    expect(cn("text-sm", false && "hidden", "font-bold")).toBe(
+    const isHidden = false;
+    expect(cn("text-sm", isHidden && "hidden", "font-bold")).toBe(
       "text-sm font-bold",
     );
   });
