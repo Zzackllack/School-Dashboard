@@ -144,7 +144,7 @@ export function useTransport() {
   const [departures, setDepartures] = useState<BvgDeparture[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const { data: nearby } = useQuery<BvgStop[]>({
+  const { data: nearby, isPending: isNearbyPending } = useQuery<BvgStop[]>({
     queryKey: ["bvg-nearby-bru", SCHOOL_LAT, SCHOOL_LNG],
     queryFn: async () => {
       const r = await fetch(
@@ -187,5 +187,10 @@ export function useTransport() {
     return () => clearInterval(iv);
   }, [stop, fetchDeps]);
 
-  return { stopName: stop?.name ?? "", departures, loading };
+  return {
+    stopName: stop?.name ?? "",
+    departures,
+    loading,
+    initialLoaded: !isNearbyPending,
+  };
 }

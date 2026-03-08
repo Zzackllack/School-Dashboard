@@ -667,7 +667,7 @@ test("admin can switch display theme and display route keeps module parity", asy
 
   await expect(
     page.getByRole("heading", { name: "Vertretungspläne" }),
-  ).toBeVisible();
+  ).toHaveCount(1);
   await expect(page.getByRole("heading", { name: "Wetter" })).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Öffentliche Verkehrsmittel" }),

@@ -1,5 +1,5 @@
 import { ModuleHeader } from "../ModuleHeader";
-import { useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import holidaysData from "../../../../../assets/holidays.json";
 import { daysUntil } from "../themeShared";
 
@@ -19,8 +19,21 @@ function fmtHolidayName(name: string): string {
 
 // ─── Holidays module ──────────────────────────────────────────────────────────────
 export function HolidaysModule() {
+  const [now, setNow] = useState(() => new Date());
+
+  useEffect(() => {
+    const intervalId = setInterval(() => {
+      const nextNow = new Date();
+      setNow((currentNow) =>
+        currentNow.toDateString() === nextNow.toDateString()
+          ? currentNow
+          : nextNow,
+      );
+    }, 60_000);
+    return () => clearInterval(intervalId);
+  }, []);
+
   const holidays = useMemo(() => {
-    const now = new Date();
     const data = holidaysData as Record<string, HolidayEntry[]>;
     const yr = now.getFullYear();
     return [...(data[yr] ?? []), ...(data[yr + 1] ?? [])]
@@ -32,7 +45,7 @@ export function HolidaysModule() {
       })
       .sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
       .slice(0, 3);
-  }, []);
+  }, [now]);
 
   const next = holidays[0];
   const days = next ? daysUntil(next.start) : null;

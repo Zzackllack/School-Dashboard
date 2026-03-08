@@ -1,7 +1,15 @@
 function LiveDot() {
   return (
-    <span className="inline-flex items-center gap-1 bg-black px-2 py-0.5 font-mono text-[10px] font-black text-white">
-      <span className="inline-block h-1.5 w-1.5 rounded-full bg-green-400" />
+    <span
+      role="status"
+      aria-live="polite"
+      className="inline-flex items-center gap-1 bg-black px-2 py-0.5 font-mono text-[10px] font-black text-white"
+    >
+      <span
+        aria-hidden="true"
+        className="inline-block h-1.5 w-1.5 rounded-full bg-green-400"
+      />
+      <span className="sr-only">Live jetzt</span>
       LIVE
     </span>
   );

@@ -3,9 +3,9 @@ import { lineBadgeCls, minsUntil, useTransport } from "../themeShared";
 
 // ─── Transport module ─────────────────────────────────────────────────────────────
 export function TransportModule() {
-  const { stopName, departures, loading } = useTransport();
+  const { stopName, departures, loading, initialLoaded } = useTransport();
   const upcoming = departures
-    .filter((d) => minsUntil(d.when ?? d.plannedWhen) >= -1)
+    .filter((d) => minsUntil(d.when ?? d.plannedWhen) >= 0)
     .slice(0, 8);
 
   return (
@@ -18,7 +18,7 @@ export function TransportModule() {
         sub={stopName || undefined}
         live
       />
-      {loading && departures.length === 0 ? (
+      {!initialLoaded || (loading && departures.length === 0) ? (
         <div className="px-3 py-4 font-mono text-[11px] uppercase tracking-wide text-black/40">
           Lade Abfahrten…
         </div>

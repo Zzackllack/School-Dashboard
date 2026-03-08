@@ -274,7 +274,17 @@ function GradeColumn({
   borderLeft: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  useContainerAutoScroll(ref, [entries.length]);
+  const resetKey = useMemo(
+    () =>
+      entries
+        .map(
+          (e) =>
+            `${e.classes}|${e.period}|${e.type}|${e.subject}|${e.originalSubject}|${e.newRoom}|${e.comment}`,
+        )
+        .join("||"),
+    [entries],
+  );
+  useContainerAutoScroll(ref, [resetKey]);
 
   return (
     <div
@@ -330,8 +340,10 @@ export function BrutalistHighDensityTheme({ displayId }: DisplayThemeProps) {
   const sidebarRef = useRef<HTMLDivElement>(null);
 
   // Fetch substitution data
-  const { data: plans = [] } = useQuery(substitutionPlansQueryOptions);
-  const allEntries = useMemo(() => plans.flatMap((p) => p.entries), [plans]);
+  const { data: plans, isLoading, isError } = useQuery(
+    substitutionPlansQueryOptions,
+  );
+  const allEntries = useMemo(() => (plans ?? []).flatMap((p) => p.entries), [plans]);
 
   useContainerAutoScroll(sidebarRef, []);
 
@@ -367,14 +379,28 @@ export function BrutalistHighDensityTheme({ displayId }: DisplayThemeProps) {
         {/* Grade columns – 70% */}
         <section className="flex min-h-0 flex-1 overflow-hidden border-r-4 border-black">
           <h2 className="sr-only">Vertretungspläne</h2>
-          {GRADE_COLUMNS.map((col, idx) => (
-            <GradeColumn
-              key={col.id}
-              col={col}
-              entries={filterByGrades(allEntries, col.grades)}
-              borderLeft={idx > 0}
-            />
-          ))}
+          {isLoading ? (
+            <div className="flex flex-1 items-center justify-center border-black bg-[#f5f4f0] p-6">
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-black/40">
+                Lade Vertretungspläne…
+              </p>
+            </div>
+          ) : isError ? (
+            <div className="flex flex-1 items-center justify-center border-black bg-[#f5f4f0] p-6">
+              <p className="font-mono text-xs uppercase tracking-[0.2em] text-red-700/80">
+                Vertretungspläne nicht verfügbar
+              </p>
+            </div>
+          ) : (
+            GRADE_COLUMNS.map((col, idx) => (
+              <GradeColumn
+                key={col.id}
+                col={col}
+                entries={filterByGrades(allEntries, col.grades)}
+                borderLeft={idx > 0}
+              />
+            ))
+          )}
         </section>
 
         {/* Info sidebar – 30% */}
