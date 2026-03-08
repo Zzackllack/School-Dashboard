@@ -1,7 +1,10 @@
 package com.schooldashboard.display.controller;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -69,5 +72,7 @@ public class AdminDisplayControllerTest {
 				.andExpect(jsonPath("$[0].id").value("audit-1"))
 				.andExpect(jsonPath("$[0].action").value("DISPLAY_UPDATED"))
 				.andExpect(jsonPath("$[0].createdAt").value("2026-03-07T12:00:00Z"));
+
+		verify(enrollmentService, never()).getDisplay(anyString());
 	}
 }

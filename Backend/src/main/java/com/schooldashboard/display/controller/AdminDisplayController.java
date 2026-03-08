@@ -77,23 +77,23 @@ public class AdminDisplayController {
 		return adminAuditLogService.listRecent(limit);
 	}
 
-	@GetMapping("/{displayId}")
+	@GetMapping("/{displayId:[0-9a-fA-F\\-]{36}}")
 	public DisplaySummaryResponse getDisplay(@PathVariable String displayId) {
 		return enrollmentService.getDisplay(displayId);
 	}
 
-	@PostMapping("/{displayId}/revoke-session")
+	@PostMapping("/{displayId:[0-9a-fA-F\\-]{36}}/revoke-session")
 	public DisplaySummaryResponse revokeDisplaySession(@PathVariable String displayId, Authentication authentication) {
 		return enrollmentService.revokeDisplaySession(displayId, resolveAdminId(authentication));
 	}
 
-	@PatchMapping("/{displayId}")
+	@PatchMapping("/{displayId:[0-9a-fA-F\\-]{36}}")
 	public DisplaySummaryResponse updateDisplay(@PathVariable String displayId,
 			@Valid @RequestBody UpdateDisplayRequest request, Authentication authentication) {
 		return enrollmentService.updateDisplay(displayId, request, resolveAdminId(authentication));
 	}
 
-	@DeleteMapping("/{displayId}")
+	@DeleteMapping("/{displayId:[0-9a-fA-F\\-]{36}}")
 	public ResponseEntity<Void> deleteDisplay(@PathVariable String displayId, Authentication authentication) {
 		enrollmentService.deleteDisplay(displayId, resolveAdminId(authentication));
 		return ResponseEntity.noContent().build();
