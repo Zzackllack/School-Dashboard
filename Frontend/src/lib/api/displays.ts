@@ -239,6 +239,7 @@ export async function validateDisplaySession(): Promise<DisplaySessionValidation
     "/displays/session",
     {
       credentials: "include",
+      cache: "no-store",
     },
   );
 

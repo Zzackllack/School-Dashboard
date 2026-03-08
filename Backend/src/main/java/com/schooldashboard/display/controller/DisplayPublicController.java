@@ -11,6 +11,7 @@ import com.schooldashboard.display.web.DisplayDomainException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import java.time.Duration;
+import org.springframework.http.CacheControl;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.ResponseCookie;
@@ -63,11 +64,13 @@ public class DisplayPublicController {
 	}
 
 	@GetMapping("/session")
-	public DisplaySessionValidationResponse validateSession(
+	public ResponseEntity<DisplaySessionValidationResponse> validateSession(
 			@RequestHeader(name = "Authorization", required = false) String authorization, HttpServletRequest request) {
 		enforceRateLimit("display-session-validation", resolveClientKey(request),
 				rateLimitProperties.getSessionValidationsPerMinute());
-		return enrollmentService.validateSession(resolveSessionToken(authorization, request));
+		DisplaySessionValidationResponse response = enrollmentService
+				.validateSession(resolveSessionToken(authorization, request));
+		return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(response);
 	}
 
 	private String resolveClientKey(HttpServletRequest request) {
