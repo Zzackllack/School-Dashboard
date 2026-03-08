@@ -27,6 +27,9 @@ export async function proxyGetRequest(
       signal: controller.signal,
       headers: copyForwardedHeaders(request),
     };
+    if (method === "GET") {
+      init.cache = "no-store";
+    }
 
     if (method !== "GET") {
       const body = await request.arrayBuffer();
@@ -40,10 +43,20 @@ export async function proxyGetRequest(
       init,
     );
 
+    const responseHeaders = new Headers(upstreamResponse.headers);
+    if (method === "GET") {
+      responseHeaders.set(
+        "Cache-Control",
+        "no-store, no-cache, must-revalidate, proxy-revalidate, max-age=0",
+      );
+      responseHeaders.set("Pragma", "no-cache");
+      responseHeaders.set("Expires", "0");
+    }
+
     return new Response(upstreamResponse.body, {
       status: upstreamResponse.status,
       statusText: upstreamResponse.statusText,
-      headers: upstreamResponse.headers,
+      headers: responseHeaders,
     });
   } catch (error) {
     if (isAbortError(error)) {
