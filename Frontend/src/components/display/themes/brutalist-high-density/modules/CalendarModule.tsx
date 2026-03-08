@@ -30,7 +30,10 @@ export function CalendarModule() {
       ) : (
         <div className="divide-y divide-black/10">
           {(events as CalendarEvent[]).map((ev, i) => {
-            const startTimestamp = ev.startDate > 1_000_000_000_000 ? ev.startDate : ev.startDate * 1_000;
+            const startTimestamp =
+              ev.startDate > 1_000_000_000_000
+                ? ev.startDate
+                : ev.startDate * 1_000;
             const start = new Date(startTimestamp);
             const days = daysUntil(start.toISOString().split("T")[0]);
             const dayLabel =

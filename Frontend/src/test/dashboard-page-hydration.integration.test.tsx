@@ -42,7 +42,9 @@ describe("DashboardPage hydration", () => {
 
       await act(async () => {});
 
-      expect(container.querySelector('[data-testid="clock-time"]')).not.toBeNull();
+      expect(
+        container.querySelector('[data-testid="clock-time"]'),
+      ).not.toBeNull();
       expect(container.textContent).not.toContain("Stand: --");
 
       await act(async () => {
