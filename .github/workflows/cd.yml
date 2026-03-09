@@ -89,7 +89,7 @@ jobs:
 
       - name: Build and push backend image
         if: needs.changes.outputs.backend == 'true'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: Docker/backend.Dockerfile
@@ -141,7 +141,7 @@ jobs:
 
       - name: Build and push frontend image
         if: needs.changes.outputs.frontend == 'true'
-        uses: docker/build-push-action@v6
+        uses: docker/build-push-action@v7
         with:
           context: .
           file: Docker/frontend.Dockerfile
