@@ -73,7 +73,9 @@ public class SurveyFlowIntegrationTest {
 						  "displayId": "11111111-1111-1111-1111-111111111111",
 						  "category": "PROBLEM",
 						  "message": "Der QR-Code sollte groesser sein und deutlicher hervorgehoben werden.",
-						  "name": "Mila"
+						  "name": "Mila",
+						  "schoolClass": "10a",
+						  "contactAllowed": true
 						}
 						"""))
 				.andExpect(status().isCreated()).andExpect(jsonPath("$.status").value("RECORDED"));
@@ -82,6 +84,8 @@ public class SurveyFlowIntegrationTest {
 		assertEquals(1, submissions.size());
 		SurveySubmissionEntity submission = submissions.getFirst();
 		assertEquals("Mila", submission.getSubmitterName());
+		assertEquals("10a", submission.getSchoolClass());
+		assertEquals(true, submission.isContactAllowed());
 		assertNotEquals("203.0.113.42", submission.getSourceIpHash());
 		assertEquals(64, submission.getSourceIpHash().length());
 
@@ -91,6 +95,8 @@ public class SurveyFlowIntegrationTest {
 				.queryParam("displayId", ACTIVE_DISPLAY_ID).queryParam("query", "groesser").queryParam("limit", "10"))
 				.andExpect(status().isOk()).andExpect(jsonPath("$[0].displayId").value(ACTIVE_DISPLAY_ID))
 				.andExpect(jsonPath("$[0].submitterName").value("Mila"))
+				.andExpect(jsonPath("$[0].schoolClass").value("10a"))
+				.andExpect(jsonPath("$[0].contactAllowed").value(true))
 				.andExpect(jsonPath("$[0].message")
 						.value(org.hamcrest.Matchers.containsString("groesser")));
 	}

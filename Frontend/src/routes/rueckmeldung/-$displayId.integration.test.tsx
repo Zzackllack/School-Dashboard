@@ -10,6 +10,7 @@ vi.mock("@tanstack/react-router", () => ({
     ...config,
     useParams: () => ({ displayId: "display-1" }),
   }),
+  useParams: () => ({ displayId: "display-1" }),
 }));
 
 vi.mock("#/lib/api/surveys", () => ({
@@ -58,6 +59,14 @@ describe("survey feedback route", () => {
     fireEvent.change(screen.getByLabelText("Name (optional)"), {
       target: { value: "Mila" },
     });
+    fireEvent.change(screen.getByLabelText("Klasse (optional)"), {
+      target: { value: "10a" },
+    });
+    fireEvent.click(
+      screen.getByLabelText(
+        /Admins duerfen auf mich zukommen, falls Rueckfragen oder mehr/,
+      ),
+    );
     fireEvent.click(screen.getByRole("button", { name: "Feedback senden" }));
 
     await waitFor(() => {
@@ -66,6 +75,8 @@ describe("survey feedback route", () => {
         category: "PROBLEM",
         message: "Der QR-Code ist auf dem Display zu klein.",
         name: "Mila",
+        schoolClass: "10a",
+        contactAllowed: true,
       });
     });
 

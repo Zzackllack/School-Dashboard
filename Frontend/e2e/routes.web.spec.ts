@@ -574,6 +574,10 @@ test("submits public feedback for a display", async ({ page }) => {
     .getByLabel("Nachricht")
     .fill("Der QR-Code ist auf dem Display zu klein.");
   await page.getByLabel("Name (optional)").fill("Mila");
+  await page.getByLabel("Klasse (optional)").fill("10a");
+  await page
+    .getByLabel(/Admins duerfen auf mich zukommen, falls Rueckfragen/)
+    .check();
   await page.getByRole("button", { name: "Feedback senden" }).click();
 
   await expect(page.getByText("Rueckmeldung gesendet")).toBeVisible();
@@ -681,6 +685,8 @@ test("admin survey inbox shows feedback entries", async ({ page }) => {
           category: "PROBLEM",
           message: "Der QR-Code ist schwer scanbar.",
           submitterName: "Mila",
+          schoolClass: "10a",
+          contactAllowed: true,
           createdAt: "2026-03-09T15:04:00Z",
         },
       ]),
@@ -693,6 +699,8 @@ test("admin survey inbox shows feedback entries", async ({ page }) => {
     page.getByRole("heading", { name: "Survey-Inbox" }),
   ).toBeVisible();
   await expect(page.getByText("Der QR-Code ist schwer scanbar.")).toBeVisible();
+  await expect(page.getByText("Klasse: 10a")).toBeVisible();
+  await expect(page.getByText("Rueckkontakt: Erlaubt")).toBeVisible();
 });
 
 test("admin pending page supports rejection action", async ({ page }) => {

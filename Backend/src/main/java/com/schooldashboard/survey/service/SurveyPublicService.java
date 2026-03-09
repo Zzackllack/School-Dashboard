@@ -46,8 +46,10 @@ public class SurveyPublicService {
 		}
 
 		String submitterName = normalizeOptional(request.name());
+		String schoolClass = normalizeOptional(request.schoolClass());
+		boolean contactAllowed = Boolean.TRUE.equals(request.contactAllowed());
 		SurveySubmissionEntity entity = new SurveySubmissionEntity(display, request.category(), request.message().trim(),
-				submitterName, tokenHashService.hash(normalizeSourceIp(sourceIp)));
+				submitterName, schoolClass, contactAllowed, tokenHashService.hash(normalizeSourceIp(sourceIp)));
 		SurveySubmissionEntity saved = surveySubmissionRepository.save(entity);
 		return new CreateSurveySubmissionResponse(saved.getId(), saved.getCreatedAt(), "RECORDED");
 	}

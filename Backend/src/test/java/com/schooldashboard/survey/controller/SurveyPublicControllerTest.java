@@ -67,7 +67,9 @@ public class SurveyPublicControllerTest {
 						  "displayId": "123e4567-e89b-12d3-a456-426614174000",
 						  "category": "PROBLEM",
 						  "message": "Der QR-Code sollte etwas groesser dargestellt werden.",
-						  "name": "Mila"
+						  "name": "Mila",
+						  "schoolClass": "10a",
+						  "contactAllowed": true
 						}
 						"""))
 				.andExpect(status().isCreated()).andExpect(jsonPath("$.submissionId").value("submission-1"))

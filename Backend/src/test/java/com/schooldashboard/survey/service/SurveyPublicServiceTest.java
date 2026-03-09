@@ -48,7 +48,7 @@ public class SurveyPublicServiceTest {
 		SurveyDomainException exception = assertThrows(SurveyDomainException.class,
 				() -> service.createSubmission(
 						new CreateSurveySubmissionRequest("missing", SurveyCategory.PROBLEM,
-								"Der QR-Code ist zu klein.", null),
+								"Der QR-Code ist zu klein.", null, null, null),
 						"127.0.0.1"));
 
 		assertEquals("SURVEY_DISPLAY_NOT_FOUND", exception.getCode());
@@ -63,7 +63,7 @@ public class SurveyPublicServiceTest {
 		SurveyDomainException exception = assertThrows(SurveyDomainException.class,
 				() -> service.createSubmission(
 						new CreateSurveySubmissionRequest(display.getId(), SurveyCategory.PROBLEM,
-								"Der QR-Code ist zu klein.", null),
+								"Der QR-Code ist zu klein.", null, null, null),
 						"127.0.0.1"));
 
 		assertEquals("SURVEY_DISPLAY_NOT_ACCEPTING", exception.getCode());
@@ -77,7 +77,7 @@ public class SurveyPublicServiceTest {
 
 		CreateSurveySubmissionResponse response = service.createSubmission(
 				new CreateSurveySubmissionRequest(display.getId(), SurveyCategory.PROBLEM,
-						"Der QR-Code ist zu klein.", "Mila"),
+						"Der QR-Code ist zu klein.", "Mila", "10a", true),
 				"127.0.0.1");
 
 		ArgumentCaptor<SurveySubmissionEntity> captor = ArgumentCaptor.forClass(SurveySubmissionEntity.class);
@@ -85,5 +85,7 @@ public class SurveyPublicServiceTest {
 		assertEquals(response.submissionId(), captor.getValue().getId());
 		assertNotEquals("127.0.0.1", captor.getValue().getSourceIpHash());
 		assertEquals(64, captor.getValue().getSourceIpHash().length());
+		assertEquals("10a", captor.getValue().getSchoolClass());
+		assertEquals(true, captor.getValue().isContactAllowed());
 	}
 }

@@ -22,7 +22,7 @@ public class SurveyAdminServiceTest {
 	public void mapsAndFiltersInboxItems() {
 		DisplayEntity display = new DisplayEntity("Haupteingang", "haupteingang", "Lobby", "default");
 		SurveySubmissionEntity entity = new SurveySubmissionEntity(display, SurveyCategory.PROBLEM,
-				"Der QR-Code ist zu klein.", "Mila", "hashed-ip");
+				"Der QR-Code ist zu klein.", "Mila", "10a", true, "hashed-ip");
 		when(repository.findInboxItems(eq(SurveyCategory.PROBLEM), eq(display.getId()), eq("qr"), org.mockito.ArgumentMatchers.any(Pageable.class)))
 				.thenReturn(List.of(entity));
 
@@ -31,6 +31,8 @@ public class SurveyAdminServiceTest {
 		assertEquals(1, response.size());
 		assertEquals("Haupteingang", response.getFirst().displayName());
 		assertEquals(SurveyCategory.PROBLEM, response.getFirst().category());
+		assertEquals("10a", response.getFirst().schoolClass());
+		assertEquals(true, response.getFirst().contactAllowed());
 	}
 
 	@Test

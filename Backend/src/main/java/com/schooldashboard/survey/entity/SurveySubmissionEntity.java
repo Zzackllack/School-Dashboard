@@ -36,6 +36,12 @@ public class SurveySubmissionEntity {
 	@Column(name = "submitter_name", length = 160)
 	private String submitterName;
 
+	@Column(name = "school_class", length = 40)
+	private String schoolClass;
+
+	@Column(name = "contact_allowed", nullable = false)
+	private boolean contactAllowed;
+
 	@Column(name = "created_at", nullable = false)
 	private Instant createdAt;
 
@@ -46,12 +52,14 @@ public class SurveySubmissionEntity {
 	}
 
 	public SurveySubmissionEntity(DisplayEntity display, SurveyCategory category, String message, String submitterName,
-			String sourceIpHash) {
+			String schoolClass, boolean contactAllowed, String sourceIpHash) {
 		this.id = UUID.randomUUID().toString();
 		this.display = display;
 		this.category = category;
 		this.message = message;
 		this.submitterName = submitterName;
+		this.schoolClass = schoolClass;
+		this.contactAllowed = contactAllowed;
 		this.sourceIpHash = sourceIpHash;
 		this.createdAt = Instant.now();
 	}
@@ -84,6 +92,14 @@ public class SurveySubmissionEntity {
 
 	public String getSubmitterName() {
 		return submitterName;
+	}
+
+	public String getSchoolClass() {
+		return schoolClass;
+	}
+
+	public boolean isContactAllowed() {
+		return contactAllowed;
 	}
 
 	public Instant getCreatedAt() {

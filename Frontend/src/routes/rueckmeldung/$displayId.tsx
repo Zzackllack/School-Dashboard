@@ -25,6 +25,8 @@ export function SurveyFeedbackPage() {
   const [category, setCategory] = useState<SurveyCategory | "">("");
   const [message, setMessage] = useState("");
   const [name, setName] = useState("");
+  const [schoolClass, setSchoolClass] = useState("");
+  const [contactAllowed, setContactAllowed] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
@@ -83,6 +85,9 @@ export function SurveyFeedbackPage() {
     if (name.trim().length > 160) {
       return "Der Name darf maximal 160 Zeichen lang sein.";
     }
+    if (schoolClass.trim().length > 40) {
+      return "Die Klasse darf maximal 40 Zeichen lang sein.";
+    }
     return null;
   }
 
@@ -106,6 +111,8 @@ export function SurveyFeedbackPage() {
         category: category as SurveyCategory,
         message: message.trim(),
         name: name.trim() || undefined,
+        schoolClass: schoolClass.trim() || undefined,
+        contactAllowed,
       });
       setSuccessMessage(
         "Danke. Deine Rueckmeldung wurde gespeichert und an das Admin-Team weitergegeben.",
@@ -113,6 +120,8 @@ export function SurveyFeedbackPage() {
       setCategory("");
       setMessage("");
       setName("");
+      setSchoolClass("");
+      setContactAllowed(false);
     } catch (error) {
       setErrorMessage(
         error instanceof Error
@@ -220,6 +229,30 @@ export function SurveyFeedbackPage() {
                   onChange={(event) => setName(event.target.value)}
                   disabled={!displayContext.acceptingFeedback || isSubmitting}
                 />
+              </label>
+
+              <label className="block text-sm font-semibold text-slate-800">
+                Klasse (optional)
+                <input
+                  className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3 text-base"
+                  value={schoolClass}
+                  onChange={(event) => setSchoolClass(event.target.value)}
+                  disabled={!displayContext.acceptingFeedback || isSubmitting}
+                />
+              </label>
+
+              <label className="flex items-start gap-3 rounded-2xl border border-slate-200 bg-slate-50 px-4 py-4 text-sm text-slate-700">
+                <input
+                  className="mt-1 h-4 w-4 rounded border-slate-300"
+                  type="checkbox"
+                  checked={contactAllowed}
+                  onChange={(event) => setContactAllowed(event.target.checked)}
+                  disabled={!displayContext.acceptingFeedback || isSubmitting}
+                />
+                <span>
+                  Admins duerfen auf mich zukommen, falls Rueckfragen oder mehr
+                  Details hilfreich waeren.
+                </span>
               </label>
 
               {validationMessage ? (

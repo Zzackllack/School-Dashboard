@@ -45,6 +45,8 @@ describe("admin surveys inbox", () => {
         category: "PROBLEM",
         message: "Der QR-Code ist schwer scanbar.",
         submitterName: "Mila",
+        schoolClass: "10a",
+        contactAllowed: true,
         createdAt: "2026-03-09T15:04:00Z",
       },
     ]);
@@ -54,6 +56,8 @@ describe("admin surveys inbox", () => {
     render(<AdminSurveysPage />);
 
     await screen.findByText("Der QR-Code ist schwer scanbar.");
+    expect(screen.getByText("Klasse: 10a")).toBeDefined();
+    expect(screen.getByText("Rueckkontakt: Erlaubt")).toBeDefined();
 
     fireEvent.change(screen.getByLabelText("Kategorie"), {
       target: { value: "PROBLEM" },

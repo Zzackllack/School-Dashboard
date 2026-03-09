@@ -15,6 +15,8 @@ export interface CreateSurveySubmissionRequest {
   category: SurveyCategory;
   message: string;
   name?: string;
+  schoolClass?: string;
+  contactAllowed?: boolean;
 }
 
 export interface CreateSurveySubmissionResponse {
@@ -31,6 +33,8 @@ export interface AdminSurveyListItemResponse {
   category: SurveyCategory;
   message: string;
   submitterName: string | null;
+  schoolClass: string | null;
+  contactAllowed: boolean;
   createdAt: string;
 }
 

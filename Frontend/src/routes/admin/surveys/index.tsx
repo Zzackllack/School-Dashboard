@@ -211,6 +211,10 @@ export function AdminSurveysPage() {
                   </p>
                   <div className="mt-3 flex flex-wrap gap-4 text-sm text-slate-500">
                     <span>Name: {item.submitterName || "Anonym"}</span>
+                    <span>Klasse: {item.schoolClass || "Nicht angegeben"}</span>
+                    <span>
+                      Rueckkontakt: {item.contactAllowed ? "Erlaubt" : "Nicht erlaubt"}
+                    </span>
                     <span>
                       Eingang:{" "}
                       {new Date(item.createdAt).toLocaleString("de-DE", {
