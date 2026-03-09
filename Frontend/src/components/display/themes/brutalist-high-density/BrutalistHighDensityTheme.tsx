@@ -13,6 +13,7 @@ import { TransportModule } from "./modules/TransportModule";
 import { WeatherModule } from "./modules/WeatherModule";
 import { HolidaysModule } from "./modules/HolidaysModule";
 import { CalendarModule } from "./modules/CalendarModule";
+import { SurveyQrModule } from "#/components/display/SurveyQrModule";
 
 // ─── Constants ──────────────────────────────────────────────────────────────────
 
@@ -493,6 +494,7 @@ export function BrutalistHighDensityTheme({ displayId }: DisplayThemeProps) {
           <TransportModule />
           <CalendarModule />
           <HolidaysModule />
+          <SurveyQrModule displayId={displayId} variant="brutalist" />
           <CreditsModule />
         </aside>
       </div>

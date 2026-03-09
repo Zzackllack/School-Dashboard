@@ -229,6 +229,12 @@ function AdminDisplaysPage() {
             >
               Offene Requests
             </Link>
+            <Link
+              className="rounded-md border border-slate-300 px-3 py-2 font-semibold text-slate-700"
+              to={"/admin/surveys" as never}
+            >
+              Survey-Inbox
+            </Link>
             <button
               className="rounded-md border border-slate-300 px-3 py-2 font-semibold text-slate-700"
               type="button"

@@ -404,6 +404,7 @@ test("completes setup -> pending -> approved -> display flow", async ({
   await expect(
     page.locator("main[data-display-theme='default']"),
   ).toBeVisible();
+  await expect(page.getByTestId("module-survey")).toBeVisible();
   await expect(page.getByText("10d, 10a")).toHaveCount(0);
 });
 
@@ -437,6 +438,7 @@ test("restores approved display from stored session token on reboot", async ({
   await expect(
     page.locator("main[data-display-theme='default']"),
   ).toBeVisible();
+  await expect(page.getByTestId("module-survey")).toBeVisible();
 });
 
 test("falls back to setup when stored token is revoked", async ({ page }) => {
@@ -503,6 +505,79 @@ for (const [targetPath, scenarioLabel] of [
     ).toBeVisible();
   });
 }
+
+test("renders the survey module in the brutalist theme", async ({ page }) => {
+  await seedDisplaySessionTokenCookie(page, "token-brutalist");
+
+  await page.route("**/api/displays/session", async (route) => {
+    if (route.request().method() !== "GET") {
+      await route.continue();
+      return;
+    }
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        valid: true,
+        displayId: "display-brutalist",
+        displaySlug: "brutalist-screen",
+        assignedProfileId: "default",
+        themeId: "brutalist-high-density",
+        redirectPath: "/display/display-brutalist",
+      }),
+    });
+  });
+
+  await page.goto("/");
+
+  await expect(page).toHaveURL(/\/display\/display-brutalist/);
+  await expect(
+    page.locator("main[data-display-theme='brutalist-high-density']"),
+  ).toBeVisible();
+  await expect(page.getByTestId("module-survey")).toBeVisible();
+});
+
+test("submits public feedback for a display", async ({ page }) => {
+  await page.route("**/api/surveys/displays/display-1", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify({
+        displayId: "display-1",
+        displayName: "Haupteingang",
+        locationLabel: "Lobby",
+        themeId: "default",
+        acceptingFeedback: true,
+      }),
+    });
+  });
+
+  await page.route("**/api/surveys/submissions", async (route) => {
+    if (route.request().method() !== "POST") {
+      await route.continue();
+      return;
+    }
+    await route.fulfill({
+      status: 201,
+      contentType: "application/json",
+      body: JSON.stringify({
+        submissionId: "submission-1",
+        createdAt: "2026-03-09T15:04:00Z",
+        status: "RECORDED",
+      }),
+    });
+  });
+
+  await page.goto("/rueckmeldung/display-1");
+  await page.getByLabel("Kategorie").selectOption("PROBLEM");
+  await page
+    .getByLabel("Nachricht")
+    .fill("Der QR-Code ist auf dem Display zu klein.");
+  await page.getByLabel("Name (optional)").fill("Mila");
+  await page.getByRole("button", { name: "Feedback senden" }).click();
+
+  await expect(page.getByText("Rueckmeldung gesendet")).toBeVisible();
+});
 
 test("admin pending page supports approval action", async ({ page }) => {
   let approved = false;
@@ -571,6 +646,53 @@ test("admin pending page supports approval action", async ({ page }) => {
   await page.getByRole("button", { name: "Freigeben" }).click();
 
   await expect(page.getByText("Keine offenen Requests.")).toBeVisible();
+});
+
+test("admin survey inbox shows feedback entries", async ({ page }) => {
+  await page.route("**/api/admin/displays", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify([
+        {
+          id: "display-1",
+          name: "Haupteingang",
+          slug: "haupteingang",
+          locationLabel: "Lobby",
+          status: "ACTIVE",
+          assignedProfileId: "default",
+          themeId: "default",
+          updatedAt: "2026-03-09T15:00:00Z",
+        },
+      ]),
+    });
+  });
+
+  await page.route("**/api/admin/surveys?*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify([
+        {
+          id: "survey-1",
+          displayId: "display-1",
+          displayName: "Haupteingang",
+          locationLabel: "Lobby",
+          category: "PROBLEM",
+          message: "Der QR-Code ist schwer scanbar.",
+          submitterName: "Mila",
+          createdAt: "2026-03-09T15:04:00Z",
+        },
+      ]),
+    });
+  });
+
+  await page.goto("/admin/surveys");
+
+  await expect(
+    page.getByRole("heading", { name: "Survey-Inbox" }),
+  ).toBeVisible();
+  await expect(page.getByText("Der QR-Code ist schwer scanbar.")).toBeVisible();
 });
 
 test("admin pending page supports rejection action", async ({ page }) => {

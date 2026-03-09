@@ -98,10 +98,11 @@ public class SecurityConfiguration {
 		http.cors(Customizer.withDefaults())
 				.csrf(csrf -> csrf.csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
 						.ignoringRequestMatchers("/api/displays/**", "/api/substitution/**", "/api/calendar/**",
-								"/api/dsb/**"))
+								"/api/dsb/**", "/api/surveys/**"))
 				.authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 						.requestMatchers("/error", "/health", "/css/**").permitAll()
-						.requestMatchers("/api/displays/**", "/api/substitution/**", "/api/calendar/**", "/api/dsb/**")
+						.requestMatchers("/api/displays/**", "/api/substitution/**", "/api/calendar/**", "/api/dsb/**",
+								"/api/surveys/**")
 						.permitAll().anyRequest().denyAll())
 				.exceptionHandling(exceptionHandling -> exceptionHandling
 						.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler))

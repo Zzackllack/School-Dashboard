@@ -15,6 +15,9 @@ vi.mock("./Transportation", () => ({
   default: () => <div>Transportation</div>,
 }));
 vi.mock("./Weather", () => ({ default: () => <div>Weather</div> }));
+vi.mock("./display/SurveyQrModule", () => ({
+  SurveyQrModule: () => <div>SurveyQrModule</div>,
+}));
 vi.mock("./display/useDisplayRuntime", () => ({
   useDisplayRuntime: () => ({
     isHydrated: false,
@@ -24,10 +27,11 @@ vi.mock("./display/useDisplayRuntime", () => ({
 
 describe("DashboardPage", () => {
   it("renders a non-time placeholder before the client clock is ready", () => {
-    render(<DashboardPage />);
+    render(<DashboardPage displayId="display-1" />);
 
     expect(screen.getByTestId("clock-placeholder")).toBeDefined();
     expect(screen.getByText("Stand: --")).toBeDefined();
     expect(screen.queryByTestId("clock-time")).toBeNull();
+    expect(screen.getByText("SurveyQrModule")).toBeDefined();
   });
 });

@@ -39,10 +39,9 @@ describe("DisplayPage integration", () => {
     const { unmount } = render(<RouterProvider router={router} />);
 
     await waitFor(() => {
-      expect(screen.getByText(/Display: test-screen/)).toBeDefined();
+      expect(screen.getByTestId("dashboard-page")).toBeDefined();
     });
 
-    expect(screen.getByTestId("dashboard-page")).toBeDefined();
     expect(screen.getByRole("main")).toBeDefined();
 
     unmount();

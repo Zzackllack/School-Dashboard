@@ -7,6 +7,7 @@ import Transportation from "./Transportation";
 import Weather from "./Weather";
 import schoolLogo from "../assets/Goethe-Logo.webp";
 import { useDisplayRuntime } from "./display/useDisplayRuntime";
+import { SurveyQrModule } from "./display/SurveyQrModule";
 
 const FOOTER_DATETIME_OPTIONS: Intl.DateTimeFormatOptions = {
   year: "numeric",
@@ -18,7 +19,11 @@ const FOOTER_DATETIME_OPTIONS: Intl.DateTimeFormatOptions = {
   hour12: false,
 };
 
-const DashboardPage = () => {
+interface DashboardPageProps {
+  displayId: string;
+}
+
+const DashboardPage = ({ displayId }: DashboardPageProps) => {
   const { currentTime, isHydrated } = useDisplayRuntime();
 
   return (
@@ -51,6 +56,7 @@ const DashboardPage = () => {
             <Transportation />
             <CalendarEvents />
             <Holidays />
+            <SurveyQrModule displayId={displayId} />
             <Credits />
           </div>
         </div>

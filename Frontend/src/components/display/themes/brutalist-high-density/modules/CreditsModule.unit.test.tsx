@@ -4,11 +4,9 @@ import { describe, expect, it } from "vitest";
 import { CreditsModule } from "./CreditsModule";
 
 describe("Brutalist credits module", () => {
-  it("renders the Goethe logo image", () => {
+  it("renders the credits image", () => {
     render(<CreditsModule />);
 
-    expect(
-      screen.getByAltText("Goethe Gymnasium Lichterfelde Logo"),
-    ).toBeDefined();
+    expect(screen.getByAltText("Leistungs‑Kurs Exkursion Hamburg")).toBeDefined();
   });
 });

@@ -72,6 +72,12 @@ public class AdminSecurityIntegrationTest {
 	}
 
 	@Test
+	public void unauthenticatedSurveyInboxRequestReturns401() throws Exception {
+		mockMvc.perform(get("/api/admin/surveys")).andExpect(status().isUnauthorized())
+				.andExpect(jsonPath("$.code").value("UNAUTHENTICATED"));
+	}
+
+	@Test
 	public void nonAdminUserGets403OnAdminRoute() throws Exception {
 		MockHttpSession operatorSession = login("operator", "operator-password");
 

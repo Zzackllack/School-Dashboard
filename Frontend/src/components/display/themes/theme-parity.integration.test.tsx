@@ -33,6 +33,9 @@ vi.mock("#/components/Holidays", () => ({
 vi.mock("#/components/Credits", () => ({
   default: () => <div data-testid="module-credits">CREDITS</div>,
 }));
+vi.mock("#/components/display/SurveyQrModule", () => ({
+  SurveyQrModule: () => <div data-testid="module-survey">SURVEY</div>,
+}));
 
 /** QueryClient with all fetching disabled so no real network requests are made. */
 function makeTestQueryClient() {
@@ -56,6 +59,7 @@ describe("display themes parity", () => {
     expect(screen.getByTestId("module-transport")).toBeDefined();
     expect(screen.getByTestId("module-calendar")).toBeDefined();
     expect(screen.getByTestId("module-holidays")).toBeDefined();
+    expect(screen.getByTestId("module-survey")).toBeDefined();
   });
 
   it("brutalist theme renders all required modules", () => {
@@ -75,6 +79,7 @@ describe("display themes parity", () => {
     expect(screen.getByTestId("module-transport")).toBeDefined();
     expect(screen.getByTestId("module-calendar")).toBeDefined();
     expect(screen.getByTestId("module-holidays")).toBeDefined();
+    expect(screen.getByTestId("module-survey")).toBeDefined();
     expect(screen.getByTestId("module-credits")).toBeDefined();
 
     // Clock wrapper is always present
