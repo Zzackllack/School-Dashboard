@@ -253,7 +253,7 @@ function SubstCard({ entry }: { entry: SubstitutionEntry }) {
       {isCancelled && (
         <div className="flex items-center justify-between gap-2 px-2.5 pt-1.5 text-[10px] font-mono font-black uppercase tracking-[0.24em] text-red-700">
           <span>Unterricht entfällt</span>
-          <span className="text-black/30">Nicht stattfinden</span>
+          <span className="text-black/30">Ausfall</span>
         </div>
       )}
 
