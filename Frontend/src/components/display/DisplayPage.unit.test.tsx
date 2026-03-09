@@ -32,13 +32,13 @@ describe("DisplayPage", () => {
     cleanup();
   });
 
-  it("renders display id header and dashboard content", () => {
+  it("renders dashboard content without the removed display overlay", () => {
     useParamsMock.mockReturnValue({ displayId: "display-42" });
 
     render(<DisplayPage themeId="default" />);
 
-    expect(screen.getByText(/Display: display-42/)).toBeDefined();
     expect(screen.getByTestId("dashboard-page")).toBeDefined();
+    expect(screen.queryByText(/Display:/)).toBeNull();
   });
 
   it("renders gracefully when displayId is empty", () => {
@@ -46,6 +46,7 @@ describe("DisplayPage", () => {
 
     render(<DisplayPage themeId={null} />);
 
-    expect(screen.getByText(/Display:/)).toBeDefined();
+    expect(screen.getByTestId("dashboard-page")).toBeDefined();
+    expect(screen.queryByText(/Display:/)).toBeNull();
   });
 });

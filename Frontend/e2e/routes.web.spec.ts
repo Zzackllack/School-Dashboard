@@ -401,7 +401,7 @@ test("completes setup -> pending -> approved -> display flow", async ({
   await page.getByRole("button", { name: "Enrollment starten" }).click();
 
   await expect(page).toHaveURL(/\/display\/display-1/);
-  await expect(page.getByText("Display: display-1")).toBeVisible();
+  await expect(page.locator("main[data-display-theme='default']")).toBeVisible();
   await expect(page.getByText("10d, 10a")).toHaveCount(0);
 });
 
@@ -432,7 +432,7 @@ test("restores approved display from stored session token on reboot", async ({
   await page.goto("/");
 
   await expect(page).toHaveURL(/\/display\/display-reboot/);
-  await expect(page.getByText("Display: display-reboot")).toBeVisible();
+  await expect(page.locator("main[data-display-theme='default']")).toBeVisible();
 });
 
 test("falls back to setup when stored token is revoked", async ({ page }) => {
@@ -722,8 +722,10 @@ test("admin can switch display theme and display route keeps module parity", asy
   ).toBeVisible();
 
   await page.goto("/display/display-1");
-  await expect(page.getByText("Display: display-1")).toBeVisible();
   await expect(page.getByTestId("theme-brutalist-high-density")).toBeVisible();
+  await expect(
+    page.getByAltText("Goethe Gymnasium Lichterfelde Logo"),
+  ).toBeVisible();
   await expect(page.getByText("10d, 10a")).toHaveCount(0);
 
   await expect(

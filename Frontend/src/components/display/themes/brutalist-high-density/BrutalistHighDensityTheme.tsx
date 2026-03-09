@@ -7,6 +7,7 @@ import {
 } from "#/lib/api/dashboard";
 import { useQuery } from "@tanstack/react-query";
 import { useEffect, useMemo, useRef } from "react";
+import schoolLogo from "#/assets/Goethe-Logo.webp";
 import { CreditsModule } from "./modules/CreditsModule";
 import { TransportModule } from "./modules/TransportModule";
 import { WeatherModule } from "./modules/WeatherModule";
@@ -195,6 +196,29 @@ function NoChanges() {
 
 function valid(s: string | null | undefined): boolean {
   return !!s && s !== "---" && s.trim() !== "";
+}
+
+function parsePlanDate(planDate: string): Date | null {
+  const rawDate = planDate.trim().split(/\s+/)[0];
+  const match = rawDate.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  if (!match) return null;
+
+  const [, day, month, year] = match;
+  const parsedDate = new Date(
+    Number.parseInt(year, 10),
+    Number.parseInt(month, 10) - 1,
+    Number.parseInt(day, 10),
+  );
+
+  return Number.isNaN(parsedDate.getTime()) ? null : parsedDate;
+}
+
+function isSameCalendarDay(left: Date, right: Date): boolean {
+  return (
+    left.getFullYear() === right.getFullYear() &&
+    left.getMonth() === right.getMonth() &&
+    left.getDate() === right.getDate()
+  );
 }
 
 function isCancellationType(type: string): boolean {
@@ -392,10 +416,15 @@ export function BrutalistHighDensityTheme({ displayId }: DisplayThemeProps) {
     isLoading,
     isError,
   } = useQuery(substitutionPlansQueryOptions);
-  const allEntries = useMemo(
-    () => (plans ?? []).flatMap((p) => p.entries),
-    [plans],
-  );
+  const allEntries = useMemo(() => {
+    const today = currentTime ?? new Date();
+    return (plans ?? [])
+      .filter((plan) => {
+        const parsedPlanDate = parsePlanDate(plan.date);
+        return parsedPlanDate ? isSameCalendarDay(parsedPlanDate, today) : true;
+      })
+      .flatMap((plan) => plan.entries);
+  }, [currentTime, plans]);
 
   useContainerAutoScroll(sidebarRef, []);
 
@@ -406,14 +435,11 @@ export function BrutalistHighDensityTheme({ displayId }: DisplayThemeProps) {
     >
       {/* ── Header ── */}
       <header className="flex shrink-0 items-center justify-between border-b-4 border-black bg-white px-5 py-2.5">
-        <div>
-          <p className="font-mono text-[10px] uppercase tracking-[0.25em] text-black/40">
-            Goethe-Gymnasium Lichterfelde
-          </p>
-          <h1 className="font-black text-xl uppercase tracking-[0.04em] leading-tight">
-            Tagesvertretungsplan
-          </h1>
-        </div>
+        <img
+          src={schoolLogo}
+          alt="Goethe Gymnasium Lichterfelde Logo"
+          className="h-16 w-auto border-2 border-black bg-black px-2 py-1 invert"
+        />
         <div data-testid="module-clock">
           {isHydrated && currentTime ? (
             <Clock currentTime={currentTime} />
