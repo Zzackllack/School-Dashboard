@@ -12,6 +12,18 @@ const substitutionFixture = [
     title: "Vertretungsplan",
     entries: [
       {
+        classes: "10d, 10a",
+        period: "",
+        absent: "",
+        substitute: "",
+        originalSubject: "",
+        subject: "",
+        newRoom: "",
+        type: "",
+        comment: "",
+        date: "01.01.2026",
+      },
+      {
         classes: "10a",
         period: "2",
         absent: "Müller",
@@ -390,6 +402,7 @@ test("completes setup -> pending -> approved -> display flow", async ({
 
   await expect(page).toHaveURL(/\/display\/display-1/);
   await expect(page.getByText("Display: display-1")).toBeVisible();
+  await expect(page.getByText("10d, 10a")).toHaveCount(0);
 });
 
 test("restores approved display from stored session token on reboot", async ({
@@ -711,6 +724,7 @@ test("admin can switch display theme and display route keeps module parity", asy
   await page.goto("/display/display-1");
   await expect(page.getByText("Display: display-1")).toBeVisible();
   await expect(page.getByTestId("theme-brutalist-high-density")).toBeVisible();
+  await expect(page.getByText("10d, 10a")).toHaveCount(0);
 
   await expect(
     page.getByRole("heading", { name: "Vertretungspläne" }),

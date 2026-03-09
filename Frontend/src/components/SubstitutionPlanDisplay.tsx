@@ -15,6 +15,11 @@ import {
   type SubstitutionPlan,
 } from "../lib/api/dashboard";
 
+const isCancellationType = (type: string) => {
+  const normalizedType = type.trim().toLowerCase();
+  return normalizedType === "entfall" || normalizedType === "ausfall";
+};
+
 const SubstitutionPlanDisplay = () => {
   const {
     data: substitutionPlans = [],
@@ -306,11 +311,16 @@ const SubstitutionPlanDisplay = () => {
                     {plan.entries.map((entry, entryIndex) => {
                       // Get class-specific background color
                       const classColor = getClassColor(entry.classes);
+                      const isCancellation = isCancellationType(entry.type);
 
                       return (
                         <tr
                           key={entryIndex}
-                          className={`${classColor} hover:bg-opacity-100 transition duration-300 ease-in-out`}
+                          className={`${classColor} transition duration-300 ease-in-out ${
+                            isCancellation
+                              ? "border-l-4 border-l-red-500 bg-gradient-to-r from-zinc-200/95 via-zinc-100/90 to-white/90"
+                              : "hover:bg-opacity-100"
+                          }`}
                         >
                           <td className="border-b border-gray-100/30 px-4 py-3 font-medium">
                             {entry.classes}

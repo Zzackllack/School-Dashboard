@@ -197,6 +197,11 @@ function valid(s: string | null | undefined): boolean {
   return !!s && s !== "---" && s.trim() !== "";
 }
 
+function isCancellationType(type: string): boolean {
+  const normalizedType = type.trim().toLowerCase();
+  return normalizedType === "entfall" || normalizedType === "ausfall";
+}
+
 function SubstCard({ entry }: { entry: SubstitutionEntry }) {
   const badge = getTypeBadge(entry.type);
   const subject = valid(entry.subject)
@@ -209,16 +214,35 @@ function SubstCard({ entry }: { entry: SubstitutionEntry }) {
   const hasRoom = valid(entry.newRoom);
   const hasPeriod = valid(entry.period);
   const hasComment = valid(entry.comment);
+  const isCancelled = isCancellationType(entry.type);
 
   return (
-    <div className="border-2 border-black bg-white">
-      <div className="flex items-start gap-2 px-2.5 pt-2 pb-0">
+    <div
+      className={`border-2 border-black ${
+        isCancelled
+          ? "bg-[linear-gradient(135deg,#f1f1f1_0%,#e2e2e2_48%,#fafafa_48%,#fafafa_100%)] shadow-[8px_8px_0_0_rgba(220,38,38,0.24)]"
+          : "bg-white"
+      }`}
+    >
+      <div
+        className={`flex items-start gap-2 px-2.5 pt-2 pb-0 ${
+          isCancelled ? "border-b-2 border-red-600/20 bg-black/[0.03]" : ""
+        }`}
+      >
         <div className="min-w-0 flex-1">
-          <span className="font-black text-sm uppercase tracking-tight">
+          <span
+            className={`font-black text-sm uppercase tracking-tight ${
+              isCancelled ? "text-black/80" : ""
+            }`}
+          >
             {entry.classes}
           </span>
           {subject && (
-            <span className="ml-1.5 text-sm font-semibold text-black/80">
+            <span
+              className={`ml-1.5 text-sm font-semibold ${
+                isCancelled ? "text-black/55 line-through decoration-red-500/80" : "text-black/80"
+              }`}
+            >
               {subject}
             </span>
           )}
@@ -226,8 +250,19 @@ function SubstCard({ entry }: { entry: SubstitutionEntry }) {
         <Badge label={badge.label} variant={badge.variant} />
       </div>
 
+      {isCancelled && (
+        <div className="flex items-center justify-between gap-2 px-2.5 pt-1.5 text-[10px] font-mono font-black uppercase tracking-[0.24em] text-red-700">
+          <span>Unterricht entfällt</span>
+          <span className="text-black/30">Nicht stattfinden</span>
+        </div>
+      )}
+
       {(hasAbsent || hasSub) && (
-        <div className="px-2.5 pt-1 text-xs text-black/65">
+        <div
+          className={`px-2.5 pt-1 text-xs ${
+            isCancelled ? "text-black/45" : "text-black/65"
+          }`}
+        >
           {hasAbsent && hasSub ? (
             <span>
               {entry.absent} <span className="font-mono text-black/35">→</span>{" "}
@@ -243,17 +278,29 @@ function SubstCard({ entry }: { entry: SubstitutionEntry }) {
 
       <div className="flex flex-wrap items-center gap-x-3 px-2.5 pb-2 pt-1">
         {hasPeriod && (
-          <span className="font-mono text-[11px] text-black/45">
+          <span
+            className={`font-mono text-[11px] ${
+              isCancelled ? "text-black/35" : "text-black/45"
+            }`}
+          >
             Std.&thinsp;{entry.period}
           </span>
         )}
         {hasRoom && (
-          <span className="font-mono text-[11px] text-black/45">
+          <span
+            className={`font-mono text-[11px] ${
+              isCancelled ? "text-black/35" : "text-black/45"
+            }`}
+          >
             Raum&thinsp;{entry.newRoom}
           </span>
         )}
         {hasComment && (
-          <span className="font-mono text-[11px] italic text-black/35 truncate max-w-48">
+          <span
+            className={`max-w-48 truncate font-mono text-[11px] italic ${
+              isCancelled ? "text-black/30" : "text-black/35"
+            }`}
+          >
             {entry.comment}
           </span>
         )}

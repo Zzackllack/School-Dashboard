@@ -35,9 +35,40 @@ export interface CalendarEvent {
   allDay: boolean;
 }
 
+function hasVisibleValue(value: string | null | undefined) {
+  return Boolean(value && value.trim() !== "" && value.trim() !== "---");
+}
+
+export function isMeaningfulSubstitutionEntry(entry: SubstitutionEntry) {
+  if (!hasVisibleValue(entry.classes)) {
+    return false;
+  }
+
+  return [
+    entry.period,
+    entry.absent,
+    entry.substitute,
+    entry.originalSubject,
+    entry.subject,
+    entry.newRoom,
+    entry.type,
+    entry.comment,
+  ].some(hasVisibleValue);
+}
+
+export function sanitizeSubstitutionPlans(plans: SubstitutionPlan[]) {
+  return plans.map((plan) => ({
+    ...plan,
+    entries: plan.entries.filter(isMeaningfulSubstitutionEntry),
+  }));
+}
+
 export const substitutionPlansQueryOptions = queryOptions({
   queryKey: ["substitution-plans"],
-  queryFn: () => fetchJson<SubstitutionPlan[]>("/substitution/plans"),
+  queryFn: async () =>
+    sanitizeSubstitutionPlans(
+      (await fetchJson<SubstitutionPlan[]>("/substitution/plans")) ?? [],
+    ),
   refetchInterval: 5 * 60 * 1000,
 });
 
