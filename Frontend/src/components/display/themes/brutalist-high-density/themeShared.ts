@@ -44,6 +44,37 @@ interface TransportStreamState {
   loading: boolean;
 }
 
+export function resolveTransportStops(nearby: BvgStop[]) {
+  if (nearby.length === 0) {
+    return {
+      busStop: null,
+      sBahnStop: null,
+    };
+  }
+
+  return {
+    busStop: nearby.find((s) => s.products.bus) ?? nearby[0],
+    sBahnStop: nearby.find((s) => s.products.suburban) ?? null,
+  };
+}
+
+export function buildDeparturesUrl(
+  stopId: string,
+  options?: {
+    suburbanOnly?: boolean;
+  },
+) {
+  const params = new URLSearchParams({
+    results: "30",
+    duration: "60",
+  });
+  if (options?.suburbanOnly) {
+    params.set("suburban", "true");
+  }
+
+  return `https://v6.bvg.transport.rest/stops/${stopId}/departures?${params.toString()}`;
+}
+
 export function weatherDesc(code: number): string {
   if (code === 0) return "Klarer Himmel";
   if (code === 1) return "Überwiegend klar";
@@ -157,7 +188,7 @@ export function useTransport() {
     queryKey: ["bvg-nearby-bru", SCHOOL_LAT, SCHOOL_LNG],
     queryFn: async () => {
       const r = await fetch(
-        `https://v6.bvg.transport.rest/locations/nearby?latitude=${SCHOOL_LAT}&longitude=${SCHOOL_LNG}&results=20`,
+        `https://v6.bvg.transport.rest/locations/nearby?latitude=${SCHOOL_LAT}&longitude=${SCHOOL_LNG}&results=30`,
       );
       if (!r.ok) throw new Error(`BVG-Fehler: ${r.status}`);
       return r.json();
@@ -172,11 +203,11 @@ export function useTransport() {
       return;
     }
 
-    const nearestBusStop = nearby.find((s) => s.products.bus) ?? nearby[0];
-    const nearestSBahnStop = nearby.find((s) => s.products.suburban) ?? null;
+    const { busStop: nearestBusStop, sBahnStop: nearestSBahnStop } =
+      resolveTransportStops(nearby);
 
     setBusStop((prev) =>
-      prev?.id === nearestBusStop.id ? prev : nearestBusStop,
+      nearestBusStop && prev?.id === nearestBusStop.id ? prev : nearestBusStop,
     );
     setSBahnStop((prev) =>
       nearestSBahnStop && prev?.id === nearestSBahnStop.id
@@ -190,20 +221,26 @@ export function useTransport() {
       stopId: string,
       setDepartures: (departures: BvgDeparture[]) => void,
       setLoading: (loading: boolean) => void,
-      product?: string,
+      options?: {
+        product?: string;
+        suburbanOnly?: boolean;
+      },
     ) => {
       setLoading(true);
       try {
         const r = await fetch(
-          `https://v6.bvg.transport.rest/stops/${stopId}/departures?results=10&duration=60`,
+          buildDeparturesUrl(stopId, {
+            suburbanOnly: options?.suburbanOnly,
+          }),
         );
         if (!r.ok) throw new Error(`BVG-Abfahrten-Fehler: ${r.status}`);
         const d = await r.json();
         const departures = Array.isArray(d.departures) ? d.departures : [];
         setDepartures(
-          product
+          options?.product
             ? departures.filter(
-                (departure: BvgDeparture) => departure.line.product === product,
+                (departure: BvgDeparture) =>
+                  departure.line.product === options.product,
               )
             : departures,
         );
@@ -225,6 +262,7 @@ export function useTransport() {
           departures.filter((departure) => departure.line.product === "bus"),
         ),
       setIsBusLoading,
+      { product: "bus" },
     );
     const iv = setInterval(
       () =>
@@ -235,6 +273,7 @@ export function useTransport() {
               departures.filter((departure) => departure.line.product === "bus"),
             ),
           setIsBusLoading,
+          { product: "bus" },
         ),
       3 * 60 * 1_000,
     );
@@ -247,7 +286,7 @@ export function useTransport() {
       sBahnStop.id,
       setSBahnDepartures,
       setIsSBahnLoading,
-      "suburban",
+      { product: "suburban", suburbanOnly: true },
     );
     const iv = setInterval(
       () =>
@@ -255,7 +294,7 @@ export function useTransport() {
           sBahnStop.id,
           setSBahnDepartures,
           setIsSBahnLoading,
-          "suburban",
+          { product: "suburban", suburbanOnly: true },
         ),
       3 * 60 * 1_000,
     );
