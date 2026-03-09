@@ -29,9 +29,9 @@ const FOOTER_OPTIONS: Intl.DateTimeFormatOptions = {
 };
 
 const GRADE_COLUMNS = [
-  { id: "07-08", label: "07—08", color: "bg-[#FFD60A]", grades: [7, 8] },
-  { id: "09-10", label: "09—10", color: "bg-[#32D74B]", grades: [9, 10] },
-  { id: "11-12", label: "11—12", color: "bg-[#FF9F0A]", grades: [11, 12] },
+  { id: "07-08", label: "07 – 08", color: "bg-[#FFD60A]", grades: [7, 8] },
+  { id: "09-10", label: "09 – 10", color: "bg-[#32D74B]", grades: [9, 10] },
+  { id: "11-12", label: "11 – 12", color: "bg-[#FF9F0A]", grades: [11, 12] },
 ] as const;
 
 // ─── Types ───────────────────────────────────────────────────────────────────────
