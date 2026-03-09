@@ -24,7 +24,8 @@ import org.mockito.ArgumentCaptor;
 public class SurveyPublicServiceTest {
 
 	private final DisplayRepository displayRepository = org.mockito.Mockito.mock(DisplayRepository.class);
-	private final SurveySubmissionRepository submissionRepository = org.mockito.Mockito.mock(SurveySubmissionRepository.class);
+	private final SurveySubmissionRepository submissionRepository = org.mockito.Mockito
+			.mock(SurveySubmissionRepository.class);
 	private final TokenHashService tokenHashService = new TokenHashService();
 	private final SurveyPublicService service = new SurveyPublicService(displayRepository, submissionRepository,
 			tokenHashService);
@@ -61,10 +62,8 @@ public class SurveyPublicServiceTest {
 		when(displayRepository.findById(display.getId())).thenReturn(Optional.of(display));
 
 		SurveyDomainException exception = assertThrows(SurveyDomainException.class,
-				() -> service.createSubmission(
-						new CreateSurveySubmissionRequest(display.getId(), SurveyCategory.PROBLEM,
-								"Der QR-Code ist zu klein.", null, null, null),
-						"127.0.0.1"));
+				() -> service.createSubmission(new CreateSurveySubmissionRequest(display.getId(),
+						SurveyCategory.PROBLEM, "Der QR-Code ist zu klein.", null, null, null), "127.0.0.1"));
 
 		assertEquals("SURVEY_DISPLAY_NOT_ACCEPTING", exception.getCode());
 	}
@@ -73,12 +72,12 @@ public class SurveyPublicServiceTest {
 	public void hashesSourceIpBeforePersisting() {
 		DisplayEntity display = new DisplayEntity("Haupteingang", "haupteingang", "Lobby", "default");
 		when(displayRepository.findById(display.getId())).thenReturn(Optional.of(display));
-		when(submissionRepository.save(any(SurveySubmissionEntity.class))).thenAnswer(invocation -> invocation.getArgument(0));
+		when(submissionRepository.save(any(SurveySubmissionEntity.class)))
+				.thenAnswer(invocation -> invocation.getArgument(0));
 
-		CreateSurveySubmissionResponse response = service.createSubmission(
-				new CreateSurveySubmissionRequest(display.getId(), SurveyCategory.PROBLEM,
-						"Der QR-Code ist zu klein.", "Mila", "10a", true),
-				"127.0.0.1");
+		CreateSurveySubmissionResponse response = service
+				.createSubmission(new CreateSurveySubmissionRequest(display.getId(), SurveyCategory.PROBLEM,
+						"Der QR-Code ist zu klein.", "Mila", "10a", true), "127.0.0.1");
 
 		ArgumentCaptor<SurveySubmissionEntity> captor = ArgumentCaptor.forClass(SurveySubmissionEntity.class);
 		org.mockito.Mockito.verify(submissionRepository).save(captor.capture());

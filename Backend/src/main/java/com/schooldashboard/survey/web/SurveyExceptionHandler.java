@@ -29,8 +29,8 @@ public class SurveyExceptionHandler {
 		if (message.isBlank()) {
 			message = "Ungültige Anfrage";
 		}
-		return ResponseEntity.badRequest().body(new SurveyErrorResponse("SURVEY_VALIDATION_ERROR", message,
-				resolveRequestId(request), Instant.now()));
+		return ResponseEntity.badRequest().body(
+				new SurveyErrorResponse("SURVEY_VALIDATION_ERROR", message, resolveRequestId(request), Instant.now()));
 	}
 
 	@ExceptionHandler(Exception.class)

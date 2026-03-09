@@ -213,7 +213,8 @@ export function AdminSurveysPage() {
                     <span>Name: {item.submitterName || "Anonym"}</span>
                     <span>Klasse: {item.schoolClass || "Nicht angegeben"}</span>
                     <span>
-                      Rueckkontakt: {item.contactAllowed ? "Erlaubt" : "Nicht erlaubt"}
+                      Rueckkontakt:{" "}
+                      {item.contactAllowed ? "Erlaubt" : "Nicht erlaubt"}
                     </span>
                     <span>
                       Eingang:{" "}

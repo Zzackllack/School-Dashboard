@@ -33,9 +33,10 @@ public class SurveyAdminService {
 	}
 
 	private AdminSurveyListItemResponse toResponse(SurveySubmissionEntity entity) {
-		return new AdminSurveyListItemResponse(entity.getId(), entity.getDisplay().getId(), entity.getDisplay().getName(),
-				entity.getDisplay().getLocationLabel(), entity.getCategory(), entity.getMessage(),
-				entity.getSubmitterName(), entity.getSchoolClass(), entity.isContactAllowed(), entity.getCreatedAt());
+		return new AdminSurveyListItemResponse(entity.getId(), entity.getDisplay().getId(),
+				entity.getDisplay().getName(), entity.getDisplay().getLocationLabel(), entity.getCategory(),
+				entity.getMessage(), entity.getSubmitterName(), entity.getSchoolClass(), entity.isContactAllowed(),
+				entity.getCreatedAt());
 	}
 
 	private int sanitizeLimit(Integer limit) {

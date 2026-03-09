@@ -22,8 +22,8 @@ public class SurveyPublicService {
 	private final SurveySubmissionRepository surveySubmissionRepository;
 	private final TokenHashService tokenHashService;
 
-	public SurveyPublicService(DisplayRepository displayRepository, SurveySubmissionRepository surveySubmissionRepository,
-			TokenHashService tokenHashService) {
+	public SurveyPublicService(DisplayRepository displayRepository,
+			SurveySubmissionRepository surveySubmissionRepository, TokenHashService tokenHashService) {
 		this.displayRepository = displayRepository;
 		this.surveySubmissionRepository = surveySubmissionRepository;
 		this.tokenHashService = tokenHashService;
@@ -38,8 +38,8 @@ public class SurveyPublicService {
 
 	@Transactional
 	public CreateSurveySubmissionResponse createSubmission(CreateSurveySubmissionRequest request, String sourceIp) {
-		DisplayEntity display = displayRepository.findById(request.displayId()).orElseThrow(() -> new SurveyDomainException(
-				"SURVEY_DISPLAY_NOT_FOUND", HttpStatus.NOT_FOUND, "Display not found"));
+		DisplayEntity display = displayRepository.findById(request.displayId()).orElseThrow(
+				() -> new SurveyDomainException("SURVEY_DISPLAY_NOT_FOUND", HttpStatus.NOT_FOUND, "Display not found"));
 		if (!isAcceptingFeedback(display)) {
 			throw new SurveyDomainException("SURVEY_DISPLAY_NOT_ACCEPTING", HttpStatus.BAD_REQUEST,
 					"Display is not accepting feedback");
@@ -48,8 +48,9 @@ public class SurveyPublicService {
 		String submitterName = normalizeOptional(request.name());
 		String schoolClass = normalizeOptional(request.schoolClass());
 		boolean contactAllowed = Boolean.TRUE.equals(request.contactAllowed());
-		SurveySubmissionEntity entity = new SurveySubmissionEntity(display, request.category(), request.message().trim(),
-				submitterName, schoolClass, contactAllowed, tokenHashService.hash(normalizeSourceIp(sourceIp)));
+		SurveySubmissionEntity entity = new SurveySubmissionEntity(display, request.category(),
+				request.message().trim(), submitterName, schoolClass, contactAllowed,
+				tokenHashService.hash(normalizeSourceIp(sourceIp)));
 		SurveySubmissionEntity saved = surveySubmissionRepository.save(entity);
 		return new CreateSurveySubmissionResponse(saved.getId(), saved.getCreatedAt(), "RECORDED");
 	}

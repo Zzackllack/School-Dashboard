@@ -153,9 +153,7 @@ export function SurveyFeedbackPage() {
         {isLoading ? (
           <section className="mt-8 rounded-2xl border border-slate-200 bg-slate-50 p-6">
             <h2 className="text-lg font-semibold">Display wird geladen</h2>
-            <p className="mt-2 text-sm text-slate-600">
-              Einen Moment bitte.
-            </p>
+            <p className="mt-2 text-sm text-slate-600">Einen Moment bitte.</p>
           </section>
         ) : errorMessage ? (
           <section className="mt-8 rounded-2xl border border-rose-200 bg-rose-50 p-6">
@@ -187,7 +185,9 @@ export function SurveyFeedbackPage() {
                 <h2 className="text-lg font-semibold text-emerald-950">
                   Rueckmeldung gesendet
                 </h2>
-                <p className="mt-2 text-sm text-emerald-800">{successMessage}</p>
+                <p className="mt-2 text-sm text-emerald-800">
+                  {successMessage}
+                </p>
               </section>
             ) : null}
 
@@ -271,7 +271,9 @@ export function SurveyFeedbackPage() {
                 type="submit"
                 disabled={!displayContext.acceptingFeedback || isSubmitting}
               >
-                {isSubmitting ? "Rueckmeldung wird gesendet ..." : "Feedback senden"}
+                {isSubmitting
+                  ? "Rueckmeldung wird gesendet ..."
+                  : "Feedback senden"}
               </button>
             </form>
           </>

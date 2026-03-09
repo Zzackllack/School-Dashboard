@@ -33,7 +33,9 @@ describe("DashboardPage hydration", () => {
       consoleErrorSpy = vi.spyOn(console, "error").mockImplementation(() => {});
 
       const container = document.createElement("div");
-      container.innerHTML = renderToString(<DashboardPage displayId="display-1" />);
+      container.innerHTML = renderToString(
+        <DashboardPage displayId="display-1" />,
+      );
       root = hydrateRoot(container, <DashboardPage displayId="display-1" />, {
         onRecoverableError: (error) => {
           recoverableErrors.push(error);

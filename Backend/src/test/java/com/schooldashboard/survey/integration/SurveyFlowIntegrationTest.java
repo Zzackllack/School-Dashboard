@@ -58,7 +58,8 @@ public class SurveyFlowIntegrationTest {
 		setId(activeDisplay, ACTIVE_DISPLAY_ID);
 		displayRepository.save(activeDisplay);
 
-		DisplayEntity inactiveDisplay = new DisplayEntity("Nebeneingang", "nebeneingang", "Westfluegel", "side-profile");
+		DisplayEntity inactiveDisplay = new DisplayEntity("Nebeneingang", "nebeneingang", "Westfluegel",
+				"side-profile");
 		inactiveDisplay.setStatus(DisplayStatus.INACTIVE);
 		setId(inactiveDisplay, INACTIVE_DISPLAY_ID);
 		displayRepository.save(inactiveDisplay);
@@ -67,8 +68,7 @@ public class SurveyFlowIntegrationTest {
 	@Test
 	public void validSubmitIsPersistedAndInboxSupportsFiltering() throws Exception {
 		mockMvc.perform(post("/api/surveys/submissions").contentType(MediaType.APPLICATION_JSON)
-				.header("X-Forwarded-For", "203.0.113.42")
-				.content("""
+				.header("X-Forwarded-For", "203.0.113.42").content("""
 						{
 						  "displayId": "11111111-1111-1111-1111-111111111111",
 						  "category": "PROBLEM",
@@ -77,8 +77,7 @@ public class SurveyFlowIntegrationTest {
 						  "schoolClass": "10a",
 						  "contactAllowed": true
 						}
-						"""))
-				.andExpect(status().isCreated()).andExpect(jsonPath("$.status").value("RECORDED"));
+						""")).andExpect(status().isCreated()).andExpect(jsonPath("$.status").value("RECORDED"));
 
 		List<SurveySubmissionEntity> submissions = surveySubmissionRepository.findAll();
 		assertEquals(1, submissions.size());
@@ -97,31 +96,26 @@ public class SurveyFlowIntegrationTest {
 				.andExpect(jsonPath("$[0].submitterName").value("Mila"))
 				.andExpect(jsonPath("$[0].schoolClass").value("10a"))
 				.andExpect(jsonPath("$[0].contactAllowed").value(true))
-				.andExpect(jsonPath("$[0].message")
-						.value(org.hamcrest.Matchers.containsString("groesser")));
+				.andExpect(jsonPath("$[0].message").value(org.hamcrest.Matchers.containsString("groesser")));
 	}
 
 	@Test
 	public void unknownDisplayAndInactiveDisplayAreRejected() throws Exception {
-		mockMvc.perform(post("/api/surveys/submissions").contentType(MediaType.APPLICATION_JSON)
-				.content("""
-						{
-						  "displayId": "33333333-3333-3333-3333-333333333333",
-						  "category": "PROBLEM",
-						  "message": "Dieses Display existiert nicht im Backend."
-						}
-						"""))
-				.andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("SURVEY_DISPLAY_NOT_FOUND"));
+		mockMvc.perform(post("/api/surveys/submissions").contentType(MediaType.APPLICATION_JSON).content("""
+				{
+				  "displayId": "33333333-3333-3333-3333-333333333333",
+				  "category": "PROBLEM",
+				  "message": "Dieses Display existiert nicht im Backend."
+				}
+				""")).andExpect(status().isNotFound()).andExpect(jsonPath("$.code").value("SURVEY_DISPLAY_NOT_FOUND"));
 
-		mockMvc.perform(post("/api/surveys/submissions").contentType(MediaType.APPLICATION_JSON)
-				.content("""
-						{
-						  "displayId": "22222222-2222-2222-2222-222222222222",
-						  "category": "WUNSCH",
-						  "message": "Bitte dieses inaktive Display nicht fuer Feedback verwenden."
-						}
-						"""))
-				.andExpect(status().isBadRequest())
+		mockMvc.perform(post("/api/surveys/submissions").contentType(MediaType.APPLICATION_JSON).content("""
+				{
+				  "displayId": "22222222-2222-2222-2222-222222222222",
+				  "category": "WUNSCH",
+				  "message": "Bitte dieses inaktive Display nicht fuer Feedback verwenden."
+				}
+				""")).andExpect(status().isBadRequest())
 				.andExpect(jsonPath("$.code").value("SURVEY_DISPLAY_NOT_ACCEPTING"));
 	}
 

@@ -23,10 +23,11 @@ public class SurveyAdminServiceTest {
 		DisplayEntity display = new DisplayEntity("Haupteingang", "haupteingang", "Lobby", "default");
 		SurveySubmissionEntity entity = new SurveySubmissionEntity(display, SurveyCategory.PROBLEM,
 				"Der QR-Code ist zu klein.", "Mila", "10a", true, "hashed-ip");
-		when(repository.findInboxItems(eq(SurveyCategory.PROBLEM), eq(display.getId()), eq("qr"), org.mockito.ArgumentMatchers.any(Pageable.class)))
-				.thenReturn(List.of(entity));
+		when(repository.findInboxItems(eq(SurveyCategory.PROBLEM), eq(display.getId()), eq("qr"),
+				org.mockito.ArgumentMatchers.any(Pageable.class))).thenReturn(List.of(entity));
 
-		List<AdminSurveyListItemResponse> response = service.getInbox(SurveyCategory.PROBLEM, display.getId(), "qr", 50);
+		List<AdminSurveyListItemResponse> response = service.getInbox(SurveyCategory.PROBLEM, display.getId(), "qr",
+				50);
 
 		assertEquals(1, response.size());
 		assertEquals("Haupteingang", response.getFirst().displayName());
