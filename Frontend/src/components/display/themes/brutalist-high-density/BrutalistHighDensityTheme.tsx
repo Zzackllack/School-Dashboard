@@ -264,7 +264,9 @@ function SubstCard({ entry }: { entry: SubstitutionEntry }) {
           {subject && (
             <span
               className={`ml-1.5 text-sm font-semibold ${
-                isCancelled ? "text-black/55 line-through decoration-red-500/80" : "text-black/80"
+                isCancelled
+                  ? "text-black/55 line-through decoration-red-500/80"
+                  : "text-black/80"
               }`}
             >
               {subject}

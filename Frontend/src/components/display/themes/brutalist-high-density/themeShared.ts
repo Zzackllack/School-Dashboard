@@ -270,7 +270,9 @@ export function useTransport() {
           busStop.id,
           (departures) =>
             setBusDepartures(
-              departures.filter((departure) => departure.line.product === "bus"),
+              departures.filter(
+                (departure) => departure.line.product === "bus",
+              ),
             ),
           setIsBusLoading,
           { product: "bus" },
@@ -282,20 +284,16 @@ export function useTransport() {
 
   useEffect(() => {
     if (!sBahnStop?.id) return;
-    fetchDeps(
-      sBahnStop.id,
-      setSBahnDepartures,
-      setIsSBahnLoading,
-      { product: "suburban", suburbanOnly: true },
-    );
+    fetchDeps(sBahnStop.id, setSBahnDepartures, setIsSBahnLoading, {
+      product: "suburban",
+      suburbanOnly: true,
+    });
     const iv = setInterval(
       () =>
-        fetchDeps(
-          sBahnStop.id,
-          setSBahnDepartures,
-          setIsSBahnLoading,
-          { product: "suburban", suburbanOnly: true },
-        ),
+        fetchDeps(sBahnStop.id, setSBahnDepartures, setIsSBahnLoading, {
+          product: "suburban",
+          suburbanOnly: true,
+        }),
       3 * 60 * 1_000,
     );
     return () => clearInterval(iv);

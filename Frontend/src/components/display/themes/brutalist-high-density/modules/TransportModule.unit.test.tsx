@@ -5,7 +5,9 @@ import { TransportModule } from "./TransportModule";
 
 vi.mock("../themeShared", () => ({
   lineBadgeCls: (product: string) =>
-    product === "suburban" ? "bg-[#009252] text-white" : "bg-[#8B008B] text-white",
+    product === "suburban"
+      ? "bg-[#009252] text-white"
+      : "bg-[#8B008B] text-white",
   minsUntil: (when: string | null) => {
     if (!when) return 0;
     return when.includes("soon") ? 3 : 6;

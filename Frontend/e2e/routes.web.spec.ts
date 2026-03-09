@@ -401,7 +401,9 @@ test("completes setup -> pending -> approved -> display flow", async ({
   await page.getByRole("button", { name: "Enrollment starten" }).click();
 
   await expect(page).toHaveURL(/\/display\/display-1/);
-  await expect(page.locator("main[data-display-theme='default']")).toBeVisible();
+  await expect(
+    page.locator("main[data-display-theme='default']"),
+  ).toBeVisible();
   await expect(page.getByText("10d, 10a")).toHaveCount(0);
 });
 
@@ -432,7 +434,9 @@ test("restores approved display from stored session token on reboot", async ({
   await page.goto("/");
 
   await expect(page).toHaveURL(/\/display\/display-reboot/);
-  await expect(page.locator("main[data-display-theme='default']")).toBeVisible();
+  await expect(
+    page.locator("main[data-display-theme='default']"),
+  ).toBeVisible();
 });
 
 test("falls back to setup when stored token is revoked", async ({ page }) => {

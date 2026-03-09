@@ -60,13 +60,12 @@ public class AdminDisplayControllerTest {
 	public void updateDisplayThemeReturnsUpdatedSummary() throws Exception {
 		Instant updatedAt = Instant.parse("2026-03-09T08:30:00Z");
 		when(enrollmentService.updateDisplay(eq("123e4567-e89b-12d3-a456-426614174000"), any(), eq("school-admin")))
-				.thenReturn(new DisplaySummaryResponse("123e4567-e89b-12d3-a456-426614174000", "Lobby", "lobby", "Main Hall", "ACTIVE",
-						"default", "brutalist-high-density", updatedAt));
+				.thenReturn(new DisplaySummaryResponse("123e4567-e89b-12d3-a456-426614174000", "Lobby", "lobby",
+						"Main Hall", "ACTIVE", "default", "brutalist-high-density", updatedAt));
 
-		mockMvc.perform(patch("/api/admin/displays/123e4567-e89b-12d3-a456-426614174000").with(csrf()).contentType("application/json")
-					.content("{\"themeId\":\"brutalist-high-density\"}"))
-				.andExpect(status().isOk())
-				.andExpect(jsonPath("$.id").value("123e4567-e89b-12d3-a456-426614174000"))
+		mockMvc.perform(patch("/api/admin/displays/123e4567-e89b-12d3-a456-426614174000").with(csrf())
+				.contentType("application/json").content("{\"themeId\":\"brutalist-high-density\"}"))
+				.andExpect(status().isOk()).andExpect(jsonPath("$.id").value("123e4567-e89b-12d3-a456-426614174000"))
 				.andExpect(jsonPath("$.themeId").value("brutalist-high-density"));
 	}
 

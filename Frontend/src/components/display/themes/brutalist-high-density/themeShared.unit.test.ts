@@ -1,8 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-  buildDeparturesUrl,
-  resolveTransportStops,
-} from "./themeShared";
+import { buildDeparturesUrl, resolveTransportStops } from "./themeShared";
 
 describe("brutalist transport helpers", () => {
   it("keeps searching nearby stops until it finds the S-Bahn stop", () => {
