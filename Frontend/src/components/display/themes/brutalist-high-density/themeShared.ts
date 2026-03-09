@@ -38,6 +38,12 @@ interface BvgDeparture {
   delay: number | null;
 }
 
+interface TransportStreamState {
+  stopName: string;
+  departures: BvgDeparture[];
+  loading: boolean;
+}
+
 export function weatherDesc(code: number): string {
   if (code === 0) return "Klarer Himmel";
   if (code === 1) return "Überwiegend klar";
@@ -140,9 +146,12 @@ export function useWeather() {
 }
 
 export function useTransport() {
-  const [stop, setStop] = useState<BvgStop | null>(null);
-  const [departures, setDepartures] = useState<BvgDeparture[]>([]);
-  const [loading, setLoading] = useState(false);
+  const [busStop, setBusStop] = useState<BvgStop | null>(null);
+  const [sBahnStop, setSBahnStop] = useState<BvgStop | null>(null);
+  const [busDepartures, setBusDepartures] = useState<BvgDeparture[]>([]);
+  const [sBahnDepartures, setSBahnDepartures] = useState<BvgDeparture[]>([]);
+  const [isBusLoading, setIsBusLoading] = useState(false);
+  const [isSBahnLoading, setIsSBahnLoading] = useState(false);
 
   const { data: nearby, isPending: isNearbyPending } = useQuery<BvgStop[]>({
     queryKey: ["bvg-nearby-bru", SCHOOL_LAT, SCHOOL_LNG],
@@ -157,40 +166,118 @@ export function useTransport() {
   });
 
   useEffect(() => {
-    if (nearby?.length) {
-      setStop((prev) =>
-        prev && nearby.some((s) => s.id === prev.id) ? prev : nearby[0],
-      );
+    if (!nearby?.length) {
+      setBusStop(null);
+      setSBahnStop(null);
+      return;
     }
+
+    const nearestBusStop = nearby.find((s) => s.products.bus) ?? nearby[0];
+    const nearestSBahnStop = nearby.find((s) => s.products.suburban) ?? null;
+
+    setBusStop((prev) =>
+      prev?.id === nearestBusStop.id ? prev : nearestBusStop,
+    );
+    setSBahnStop((prev) =>
+      nearestSBahnStop && prev?.id === nearestSBahnStop.id
+        ? prev
+        : nearestSBahnStop,
+    );
   }, [nearby]);
 
-  const fetchDeps = useCallback(async (stopId: string) => {
-    setLoading(true);
-    try {
-      const r = await fetch(
-        `https://v6.bvg.transport.rest/stops/${stopId}/departures?results=10&duration=60`,
-      );
-      if (!r.ok) throw new Error(`BVG-Abfahrten-Fehler: ${r.status}`);
-      const d = await r.json();
-      setDepartures(Array.isArray(d.departures) ? d.departures : []);
-    } catch {
-      setDepartures([]);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+  const fetchDeps = useCallback(
+    async (
+      stopId: string,
+      setDepartures: (departures: BvgDeparture[]) => void,
+      setLoading: (loading: boolean) => void,
+      product?: string,
+    ) => {
+      setLoading(true);
+      try {
+        const r = await fetch(
+          `https://v6.bvg.transport.rest/stops/${stopId}/departures?results=10&duration=60`,
+        );
+        if (!r.ok) throw new Error(`BVG-Abfahrten-Fehler: ${r.status}`);
+        const d = await r.json();
+        const departures = Array.isArray(d.departures) ? d.departures : [];
+        setDepartures(
+          product
+            ? departures.filter(
+                (departure: BvgDeparture) => departure.line.product === product,
+              )
+            : departures,
+        );
+      } catch {
+        setDepartures([]);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
 
   useEffect(() => {
-    if (!stop?.id) return;
-    fetchDeps(stop.id);
-    const iv = setInterval(() => fetchDeps(stop.id), 3 * 60 * 1_000);
+    if (!busStop?.id) return;
+    fetchDeps(
+      busStop.id,
+      (departures) =>
+        setBusDepartures(
+          departures.filter((departure) => departure.line.product === "bus"),
+        ),
+      setIsBusLoading,
+    );
+    const iv = setInterval(
+      () =>
+        fetchDeps(
+          busStop.id,
+          (departures) =>
+            setBusDepartures(
+              departures.filter((departure) => departure.line.product === "bus"),
+            ),
+          setIsBusLoading,
+        ),
+      3 * 60 * 1_000,
+    );
     return () => clearInterval(iv);
-  }, [stop, fetchDeps]);
+  }, [busStop, fetchDeps]);
+
+  useEffect(() => {
+    if (!sBahnStop?.id) return;
+    fetchDeps(
+      sBahnStop.id,
+      setSBahnDepartures,
+      setIsSBahnLoading,
+      "suburban",
+    );
+    const iv = setInterval(
+      () =>
+        fetchDeps(
+          sBahnStop.id,
+          setSBahnDepartures,
+          setIsSBahnLoading,
+          "suburban",
+        ),
+      3 * 60 * 1_000,
+    );
+    return () => clearInterval(iv);
+  }, [sBahnStop, fetchDeps]);
+
+  const bus: TransportStreamState = {
+    stopName: busStop?.name ?? "",
+    departures: busDepartures,
+    loading: isBusLoading,
+  };
+
+  const sBahn: TransportStreamState = {
+    stopName: sBahnStop?.name ?? "",
+    departures: sBahnDepartures,
+    loading: isSBahnLoading,
+  };
 
   return {
-    stopName: stop?.name ?? "",
-    departures,
-    loading,
+    bus,
+    sBahn,
+    loading: isBusLoading || isSBahnLoading,
     initialLoaded: !isNearbyPending,
   };
 }

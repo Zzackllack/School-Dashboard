@@ -8,11 +8,13 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.schooldashboard.display.dto.CreateEnrollmentCodeResponse;
+import com.schooldashboard.display.dto.DisplaySummaryResponse;
 import com.schooldashboard.display.dto.AdminAuditLogResponse;
 import com.schooldashboard.display.service.AdminAuditLogService;
 import com.schooldashboard.display.service.DisplayEnrollmentService;
@@ -51,6 +53,21 @@ public class AdminDisplayControllerTest {
 		mockMvc.perform(post("/api/admin/displays/enrollment-codes").with(csrf())
 				.contentType("application/json").content("{\"ttlSeconds\":300,\"maxUses\":3}"))
 				.andExpect(status().isOk()).andExpect(jsonPath("$.code").value("ABCD1234"));
+	}
+
+	@Test
+	@WithMockUser(username = "school-admin", roles = "ADMIN")
+	public void updateDisplayThemeReturnsUpdatedSummary() throws Exception {
+		Instant updatedAt = Instant.parse("2026-03-09T08:30:00Z");
+		when(enrollmentService.updateDisplay(eq("123e4567-e89b-12d3-a456-426614174000"), any(), eq("school-admin")))
+				.thenReturn(new DisplaySummaryResponse("123e4567-e89b-12d3-a456-426614174000", "Lobby", "lobby", "Main Hall", "ACTIVE",
+						"default", "brutalist-high-density", updatedAt));
+
+		mockMvc.perform(patch("/api/admin/displays/123e4567-e89b-12d3-a456-426614174000").with(csrf()).contentType("application/json")
+					.content("{\"themeId\":\"brutalist-high-density\"}"))
+				.andExpect(status().isOk())
+				.andExpect(jsonPath("$.id").value("123e4567-e89b-12d3-a456-426614174000"))
+				.andExpect(jsonPath("$.themeId").value("brutalist-high-density"));
 	}
 
 	@Test

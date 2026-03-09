@@ -1,0 +1,58 @@
+// @vitest-environment jsdom
+import { render, screen } from "@testing-library/react";
+import { describe, expect, it, vi } from "vitest";
+import { TransportModule } from "./TransportModule";
+
+vi.mock("../themeShared", () => ({
+  lineBadgeCls: (product: string) =>
+    product === "suburban" ? "bg-[#009252] text-white" : "bg-[#8B008B] text-white",
+  minsUntil: (when: string | null) => {
+    if (!when) return 0;
+    return when.includes("soon") ? 3 : 6;
+  },
+  useTransport: () => ({
+    bus: {
+      stopName: "Goethestr./Drakestr.",
+      departures: [
+        {
+          tripId: "bus-1",
+          direction: "S Lichterfelde West",
+          line: { name: "M11", product: "bus" },
+          when: "soon-bus",
+          plannedWhen: "soon-bus",
+          delay: 60,
+        },
+      ],
+      loading: false,
+    },
+    sBahn: {
+      stopName: "S Lichterfelde West",
+      departures: [
+        {
+          tripId: "sbahn-1",
+          direction: "Wannsee",
+          line: { name: "S1", product: "suburban" },
+          when: "soon-sbahn",
+          plannedWhen: "soon-sbahn",
+          delay: null,
+        },
+      ],
+      loading: false,
+    },
+    loading: false,
+    initialLoaded: true,
+  }),
+}));
+
+describe("Brutalist transport module", () => {
+  it("renders separate bus and S-Bahn sections", () => {
+    render(<TransportModule />);
+
+    expect(screen.getByRole("heading", { name: "Bus" })).toBeDefined();
+    expect(screen.getByRole("heading", { name: "S-Bahn" })).toBeDefined();
+    expect(screen.getAllByText("Goethestr./Drakestr.")).toHaveLength(2);
+    expect(screen.getAllByText("S Lichterfelde West")).toHaveLength(2);
+    expect(screen.getByText("M11")).toBeDefined();
+    expect(screen.getByText("S1")).toBeDefined();
+  });
+});

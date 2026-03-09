@@ -71,6 +71,27 @@ const weatherFixture = {
 const nearbyStopsFixture = [
   {
     type: "stop",
+    id: "900000002",
+    name: "Goethestr./Drakestr.",
+    location: {
+      type: "location",
+      id: "loc2",
+      latitude: 52.434,
+      longitude: 13.304,
+    },
+    products: {
+      suburban: false,
+      subway: false,
+      tram: false,
+      bus: true,
+      ferry: false,
+      express: false,
+      regional: false,
+    },
+    distance: 90,
+  },
+  {
+    type: "stop",
     id: "900000001",
     name: "S Lichterfelde West",
     location: {
@@ -92,10 +113,32 @@ const nearbyStopsFixture = [
   },
 ];
 
-const departuresFixture = {
+const busDeparturesFixture = {
   departures: [
     {
-      tripId: "trip-1",
+      tripId: "trip-bus-1",
+      direction: "U Dahlem-Dorf",
+      line: {
+        type: "line",
+        id: "line-m11",
+        name: "M11",
+        mode: "bus",
+        product: "bus",
+      },
+      when: "2026-02-28T12:18:00+01:00",
+      plannedWhen: "2026-02-28T12:18:00+01:00",
+      delay: null,
+      platform: null,
+      plannedPlatform: null,
+      stop: nearbyStopsFixture[0],
+    },
+  ],
+};
+
+const sBahnDeparturesFixture = {
+  departures: [
+    {
+      tripId: "trip-sbahn-1",
       direction: "S Südkreuz",
       line: {
         type: "line",
@@ -192,10 +235,14 @@ test.beforeEach(async ({ page }) => {
   await page.route(
     "**/v6.bvg.transport.rest/stops/*/departures*",
     async (route) => {
+      const url = new URL(route.request().url());
+      const isSBahnStop = url.pathname.includes("/900000001/");
       await route.fulfill({
         status: 200,
         contentType: "application/json",
-        body: JSON.stringify(departuresFixture),
+        body: JSON.stringify(
+          isSBahnStop ? sBahnDeparturesFixture : busDeparturesFixture,
+        ),
       });
     },
   );
@@ -672,6 +719,10 @@ test("admin can switch display theme and display route keeps module parity", asy
   await expect(
     page.getByRole("heading", { name: "Öffentliche Verkehrsmittel" }),
   ).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Bus" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "S-Bahn" })).toBeVisible();
+  await expect(page.getByText("M11")).toBeVisible();
+  await expect(page.getByText("S1")).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Kommende Termine" }),
   ).toBeVisible();
