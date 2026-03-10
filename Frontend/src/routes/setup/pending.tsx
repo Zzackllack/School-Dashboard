@@ -29,11 +29,11 @@ export function SetupPendingPage() {
     () => search.requestId ?? getPendingEnrollmentRequestId(),
     [search.requestId],
   );
+  const effectiveStatus = requestId ? status : "UNKNOWN";
 
   useEffect(() => {
     const activeRequestId = requestId;
     if (!activeRequestId) {
-      setStatus("UNKNOWN");
       return;
     }
     const stableRequestId: string = activeRequestId;
@@ -149,7 +149,7 @@ export function SetupPendingPage() {
           </div>
           <div className="mt-2 flex justify-between gap-3">
             <dt className="font-semibold text-slate-600">Status</dt>
-            <dd className="font-semibold text-slate-900">{status}</dd>
+            <dd className="font-semibold text-slate-900">{effectiveStatus}</dd>
           </div>
         </dl>
 
@@ -159,9 +159,9 @@ export function SetupPendingPage() {
           </p>
         ) : null}
 
-        {status === "REJECTED" ||
-        status === "EXPIRED" ||
-        status === "UNKNOWN" ? (
+        {effectiveStatus === "REJECTED" ||
+        effectiveStatus === "EXPIRED" ||
+        effectiveStatus === "UNKNOWN" ? (
           <p className="mt-6 text-sm text-slate-600">
             Bitte starte das Setup erneut unter{" "}
             <Link className="font-semibold underline" to="/setup">

@@ -1,5 +1,3 @@
-import React from "react";
-
 interface ClockProps {
   currentTime: Date;
 }
@@ -17,7 +15,7 @@ const DATE_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
   year: "numeric",
 };
 
-const Clock: React.FC<ClockProps> = ({ currentTime }) => {
+const Clock = ({ currentTime }: ClockProps) => {
   return (
     <div className="text-right">
       <div className="text-2xl font-bold" data-testid="clock-time">

@@ -36,12 +36,12 @@ export async function resolveDisplayAccess(
 function GuardedDisplayRoute() {
   const navigate = useNavigate();
   const { displayId } = Route.useParams();
-  const [accessAllowed, setAccessAllowed] = useState(false);
+  const [grantedDisplayId, setGrantedDisplayId] = useState<string | null>(null);
   const [resolvedThemeId, setResolvedThemeId] = useState<string | null>(null);
+  const accessAllowed = grantedDisplayId === displayId;
 
   useEffect(() => {
     let cancelled = false;
-    setAccessAllowed(false);
 
     async function guardDisplayAccess() {
       try {
@@ -52,7 +52,7 @@ function GuardedDisplayRoute() {
 
         if (access.kind === "allow") {
           setResolvedThemeId(access.themeId);
-          setAccessAllowed(true);
+          setGrantedDisplayId(access.displayId);
           return;
         }
 

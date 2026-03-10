@@ -45,9 +45,12 @@ describe("DashboardPage hydration", () => {
       await act(async () => {});
 
       expect(
-        container.querySelector('[data-testid="clock-time"]'),
+        container.querySelector('[data-testid="clock-placeholder"]'),
       ).not.toBeNull();
-      expect(container.textContent).not.toContain("Stand: --");
+      expect(
+        container.querySelector('[data-testid="clock-time"]'),
+      ).toBeNull();
+      expect(container.textContent).toContain("Stand: --");
 
       await act(async () => {
         await vi.advanceTimersByTimeAsync(1_000);

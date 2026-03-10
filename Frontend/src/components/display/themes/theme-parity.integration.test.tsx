@@ -69,10 +69,10 @@ describe("display themes parity", () => {
       </QueryClientProvider>,
     );
 
-    // Grade column headers (em-dash separators matching the design)
-    expect(screen.getByText("07—08")).toBeDefined();
-    expect(screen.getByText("09—10")).toBeDefined();
-    expect(screen.getByText("11—12")).toBeDefined();
+    // Grade column headers (en-dash separators matching the rendered design)
+    expect(screen.getByText("07 – 08")).toBeDefined();
+    expect(screen.getByText("09 – 10")).toBeDefined();
+    expect(screen.getByText("11 – 12")).toBeDefined();
 
     // Right-sidebar module containers
     expect(screen.getByTestId("module-weather")).toBeDefined();

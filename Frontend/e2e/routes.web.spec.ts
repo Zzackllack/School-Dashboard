@@ -907,7 +907,7 @@ test("renders root not-found component for unknown routes", async ({
 test("calendar API route forwards upstream status, headers, and body", async ({
   request,
 }) => {
-  let backendServer: Server | null = null;
+  let backendServer: Server;
 
   try {
     backendServer = await startMockBackend((incomingRequest, response) => {
@@ -939,8 +939,6 @@ test("calendar API route forwards upstream status, headers, and body", async ({
     expect(response.headers()["x-upstream"]).toBe("calendar");
     await expect(response.text()).resolves.toBe('{"source":"upstream"}');
   } finally {
-    if (backendServer) {
-      await stopMockBackend(backendServer);
-    }
+    await stopMockBackend(backendServer);
   }
 });

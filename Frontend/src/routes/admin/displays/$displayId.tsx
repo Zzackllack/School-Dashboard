@@ -28,11 +28,11 @@ export function AdminDisplayDetailPage() {
   const [statusType, setStatusType] = useState<"success" | "error" | "neutral">(
     "neutral",
   );
-  const [isDisplayLoaded, setIsDisplayLoaded] = useState(false);
+  const [loadedDisplayId, setLoadedDisplayId] = useState<string | null>(null);
+  const isDisplayLoaded = loadedDisplayId === displayId;
 
   useEffect(() => {
     let cancelled = false;
-    setIsDisplayLoaded(false);
 
     async function loadDisplay() {
       try {
@@ -46,13 +46,13 @@ export function AdminDisplayDetailPage() {
             themeId: display.themeId,
             status: display.status,
           });
-          setIsDisplayLoaded(true);
+          setLoadedDisplayId(displayId);
           setStatusMessage(null);
           setStatusType("neutral");
         }
       } catch (error) {
         if (!cancelled) {
-          setIsDisplayLoaded(false);
+          setLoadedDisplayId(null);
           setStatusType("error");
           setStatusMessage(
             error instanceof Error

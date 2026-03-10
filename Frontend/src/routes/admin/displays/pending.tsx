@@ -36,7 +36,33 @@ function AdminPendingDisplaysPage() {
   }
 
   useEffect(() => {
-    void refreshPending();
+    let cancelled = false;
+
+    async function loadPendingRequests() {
+      try {
+        const response = await listDisplayEnrollments("PENDING");
+        if (cancelled) {
+          return;
+        }
+        setPendingRequests(response);
+        setStatusMessage(null);
+      } catch (error) {
+        if (cancelled) {
+          return;
+        }
+        setStatusMessage(
+          error instanceof Error
+            ? error.message
+            : "Pending Requests konnten nicht geladen werden.",
+        );
+      }
+    }
+
+    void loadPendingRequests();
+
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   async function approve(requestId: string) {

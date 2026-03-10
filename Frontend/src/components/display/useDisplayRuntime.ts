@@ -3,14 +3,10 @@ import useAutoScroll from "#/hooks/useAutoScroll";
 
 export function useDisplayRuntime() {
   const [currentTime, setCurrentTime] = useState<Date | null>(null);
-  const [isHydrated, setIsHydrated] = useState(false);
 
   useAutoScroll(5, 80);
 
   useEffect(() => {
-    setIsHydrated(true);
-    setCurrentTime(new Date());
-
     const clockTimer = setInterval(() => {
       setCurrentTime(new Date());
     }, 1000);
@@ -27,6 +23,6 @@ export function useDisplayRuntime() {
 
   return {
     currentTime,
-    isHydrated,
+    isHydrated: currentTime !== null,
   };
 }
