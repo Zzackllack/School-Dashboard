@@ -7,8 +7,6 @@ describe("Brutalist credits module", () => {
   it("renders the credits image", () => {
     render(<CreditsModule />);
 
-    expect(
-      screen.getByAltText("Leistungs‑Kurs Exkursion Hamburg"),
-    ).toBeDefined();
+    expect(screen.getByAltText("LK Exkursion Hamburg")).toBeDefined();
   });
 });
