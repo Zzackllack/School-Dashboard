@@ -3,6 +3,8 @@ import { render, screen } from "@testing-library/react";
 import { describe, expect, it, vi } from "vitest";
 import { TransportModule } from "./TransportModule";
 
+let mockedMinutes = 3;
+
 vi.mock("../themeShared", () => ({
   lineBadgeCls: (product: string) =>
     product === "suburban"
@@ -10,7 +12,7 @@ vi.mock("../themeShared", () => ({
       : "bg-[#8B008B] text-white",
   minsUntil: (when: string | null) => {
     if (!when) return 0;
-    return when.includes("soon") ? 3 : 6;
+    return when.includes("soon") ? mockedMinutes : 6;
   },
   useTransport: () => ({
     bus: {
@@ -48,6 +50,7 @@ vi.mock("../themeShared", () => ({
 
 describe("Brutalist transport module", () => {
   it("renders separate bus and S-Bahn sections", () => {
+    mockedMinutes = 3;
     render(<TransportModule />);
 
     expect(screen.getByRole("heading", { name: "Bus" })).toBeDefined();
@@ -56,5 +59,17 @@ describe("Brutalist transport module", () => {
     expect(screen.getAllByText("S Lichterfelde West")).toHaveLength(2);
     expect(screen.getByText("M11")).toBeDefined();
     expect(screen.getByText("S1")).toBeDefined();
+  });
+
+  it("updates the countdown value when departure minutes change", () => {
+    mockedMinutes = 5;
+    const { rerender } = render(<TransportModule />);
+
+    expect(screen.getAllByLabelText("Abfahrt in 5 Minuten")).toHaveLength(2);
+
+    mockedMinutes = 4;
+    rerender(<TransportModule />);
+
+    expect(screen.getAllByLabelText("Abfahrt in 4 Minuten")).toHaveLength(2);
   });
 });

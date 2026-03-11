@@ -1,5 +1,94 @@
+import { useEffect, useState } from "react";
 import { ModuleHeader } from "../ModuleHeader";
 import { lineBadgeCls, minsUntil, useTransport } from "../themeShared";
+
+const COUNTDOWN_TRANSITION_MS = 420;
+
+function CountdownValue({
+  value,
+  emphasized,
+}: {
+  value: string;
+  emphasized: boolean;
+}) {
+  const [rendered, setRendered] = useState(value);
+  const [outgoing, setOutgoing] = useState<string | null>(null);
+  const [phase, setPhase] = useState<"idle" | "animating">("idle");
+
+  useEffect(() => {
+    if (value === rendered) {
+      return;
+    }
+
+    setOutgoing(rendered);
+    setRendered(value);
+    setPhase("animating");
+
+    const timeoutId = window.setTimeout(() => {
+      setOutgoing(null);
+      setPhase("idle");
+    }, COUNTDOWN_TRANSITION_MS);
+
+    return () => {
+      window.clearTimeout(timeoutId);
+    };
+  }, [rendered, value]);
+
+  const toneClass = emphasized ? "text-red-600" : "text-black";
+
+  return (
+    <span
+      className={`relative inline-flex h-[1.05em] min-w-[2ch] items-center justify-end overflow-hidden font-black text-sm tabular-nums ${toneClass}`}
+      aria-live="off"
+    >
+      {outgoing ? (
+        <span
+          aria-hidden="true"
+          className="absolute right-0 top-0"
+          style={{
+            opacity: phase === "animating" ? 0 : 1,
+            transform:
+              phase === "animating"
+                ? "translate3d(0,-115%,0) scale(0.92)"
+                : "translate3d(0,0,0) scale(1)",
+            transition: `transform ${COUNTDOWN_TRANSITION_MS}ms cubic-bezier(0.22, 1, 0.36, 1), opacity ${COUNTDOWN_TRANSITION_MS}ms ease`,
+          }}
+        >
+          {outgoing}
+        </span>
+      ) : null}
+      <span
+        className={phase === "animating" ? "absolute right-0 top-0" : ""}
+        style={{
+          opacity: phase === "animating" ? 1 : 1,
+          transform:
+            phase === "animating"
+              ? "translate3d(0,0,0) scale(1)"
+              : "translate3d(0,0,0) scale(1)",
+          transition:
+            phase === "animating"
+              ? `transform ${COUNTDOWN_TRANSITION_MS}ms cubic-bezier(0.22, 1, 0.36, 1), opacity ${COUNTDOWN_TRANSITION_MS}ms ease`
+              : undefined,
+        }}
+      >
+        {rendered}
+      </span>
+      {phase === "animating" ? (
+        <span
+          aria-hidden="true"
+          className="absolute right-0 top-0"
+          style={{
+            opacity: 0,
+            transform: "translate3d(0,115%,0) scale(0.92)",
+            animation: `transport-countdown-enter ${COUNTDOWN_TRANSITION_MS}ms cubic-bezier(0.22, 1, 0.36, 1) forwards`,
+          }}
+        >
+          {rendered}
+        </span>
+      ) : null}
+    </span>
+  );
+}
 
 function DepartureList({
   departures,
@@ -18,6 +107,7 @@ function DepartureList({
       {departures.map((dep, i) => {
         const mins = minsUntil(dep.when ?? dep.plannedWhen);
         const delay = dep.delay ? Math.round(dep.delay / 60) : 0;
+        const displayValue = mins <= 0 ? "JETZT" : `${mins}`;
         return (
           <div
             key={`${dep.tripId}-${i}`}
@@ -32,9 +122,14 @@ function DepartureList({
               {dep.direction}
             </span>
             <span
-              className={`shrink-0 font-black text-sm tabular-nums ${delay > 0 ? "text-red-600" : ""}`}
+              className="shrink-0"
+              aria-label={
+                mins <= 0
+                  ? "Abfahrt jetzt"
+                  : `Abfahrt in ${mins} Minuten`
+              }
             >
-              {mins <= 0 ? "JETZT" : `${mins}`}
+              <CountdownValue value={displayValue} emphasized={delay > 0} />
             </span>
             <span className="shrink-0 w-5 text-right font-mono text-[9px] text-black/40">
               {mins > 0 ? "MIN" : ""}
@@ -112,9 +207,22 @@ export function TransportModule() {
       className="shrink-0 border-b-2 border-black"
       data-testid="module-transport"
     >
+      <style>{`
+        @keyframes transport-countdown-enter {
+          from {
+            opacity: 0;
+            transform: translate3d(0,115%,0) scale(0.92);
+          }
+          to {
+            opacity: 1;
+            transform: translate3d(0,0,0) scale(1);
+          }
+        }
+      `}</style>
       <ModuleHeader
         title="Öffentliche Verkehrsmittel"
-        sub={bus.stopName || sBahn.stopName || undefined}
+        // not needed since we show the stop names in the sections now, and often there is only one stop per section, making it redundant
+        // sub={bus.stopName || sBahn.stopName || undefined}
         live
       />
       {!initialLoaded ||
