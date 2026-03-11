@@ -1,5 +1,6 @@
 import { QRCodeSVG } from "qrcode.react";
 import { useEffect, useState } from "react";
+import { ModuleHeader } from "#/components/display/themes/brutalist-high-density/ModuleHeader";
 
 type SurveyQrVariant = "default" | "brutalist";
 
@@ -31,24 +32,22 @@ export function SurveyQrModule({
     <section
       className={
         isBrutalist
-          ? "shrink-0 border-2 border-black bg-[#FFF7D6] p-3 text-black"
+          ? "shrink-0 border-b-2 border-black bg-[#FFF7D6] text-black"
           : "w-full rounded-lg bg-white p-4 shadow-md"
       }
       data-testid="module-survey"
     >
-      <h2
-        className={
-          isBrutalist
-            ? "border-b-2 border-black pb-2 font-mono text-sm font-black uppercase tracking-[0.18em]"
-            : "mb-3 border-b border-gray-200 pb-2 text-xl font-bold text-gray-800"
-        }
-      >
-        Dein Feedback
-      </h2>
+      {isBrutalist ? (
+        <ModuleHeader title="Feedback" />
+      ) : (
+        <h2 className="mb-3 border-b border-gray-200 pb-2 text-xl font-bold text-gray-800">
+          Dein Feedback
+        </h2>
+      )}
       <p
         className={
           isBrutalist
-            ? "mt-3 font-sans text-sm leading-5"
+            ? "px-3 pt-3 font-mono text-[11px] uppercase tracking-wide text-black/60"
             : "mb-4 text-sm leading-6 text-gray-600"
         }
       >
@@ -59,7 +58,7 @@ export function SurveyQrModule({
       <div
         className={
           isBrutalist
-            ? "mx-auto flex w-fit items-center justify-center border-2 border-black bg-white p-3"
+            ? "mx-auto mt-4 mb-3 flex w-fit items-center justify-center border-2 border-black bg-white p-3"
             : "mx-auto mb-3 flex w-fit items-center justify-center rounded-lg border border-gray-200 bg-white p-3"
         }
       >
@@ -72,24 +71,14 @@ export function SurveyQrModule({
         />
       </div>
 
-      <p
-        className={
-          isBrutalist
-            ? "font-mono text-[11px] uppercase tracking-[0.14em] text-black/70"
-            : "text-xs text-gray-500"
-        }
-      >
-        Falls das Scannen nicht klappt, öffne:
-      </p>
-      <p
-        className={
-          isBrutalist
-            ? "mt-1 break-all font-mono text-[11px] text-black"
-            : "mt-1 break-all text-xs text-gray-700"
-        }
-      >
-        {surveyUrl}
-      </p>
+      {isBrutalist ? null : (
+        <>
+          <p className="text-xs text-gray-500">
+            Falls das Scannen nicht klappt, öffne:
+          </p>
+          <p className="mt-1 break-all text-xs text-gray-700">{surveyUrl}</p>
+        </>
+      )}
     </section>
   );
 }
