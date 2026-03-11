@@ -52,7 +52,7 @@ export function SurveyQrModule({
             : "mb-4 text-sm leading-6 text-gray-600"
         }
       >
-        Scanne den QR-Code und sende uns Probleme, Wuensche oder allgemeines
+        Scanne den QR-Code und sende uns Probleme, Wünsche oder allgemeines
         Feedback direkt zu diesem Display.
       </p>
 
@@ -68,7 +68,7 @@ export function SurveyQrModule({
           size={144}
           level="M"
           marginSize={2}
-          title={`QR-Code fuer Rueckmeldung zu Display ${displayId}`}
+          title={`QR-Code für Rückmeldung zu Display ${displayId}`}
         />
       </div>
 
@@ -79,7 +79,7 @@ export function SurveyQrModule({
             : "text-xs text-gray-500"
         }
       >
-        Falls das Scannen nicht klappt, oeffne:
+        Falls das Scannen nicht klappt, öffne:
       </p>
       <p
         className={

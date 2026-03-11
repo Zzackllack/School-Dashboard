@@ -15,14 +15,14 @@ describe("SurveyQrModule", () => {
     expect(screen.getByText("Dein Feedback")).toBeDefined();
     expect(
       screen.getByText(
-        "Scanne den QR-Code und sende uns Probleme, Wuensche oder allgemeines Feedback direkt zu diesem Display.",
+        "Scanne den QR-Code und sende uns Probleme, Wünsche oder allgemeines Feedback direkt zu diesem Display.",
       ),
     ).toBeDefined();
     expect(
       screen.getByText("https://dashboard.example/rueckmeldung/display-123"),
     ).toBeDefined();
     expect(
-      screen.getByTitle("QR-Code fuer Rueckmeldung zu Display display-123"),
+      screen.getByTitle("QR-Code für Rückmeldung zu Display display-123"),
     ).toBeDefined();
   });
 });

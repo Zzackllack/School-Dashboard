@@ -110,7 +110,7 @@ export function AdminSurveysPage() {
         <header className="rounded-2xl bg-white p-6 shadow-lg">
           <h1 className="text-3xl font-bold">Survey-Inbox</h1>
           <p className="mt-2 text-sm text-slate-600">
-            Neue Rueckmeldungen aus der Schuelerschaft werden hier gesammelt.
+            Neue Rückmeldungen aus der Schülerschaft werden hier gesammelt.
           </p>
         </header>
 
@@ -182,11 +182,11 @@ export function AdminSurveysPage() {
           ) : null}
           {isLoading ? (
             <p className="mt-4 text-sm text-slate-600">
-              Rueckmeldungen werden geladen.
+              Rückmeldungen werden geladen.
             </p>
           ) : items.length === 0 ? (
             <p className="mt-4 text-sm text-slate-600">
-              Aktuell gibt es keine passenden Rueckmeldungen.
+              Aktuell gibt es keine passenden Rückmeldungen.
             </p>
           ) : (
             <div className="mt-4 space-y-4">
@@ -213,7 +213,7 @@ export function AdminSurveysPage() {
                     <span>Name: {item.submitterName || "Anonym"}</span>
                     <span>Klasse: {item.schoolClass || "Nicht angegeben"}</span>
                     <span>
-                      Rueckkontakt:{" "}
+                      Rückkontakt:{" "}
                       {item.contactAllowed ? "Erlaubt" : "Nicht erlaubt"}
                     </span>
                     <span>

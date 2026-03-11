@@ -57,7 +57,7 @@ describe("admin surveys inbox", () => {
 
     await screen.findByText("Der QR-Code ist schwer scanbar.");
     expect(screen.getByText("Klasse: 10a")).toBeDefined();
-    expect(screen.getByText("Rueckkontakt: Erlaubt")).toBeDefined();
+    expect(screen.getByText("Rückkontakt: Erlaubt")).toBeDefined();
 
     fireEvent.change(screen.getByLabelText("Kategorie"), {
       target: { value: "PROBLEM" },

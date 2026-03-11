@@ -70,7 +70,7 @@ export function SurveyFeedbackPage() {
 
   function validateForm() {
     if (!category) {
-      return "Bitte waehle eine Kategorie aus.";
+      return "Bitte wähle eine Kategorie aus.";
     }
     const trimmedMessage = message.trim();
     if (trimmedMessage.length === 0) {
@@ -115,7 +115,7 @@ export function SurveyFeedbackPage() {
         contactAllowed,
       });
       setSuccessMessage(
-        "Danke. Deine Rueckmeldung wurde gespeichert und an das Admin-Team weitergegeben.",
+        "Danke. Deine Rückmeldung wurde gespeichert und an das Admin-Team weitergegeben.",
       );
       setCategory("");
       setMessage("");
@@ -126,7 +126,7 @@ export function SurveyFeedbackPage() {
       setErrorMessage(
         error instanceof Error
           ? error.message
-          : "Die Rueckmeldung konnte nicht gespeichert werden.",
+          : "Die Rückmeldung konnte nicht gespeichert werden.",
       );
     } finally {
       setIsSubmitting(false);
@@ -138,14 +138,14 @@ export function SurveyFeedbackPage() {
       <section className="mx-auto max-w-2xl rounded-[28px] border border-amber-200/70 bg-white/95 p-6 shadow-[0_24px_80px_rgba(120,83,25,0.12)] backdrop-blur sm:p-8">
         <header className="space-y-3">
           <span className="inline-flex rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-amber-800">
-            Schueler-Rueckmeldung
+            Schüler-Rückmeldung
           </span>
           <h1 className="text-3xl font-black tracking-tight text-slate-950">
             Dein Feedback zum Dashboard
           </h1>
           <p className="max-w-xl text-sm leading-6 text-slate-600">
-            Melde Probleme, Wuensche oder allgemeines Feedback direkt zum
-            aktuellen Display. Die Rueckmeldung ist oeffentlich, wird aber dem
+            Melde Probleme, Wünsche oder allgemeines Feedback direkt zum
+            aktuellen Display. Die Rückmeldung ist öffentlich, wird aber dem
             richtigen Display zugeordnet.
           </p>
         </header>
@@ -158,7 +158,7 @@ export function SurveyFeedbackPage() {
         ) : errorMessage ? (
           <section className="mt-8 rounded-2xl border border-rose-200 bg-rose-50 p-6">
             <h2 className="text-lg font-semibold text-rose-900">
-              Display nicht verfuegbar
+              Display nicht verfügbar
             </h2>
             <p className="mt-2 text-sm text-rose-700">{errorMessage}</p>
           </section>
@@ -175,7 +175,7 @@ export function SurveyFeedbackPage() {
               </p>
               {!displayContext.acceptingFeedback ? (
                 <p className="mt-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
-                  Dieses Display nimmt aktuell keine Rueckmeldungen entgegen.
+                  Dieses Display nimmt aktuell keine Rückmeldungen entgegen.
                 </p>
               ) : null}
             </section>
@@ -183,7 +183,7 @@ export function SurveyFeedbackPage() {
             {successMessage ? (
               <section className="mt-6 rounded-2xl border border-emerald-200 bg-emerald-50 p-6">
                 <h2 className="text-lg font-semibold text-emerald-950">
-                  Rueckmeldung gesendet
+                  Rückmeldung gesendet
                 </h2>
                 <p className="mt-2 text-sm text-emerald-800">
                   {successMessage}
@@ -202,7 +202,7 @@ export function SurveyFeedbackPage() {
                   }
                   disabled={!displayContext.acceptingFeedback || isSubmitting}
                 >
-                  <option value="">Bitte auswaehlen</option>
+                  <option value="">Bitte auswählen</option>
                   {CATEGORY_OPTIONS.map((option) => (
                     <option key={option.value} value={option.value}>
                       {option.label}
@@ -250,8 +250,8 @@ export function SurveyFeedbackPage() {
                   disabled={!displayContext.acceptingFeedback || isSubmitting}
                 />
                 <span>
-                  Admins duerfen auf mich zukommen, falls Rueckfragen oder mehr
-                  Details hilfreich waeren.
+                  Admins dürfen auf mich zukommen, falls Rückfragen oder mehr
+                  Details hilfreich wären.
                 </span>
               </label>
 
@@ -272,7 +272,7 @@ export function SurveyFeedbackPage() {
                 disabled={!displayContext.acceptingFeedback || isSubmitting}
               >
                 {isSubmitting
-                  ? "Rueckmeldung wird gesendet ..."
+                  ? "Rückmeldung wird gesendet ..."
                   : "Feedback senden"}
               </button>
             </form>

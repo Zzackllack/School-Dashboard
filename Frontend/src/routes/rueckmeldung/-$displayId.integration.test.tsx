@@ -70,7 +70,7 @@ describe("survey feedback route", () => {
     });
     fireEvent.click(
       screen.getByLabelText(
-        /Admins duerfen auf mich zukommen, falls Rueckfragen oder mehr/,
+        /Admins dürfen auf mich zukommen, falls Rückfragen oder mehr/,
       ),
     );
     fireEvent.click(screen.getByRole("button", { name: "Feedback senden" }));
@@ -86,7 +86,7 @@ describe("survey feedback route", () => {
       });
     });
 
-    expect(screen.getByText("Rueckmeldung gesendet")).toBeDefined();
+    expect(screen.getByText("Rückmeldung gesendet")).toBeDefined();
   });
 
   it("shows a German validation message for an empty message", async () => {

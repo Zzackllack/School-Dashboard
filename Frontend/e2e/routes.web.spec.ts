@@ -576,11 +576,11 @@ test("submits public feedback for a display", async ({ page }) => {
   await page.getByLabel("Name (optional)").fill("Mila");
   await page.getByLabel("Klasse (optional)").fill("10a");
   await page
-    .getByLabel(/Admins duerfen auf mich zukommen, falls Rueckfragen/)
+    .getByLabel(/Admins dürfen auf mich zukommen, falls Rückfragen/)
     .check();
   await page.getByRole("button", { name: "Feedback senden" }).click();
 
-  await expect(page.getByText("Rueckmeldung gesendet")).toBeVisible();
+  await expect(page.getByText("Rückmeldung gesendet")).toBeVisible();
 });
 
 test("admin pending page supports approval action", async ({ page }) => {
@@ -700,7 +700,7 @@ test("admin survey inbox shows feedback entries", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByText("Der QR-Code ist schwer scanbar.")).toBeVisible();
   await expect(page.getByText("Klasse: 10a")).toBeVisible();
-  await expect(page.getByText("Rueckkontakt: Erlaubt")).toBeVisible();
+  await expect(page.getByText("Rückkontakt: Erlaubt")).toBeVisible();
 });
 
 test("admin pending page supports rejection action", async ({ page }) => {

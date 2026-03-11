@@ -67,7 +67,7 @@ export async function createSurveySubmission(
   );
 
   if (!response) {
-    throw new Error("Rueckmeldung konnte nicht gespeichert werden.");
+    throw new Error("Rückmeldung konnte nicht gespeichert werden.");
   }
 
   return response;
