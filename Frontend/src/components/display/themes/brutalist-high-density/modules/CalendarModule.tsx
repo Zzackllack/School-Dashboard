@@ -6,8 +6,6 @@ import {
   type CalendarEvent,
 } from "#/lib/api/dashboard";
 
-const THREE_DAYS_IN_MS = 3 * 24 * 60 * 60 * 1_000;
-
 function normalizeTimestamp(timestamp: number) {
   return timestamp > 1_000_000_000_000 ? timestamp : timestamp * 1_000;
 }
@@ -19,15 +17,11 @@ export function getUpcomingCalendarEvents(
   const todayStart = new Date(now);
   todayStart.setHours(0, 0, 0, 0);
 
-  const cutoff = new Date(todayStart.getTime() + THREE_DAYS_IN_MS);
-  cutoff.setHours(23, 59, 59, 999);
-
   return events
     .filter((event) => {
-      const start = normalizeTimestamp(event.startDate);
       const end = normalizeTimestamp(event.endDate);
 
-      return end >= todayStart.getTime() && start <= cutoff.getTime();
+      return end >= todayStart.getTime();
     })
     .sort(
       (left, right) =>

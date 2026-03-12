@@ -17,7 +17,7 @@ describe("Brutalist calendar module", () => {
     vi.restoreAllMocks();
   });
 
-  it("keeps only events that are running now or start within the next three days", () => {
+  it("keeps the next ongoing or upcoming events and drops finished ones", () => {
     const now = new Date("2026-03-12T09:00:00.000Z");
 
     expect(
@@ -32,19 +32,19 @@ describe("Brutalist calendar module", () => {
             allDay: false,
           },
           {
-            summary: "Within range",
+            summary: "Upcoming later",
             description: "",
             location: "",
-            startDate: Date.parse("2026-03-15T10:00:00.000Z"),
-            endDate: Date.parse("2026-03-15T11:00:00.000Z"),
+            startDate: Date.parse("2026-03-20T10:00:00.000Z"),
+            endDate: Date.parse("2026-03-20T11:00:00.000Z"),
             allDay: false,
           },
           {
-            summary: "Too far away",
+            summary: "Upcoming sooner",
             description: "",
             location: "",
-            startDate: Date.parse("2026-03-16T10:00:00.000Z"),
-            endDate: Date.parse("2026-03-16T11:00:00.000Z"),
+            startDate: Date.parse("2026-03-13T10:00:00.000Z"),
+            endDate: Date.parse("2026-03-13T11:00:00.000Z"),
             allDay: false,
           },
           {
@@ -58,7 +58,7 @@ describe("Brutalist calendar module", () => {
         ],
         now,
       ).map((event) => event.summary),
-    ).toEqual(["Running now", "Within range"]);
+    ).toEqual(["Running now", "Upcoming sooner", "Upcoming later"]);
   });
 
   it("renders at most the next three visible events", async () => {
