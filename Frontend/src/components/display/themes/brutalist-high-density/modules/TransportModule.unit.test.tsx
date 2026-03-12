@@ -62,6 +62,7 @@ vi.mock("../themeShared", () => ({
         },
       ],
       loading: false,
+      error: null,
     },
     sBahn: {
       stopName: "S Lichterfelde West",
@@ -108,9 +109,11 @@ vi.mock("../themeShared", () => ({
         },
       ],
       loading: false,
+      error: null,
     },
     loading: false,
     initialLoaded: true,
+    error: null,
   }),
 }));
 

@@ -55,7 +55,6 @@ function TransportSection({
   title,
   sub,
   departures,
-  accentClass,
 }: {
   title: string;
   sub: string;
@@ -67,24 +66,16 @@ function TransportSection({
     plannedWhen: string;
     delay: number | null;
   }>;
-  accentClass: string;
 }) {
   return (
     <section>
-      <div className="flex items-center justify-between gap-2 border-b border-black/10 px-3 py-2">
-        <div className="min-w-0">
-          <h3 className="font-black text-xs uppercase tracking-[0.2em] text-black">
-            {title}
-          </h3>
-          <p className="truncate font-mono text-[10px] uppercase tracking-wide text-black/40">
-            {sub || "Kein Halt verfügbar"}
-          </p>
-        </div>
-        <span
-          className={`shrink-0 border-2 border-black px-1.5 py-0.5 font-mono text-[9px] font-black uppercase tracking-[0.2em] ${accentClass}`}
-        >
-          Live
-        </span>
+      <div className="min-w-0 border-b border-black/10 px-3 py-2">
+        <h3 className="font-black text-xs uppercase tracking-[0.2em] text-black">
+          {title}
+        </h3>
+        <p className="truncate font-mono text-[10px] uppercase tracking-wide text-black/40">
+          {sub || "Kein Halt verfügbar"}
+        </p>
       </div>
       {departures.length === 0 ? (
         <div className="px-3 py-3 font-mono text-[11px] uppercase tracking-wide text-black/40">
@@ -99,7 +90,7 @@ function TransportSection({
 
 // ─── Transport module ─────────────────────────────────────────────────────────────
 export function TransportModule() {
-  const { bus, sBahn, loading, initialLoaded } = useTransport();
+  const { bus, sBahn, loading, initialLoaded, error } = useTransport();
   const upcomingBus = bus.departures
     .filter((d) => minsUntil(d.when ?? d.plannedWhen) >= 0)
     .slice(0, 3);
@@ -126,22 +117,26 @@ export function TransportModule() {
           Lade Abfahrten…
         </div>
       ) : upcomingBus.length === 0 && upcomingSBahn.length === 0 ? (
-        <div className="px-3 py-3 font-mono text-[11px] uppercase tracking-wide text-black/40">
-          Keine Abfahrten verfügbar
-        </div>
+        error ? (
+          <div className="px-3 py-3 font-mono text-[11px] uppercase tracking-wide text-red-700">
+            {error}
+          </div>
+        ) : (
+          <div className="px-3 py-3 font-mono text-[11px] uppercase tracking-wide text-black/40">
+            Keine Abfahrten verfügbar
+          </div>
+        )
       ) : (
         <div className="divide-y-2 divide-black">
           <TransportSection
             title="Bus"
             sub={bus.stopName}
             departures={upcomingBus}
-            accentClass="bg-[#8B008B] text-white"
           />
           <TransportSection
             title="S-Bahn"
             sub={sBahn.stopName}
             departures={upcomingSBahn}
-            accentClass="bg-[#009252] text-white"
           />
         </div>
       )}

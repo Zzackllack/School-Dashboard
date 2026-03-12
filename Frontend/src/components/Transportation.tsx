@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { fetchJson } from "#/lib/api/http";
 import { TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS } from "#/lib/transport";
 
 // Define interfaces for API responses
@@ -78,21 +79,26 @@ const Transportation = () => {
   const schoolLat = 52.43432378391319;
   const schoolLng = 13.305375391277634;
 
+  const nearbyStopsUrl = `/transport/stops/nearby?latitude=${schoolLat}&longitude=${schoolLng}&results=30`;
+  const buildDeparturesApiPath = (stopId: string, suburbanOnly = false) => {
+    const params = new URLSearchParams({
+      results: "30",
+      duration: "60",
+    });
+    if (suburbanOnly) {
+      params.set("suburban", "true");
+    }
+
+    return `/transport/stops/${stopId}/departures?${params.toString()}`;
+  };
+
   const {
     data: nearbyStops = [],
     isLoading: isLoadingStops,
     error: nearbyStopsError,
   } = useQuery<Stop[]>({
     queryKey: ["nearby-stops", schoolLat, schoolLng],
-    queryFn: async () => {
-      const response = await fetch(
-        `https://v6.bvg.transport.rest/locations/nearby?latitude=${schoolLat}&longitude=${schoolLng}&results=30`,
-      );
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-      return response.json();
-    },
+    queryFn: async () => (await fetchJson<Stop[]>(nearbyStopsUrl)) ?? [],
     refetchInterval: 30 * 60 * 1000,
   });
 
@@ -101,13 +107,9 @@ const Transportation = () => {
     setIsLoadingDepartures(true);
     try {
       console.log("Fetching departures for stop:", stopId);
-      const response = await fetch(
-        `https://v6.bvg.transport.rest/stops/${stopId}/departures?results=30&duration=60`,
-      );
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-      const data: DeparturesResponse = await response.json();
+      const data = (await fetchJson<DeparturesResponse>(
+        buildDeparturesApiPath(stopId),
+      )) ?? { departures: [] };
 
       // Check if data has the expected structure
       if (!data.departures || !Array.isArray(data.departures)) {
@@ -131,13 +133,9 @@ const Transportation = () => {
     setIsLoadingSBahnDepartures(true);
     try {
       console.log("Fetching S-Bahn departures for stop:", stopId);
-      const response = await fetch(
-        `https://v6.bvg.transport.rest/stops/${stopId}/departures?results=30&duration=60&suburban=true`,
-      );
-      if (!response.ok) {
-        throw new Error(`API error: ${response.status}`);
-      }
-      const data: DeparturesResponse = await response.json();
+      const data = (await fetchJson<DeparturesResponse>(
+        buildDeparturesApiPath(stopId, true),
+      )) ?? { departures: [] };
 
       // Check if data has the expected structure
       if (!data.departures || !Array.isArray(data.departures)) {

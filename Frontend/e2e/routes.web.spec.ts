@@ -233,31 +233,25 @@ test.beforeEach(async ({ page }) => {
     });
   });
 
-  await page.route(
-    "**/v6.bvg.transport.rest/locations/nearby*",
-    async (route) => {
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(nearbyStopsFixture),
-      });
-    },
-  );
+  await page.route("**/api/transport/stops/nearby*", async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(nearbyStopsFixture),
+    });
+  });
 
-  await page.route(
-    "**/v6.bvg.transport.rest/stops/*/departures*",
-    async (route) => {
-      const url = new URL(route.request().url());
-      const isSBahnStop = url.pathname.includes("/900000001/");
-      await route.fulfill({
-        status: 200,
-        contentType: "application/json",
-        body: JSON.stringify(
-          isSBahnStop ? sBahnDeparturesFixture : busDeparturesFixture,
-        ),
-      });
-    },
-  );
+  await page.route("**/api/transport/stops/*/departures*", async (route) => {
+    const url = new URL(route.request().url());
+    const isSBahnStop = url.pathname.includes("/900000001/");
+    await route.fulfill({
+      status: 200,
+      contentType: "application/json",
+      body: JSON.stringify(
+        isSBahnStop ? sBahnDeparturesFixture : busDeparturesFixture,
+      ),
+    });
+  });
 
   await page.route("**/api/admin/auth/me", async (route) => {
     await route.fulfill({

@@ -31,6 +31,7 @@ import { Route as AdminDisplaysPendingRouteImport } from './routes/admin/display
 import { Route as AdminDisplaysDisplayIdRouteImport } from './routes/admin/displays/$displayId'
 import { Route as ApiAdminDisplaysRouteRouteImport } from './routes/api/admin/displays/route'
 import { Route as ApiDisplaysEnrollmentsIndexRouteImport } from './routes/api/displays/enrollments/index'
+import { Route as ApiTransportStopsNearbyRouteImport } from './routes/api/transport/stops/nearby'
 import { Route as ApiSurveysDisplaysDisplayIdRouteImport } from './routes/api/surveys/displays/$displayId'
 import { Route as ApiDisplaysEnrollmentsRequestIdRouteImport } from './routes/api/displays/enrollments/$requestId'
 import { Route as ApiAdminDisplaysEnrollmentCodesRouteImport } from './routes/api/admin/displays/enrollment-codes'
@@ -42,6 +43,7 @@ import { Route as ApiAdminAuthCsrfRouteImport } from './routes/api/admin/auth/cs
 import { Route as ApiAdminAuthCredentialsRouteImport } from './routes/api/admin/auth/credentials'
 import { Route as ApiAdminDisplaysEnrollmentsRouteRouteImport } from './routes/api/admin/displays/enrollments/route'
 import { Route as ApiAdminDisplaysDisplayIdRouteRouteImport } from './routes/api/admin/displays/$displayId/route'
+import { Route as ApiTransportStopsStopIdDeparturesRouteImport } from './routes/api/transport/stops/$stopId/departures'
 import { Route as ApiAdminDisplaysDisplayIdRevokeSessionRouteImport } from './routes/api/admin/displays/$displayId/revoke-session'
 import { Route as ApiAdminDisplaysEnrollmentsRequestIdRejectRouteImport } from './routes/api/admin/displays/enrollments/$requestId/reject'
 import { Route as ApiAdminDisplaysEnrollmentsRequestIdApproveRouteImport } from './routes/api/admin/displays/enrollments/$requestId/approve'
@@ -157,6 +159,11 @@ const ApiDisplaysEnrollmentsIndexRoute =
     path: '/api/displays/enrollments/',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ApiTransportStopsNearbyRoute = ApiTransportStopsNearbyRouteImport.update({
+  id: '/api/transport/stops/nearby',
+  path: '/api/transport/stops/nearby',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiSurveysDisplaysDisplayIdRoute =
   ApiSurveysDisplaysDisplayIdRouteImport.update({
     id: '/api/surveys/displays/$displayId',
@@ -218,6 +225,12 @@ const ApiAdminDisplaysDisplayIdRouteRoute =
     path: '/$displayId',
     getParentRoute: () => ApiAdminDisplaysRouteRoute,
   } as any)
+const ApiTransportStopsStopIdDeparturesRoute =
+  ApiTransportStopsStopIdDeparturesRouteImport.update({
+    id: '/api/transport/stops/$stopId/departures',
+    path: '/api/transport/stops/$stopId/departures',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApiAdminDisplaysDisplayIdRevokeSessionRoute =
   ApiAdminDisplaysDisplayIdRevokeSessionRouteImport.update({
     id: '/revoke-session',
@@ -270,8 +283,10 @@ export interface FileRoutesByFullPath {
   '/api/admin/displays/enrollment-codes': typeof ApiAdminDisplaysEnrollmentCodesRoute
   '/api/displays/enrollments/$requestId': typeof ApiDisplaysEnrollmentsRequestIdRoute
   '/api/surveys/displays/$displayId': typeof ApiSurveysDisplaysDisplayIdRoute
+  '/api/transport/stops/nearby': typeof ApiTransportStopsNearbyRoute
   '/api/displays/enrollments/': typeof ApiDisplaysEnrollmentsIndexRoute
   '/api/admin/displays/$displayId/revoke-session': typeof ApiAdminDisplaysDisplayIdRevokeSessionRoute
+  '/api/transport/stops/$stopId/departures': typeof ApiTransportStopsStopIdDeparturesRoute
   '/api/admin/displays/enrollments/$requestId/approve': typeof ApiAdminDisplaysEnrollmentsRequestIdApproveRoute
   '/api/admin/displays/enrollments/$requestId/reject': typeof ApiAdminDisplaysEnrollmentsRequestIdRejectRoute
 }
@@ -305,8 +320,10 @@ export interface FileRoutesByTo {
   '/api/admin/displays/enrollment-codes': typeof ApiAdminDisplaysEnrollmentCodesRoute
   '/api/displays/enrollments/$requestId': typeof ApiDisplaysEnrollmentsRequestIdRoute
   '/api/surveys/displays/$displayId': typeof ApiSurveysDisplaysDisplayIdRoute
+  '/api/transport/stops/nearby': typeof ApiTransportStopsNearbyRoute
   '/api/displays/enrollments': typeof ApiDisplaysEnrollmentsIndexRoute
   '/api/admin/displays/$displayId/revoke-session': typeof ApiAdminDisplaysDisplayIdRevokeSessionRoute
+  '/api/transport/stops/$stopId/departures': typeof ApiTransportStopsStopIdDeparturesRoute
   '/api/admin/displays/enrollments/$requestId/approve': typeof ApiAdminDisplaysEnrollmentsRequestIdApproveRoute
   '/api/admin/displays/enrollments/$requestId/reject': typeof ApiAdminDisplaysEnrollmentsRequestIdRejectRoute
 }
@@ -344,8 +361,10 @@ export interface FileRoutesById {
   '/api/admin/displays/enrollment-codes': typeof ApiAdminDisplaysEnrollmentCodesRoute
   '/api/displays/enrollments/$requestId': typeof ApiDisplaysEnrollmentsRequestIdRoute
   '/api/surveys/displays/$displayId': typeof ApiSurveysDisplaysDisplayIdRoute
+  '/api/transport/stops/nearby': typeof ApiTransportStopsNearbyRoute
   '/api/displays/enrollments/': typeof ApiDisplaysEnrollmentsIndexRoute
   '/api/admin/displays/$displayId/revoke-session': typeof ApiAdminDisplaysDisplayIdRevokeSessionRoute
+  '/api/transport/stops/$stopId/departures': typeof ApiTransportStopsStopIdDeparturesRoute
   '/api/admin/displays/enrollments/$requestId/approve': typeof ApiAdminDisplaysEnrollmentsRequestIdApproveRoute
   '/api/admin/displays/enrollments/$requestId/reject': typeof ApiAdminDisplaysEnrollmentsRequestIdRejectRoute
 }
@@ -384,8 +403,10 @@ export interface FileRouteTypes {
     | '/api/admin/displays/enrollment-codes'
     | '/api/displays/enrollments/$requestId'
     | '/api/surveys/displays/$displayId'
+    | '/api/transport/stops/nearby'
     | '/api/displays/enrollments/'
     | '/api/admin/displays/$displayId/revoke-session'
+    | '/api/transport/stops/$stopId/departures'
     | '/api/admin/displays/enrollments/$requestId/approve'
     | '/api/admin/displays/enrollments/$requestId/reject'
   fileRoutesByTo: FileRoutesByTo
@@ -419,8 +440,10 @@ export interface FileRouteTypes {
     | '/api/admin/displays/enrollment-codes'
     | '/api/displays/enrollments/$requestId'
     | '/api/surveys/displays/$displayId'
+    | '/api/transport/stops/nearby'
     | '/api/displays/enrollments'
     | '/api/admin/displays/$displayId/revoke-session'
+    | '/api/transport/stops/$stopId/departures'
     | '/api/admin/displays/enrollments/$requestId/approve'
     | '/api/admin/displays/enrollments/$requestId/reject'
   id:
@@ -457,8 +480,10 @@ export interface FileRouteTypes {
     | '/api/admin/displays/enrollment-codes'
     | '/api/displays/enrollments/$requestId'
     | '/api/surveys/displays/$displayId'
+    | '/api/transport/stops/nearby'
     | '/api/displays/enrollments/'
     | '/api/admin/displays/$displayId/revoke-session'
+    | '/api/transport/stops/$stopId/departures'
     | '/api/admin/displays/enrollments/$requestId/approve'
     | '/api/admin/displays/enrollments/$requestId/reject'
   fileRoutesById: FileRoutesById
@@ -483,7 +508,9 @@ export interface RootRouteChildren {
   ApiAdminAuthMeRoute: typeof ApiAdminAuthMeRoute
   ApiDisplaysEnrollmentsRequestIdRoute: typeof ApiDisplaysEnrollmentsRequestIdRoute
   ApiSurveysDisplaysDisplayIdRoute: typeof ApiSurveysDisplaysDisplayIdRoute
+  ApiTransportStopsNearbyRoute: typeof ApiTransportStopsNearbyRoute
   ApiDisplaysEnrollmentsIndexRoute: typeof ApiDisplaysEnrollmentsIndexRoute
+  ApiTransportStopsStopIdDeparturesRoute: typeof ApiTransportStopsStopIdDeparturesRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -642,6 +669,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiDisplaysEnrollmentsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/api/transport/stops/nearby': {
+      id: '/api/transport/stops/nearby'
+      path: '/api/transport/stops/nearby'
+      fullPath: '/api/transport/stops/nearby'
+      preLoaderRoute: typeof ApiTransportStopsNearbyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/surveys/displays/$displayId': {
       id: '/api/surveys/displays/$displayId'
       path: '/api/surveys/displays/$displayId'
@@ -718,6 +752,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/admin/displays/$displayId'
       preLoaderRoute: typeof ApiAdminDisplaysDisplayIdRouteRouteImport
       parentRoute: typeof ApiAdminDisplaysRouteRoute
+    }
+    '/api/transport/stops/$stopId/departures': {
+      id: '/api/transport/stops/$stopId/departures'
+      path: '/api/transport/stops/$stopId/departures'
+      fullPath: '/api/transport/stops/$stopId/departures'
+      preLoaderRoute: typeof ApiTransportStopsStopIdDeparturesRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/admin/displays/$displayId/revoke-session': {
       id: '/api/admin/displays/$displayId/revoke-session'
@@ -864,7 +905,10 @@ const rootRouteChildren: RootRouteChildren = {
   ApiAdminAuthMeRoute: ApiAdminAuthMeRoute,
   ApiDisplaysEnrollmentsRequestIdRoute: ApiDisplaysEnrollmentsRequestIdRoute,
   ApiSurveysDisplaysDisplayIdRoute: ApiSurveysDisplaysDisplayIdRoute,
+  ApiTransportStopsNearbyRoute: ApiTransportStopsNearbyRoute,
   ApiDisplaysEnrollmentsIndexRoute: ApiDisplaysEnrollmentsIndexRoute,
+  ApiTransportStopsStopIdDeparturesRoute:
+    ApiTransportStopsStopIdDeparturesRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

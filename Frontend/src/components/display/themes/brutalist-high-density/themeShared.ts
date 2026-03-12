@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
+import { fetchJson } from "#/lib/api/http";
 import { TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS } from "#/lib/transport";
 
 const SCHOOL_LAT = 52.43432378391319;
@@ -43,6 +44,7 @@ interface TransportStreamState {
   stopName: string;
   departures: BvgDeparture[];
   loading: boolean;
+  error: string | null;
 }
 
 export function resolveTransportStops(nearby: BvgStop[]) {
@@ -73,7 +75,17 @@ export function buildDeparturesUrl(
     params.set("suburban", "true");
   }
 
-  return `https://v6.bvg.transport.rest/stops/${stopId}/departures?${params.toString()}`;
+  return `/api/transport/stops/${stopId}/departures?${params.toString()}`;
+}
+
+export function buildNearbyStopsUrl(latitude: number, longitude: number) {
+  const params = new URLSearchParams({
+    latitude: String(latitude),
+    longitude: String(longitude),
+    results: "30",
+  });
+
+  return `/api/transport/stops/nearby?${params.toString()}`;
 }
 
 export function weatherDesc(code: number): string {
@@ -184,20 +196,33 @@ export function useTransport() {
   const [sBahnDepartures, setSBahnDepartures] = useState<BvgDeparture[]>([]);
   const [isBusLoading, setIsBusLoading] = useState(false);
   const [isSBahnLoading, setIsSBahnLoading] = useState(false);
+  const [busError, setBusError] = useState<string | null>(null);
+  const [sBahnError, setSBahnError] = useState<string | null>(null);
 
-  const { data: nearby, isPending: isNearbyPending } = useQuery<BvgStop[]>({
+  const {
+    data: nearby,
+    isPending: isNearbyPending,
+    error: nearbyStopsError,
+  } = useQuery<BvgStop[]>({
     queryKey: ["bvg-nearby-bru", SCHOOL_LAT, SCHOOL_LNG],
     queryFn: async () => {
-      const r = await fetch(
-        `https://v6.bvg.transport.rest/locations/nearby?latitude=${SCHOOL_LAT}&longitude=${SCHOOL_LNG}&results=30`,
-      );
-      if (!r.ok) throw new Error(`BVG-Fehler: ${r.status}`);
-      return r.json();
+      const url = buildNearbyStopsUrl(SCHOOL_LAT, SCHOOL_LNG);
+      console.info("[transport] fetching nearby stops", { url });
+      const stops = await fetchJson<BvgStop[]>(url);
+      console.info("[transport] nearby stops loaded", {
+        url,
+        count: stops?.length ?? 0,
+      });
+      return stops ?? [];
     },
     refetchInterval: 30 * 60 * 1_000,
   });
 
   useEffect(() => {
+    if (nearbyStopsError) {
+      console.error("[transport] nearby stops failed", nearbyStopsError);
+    }
+
     if (!nearby?.length) {
       setBusStop(null);
       setSBahnStop(null);
@@ -215,7 +240,13 @@ export function useTransport() {
         ? prev
         : nearestSBahnStop,
     );
-  }, [nearby]);
+    console.info("[transport] resolved nearest stops", {
+      busStopId: nearestBusStop?.id ?? null,
+      busStopName: nearestBusStop?.name ?? null,
+      sBahnStopId: nearestSBahnStop?.id ?? null,
+      sBahnStopName: nearestSBahnStop?.name ?? null,
+    });
+  }, [nearby, nearbyStopsError]);
 
   const fetchDeps = useCallback(
     async (
@@ -229,14 +260,21 @@ export function useTransport() {
     ) => {
       setLoading(true);
       try {
-        const r = await fetch(
-          buildDeparturesUrl(stopId, {
-            suburbanOnly: options?.suburbanOnly,
-          }),
-        );
-        if (!r.ok) throw new Error(`BVG-Abfahrten-Fehler: ${r.status}`);
-        const d = await r.json();
+        const url = buildDeparturesUrl(stopId, {
+          suburbanOnly: options?.suburbanOnly,
+        });
+        console.info("[transport] fetching departures", {
+          stopId,
+          product: options?.product ?? null,
+          url,
+        });
+        const d = (await fetchJson<{ departures?: BvgDeparture[] }>(url)) ?? {};
         const departures = Array.isArray(d.departures) ? d.departures : [];
+        console.info("[transport] departures loaded", {
+          stopId,
+          product: options?.product ?? null,
+          count: departures.length,
+        });
         setDepartures(
           options?.product
             ? departures.filter(
@@ -245,8 +283,26 @@ export function useTransport() {
               )
             : departures,
         );
-      } catch {
-        setDepartures([]);
+        if (options?.product === "bus") {
+          setBusError(null);
+        } else if (options?.product === "suburban") {
+          setSBahnError(null);
+        }
+      } catch (error) {
+        console.warn(
+          "Keeping previous departures after transport refresh error",
+          {
+            stopId,
+            product: options?.product ?? null,
+            error,
+          },
+        );
+        const message = `Abfahrten konnten nicht aktualisiert werden (${options?.product ?? "unknown"}).`;
+        if (options?.product === "bus") {
+          setBusError(message);
+        } else if (options?.product === "suburban") {
+          setSBahnError(message);
+        }
       } finally {
         setLoading(false);
       }
@@ -304,18 +360,25 @@ export function useTransport() {
     stopName: busStop?.name ?? "",
     departures: busDepartures,
     loading: isBusLoading,
+    error: busError,
   };
 
   const sBahn: TransportStreamState = {
     stopName: sBahnStop?.name ?? "",
     departures: sBahnDepartures,
     loading: isSBahnLoading,
+    error: sBahnError,
   };
+
+  const nearbyErrorMessage = nearbyStopsError
+    ? "Haltestellen konnten nicht geladen werden."
+    : null;
 
   return {
     bus,
     sBahn,
     loading: isBusLoading || isSBahnLoading,
     initialLoaded: !isNearbyPending,
+    error: nearbyErrorMessage ?? busError ?? sBahnError,
   };
 }

@@ -11,6 +11,13 @@ const FORWARDED_HEADERS = [
   "x-xsrf-token",
   "x-request-id",
 ];
+const STRIPPED_RESPONSE_HEADERS = [
+  "connection",
+  "content-encoding",
+  "content-length",
+  "keep-alive",
+  "transfer-encoding",
+];
 
 export async function proxyGetRequest(
   method: "GET" | "POST" | "PATCH" | "DELETE",
@@ -43,7 +50,7 @@ export async function proxyGetRequest(
       init,
     );
 
-    const responseHeaders = new Headers(upstreamResponse.headers);
+    const responseHeaders = sanitizeProxyResponseHeaders(upstreamResponse);
     if (method === "GET") {
       responseHeaders.set(
         "Cache-Control",
@@ -116,6 +123,14 @@ function copyForwardedHeaders(request: Request): Headers {
     if (value) {
       headers.set(header, value);
     }
+  }
+  return headers;
+}
+
+function sanitizeProxyResponseHeaders(upstreamResponse: Response) {
+  const headers = new Headers(upstreamResponse.headers);
+  for (const header of STRIPPED_RESPONSE_HEADERS) {
+    headers.delete(header);
   }
   return headers;
 }
