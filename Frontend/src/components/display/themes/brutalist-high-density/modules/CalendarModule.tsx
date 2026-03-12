@@ -6,12 +6,44 @@ import {
   type CalendarEvent,
 } from "#/lib/api/dashboard";
 
+const THREE_DAYS_IN_MS = 3 * 24 * 60 * 60 * 1_000;
+
+function normalizeTimestamp(timestamp: number) {
+  return timestamp > 1_000_000_000_000 ? timestamp : timestamp * 1_000;
+}
+
+export function getUpcomingCalendarEvents(
+  events: CalendarEvent[],
+  now = new Date(),
+) {
+  const todayStart = new Date(now);
+  todayStart.setHours(0, 0, 0, 0);
+
+  const cutoff = new Date(todayStart.getTime() + THREE_DAYS_IN_MS);
+  cutoff.setHours(23, 59, 59, 999);
+
+  return events
+    .filter((event) => {
+      const start = normalizeTimestamp(event.startDate);
+      const end = normalizeTimestamp(event.endDate);
+
+      return end >= todayStart.getTime() && start <= cutoff.getTime();
+    })
+    .sort(
+      (left, right) =>
+        normalizeTimestamp(left.startDate) -
+        normalizeTimestamp(right.startDate),
+    )
+    .slice(0, 3);
+}
+
 // ─── Calendar events module ───────────────────────────────────────────────────────
 
 export function CalendarModule() {
   const { data: events = [], isLoading } = useQuery(
-    calendarEventsQueryOptions(6),
+    calendarEventsQueryOptions(9),
   );
+  const upcomingEvents = getUpcomingCalendarEvents(events as CalendarEvent[]);
 
   return (
     <div
@@ -23,17 +55,14 @@ export function CalendarModule() {
         <div className="px-3 py-4 font-mono text-[11px] uppercase tracking-wide text-black/40">
           Lade Termine…
         </div>
-      ) : events.length === 0 ? (
+      ) : upcomingEvents.length === 0 ? (
         <div className="px-3 py-3 font-mono text-[11px] uppercase tracking-wide text-black/40">
           Keine Termine vorhanden
         </div>
       ) : (
         <div className="divide-y divide-black/10">
-          {(events as CalendarEvent[]).map((ev, i) => {
-            const startTimestamp =
-              ev.startDate > 1_000_000_000_000
-                ? ev.startDate
-                : ev.startDate * 1_000;
+          {upcomingEvents.map((ev, i) => {
+            const startTimestamp = normalizeTimestamp(ev.startDate);
             const start = new Date(startTimestamp);
             const days = daysUntil(start.toISOString().split("T")[0]);
             const dayLabel =
@@ -45,20 +74,20 @@ export function CalendarModule() {
                     ? "Läuft"
                     : `${days}d`;
             return (
-              <div key={i} className="flex items-start gap-2.5 px-3 py-2">
-                <div className="shrink-0 bg-black px-2 py-1 text-center min-w-9">
+              <div key={i} className="flex items-start gap-2 px-3 py-1.5">
+                <div className="min-w-8 shrink-0 bg-black px-1.5 py-1 text-center">
                   <span className="block font-mono text-[9px] font-black uppercase text-white/50">
                     {start
                       .toLocaleDateString("de-DE", { month: "short" })
                       .toUpperCase()
                       .replace(".", "")}
                   </span>
-                  <span className="block font-black text-base leading-none text-white">
+                  <span className="block font-black text-sm leading-none text-white">
                     {start.getDate()}
                   </span>
                 </div>
                 <div className="min-w-0 flex-1">
-                  <div className="font-semibold text-xs leading-tight text-black line-clamp-2">
+                  <div className="line-clamp-2 font-semibold text-[11px] leading-tight text-black">
                     {ev.summary}
                   </div>
                   <div className="mt-0.5 font-mono text-[10px] text-black/40">

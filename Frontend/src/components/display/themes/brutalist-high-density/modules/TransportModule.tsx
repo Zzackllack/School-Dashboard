@@ -102,10 +102,10 @@ export function TransportModule() {
   const { bus, sBahn, loading, initialLoaded } = useTransport();
   const upcomingBus = bus.departures
     .filter((d) => minsUntil(d.when ?? d.plannedWhen) >= 0)
-    .slice(0, 8);
+    .slice(0, 3);
   const upcomingSBahn = sBahn.departures
     .filter((d) => minsUntil(d.when ?? d.plannedWhen) >= 0)
-    .slice(0, 6);
+    .slice(0, 3);
 
   return (
     <div
