@@ -1,7 +1,12 @@
 import { describe, expect, it } from "vitest";
+import { TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS } from "#/lib/transport";
 import { buildDeparturesUrl, resolveTransportStops } from "./themeShared";
 
 describe("brutalist transport helpers", () => {
+  it("uses a 30 second departures refresh interval", () => {
+    expect(TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS).toBe(30_000);
+  });
+
   it("keeps searching nearby stops until it finds the S-Bahn stop", () => {
     const stops = Array.from({ length: 25 }, (_, index) => ({
       id: `stop-${index}`,

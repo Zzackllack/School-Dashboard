@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { useQuery } from "@tanstack/react-query";
+import { TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS } from "#/lib/transport";
 
 // Define interfaces for API responses
 interface Stop {
@@ -218,14 +219,13 @@ const Transportation = () => {
     }
   }, [currentSBahnStop, fetchSBahnDepartures]);
 
-  // Set up automatic refresh every 3 minutes
+  // Refresh departures often enough to feel live without approaching
+  // the upstream API rate limits.
   useEffect(() => {
-    // Update data every 3 minutes (180000 ms)
     const intervalId = setInterval(() => {
       updateAllData();
-    }, 180000);
+    }, TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS);
 
-    // Clean up interval on component unmount
     return () => clearInterval(intervalId);
   }, [updateAllData]);
 

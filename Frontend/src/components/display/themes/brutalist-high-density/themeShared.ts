@@ -1,5 +1,6 @@
 import { useQuery } from "@tanstack/react-query";
 import { useCallback, useEffect, useState } from "react";
+import { TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS } from "#/lib/transport";
 
 const SCHOOL_LAT = 52.43432378391319;
 const SCHOOL_LNG = 13.305375391277634;
@@ -277,7 +278,7 @@ export function useTransport() {
           setIsBusLoading,
           { product: "bus" },
         ),
-      3 * 60 * 1_000,
+      TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS,
     );
     return () => clearInterval(iv);
   }, [busStop, fetchDeps]);
@@ -294,7 +295,7 @@ export function useTransport() {
           product: "suburban",
           suburbanOnly: true,
         }),
-      3 * 60 * 1_000,
+      TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS,
     );
     return () => clearInterval(iv);
   }, [sBahnStop, fetchDeps]);
