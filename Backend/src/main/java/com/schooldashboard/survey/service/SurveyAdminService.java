@@ -5,6 +5,7 @@ import com.schooldashboard.survey.entity.SurveyCategory;
 import com.schooldashboard.survey.entity.SurveySubmissionEntity;
 import com.schooldashboard.survey.repository.SurveySubmissionRepository;
 import java.util.List;
+import java.util.Locale;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,9 +28,14 @@ public class SurveyAdminService {
 	@PreAuthorize("hasRole('ADMIN')")
 	public List<AdminSurveyListItemResponse> getInbox(SurveyCategory category, String displayId, String query,
 			Integer limit) {
-		Pageable pageable = PageRequest.of(0, sanitizeLimit(limit));
-		return surveySubmissionRepository.findInboxItems(category, normalize(displayId), normalize(query), pageable)
-				.stream().map(this::toResponse).toList();
+		String normalizedDisplayId = normalize(displayId);
+		String normalizedQuery = normalize(query);
+		int sanitizedLimit = sanitizeLimit(limit);
+		Pageable pageable = normalizedQuery == null ? PageRequest.of(0, sanitizedLimit) : Pageable.unpaged();
+
+		return surveySubmissionRepository.findInboxItems(category, normalizedDisplayId, pageable).stream()
+				.filter(entity -> matchesQuery(entity, normalizedQuery)).limit(sanitizedLimit).map(this::toResponse)
+				.toList();
 	}
 
 	private AdminSurveyListItemResponse toResponse(SurveySubmissionEntity entity) {
@@ -44,6 +50,22 @@ public class SurveyAdminService {
 			return DEFAULT_LIMIT;
 		}
 		return Math.max(1, Math.min(limit, MAX_LIMIT));
+	}
+
+	private boolean matchesQuery(SurveySubmissionEntity entity, String query) {
+		if (query == null) {
+			return true;
+		}
+
+		String normalizedQuery = query.toLowerCase(Locale.ROOT);
+		return containsIgnoreCase(entity.getMessage(), normalizedQuery)
+				|| containsIgnoreCase(entity.getSubmitterName(), normalizedQuery)
+				|| containsIgnoreCase(entity.getDisplay().getName(), normalizedQuery)
+				|| containsIgnoreCase(entity.getDisplay().getLocationLabel(), normalizedQuery);
+	}
+
+	private boolean containsIgnoreCase(String value, String query) {
+		return value != null && value.toLowerCase(Locale.ROOT).contains(query);
 	}
 
 	private String normalize(String value) {
