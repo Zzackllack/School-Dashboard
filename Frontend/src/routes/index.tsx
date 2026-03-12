@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { validateDisplaySession } from "#/lib/api/displays";
 import {
   clearDisplaySessionStorage,
+  getDisplayIdHint,
   setDisplayIdHint,
 } from "#/lib/display-session";
 
@@ -12,13 +13,25 @@ export interface BootstrapRedirectTarget {
 }
 
 export async function resolveBootstrapRedirect(): Promise<BootstrapRedirectTarget> {
-  const sessionValidation = await validateDisplaySession();
-  if (sessionValidation.valid && sessionValidation.displayId) {
-    setDisplayIdHint(sessionValidation.displayId);
-    return {
-      to: "/display/$displayId",
-      displayId: sessionValidation.displayId,
-    };
+  try {
+    const sessionValidation = await validateDisplaySession();
+    if (sessionValidation.valid && sessionValidation.displayId) {
+      setDisplayIdHint(sessionValidation.displayId);
+      return {
+        to: "/display/$displayId",
+        displayId: sessionValidation.displayId,
+      };
+    }
+  } catch {
+    const hintedDisplayId = getDisplayIdHint();
+    if (hintedDisplayId) {
+      return {
+        to: "/display/$displayId",
+        displayId: hintedDisplayId,
+      };
+    }
+
+    throw new Error("Display session validation unavailable");
   }
 
   clearDisplaySessionStorage();
@@ -56,16 +69,14 @@ export function BootstrapResolverPage() {
 
         await navigate({ to: "/setup", replace: true });
         return;
-      } catch {
-        // Fall through to setup flow.
-      }
+      } catch {}
 
       if (cancelled) {
         return;
       }
 
       setMessage(
-        "Display-Session ist ungültig oder abgelaufen. Setup wird geöffnet.",
+        "Display-Session kann aktuell nicht geprüft werden. Setup wird geöffnet.",
       );
       await navigate({ to: "/setup", replace: true });
     }

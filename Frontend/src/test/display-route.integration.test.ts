@@ -1,8 +1,9 @@
-import { describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { resolveDisplayAccess } from "../routes/display/$displayId";
 
 vi.mock("../lib/display-session", () => ({
   clearDisplaySessionStorage: vi.fn(),
+  getDisplayIdHint: vi.fn(),
   setDisplayIdHint: vi.fn(),
 }));
 
@@ -14,6 +15,10 @@ const displaySessionModule = await import("../lib/display-session");
 const displaysApiModule = await import("../lib/api/displays");
 
 describe("display route guard", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
   it("redirects to setup when no display session token exists", async () => {
     vi.mocked(displaysApiModule.validateDisplaySession).mockResolvedValue({
       valid: false,
@@ -81,6 +86,49 @@ describe("display route guard", () => {
     });
     expect(displaySessionModule.setDisplayIdHint).toHaveBeenCalledWith(
       "display-2",
+    );
+  });
+
+  it("keeps access when validation is temporarily unavailable but the display hint matches", async () => {
+    vi.mocked(displaySessionModule.getDisplayIdHint).mockReturnValue(
+      "display-1",
+    );
+    vi.mocked(displaysApiModule.validateDisplaySession).mockRejectedValue(
+      new Error("network error"),
+    );
+
+    await expect(resolveDisplayAccess("display-1")).resolves.toEqual({
+      kind: "allow",
+      displayId: "display-1",
+      themeId: null,
+    });
+    expect(
+      displaySessionModule.clearDisplaySessionStorage,
+    ).not.toHaveBeenCalled();
+  });
+
+  it("redirects to the hinted display when validation is temporarily unavailable", async () => {
+    vi.mocked(displaySessionModule.getDisplayIdHint).mockReturnValue(
+      "display-2",
+    );
+    vi.mocked(displaysApiModule.validateDisplaySession).mockRejectedValue(
+      new Error("network error"),
+    );
+
+    await expect(resolveDisplayAccess("display-1")).resolves.toEqual({
+      kind: "redirect-display",
+      displayId: "display-2",
+    });
+  });
+
+  it("propagates validation outages when no display hint exists", async () => {
+    vi.mocked(displaySessionModule.getDisplayIdHint).mockReturnValue(null);
+    vi.mocked(displaysApiModule.validateDisplaySession).mockRejectedValue(
+      new Error("network error"),
+    );
+
+    await expect(resolveDisplayAccess("display-1")).rejects.toThrow(
+      "Display session validation unavailable",
     );
   });
 });

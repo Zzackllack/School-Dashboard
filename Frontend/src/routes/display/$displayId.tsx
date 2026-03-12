@@ -4,6 +4,7 @@ import { DisplayPage } from "#/components/display/DisplayPage";
 import { validateDisplaySession } from "#/lib/api/displays";
 import {
   clearDisplaySessionStorage,
+  getDisplayIdHint,
   setDisplayIdHint,
 } from "#/lib/display-session";
 
@@ -15,22 +16,42 @@ type DisplayAccessResult =
 export async function resolveDisplayAccess(
   requestedDisplayId: string,
 ): Promise<DisplayAccessResult> {
-  const sessionValidation = await validateDisplaySession();
-  if (!sessionValidation.valid || !sessionValidation.displayId) {
-    clearDisplaySessionStorage();
-    return { kind: "redirect-setup" };
-  }
+  try {
+    const sessionValidation = await validateDisplaySession();
+    if (!sessionValidation.valid || !sessionValidation.displayId) {
+      clearDisplaySessionStorage();
+      return { kind: "redirect-setup" };
+    }
 
-  setDisplayIdHint(sessionValidation.displayId);
-  if (sessionValidation.displayId !== requestedDisplayId) {
-    return { kind: "redirect-display", displayId: sessionValidation.displayId };
-  }
+    setDisplayIdHint(sessionValidation.displayId);
+    if (sessionValidation.displayId !== requestedDisplayId) {
+      return {
+        kind: "redirect-display",
+        displayId: sessionValidation.displayId,
+      };
+    }
 
-  return {
-    kind: "allow",
-    displayId: sessionValidation.displayId,
-    themeId: sessionValidation.themeId,
-  };
+    return {
+      kind: "allow",
+      displayId: sessionValidation.displayId,
+      themeId: sessionValidation.themeId,
+    };
+  } catch {
+    const hintedDisplayId = getDisplayIdHint();
+    if (!hintedDisplayId) {
+      throw new Error("Display session validation unavailable");
+    }
+
+    if (hintedDisplayId !== requestedDisplayId) {
+      return { kind: "redirect-display", displayId: hintedDisplayId };
+    }
+
+    return {
+      kind: "allow",
+      displayId: hintedDisplayId,
+      themeId: null,
+    };
+  }
 }
 
 function GuardedDisplayRoute() {

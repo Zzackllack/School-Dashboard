@@ -3,6 +3,7 @@ import { resolveBootstrapRedirect } from "../routes/index";
 
 vi.mock("../lib/display-session", () => ({
   clearDisplaySessionStorage: vi.fn(),
+  getDisplayIdHint: vi.fn(),
   setDisplayIdHint: vi.fn(),
 }));
 
@@ -56,14 +57,35 @@ describe("bootstrap resolver", () => {
   });
 
   it("propagates error when session validation fails", async () => {
+    vi.mocked(displaySessionModule.getDisplayIdHint).mockReturnValue(null);
+
     vi.mocked(displaysApiModule.validateDisplaySession).mockRejectedValue(
       new Error("network error"),
     );
 
-    await expect(resolveBootstrapRedirect()).rejects.toThrow("network error");
+    await expect(resolveBootstrapRedirect()).rejects.toThrow(
+      "Display session validation unavailable",
+    );
     expect(
       displaySessionModule.clearDisplaySessionStorage,
     ).not.toHaveBeenCalled();
     expect(displaySessionModule.setDisplayIdHint).not.toHaveBeenCalled();
+  });
+
+  it("falls back to the stored display id when validation is temporarily unavailable", async () => {
+    vi.mocked(displaySessionModule.getDisplayIdHint).mockReturnValue(
+      "display-7",
+    );
+    vi.mocked(displaysApiModule.validateDisplaySession).mockRejectedValue(
+      new Error("network error"),
+    );
+
+    await expect(resolveBootstrapRedirect()).resolves.toEqual({
+      to: "/display/$displayId",
+      displayId: "display-7",
+    });
+    expect(
+      displaySessionModule.clearDisplaySessionStorage,
+    ).not.toHaveBeenCalled();
   });
 });
