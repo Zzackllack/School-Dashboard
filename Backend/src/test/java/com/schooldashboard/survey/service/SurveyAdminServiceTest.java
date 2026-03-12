@@ -56,7 +56,8 @@ public class SurveyAdminServiceTest {
 				"Die Anzeige blendet zu schnell um.", "Mila", "10a", true, "hashed-ip");
 		SurveySubmissionEntity nonMatchingEntity = new SurveySubmissionEntity(secondDisplay, SurveyCategory.PROBLEM,
 				"Alles gut.", "Noah", "9b", false, "other-hash");
-		when(repository.findInboxItems(eq(SurveyCategory.PROBLEM), eq(null), org.mockito.ArgumentMatchers.any(Pageable.class)))
+		when(repository.findInboxItems(eq(SurveyCategory.PROBLEM), eq(null),
+				org.mockito.ArgumentMatchers.any(Pageable.class)))
 				.thenReturn(List.of(matchingEntity, nonMatchingEntity));
 
 		List<AdminSurveyListItemResponse> response = service.getInbox(SurveyCategory.PROBLEM, null, "MILA", 10);
@@ -74,8 +75,8 @@ public class SurveyAdminServiceTest {
 				"QR Code Problem eins", "Mila", "10a", true, "hash-1");
 		SurveySubmissionEntity secondEntity = new SurveySubmissionEntity(display, SurveyCategory.PROBLEM,
 				"QR Code Problem zwei", "Noah", "9b", false, "hash-2");
-		when(repository.findInboxItems(eq(SurveyCategory.PROBLEM), eq(null), org.mockito.ArgumentMatchers.any(Pageable.class)))
-				.thenReturn(List.of(firstEntity, secondEntity));
+		when(repository.findInboxItems(eq(SurveyCategory.PROBLEM), eq(null),
+				org.mockito.ArgumentMatchers.any(Pageable.class))).thenReturn(List.of(firstEntity, secondEntity));
 
 		List<AdminSurveyListItemResponse> response = service.getInbox(SurveyCategory.PROBLEM, null, "qr code", 1);
 
