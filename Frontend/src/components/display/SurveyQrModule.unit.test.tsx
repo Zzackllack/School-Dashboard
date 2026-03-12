@@ -40,8 +40,6 @@ describe("SurveyQrModule", () => {
     expect(
       module.queryByText("Falls das Scannen nicht klappt, öffne:"),
     ).toBeNull();
-    expect(
-      module.queryByText(/rueckmeldung\/display-123$/),
-    ).toBeNull();
+    expect(module.queryByText(/rueckmeldung\/display-123$/)).toBeNull();
   });
 });
