@@ -3,6 +3,12 @@ import { useEffect, useState } from "react";
 import { DisplayPage } from "#/components/display/DisplayPage";
 import { validateDisplaySession } from "#/lib/api/displays";
 import {
+  clearSessionRetryState,
+  formatRetryDelay,
+  getSessionRetryDelayMs,
+  recordSessionRetryFailure,
+} from "#/lib/client-backoff";
+import {
   clearDisplaySessionStorage,
   getDisplayIdHint,
   setDisplayIdHint,
@@ -59,17 +65,39 @@ function GuardedDisplayRoute() {
   const { displayId } = Route.useParams();
   const [grantedDisplayId, setGrantedDisplayId] = useState<string | null>(null);
   const [resolvedThemeId, setResolvedThemeId] = useState<string | null>(null);
+  const [statusMessage, setStatusMessage] = useState(
+    "Bitte einen Moment warten.",
+  );
   const accessAllowed = grantedDisplayId === displayId;
 
   useEffect(() => {
     let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
+    const retryScope = `display-access:${displayId}`;
 
     async function guardDisplayAccess() {
+      const retryDelayMs = getSessionRetryDelayMs(retryScope);
+      if (retryDelayMs > 0) {
+        setStatusMessage(
+          `Display-Zugriff wird erneut geprüft in ${formatRetryDelay(retryDelayMs)}.`,
+        );
+        timer = setTimeout(() => {
+          if (!cancelled) {
+            void guardDisplayAccess();
+          }
+        }, retryDelayMs);
+        return;
+      }
+
+      setStatusMessage("Bitte einen Moment warten.");
+
       try {
         const access = await resolveDisplayAccess(displayId);
         if (cancelled) {
           return;
         }
+
+        clearSessionRetryState(retryScope);
 
         if (access.kind === "allow") {
           setResolvedThemeId(access.themeId);
@@ -91,7 +119,16 @@ function GuardedDisplayRoute() {
         if (cancelled) {
           return;
         }
-        await navigate({ to: "/setup", replace: true });
+
+        const nextDelayMs = recordSessionRetryFailure(retryScope);
+        setStatusMessage(
+          `Display-Session kann aktuell nicht geprüft werden. Neuer Versuch in ${formatRetryDelay(nextDelayMs)}.`,
+        );
+        timer = setTimeout(() => {
+          if (!cancelled) {
+            void guardDisplayAccess();
+          }
+        }, nextDelayMs);
       }
     }
 
@@ -99,6 +136,9 @@ function GuardedDisplayRoute() {
 
     return () => {
       cancelled = true;
+      if (timer) {
+        clearTimeout(timer);
+      }
     };
   }, [displayId, navigate]);
 
@@ -107,7 +147,7 @@ function GuardedDisplayRoute() {
       <main className="flex min-h-screen items-center justify-center bg-slate-100 p-6 text-slate-900">
         <section className="w-full max-w-lg rounded-2xl bg-white p-8 shadow-xl">
           <h1 className="text-2xl font-bold">Display Zugriff wird geprüft</h1>
-          <p className="mt-3 text-slate-600">Bitte einen Moment warten.</p>
+          <p className="mt-3 text-slate-600">{statusMessage}</p>
         </section>
       </main>
     );

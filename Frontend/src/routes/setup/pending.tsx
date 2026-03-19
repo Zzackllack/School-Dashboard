@@ -2,6 +2,12 @@ import { Link, createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { getEnrollmentStatus } from "#/lib/api/displays";
 import {
+  clearPendingPollState,
+  formatRetryDelay,
+  getPendingPollDelayMs,
+  recordPendingPollError,
+} from "#/lib/client-backoff";
+import {
   getPendingEnrollmentRequestId,
   setDisplayIdHint,
   setPendingEnrollmentRequestId,
@@ -58,6 +64,7 @@ export function SetupPendingPage() {
         if (response.status === "APPROVED" && response.displayId) {
           setDisplayIdHint(response.displayId);
           setPendingEnrollmentRequestId(null);
+          clearPendingPollState(stableRequestId);
           if (timer) {
             clearTimeout(timer);
             timer = null;
@@ -76,6 +83,7 @@ export function SetupPendingPage() {
 
         if (response.status === "REJECTED" || response.status === "EXPIRED") {
           setPendingEnrollmentRequestId(null);
+          clearPendingPollState(stableRequestId);
           if (timer) {
             clearTimeout(timer);
             timer = null;
@@ -83,11 +91,10 @@ export function SetupPendingPage() {
           return;
         }
 
-        const pollAfterSeconds = Math.min(
-          60,
-          Math.max(1, response.pollAfterSeconds ?? 5),
+        const nextPollDelayMs = getPendingPollDelayMs(
+          stableRequestId,
+          response.pollAfterSeconds,
         );
-        const nextPollDelayMs = pollAfterSeconds * 1000;
         if (timer) {
           clearTimeout(timer);
           timer = null;
@@ -103,10 +110,13 @@ export function SetupPendingPage() {
         }, nextPollDelayMs);
       } catch (error) {
         if (!cancelled) {
+          const nextPollDelayMs = recordPendingPollError(stableRequestId);
           setErrorMessage(
-            error instanceof Error
-              ? error.message
-              : "Status konnte nicht geladen werden.",
+            `${
+              error instanceof Error
+                ? error.message
+                : "Status konnte nicht geladen werden."
+            } Neuer Versuch in ${formatRetryDelay(nextPollDelayMs)}.`,
           );
           if (timer) {
             clearTimeout(timer);
@@ -117,7 +127,7 @@ export function SetupPendingPage() {
               return;
             }
             void poll();
-          }, 5000);
+          }, nextPollDelayMs);
         }
       }
     }

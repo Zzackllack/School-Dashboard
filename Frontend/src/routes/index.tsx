@@ -2,6 +2,12 @@ import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { validateDisplaySession } from "#/lib/api/displays";
 import {
+  clearSessionRetryState,
+  formatRetryDelay,
+  getSessionRetryDelayMs,
+  recordSessionRetryFailure,
+} from "#/lib/client-backoff";
+import {
   clearDisplaySessionStorage,
   getDisplayIdHint,
   setDisplayIdHint,
@@ -11,6 +17,8 @@ export interface BootstrapRedirectTarget {
   to: "/setup" | "/display/$displayId";
   displayId?: string;
 }
+
+const BOOTSTRAP_RETRY_SCOPE = "bootstrap-session";
 
 export async function resolveBootstrapRedirect(): Promise<BootstrapRedirectTarget> {
   try {
@@ -46,14 +54,30 @@ export function BootstrapResolverPage() {
 
   useEffect(() => {
     let cancelled = false;
+    let timer: ReturnType<typeof setTimeout> | null = null;
 
     async function resolveBootstrap() {
+      const retryDelayMs = getSessionRetryDelayMs(BOOTSTRAP_RETRY_SCOPE);
+      if (retryDelayMs > 0) {
+        setMessage(
+          `Display-Session kann aktuell nicht geprüft werden. Neuer Versuch in ${formatRetryDelay(retryDelayMs)}.`,
+        );
+        timer = setTimeout(() => {
+          if (!cancelled) {
+            void resolveBootstrap();
+          }
+        }, retryDelayMs);
+        return;
+      }
+
       try {
         const redirectTarget = await resolveBootstrapRedirect();
 
         if (cancelled) {
           return;
         }
+
+        clearSessionRetryState(BOOTSTRAP_RETRY_SCOPE);
 
         if (
           redirectTarget.to === "/display/$displayId" &&
@@ -69,22 +93,31 @@ export function BootstrapResolverPage() {
 
         await navigate({ to: "/setup", replace: true });
         return;
-      } catch {}
+      } catch {
+        if (cancelled) {
+          return;
+        }
 
-      if (cancelled) {
-        return;
+        const nextDelayMs = recordSessionRetryFailure(BOOTSTRAP_RETRY_SCOPE);
+        setMessage(
+          `Display-Session kann aktuell nicht geprüft werden. Neuer Versuch in ${formatRetryDelay(nextDelayMs)}.`,
+        );
+        timer = setTimeout(() => {
+          if (!cancelled) {
+            void resolveBootstrap();
+          }
+        }, nextDelayMs);
       }
 
-      setMessage(
-        "Display-Session kann aktuell nicht geprüft werden. Setup wird geöffnet.",
-      );
-      await navigate({ to: "/setup", replace: true });
     }
 
     void resolveBootstrap();
 
     return () => {
       cancelled = true;
+      if (timer) {
+        clearTimeout(timer);
+      }
     };
   }, [navigate]);
 
