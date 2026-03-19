@@ -108,7 +108,6 @@ export function BootstrapResolverPage() {
           }
         }, nextDelayMs);
       }
-
     }
 
     void resolveBootstrap();
