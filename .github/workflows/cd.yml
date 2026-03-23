@@ -102,7 +102,7 @@ jobs:
 
       - name: Scan backend image
         if: needs.changes.outputs.backend == 'true'
-        uses: aquasecurity/trivy-action@0.34.1
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: ${{ env.BACKEND_IMAGE_REF }}
           severity: HIGH,CRITICAL
@@ -154,7 +154,7 @@ jobs:
 
       - name: Scan frontend image
         if: needs.changes.outputs.frontend == 'true'
-        uses: aquasecurity/trivy-action@0.34.1
+        uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: ${{ env.FRONTEND_IMAGE_REF }}
           severity: HIGH,CRITICAL
