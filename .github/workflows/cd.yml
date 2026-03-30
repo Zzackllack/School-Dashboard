@@ -110,7 +110,7 @@ jobs:
 
       - name: Install Cosign
         if: needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true'
-        uses: sigstore/cosign-installer@v4.1.0
+        uses: sigstore/cosign-installer@v4.1.1
 
       - name: Sign backend image
         if: needs.changes.outputs.backend == 'true'
