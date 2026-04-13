@@ -73,7 +73,8 @@ public class DisplayPublicController {
 		DisplaySessionValidationResponse response = enrollmentService.validateSession(sessionToken);
 		ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.ok().cacheControl(CacheControl.noStore());
 		if (response.valid() && sessionToken != null && !sessionToken.isBlank()) {
-			responseBuilder.header("Set-Cookie", buildDisplaySessionCookie(sessionToken, request.isSecure()).toString());
+			responseBuilder.header("Set-Cookie",
+					buildDisplaySessionCookie(sessionToken, request.isSecure()).toString());
 		}
 		return responseBuilder.body(response);
 	}
