@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import com.schooldashboard.display.config.DisplayRateLimitProperties;
+import com.schooldashboard.display.config.DisplayEnrollmentProperties;
 import com.schooldashboard.display.dto.CreateEnrollmentResponse;
 import com.schooldashboard.display.dto.DisplaySessionValidationResponse;
 import com.schooldashboard.display.dto.EnrollmentStatusResponse;
@@ -36,6 +37,9 @@ public class DisplayPublicControllerTest {
 
 	@MockitoBean
 	private DisplayRateLimitProperties rateLimitProperties;
+
+	@MockitoBean
+	private DisplayEnrollmentProperties enrollmentProperties;
 
 	@MockitoBean
 	@SuppressWarnings("unused")
@@ -81,11 +85,29 @@ public class DisplayPublicControllerTest {
 
 	@Test
 	public void getEnrollmentStatusSetsHttpOnlySessionCookieWhenApproved() throws Exception {
+		when(enrollmentProperties.getSessionTtlSeconds()).thenReturn(Integer.MAX_VALUE);
 		when(enrollmentService.getEnrollmentStatus("req-1"))
 				.thenReturn(new EnrollmentStatusResponse("req-1", "APPROVED", "display-1", "session-123", null));
 
 		mockMvc.perform(get("/api/displays/enrollments/req-1")).andExpect(status().isOk())
 				.andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("DISPLAY_SESSION_TOKEN=")))
+				.andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("Max-Age=2147483647")))
 				.andExpect(jsonPath("$.displaySessionToken").isEmpty());
+	}
+
+	@Test
+	public void validateSessionRefreshesCookieWhenSessionIsValid() throws Exception {
+		when(rateLimitProperties.getSessionValidationsPerMinute()).thenReturn(120);
+		when(rateLimiter.tryAcquire(anyString(), anyString(), eq(120), any())).thenReturn(true);
+		when(enrollmentProperties.getSessionTtlSeconds()).thenReturn(Integer.MAX_VALUE);
+		when(enrollmentService.validateSession("token-123")).thenReturn(
+				new DisplaySessionValidationResponse(true, "display-1", "lobby", "default", "default",
+						"/display/display-1"));
+
+		mockMvc.perform(get("/api/displays/session").header("Authorization", "Bearer token-123"))
+				.andExpect(status().isOk())
+				.andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("DISPLAY_SESSION_TOKEN=")))
+				.andExpect(header().string("Set-Cookie", org.hamcrest.Matchers.containsString("Max-Age=2147483647")))
+				.andExpect(jsonPath("$.valid").value(true));
 	}
 }

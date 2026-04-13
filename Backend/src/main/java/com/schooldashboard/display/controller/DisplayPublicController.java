@@ -1,6 +1,7 @@
 package com.schooldashboard.display.controller;
 
 import com.schooldashboard.display.config.DisplayRateLimitProperties;
+import com.schooldashboard.display.config.DisplayEnrollmentProperties;
 import com.schooldashboard.display.dto.CreateEnrollmentRequest;
 import com.schooldashboard.display.dto.CreateEnrollmentResponse;
 import com.schooldashboard.display.dto.DisplaySessionValidationResponse;
@@ -32,12 +33,14 @@ public class DisplayPublicController {
 	private final DisplayEnrollmentService enrollmentService;
 	private final RequestRateLimiter rateLimiter;
 	private final DisplayRateLimitProperties rateLimitProperties;
+	private final DisplayEnrollmentProperties enrollmentProperties;
 
 	public DisplayPublicController(DisplayEnrollmentService enrollmentService, RequestRateLimiter rateLimiter,
-			DisplayRateLimitProperties rateLimitProperties) {
+			DisplayRateLimitProperties rateLimitProperties, DisplayEnrollmentProperties enrollmentProperties) {
 		this.enrollmentService = enrollmentService;
 		this.rateLimiter = rateLimiter;
 		this.rateLimitProperties = rateLimitProperties;
+		this.enrollmentProperties = enrollmentProperties;
 	}
 
 	@PostMapping("/enrollments")
@@ -54,9 +57,7 @@ public class DisplayPublicController {
 			HttpServletRequest request) {
 		EnrollmentStatusResponse response = enrollmentService.getEnrollmentStatus(requestId);
 		if ("APPROVED".equals(response.status()) && response.displaySessionToken() != null) {
-			ResponseCookie cookie = ResponseCookie.from(DISPLAY_SESSION_COOKIE_NAME, response.displaySessionToken())
-					.httpOnly(true).secure(request.isSecure()).sameSite("Lax").path("/").maxAge(Duration.ofDays(30))
-					.build();
+			ResponseCookie cookie = buildDisplaySessionCookie(response.displaySessionToken(), request.isSecure());
 			return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).body(new EnrollmentStatusResponse(
 					response.requestId(), response.status(), response.displayId(), null, response.pollAfterSeconds()));
 		}
@@ -68,9 +69,19 @@ public class DisplayPublicController {
 			@RequestHeader(name = "Authorization", required = false) String authorization, HttpServletRequest request) {
 		enforceRateLimit("display-session-validation", resolveClientKey(request),
 				rateLimitProperties.getSessionValidationsPerMinute());
-		DisplaySessionValidationResponse response = enrollmentService
-				.validateSession(resolveSessionToken(authorization, request));
-		return ResponseEntity.ok().cacheControl(CacheControl.noStore()).body(response);
+		String sessionToken = resolveSessionToken(authorization, request);
+		DisplaySessionValidationResponse response = enrollmentService.validateSession(sessionToken);
+		ResponseEntity.BodyBuilder responseBuilder = ResponseEntity.ok().cacheControl(CacheControl.noStore());
+		if (response.valid() && sessionToken != null && !sessionToken.isBlank()) {
+			responseBuilder.header("Set-Cookie", buildDisplaySessionCookie(sessionToken, request.isSecure()).toString());
+		}
+		return responseBuilder.body(response);
+	}
+
+	private ResponseCookie buildDisplaySessionCookie(String sessionToken, boolean secureRequest) {
+		return ResponseCookie.from(DISPLAY_SESSION_COOKIE_NAME, sessionToken).httpOnly(true).secure(secureRequest)
+				.sameSite("Lax").path("/").maxAge(Duration.ofSeconds(enrollmentProperties.getSessionTtlSeconds()))
+				.build();
 	}
 
 	private String resolveClientKey(HttpServletRequest request) {

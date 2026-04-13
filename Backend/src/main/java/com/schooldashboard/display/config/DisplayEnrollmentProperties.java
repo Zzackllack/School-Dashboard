@@ -17,7 +17,7 @@ public class DisplayEnrollmentProperties {
 	@Min(1)
 	private int requestTtlSeconds = 86400;
 	@Min(1)
-	private int sessionTtlSeconds = 2592000;
+	private int sessionTtlSeconds = Integer.MAX_VALUE;
 	@Min(1)
 	private int pollAfterSeconds = 5;
 	@Min(1)

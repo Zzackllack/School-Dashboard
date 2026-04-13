@@ -29,7 +29,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 @SpringBootTest(properties = {"spring.task.scheduling.enabled=false", "display.enrollment.code-ttl-seconds=900",
-		"display.enrollment.request-ttl-seconds=900", "display.enrollment.session-ttl-seconds=3600",
+		"display.enrollment.request-ttl-seconds=900", "display.enrollment.session-ttl-seconds=2147483647",
 		"dsb.username=test", "dsb.password=test", "calendar.ics-url=", "security.admin.bootstrap.enabled=true",
 		"security.admin.bootstrap.username=test-admin", "security.admin.bootstrap.password=test-admin-password"})
 @AutoConfigureMockMvc
@@ -78,6 +78,9 @@ public class DisplayEnrollmentFlowIntegrationTest {
 
 		MvcResult approvedStatusResult = mockMvc.perform(get("/api/displays/enrollments/{requestId}", requestId))
 				.andExpect(status().isOk()).andReturn();
+		String approvedSetCookieHeader = approvedStatusResult.getResponse().getHeader("Set-Cookie");
+		assertNotNull(approvedSetCookieHeader);
+		assertTrue(approvedSetCookieHeader.contains("Max-Age=2147483647"));
 		Map<String, Object> approvedStatusResponse = readMap(approvedStatusResult.getResponse().getContentAsString());
 		assertEquals("APPROVED", asString(approvedStatusResponse, "status"));
 		assertNull(approvedStatusResponse.get("displaySessionToken"));
@@ -90,9 +93,13 @@ public class DisplayEnrollmentFlowIntegrationTest {
 						.andReturn().getResponse().getContentAsString());
 		assertNull(approvedStatusSecondPollResponse.get("displaySessionToken"));
 
-		Map<String, Object> validationResponse = readMap(
-				mockMvc.perform(get("/api/displays/session").header("Authorization", "Bearer " + approvedSessionToken))
-						.andExpect(status().isOk()).andReturn().getResponse().getContentAsString());
+		MvcResult validationResult = mockMvc
+				.perform(get("/api/displays/session").header("Authorization", "Bearer " + approvedSessionToken))
+				.andExpect(status().isOk()).andReturn();
+		String validationSetCookieHeader = validationResult.getResponse().getHeader("Set-Cookie");
+		assertNotNull(validationSetCookieHeader);
+		assertTrue(validationSetCookieHeader.contains("Max-Age=2147483647"));
+		Map<String, Object> validationResponse = readMap(validationResult.getResponse().getContentAsString());
 		assertEquals(Boolean.TRUE, validationResponse.get("valid"));
 		assertEquals(asString(approveResponse, "displayId"), asString(validationResponse, "displayId"));
 		assertEquals("default", asString(validationResponse, "themeId"));
