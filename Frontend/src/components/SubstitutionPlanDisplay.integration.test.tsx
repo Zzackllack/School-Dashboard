@@ -79,4 +79,59 @@ describe("SubstitutionPlanDisplay", () => {
     expect(screen.getAllByText("10b")).toHaveLength(2);
     expect(screen.getByText("Entfall")).toBeDefined();
   });
+
+  it("renders multiple repaired grouped rows and their Text comments", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          {
+            date: "16.9.2026 Mittwoch",
+            title: "Vertretungsplan",
+            entries: [
+              {
+                absent: "",
+                classes: "7c",
+                comment: "Bitte Material mitbringen",
+                date: "16.9.2026 Mittwoch",
+                newRoom: "R-101",
+                originalSubject: "",
+                period: "1",
+                subject: "Mathe",
+                substitute: "Nguyen",
+                type: "Vertr.",
+              },
+              {
+                absent: "",
+                classes: "11",
+                comment: "Vertretungsraum",
+                date: "16.9.2026 Mittwoch",
+                newRoom: "R-302",
+                originalSubject: "",
+                period: "5",
+                subject: "Physik",
+                substitute: "Schubert",
+                type: "Vertr.",
+              },
+            ],
+            news: { date: "16.9.2026", newsItems: [] },
+          },
+        ]),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+
+    render(
+      <QueryClientProvider client={makeQueryClient()}>
+        <SubstitutionPlanDisplay />
+      </QueryClientProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Bitte Material mitbringen")).toBeDefined();
+      expect(screen.getByText("Vertretungsraum")).toBeDefined();
+    });
+    expect(
+      screen.queryByText("Keine Vertretungen für dieses Datum verfügbar."),
+    ).toBeNull();
+  });
 });

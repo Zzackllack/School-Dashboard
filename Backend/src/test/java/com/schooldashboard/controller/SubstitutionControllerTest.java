@@ -34,11 +34,18 @@ public class SubstitutionControllerTest {
 	private CacheManager cacheManager;
 
 	@Test
-  public void getPlansSuccess() throws Exception {
-    when(service.getSubstitutionPlans())
-        .thenReturn(Collections.singletonList(new com.schooldashboard.model.SubstitutionPlan()));
-    mockMvc.perform(get("/api/substitution/plans")).andExpect(status().isOk());
-  }
+	public void getPlansSuccess() throws Exception {
+		com.schooldashboard.model.SubstitutionPlan plan = new com.schooldashboard.model.SubstitutionPlan();
+		com.schooldashboard.model.SubstitutionEntry entry = new com.schooldashboard.model.SubstitutionEntry();
+		entry.setClasses("10a");
+		entry.setPeriod("2");
+		entry.setComment("Text from grouped row");
+		plan.addEntry(entry);
+		when(service.getSubstitutionPlans()).thenReturn(Collections.singletonList(plan));
+		mockMvc.perform(get("/api/substitution/plans")).andExpect(status().isOk())
+				.andExpect(jsonPath("$[0].entries[0].classes").value("10a"))
+				.andExpect(jsonPath("$[0].entries[0].comment").value("Text from grouped row"));
+	}
 
 	@Test
   public void getPlansEmptyFallsBackToDb() throws Exception {

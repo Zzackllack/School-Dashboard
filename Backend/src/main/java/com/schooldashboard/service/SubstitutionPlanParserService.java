@@ -2,19 +2,34 @@ package com.schooldashboard.service;
 
 import com.schooldashboard.model.DailyNews;
 import com.schooldashboard.model.ParsedPlanDocument;
+import com.schooldashboard.model.PlanParseDiagnostics;
 import com.schooldashboard.model.SubstitutionEntry;
 import com.schooldashboard.model.SubstitutionPlan;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Stream;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 @Service
 public class SubstitutionPlanParserService {
+
+	private static final Logger logger = LoggerFactory.getLogger(SubstitutionPlanParserService.class);
+	private static final Pattern PAGE_PATTERN = Pattern.compile("(?i)seite\\s+(\\d+)\\s*/\\s*(\\d+)");
 
 	public SubstitutionPlan parseSubstitutionPlanFromUrl(String url) {
 		return parsePlanDocumentFromUrl(url).getPlan();
@@ -22,19 +37,119 @@ public class SubstitutionPlanParserService {
 
 	public ParsedPlanDocument parsePlanDocumentFromUrl(String url) {
 		try {
-			// Connect to the URL and get the document
 			Document doc = Jsoup.connect(url).get();
-			SubstitutionPlan plan = parseDocument(doc);
-			return new ParsedPlanDocument(plan, doc.outerHtml());
+			ParsedPlanDocument parsedDocument = parseDocumentResult(doc);
+			logDiagnostics(parsedDocument.getDiagnostics());
+			return new ParsedPlanDocument(parsedDocument.getPlan(), doc.outerHtml(), parsedDocument.getDiagnostics());
 		} catch (IOException e) {
 			throw new RuntimeException("Error fetching or parsing substitution plan", e);
 		}
 	}
 
-	private SubstitutionPlan parseDocument(Document doc) {
+	private ParsedPlanDocument parseDocumentResult(Document doc) {
 		SubstitutionPlan plan = new SubstitutionPlan();
+		extractPlanMetadata(doc, plan);
+		extractDailyNews(doc, plan.getNews());
 
-		// Extract date from the page
+		Element tableElement = doc.selectFirst("table.mon_list");
+		PageInfo pageInfo = extractPageInfo(doc);
+		if (tableElement == null) {
+			PlanParseDiagnostics.Status status = containsEmptyPlanMarker(doc)
+					? PlanParseDiagnostics.Status.EMPTY
+					: PlanParseDiagnostics.Status.UNSUPPORTED;
+			PlanParseDiagnostics.Format format = status == PlanParseDiagnostics.Status.EMPTY
+					? PlanParseDiagnostics.Format.EMPTY
+					: PlanParseDiagnostics.Format.UNSUPPORTED;
+			return new ParsedPlanDocument(plan, null,
+					diagnostics(format, status, List.of(), List.of(), 0, 0, 0, 0, 0, pageInfo));
+		}
+
+		HeaderMapping headerMapping = buildColumnMap(tableElement);
+		List<Element> rows = tableElement.select("tr.list.odd, tr.list.even");
+		List<SubstitutionEntry> entries = new ArrayList<>();
+		String activeClass = null;
+		int groupRows = 0;
+		int dataRows = 0;
+		int skippedRows = 0;
+		boolean structuralFailure = false;
+		boolean sawGroupRow = false;
+		List<String> classCandidates = extractClassCandidates(doc);
+
+		for (Element row : rows) {
+			List<Element> cells = directCells(row);
+			if (cells.isEmpty()) {
+				skippedRows++;
+				continue;
+			}
+
+			Element groupCell = cells.stream().filter(this::isGroupContextCell).findFirst().orElse(null);
+			if (groupCell != null) {
+				groupRows++;
+				sawGroupRow = true;
+				activeClass = extractClassIdentifier(groupCell.text(), classCandidates);
+				if (activeClass == null) {
+					skippedRows++;
+				}
+				continue;
+			}
+
+			dataRows++;
+			if (cells.size() < headerMapping.minimumCellCount()) {
+				skippedRows++;
+				structuralFailure = true;
+				continue;
+			}
+
+			SubstitutionEntry entry = mapEntry(cells, headerMapping.columnMap(), activeClass, plan.getDate());
+			if (!hasVisibleValue(entry.getClasses())) {
+				// A grouped row without context is unsafe to publish.
+				skippedRows++;
+				structuralFailure = true;
+				continue;
+			}
+			if (!isMeaningfulEntry(entry)) {
+				// Class-only placeholders are safe to skip; the frontend applies
+				// the same last-line defense.
+				skippedRows++;
+				continue;
+			}
+			entries.add(entry);
+		}
+
+		for (SubstitutionEntry entry : entries) {
+			plan.addEntry(entry);
+		}
+
+		PlanParseDiagnostics.Format format = sawGroupRow
+				? PlanParseDiagnostics.Format.GROUPED
+				: headerMapping.hasClassColumn()
+						? PlanParseDiagnostics.Format.EXPLICIT
+						: PlanParseDiagnostics.Format.UNSUPPORTED;
+		PlanParseDiagnostics.Status status;
+		if (headerMapping.columnMap().isEmpty() || structuralFailure || !hasRequiredSubstitutionColumn(headerMapping)
+				|| dataRows > 0 && entries.isEmpty() && !rows.isEmpty()) {
+			status = PlanParseDiagnostics.Status.UNSUPPORTED;
+			format = PlanParseDiagnostics.Format.UNSUPPORTED;
+		} else if (dataRows == 0 && groupRows == 0) {
+			status = PlanParseDiagnostics.Status.EMPTY;
+			format = PlanParseDiagnostics.Format.EMPTY;
+		} else if (dataRows == 0) {
+			status = PlanParseDiagnostics.Status.UNSUPPORTED;
+			format = PlanParseDiagnostics.Format.UNSUPPORTED;
+		} else {
+			status = PlanParseDiagnostics.Status.VALID;
+		}
+
+		return new ParsedPlanDocument(plan, null,
+				diagnostics(format, status, headerMapping.normalizedHeaders(), headerMapping.unknownHeaders(),
+						rows.size(), groupRows, dataRows, entries.size(), skippedRows, pageInfo));
+	}
+
+	private SubstitutionPlan parseDocument(Document doc) {
+		return parseDocumentResult(doc).getPlan();
+	}
+
+	private void extractPlanMetadata(Document doc, SubstitutionPlan plan) {
 		Element titleElement = doc.selectFirst("div.mon_title");
 		if (titleElement != null) {
 			String dateText = titleElement.text().trim();
@@ -42,7 +157,6 @@ public class SubstitutionPlanParserService {
 			plan.getNews().setDate(dateText);
 		}
 
-		// Extract any additional information
 		Elements infoElements = doc.select("table.info tr.info");
 		if (!infoElements.isEmpty()) {
 			StringBuilder infoBuilder = new StringBuilder();
@@ -54,88 +168,230 @@ public class SubstitutionPlanParserService {
 			}
 			plan.setTitle(infoBuilder.toString().trim());
 		}
+	}
 
-		// Extract news for the day - look for elements after "Nachrichten zum Tag"
-		// heading
-		extractDailyNews(doc, plan.getNews());
+	private HeaderMapping buildColumnMap(Element tableElement) {
+		Element headerRow = tableElement.selectFirst("tr.list:has(th)");
+		if (headerRow == null) {
+			return new HeaderMapping(Map.of(), List.of(), List.of(), 0, false);
+		}
 
-		// Extract table data for substitutions - first get the headers
-		Element tableElement = doc.selectFirst("table.mon_list");
-		if (tableElement != null) {
-			Elements headerElements = tableElement.select("tr.list th");
-
-			// Create a mapping between column index and field type
-			Map<Integer, String> columnMap = new HashMap<>();
-			for (int i = 0; i < headerElements.size(); i++) {
-				String header = headerElements.get(i).text().toLowerCase().trim();
-
-				if (header.contains("klasse")) {
-					columnMap.put(i, "classes");
-				} else if (header.contains("stunde")) {
-					columnMap.put(i, "period");
-				} else if (header.contains("abwesend")) {
-					columnMap.put(i, "absent");
-				} else if (header.contains("vertreter")) {
-					columnMap.put(i, "substitute");
-				} else if (header.contains("(fach)")) {
-					columnMap.put(i, "originalSubject");
-				} else if (header.contains("fach") && !header.contains("(fach)")) {
-					columnMap.put(i, "subject");
-				} else if (header.contains("raum")) {
-					columnMap.put(i, "room");
-				} else if (header.contains("art")) {
-					columnMap.put(i, "type");
-				} else if (header.contains("bemerkung")) {
-					columnMap.put(i, "comment");
-				}
-			}
-
-			// Process each row in the table
-			Elements rowElements = tableElement.select("tr.list.odd, tr.list.even");
-			for (Element row : rowElements) {
-				Elements cells = row.select("td");
-
-				if (!cells.isEmpty()) {
-					SubstitutionEntry entry = new SubstitutionEntry();
-					entry.setDate(plan.getDate());
-
-					// Map each cell to the appropriate field based on the column index
-					for (int i = 0; i < cells.size(); i++) {
-						String value = cells.get(i).text().trim();
-						String fieldType = columnMap.getOrDefault(i, null);
-
-						if (fieldType != null) {
-							switch (fieldType) {
-								case "classes" -> entry.setClasses(value);
-								case "period" -> entry.setPeriod(value);
-								case "absent" -> entry.setAbsent(value);
-								case "substitute" -> entry.setSubstitute(value);
-								case "originalSubject" -> entry.setOriginalSubject(value);
-								case "subject" -> entry.setSubject(value);
-								case "room" -> entry.setNewRoom(value);
-								case "type" -> entry.setType(value);
-								case "comment" -> entry.setComment(value);
-								default -> {
-								}
-							}
-						}
-					}
-
-					plan.addEntry(entry);
-				}
+		List<Element> headerElements = directChildren(headerRow, "th");
+		Map<Integer, PlanField> columnMap = new HashMap<>();
+		List<String> normalizedHeaders = new ArrayList<>();
+		Set<String> unknownHeaders = new LinkedHashSet<>();
+		for (int i = 0; i < headerElements.size(); i++) {
+			String normalizedHeader = normalizeHeader(headerElements.get(i).text());
+			normalizedHeaders.add(normalizedHeader);
+			PlanField field = fieldForHeader(normalizedHeader);
+			if (field == null) {
+				unknownHeaders.add(normalizedHeader);
+			} else {
+				columnMap.put(i, field);
 			}
 		}
 
-		return plan;
+		int minimumCellCount = columnMap.keySet().stream().mapToInt(Integer::intValue).max().orElse(-1) + 1;
+		return new HeaderMapping(columnMap, normalizedHeaders, List.copyOf(unknownHeaders), minimumCellCount,
+				columnMap.containsValue(PlanField.CLASSES));
+	}
+
+	private PlanField fieldForHeader(String header) {
+		return switch (header) {
+			case "klasse", "klasse(n)" -> PlanField.CLASSES;
+			case "stunde" -> PlanField.PERIOD;
+			case "abwesend" -> PlanField.ABSENT;
+			case "vertreter" -> PlanField.SUBSTITUTE;
+			case "(fach)" -> PlanField.ORIGINAL_SUBJECT;
+			case "fach" -> PlanField.SUBJECT;
+			case "raum", "neuer raum" -> PlanField.ROOM;
+			case "art" -> PlanField.TYPE;
+			case "text", "bemerkung", "bemerkungen" -> PlanField.COMMENT;
+			default -> null;
+		};
+	}
+
+	private List<Element> directCells(Element row) {
+		return row.children().stream().filter(child -> child.normalName().equals("td")).toList();
+	}
+
+	private List<Element> directChildren(Element element, String name) {
+		return element.children().stream().filter(child -> child.normalName().equals(name)).toList();
+	}
+
+	private boolean isGroupContextCell(Element cell) {
+		return cell.classNames().contains("inline_header");
+	}
+
+	private SubstitutionEntry mapEntry(List<Element> cells, Map<Integer, PlanField> columnMap, String activeClass,
+			String date) {
+		SubstitutionEntry entry = new SubstitutionEntry();
+		entry.setDate(date);
+		for (int i = 0; i < cells.size(); i++) {
+			PlanField field = columnMap.get(i);
+			if (field == null) {
+				continue;
+			}
+			setField(entry, field, cells.get(i).text().trim());
+		}
+		if (!hasVisibleValue(entry.getClasses())) {
+			entry.setClasses(activeClass);
+		}
+		return entry;
+	}
+
+	private void setField(SubstitutionEntry entry, PlanField field, String value) {
+		switch (field) {
+			case CLASSES -> entry.setClasses(value);
+			case PERIOD -> entry.setPeriod(value);
+			case ABSENT -> entry.setAbsent(value);
+			case SUBSTITUTE -> entry.setSubstitute(value);
+			case ORIGINAL_SUBJECT -> entry.setOriginalSubject(value);
+			case SUBJECT -> entry.setSubject(value);
+			case ROOM -> entry.setNewRoom(value);
+			case TYPE -> entry.setType(value);
+			case COMMENT -> entry.setComment(value);
+		}
+	}
+
+	private boolean isMeaningfulEntry(SubstitutionEntry entry) {
+		return Stream
+				.of(entry.getPeriod(), entry.getAbsent(), entry.getSubstitute(), entry.getOriginalSubject(),
+						entry.getSubject(), entry.getNewRoom(), entry.getType(), entry.getComment())
+				.anyMatch(this::hasVisibleValue);
+	}
+
+	private boolean hasVisibleValue(String value) {
+		return value != null && !value.isBlank() && !value.trim().equals("---");
+	}
+
+	private boolean hasRequiredSubstitutionColumn(HeaderMapping mapping) {
+		return mapping.columnMap().values().stream().anyMatch(field -> field != PlanField.CLASSES);
+	}
+
+	private List<String> extractClassCandidates(Document doc) {
+		List<String> candidates = new ArrayList<>();
+		for (Element info : doc.select("table.info tr.info")) {
+			String text = normalizeWhitespace(info.text());
+			String lower = text.toLowerCase(Locale.ROOT);
+			int marker = lower.indexOf("betroffene klassen");
+			if (marker < 0) {
+				continue;
+			}
+			String value = text.substring(marker + "betroffene klassen".length()).replaceFirst("^\\s*[:=-]\\s*", "");
+			for (String candidate : value.split("[,;]")) {
+				String normalized = normalizeWhitespace(candidate);
+				if (!normalized.isEmpty()) {
+					candidates.add(normalized);
+				}
+			}
+		}
+		candidates.sort(Comparator.comparingInt(String::length).reversed());
+		return candidates;
+	}
+
+	private String extractClassIdentifier(String label, List<String> candidates) {
+		String normalizedLabel = normalizeWhitespace(label);
+		if (normalizedLabel.isEmpty() || normalizedLabel.equals("---")) {
+			return null;
+		}
+		for (String candidate : candidates) {
+			boolean startsWithCandidate = normalizedLabel.regionMatches(true, 0, candidate, 0, candidate.length());
+			if (startsWithCandidate && (normalizedLabel.length() == candidate.length()
+					|| Character.isWhitespace(normalizedLabel.charAt(candidate.length()))
+					|| "([,/:-".indexOf(normalizedLabel.charAt(candidate.length())) >= 0)) {
+				return normalizeClassIdentifier(candidate);
+			}
+		}
+
+		String token = normalizedLabel.split("\\s+", 2)[0].replaceAll("^[\\[(]+|[\\],;:]+$", "");
+		return normalizeClassIdentifier(token);
+	}
+
+	private String normalizeClassIdentifier(String candidate) {
+		if (candidate == null || candidate.isBlank() || candidate.equals("---")) {
+			return null;
+		}
+		String normalized = candidate.trim();
+		if (normalized.matches("0\\d+[^\\s]*")) {
+			normalized = normalized.substring(1);
+		}
+		return normalized.isBlank() ? null : normalized;
+	}
+
+	private String normalizeHeader(String value) {
+		return normalizeWhitespace(value).toLowerCase(Locale.ROOT);
+	}
+
+	private String normalizeWhitespace(String value) {
+		return value == null ? "" : value.trim().replaceAll("\\s+", " ");
+	}
+
+	private boolean containsEmptyPlanMarker(Document doc) {
+		String text = doc.body() == null ? "" : doc.body().text().toLowerCase(Locale.ROOT);
+		return text.contains("keine vertretungen") || text.contains("keine substitutionen");
+	}
+
+	private PageInfo extractPageInfo(Document doc) {
+		Matcher matcher = PAGE_PATTERN.matcher(doc.text());
+		if (!matcher.find()) {
+			return new PageInfo(null, null);
+		}
+		return new PageInfo(parseInt(matcher.group(1)), parseInt(matcher.group(2)));
+	}
+
+	private Integer parseInt(String value) {
+		try {
+			return Integer.valueOf(value);
+		} catch (NumberFormatException ex) {
+			return null;
+		}
+	}
+
+	private PlanParseDiagnostics diagnostics(PlanParseDiagnostics.Format format, PlanParseDiagnostics.Status status,
+			List<String> headers, List<String> unknownHeaders, int sourceRows, int groupRows, int dataRows,
+			int validEntries, int skippedRows, PageInfo pageInfo) {
+		return new PlanParseDiagnostics(format, status, headers, unknownHeaders, sourceRows, groupRows, dataRows,
+				validEntries, skippedRows, pageInfo.pageNumber(), pageInfo.pageCount());
+	}
+
+	private void logDiagnostics(PlanParseDiagnostics diagnostics) {
+		if (!diagnostics.getUnknownHeaders().isEmpty()) {
+			logger.warn("[SubstitutionPlanParserService] Unknown substitution headers: {}",
+					diagnostics.getUnknownHeaders());
+		}
+		if (!diagnostics.isPublishable()) {
+			logger.warn(
+					"[SubstitutionPlanParserService] Unsupported substitution document: format={}, headers={}, "
+							+ "sourceRows={}, groupRows={}, dataRows={}, validEntries={}, skippedRows={}",
+					diagnostics.getFormat(), diagnostics.getNormalizedHeaders(), diagnostics.getSourceRows(),
+					diagnostics.getGroupRows(), diagnostics.getDataRows(), diagnostics.getValidEntries(),
+					diagnostics.getSkippedRows());
+		}
+		logger.info(
+				"[SubstitutionPlanParserService] Parsed substitution document: format={}, headers={}, "
+						+ "sourceRows={}, groupRows={}, dataRows={}, validEntries={}, skippedRows={}",
+				diagnostics.getFormat(), diagnostics.getNormalizedHeaders().size(), diagnostics.getSourceRows(),
+				diagnostics.getGroupRows(), diagnostics.getDataRows(), diagnostics.getValidEntries(),
+				diagnostics.getSkippedRows());
+	}
+
+	private enum PlanField {
+		CLASSES, PERIOD, ABSENT, SUBSTITUTE, ORIGINAL_SUBJECT, SUBJECT, ROOM, TYPE, COMMENT
+	}
+
+	private record HeaderMapping(Map<Integer, PlanField> columnMap, List<String> normalizedHeaders,
+			List<String> unknownHeaders, int minimumCellCount, boolean hasClassColumn) {
+	}
+
+	private record PageInfo(Integer pageNumber, Integer pageCount) {
 	}
 
 	private void extractDailyNews(Document doc, DailyNews news) {
-		// Looking for any elements containing "Nachrichten zum Tag"
 		Elements newsHeaders = doc.getElementsContainingOwnText("Nachrichten zum Tag");
-
 		if (!newsHeaders.isEmpty()) {
 			Element newsHeader = newsHeaders.first();
-			Element parent = (newsHeader == null) ? null : newsHeader.parent();
+			Element parent = newsHeader == null ? null : newsHeader.parent();
 			if (parent != null) {
 				Elements newsElements = parent.nextElementSiblings();
 				for (Element element : newsElements) {
@@ -149,27 +405,20 @@ public class SubstitutionPlanParserService {
 			}
 
 			if (news.getNewsItems().isEmpty()) {
-				Element current = (newsHeader == null) ? null : newsHeader.nextElementSibling();
-
-				// Look for paragraphs or divs after the header until the substitution table
-				// appears
+				Element current = newsHeader == null ? null : newsHeader.nextElementSibling();
 				while (current != null) {
 					if (current.is("table.mon_list")) {
 						break;
 					}
-
 					if (current.is("p, div")) {
 						addNewsItem(news, current.text());
 					}
-
 					current = current.nextElementSibling();
 				}
 			}
 
-			// If no siblings found, try looking for content within a font or p tag
 			if (news.getNewsItems().isEmpty()) {
-				Elements fontElements = doc.select("font[size=4]");
-				for (Element font : fontElements) {
+				for (Element font : doc.select("font[size=4]")) {
 					addNewsItem(news, font.text());
 				}
 			}

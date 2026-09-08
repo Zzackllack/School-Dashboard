@@ -4,6 +4,8 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.schooldashboard.model.ParsedPlanDocument;
+import com.schooldashboard.model.PlanParseDiagnostics;
+import com.schooldashboard.model.SubstitutionEntry;
 import com.schooldashboard.model.SubstitutionPlan;
 import com.schooldashboard.util.DSBMobile;
 import com.schooldashboard.util.DSBMobile.TimeTable;
@@ -42,15 +44,15 @@ public class SubstitutionPlanServiceTest {
 				tt(u2, "morgen", "u2"));
 		when(dsbService.getTimeTables()).thenReturn(tables);
 
-		SubstitutionPlan p1 = new SubstitutionPlan("d1", "t1");
-		p1.addEntry(new com.schooldashboard.model.SubstitutionEntry());
+		SubstitutionPlan p1 = meaningfulPlan("d1", "1");
+		p1.setTitle("t1");
 		p1.getNews().addNewsItem("n1");
-		SubstitutionPlan p2 = new SubstitutionPlan("d1", "t2");
-		p2.addEntry(new com.schooldashboard.model.SubstitutionEntry());
+		SubstitutionPlan p2 = meaningfulPlan("d1", "2");
+		p2.setTitle("t2");
 		p2.getNews().addNewsItem("n1");
 		p2.getNews().addNewsItem("n2");
-		SubstitutionPlan p3 = new SubstitutionPlan("d2", "t3");
-		p3.addEntry(new com.schooldashboard.model.SubstitutionEntry());
+		SubstitutionPlan p3 = meaningfulPlan("d2", "3");
+		p3.setTitle("t3");
 
 		when(parser.parsePlanDocumentFromUrl("u1-1")).thenReturn(parsed(p1));
 		when(parser.parsePlanDocumentFromUrl("u1-2")).thenReturn(parsed(p2));
@@ -78,6 +80,77 @@ public class SubstitutionPlanServiceTest {
 		service.updateSubstitutionPlans();
 		assertTrue(service.getSubstitutionPlans().isEmpty());
 		verify(cacheService, never()).store(eq(ApiResponseCacheKeys.SUBSTITUTION_PLANS), any());
+	}
+
+	@Test
+	public void invalidRefreshKeepsPreviouslyPublishedPlansAndCache() {
+		UUID validUuid = UUID.randomUUID();
+		UUID invalidUuid = UUID.randomUUID();
+		when(dsbService.getTimeTables()).thenReturn(List.of(tt(validUuid, "heute", "valid")),
+				List.of(tt(invalidUuid, "heute", "unsupported")));
+
+		SubstitutionPlan validPlan = meaningfulPlan("valid-date", "1");
+		when(parser.parsePlanDocumentFromUrl("valid")).thenReturn(parsed(validPlan));
+		when(parser.parsePlanDocumentFromUrl("unsupported"))
+				.thenReturn(new ParsedPlanDocument(new SubstitutionPlan(), "<html></html>", unsupportedDiagnostics()));
+
+		service.updateSubstitutionPlans();
+		service.updateSubstitutionPlans();
+
+		assertEquals(List.of(validPlan), service.getSubstitutionPlans());
+		verify(cacheService, times(1)).store(eq(ApiResponseCacheKeys.SUBSTITUTION_PLANS), any());
+	}
+
+	@Test
+	public void mergesPagesInDeterministicPageOrder() {
+		UUID uuid = UUID.randomUUID();
+		when(dsbService.getTimeTables())
+				.thenReturn(List.of(tt(uuid, "heute", "page-2.html"), tt(uuid, "heute", "page-1.html")));
+
+		SubstitutionPlan pageOne = meaningfulPlan("date", "1");
+		SubstitutionPlan pageTwo = meaningfulPlan("date", "2");
+		when(parser.parsePlanDocumentFromUrl("page-1.html")).thenReturn(parsed(pageOne));
+		when(parser.parsePlanDocumentFromUrl("page-2.html")).thenReturn(parsed(pageTwo));
+
+		service.updateSubstitutionPlans();
+
+		assertEquals(List.of("1", "2"),
+				service.getSubstitutionPlans().get(0).getEntries().stream().map(SubstitutionEntry::getPeriod).toList());
+		verify(parser).parsePlanDocumentFromUrl("page-1.html");
+		verify(parser).parsePlanDocumentFromUrl("page-2.html");
+	}
+
+	@Test
+	public void incompleteAdvertisedPageSetIsNotPublished() {
+		UUID uuid = UUID.randomUUID();
+		when(dsbService.getTimeTables()).thenReturn(List.of(tt(uuid, "heute", "page-1.html")));
+		when(parser.parsePlanDocumentFromUrl("page-1.html")).thenReturn(
+				new ParsedPlanDocument(meaningfulPlan("date", "1"), "<html></html>", validDiagnostics(1, 2)));
+
+		service.updateSubstitutionPlans();
+
+		assertTrue(service.getSubstitutionPlans().isEmpty());
+		verify(cacheService, never()).store(eq(ApiResponseCacheKeys.SUBSTITUTION_PLANS), any());
+	}
+
+	private SubstitutionPlan meaningfulPlan(String date, String period) {
+		SubstitutionPlan plan = new SubstitutionPlan(date, "title");
+		SubstitutionEntry entry = new SubstitutionEntry();
+		entry.setClasses("10a");
+		entry.setPeriod(period);
+		plan.addEntry(entry);
+		return plan;
+	}
+
+	private PlanParseDiagnostics unsupportedDiagnostics() {
+		return new PlanParseDiagnostics(PlanParseDiagnostics.Format.UNSUPPORTED,
+				PlanParseDiagnostics.Status.UNSUPPORTED, List.of("unknown"), List.of("unknown"), 1, 0, 1, 0, 1, null,
+				null);
+	}
+
+	private PlanParseDiagnostics validDiagnostics(int pageNumber, int pageCount) {
+		return new PlanParseDiagnostics(PlanParseDiagnostics.Format.GROUPED, PlanParseDiagnostics.Status.VALID,
+				List.of("stunde", "text"), List.of(), 2, 1, 1, 1, 0, pageNumber, pageCount);
 	}
 
 	private ParsedPlanDocument parsed(SubstitutionPlan plan) {
