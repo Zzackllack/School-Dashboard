@@ -107,8 +107,20 @@ public class SubstitutionPlanParserServiceTest {
 		assertEquals(3, parsed.getPlan().getEntries().size());
 		assertEquals(List.of("7c", "7c", "11"), parsed.getPlan().getEntries().stream()
 				.map(com.schooldashboard.model.SubstitutionEntry::getClasses).toList());
-		assertEquals("Bitte Material mitbringen", parsed.getPlan().getEntries().get(0).getComment());
-		assertEquals("", valueOrEmpty(parsed.getPlan().getEntries().get(1).getAbsent()));
+		var repairedEvaEntry = parsed.getPlan().getEntries().get(0);
+		assertEquals("Ahr", repairedEvaEntry.getAbsent());
+		assertEquals("", valueOrEmpty(repairedEvaEntry.getSubstitute()));
+		assertEquals("LEN12", repairedEvaEntry.getSubject());
+		assertEquals("", valueOrEmpty(repairedEvaEntry.getNewRoom()));
+		assertEquals("EVA", repairedEvaEntry.getType());
+		assertEquals("Bitte Material mitbringen", repairedEvaEntry.getComment());
+
+		var repairedMitbetreuungEntry = parsed.getPlan().getEntries().get(1);
+		assertEquals("Ahr", repairedMitbetreuungEntry.getAbsent());
+		assertEquals("Pat", repairedMitbetreuungEntry.getSubstitute());
+		assertEquals("Gpsy15", repairedMitbetreuungEntry.getSubject());
+		assertEquals("253", repairedMitbetreuungEntry.getNewRoom());
+		assertEquals("Mitbetr.", repairedMitbetreuungEntry.getType());
 		assertEquals("11", parsed.getPlan().getEntries().get(2).getClasses());
 		assertFalse(parsed.getPlan().getEntries().stream().anyMatch(entry -> entry.getPeriod().contains("Unterstufe")));
 	}

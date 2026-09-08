@@ -227,31 +227,78 @@ public class SubstitutionPlanParserService {
 			String date) {
 		SubstitutionEntry entry = new SubstitutionEntry();
 		entry.setDate(date);
+		boolean roomWasReplaced = false;
 		for (int i = 0; i < cells.size(); i++) {
 			PlanField field = columnMap.get(i);
 			if (field == null) {
 				continue;
 			}
-			setField(entry, field, cells.get(i).text().trim());
+			CellValue cellValue = readCellValue(cells.get(i));
+			setField(entry, field, cellValue);
+			roomWasReplaced |= field == PlanField.ROOM && cellValue.hasStruckText();
 		}
 		if (!hasVisibleValue(entry.getClasses())) {
 			entry.setClasses(activeClass);
 		}
+		if (roomWasReplaced && sameVisibleValue(entry.getNewRoom(), entry.getType())) {
+			// Untis repeats markers such as "?EVA" in the room cell for some
+			// activity types. The type column already carries that information.
+			entry.setNewRoom("");
+		}
 		return entry;
 	}
 
-	private void setField(SubstitutionEntry entry, PlanField field, String value) {
-		switch (field) {
-			case CLASSES -> entry.setClasses(value);
-			case PERIOD -> entry.setPeriod(value);
-			case ABSENT -> entry.setAbsent(value);
-			case SUBSTITUTE -> entry.setSubstitute(value);
-			case ORIGINAL_SUBJECT -> entry.setOriginalSubject(value);
-			case SUBJECT -> entry.setSubject(value);
-			case ROOM -> entry.setNewRoom(value);
-			case TYPE -> entry.setType(value);
-			case COMMENT -> entry.setComment(value);
+	private CellValue readCellValue(Element cell) {
+		List<String> struckParts = cell.select("s, strike, del").stream().map(Element::text).map(String::trim)
+				.filter(this::hasVisibleValue).toList();
+		Element activeCell = cell.clone();
+		activeCell.select("s, strike, del").remove();
+		String activeText = normalizeActiveText(activeCell.text());
+		String plainText = normalizeActiveText(cell.text());
+		String struckText = String.join(" ", struckParts);
+		return new CellValue(plainText, struckText, activeText, !struckParts.isEmpty());
+	}
+
+	private String normalizeActiveText(String value) {
+		if (value == null) {
+			return "";
 		}
+		return value.trim().replaceFirst("^\\s*\\?\\s*", "").trim();
+	}
+
+	private void setField(SubstitutionEntry entry, PlanField field, CellValue value) {
+		switch (field) {
+			case CLASSES -> entry.setClasses(value.plainText());
+			case PERIOD -> entry.setPeriod(value.plainText());
+			case ABSENT -> entry.setAbsent(value.hasStruckText() ? value.struckText() : value.plainText());
+			case SUBSTITUTE -> {
+				if (value.hasStruckText()) {
+					if (!hasVisibleValue(entry.getAbsent())) {
+						entry.setAbsent(value.struckText());
+					}
+					entry.setSubstitute(value.activeText());
+				} else {
+					entry.setSubstitute(value.plainText());
+				}
+			}
+			case ORIGINAL_SUBJECT ->
+				entry.setOriginalSubject(value.hasStruckText() ? value.struckText() : value.plainText());
+			case SUBJECT -> {
+				if (value.hasStruckText()) {
+					entry.setOriginalSubject(value.struckText());
+					entry.setSubject(value.activeText());
+				} else {
+					entry.setSubject(value.plainText());
+				}
+			}
+			case ROOM -> entry.setNewRoom(value.activeText());
+			case TYPE -> entry.setType(value.activeText());
+			case COMMENT -> entry.setComment(value.activeText());
+		}
+	}
+
+	private boolean sameVisibleValue(String first, String second) {
+		return hasVisibleValue(first) && hasVisibleValue(second) && first.trim().equalsIgnoreCase(second.trim());
 	}
 
 	private boolean isMeaningfulEntry(SubstitutionEntry entry) {
@@ -382,6 +429,9 @@ public class SubstitutionPlanParserService {
 
 	private record HeaderMapping(Map<Integer, PlanField> columnMap, List<String> normalizedHeaders,
 			List<String> unknownHeaders, int minimumCellCount, boolean hasClassColumn) {
+	}
+
+	private record CellValue(String plainText, String struckText, String activeText, boolean hasStruckText) {
 	}
 
 	private record PageInfo(Integer pageNumber, Integer pageCount) {
