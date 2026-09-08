@@ -137,7 +137,6 @@ public class SurveyFlowIntegrationTest {
 		return (MockHttpSession) result.getRequest().getSession(false);
 	}
 
-	@SuppressWarnings("unchecked")
 	private void setId(DisplayEntity display, String id) {
 		try {
 			var field = DisplayEntity.class.getDeclaredField("id");

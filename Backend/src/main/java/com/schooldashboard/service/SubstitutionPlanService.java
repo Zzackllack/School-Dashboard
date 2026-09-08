@@ -83,7 +83,7 @@ public class SubstitutionPlanService {
 				combinedPlans.add(result.plan());
 			}
 
-			combinedPlans.sort(Comparator.comparing(SubstitutionPlan::getSortPriority)
+			combinedPlans.sort(Comparator.comparing((SubstitutionPlan plan) -> plan.getSortPriority())
 					.thenComparing(plan -> plan.getDate() == null ? "" : plan.getDate()));
 
 			if (refreshValid && !combinedPlans.isEmpty()) {

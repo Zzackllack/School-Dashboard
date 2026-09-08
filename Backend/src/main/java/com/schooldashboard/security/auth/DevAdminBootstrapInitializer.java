@@ -109,7 +109,7 @@ public class DevAdminBootstrapInitializer implements ApplicationRunner {
 			adminUser.setPasswordHash(passwordEncoder.encode(password));
 			changed = true;
 		}
-		if (!adminUser.getRoles().stream().map(AppRoleEntity::getName).anyMatch("ROLE_ADMIN"::equals)) {
+		if (!adminUser.getRoles().stream().map(role -> role.getName()).anyMatch(name -> "ROLE_ADMIN".equals(name))) {
 			adminUser.addRole(adminRole);
 			changed = true;
 		}

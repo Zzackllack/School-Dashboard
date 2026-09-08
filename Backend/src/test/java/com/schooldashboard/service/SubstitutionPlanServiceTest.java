@@ -86,8 +86,8 @@ public class SubstitutionPlanServiceTest {
 	public void invalidRefreshKeepsPreviouslyPublishedPlansAndCache() {
 		UUID validUuid = UUID.randomUUID();
 		UUID invalidUuid = UUID.randomUUID();
-		when(dsbService.getTimeTables()).thenReturn(List.of(tt(validUuid, "heute", "valid")),
-				List.of(tt(invalidUuid, "heute", "unsupported")));
+		when(dsbService.getTimeTables()).thenReturn(List.of(tt(validUuid, "heute", "valid")))
+				.thenReturn(List.of(tt(invalidUuid, "heute", "unsupported")));
 
 		SubstitutionPlan validPlan = meaningfulPlan("valid-date", "1");
 		when(parser.parsePlanDocumentFromUrl("valid")).thenReturn(parsed(validPlan));
@@ -115,7 +115,7 @@ public class SubstitutionPlanServiceTest {
 		service.updateSubstitutionPlans();
 
 		assertEquals(List.of("1", "2"),
-				service.getSubstitutionPlans().get(0).getEntries().stream().map(SubstitutionEntry::getPeriod).toList());
+				service.getSubstitutionPlans().get(0).getEntries().stream().map(entry -> entry.getPeriod()).toList());
 		verify(parser).parsePlanDocumentFromUrl("page-1.html");
 		verify(parser).parsePlanDocumentFromUrl("page-2.html");
 	}

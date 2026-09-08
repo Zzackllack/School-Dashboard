@@ -71,7 +71,7 @@ public class ApiResponseCacheService {
 		if (cacheKey == null || cacheKey.isBlank()) {
 			return Optional.empty();
 		}
-		return repository.findById(cacheKey).map(ApiResponseCache::getJsonBody);
+		return repository.findById(cacheKey).map(cacheEntry -> cacheEntry.getJsonBody());
 	}
 
 	public Optional<JsonNode> getJson(String cacheKey) {

@@ -145,6 +145,7 @@ public class SubstitutionPlanParserService {
 						rows.size(), groupRows, dataRows, entries.size(), skippedRows, pageInfo));
 	}
 
+	@SuppressWarnings("unused") // Kept for parser tests that exercise the legacy reflective entry point.
 	private SubstitutionPlan parseDocument(Document doc) {
 		return parseDocumentResult(doc).getPlan();
 	}
@@ -191,7 +192,7 @@ public class SubstitutionPlanParserService {
 			}
 		}
 
-		int minimumCellCount = columnMap.keySet().stream().mapToInt(Integer::intValue).max().orElse(-1) + 1;
+		int minimumCellCount = columnMap.keySet().stream().mapToInt(index -> index).max().orElse(-1) + 1;
 		return new HeaderMapping(columnMap, normalizedHeaders, List.copyOf(unknownHeaders), minimumCellCount,
 				columnMap.containsValue(PlanField.CLASSES));
 	}
@@ -249,8 +250,8 @@ public class SubstitutionPlanParserService {
 	}
 
 	private CellValue readCellValue(Element cell) {
-		List<String> struckParts = cell.select("s, strike, del").stream().map(Element::text).map(String::trim)
-				.filter(this::hasVisibleValue).toList();
+		List<String> struckParts = cell.select("s, strike, del").stream().map(element -> element.text())
+				.map(value -> value.trim()).filter(this::hasVisibleValue).toList();
 		Element activeCell = cell.clone();
 		activeCell.select("s, strike, del").remove();
 		String activeText = normalizeActiveText(activeCell.text());
@@ -333,7 +334,7 @@ public class SubstitutionPlanParserService {
 				}
 			}
 		}
-		candidates.sort(Comparator.comparingInt(String::length).reversed());
+		candidates.sort(Comparator.comparingInt((String value) -> value.length()).reversed());
 		return candidates;
 	}
 

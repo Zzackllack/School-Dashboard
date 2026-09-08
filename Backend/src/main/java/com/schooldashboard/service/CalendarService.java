@@ -105,7 +105,7 @@ public class CalendarService {
 			throw new IllegalStateException("Failed to parse calendar data", ex);
 		}
 
-		parsed.sort(Comparator.comparingLong(CalendarEvent::getStartDate));
+		parsed.sort(Comparator.comparingLong(event -> event.getStartDate()));
 		return parsed;
 	}
 

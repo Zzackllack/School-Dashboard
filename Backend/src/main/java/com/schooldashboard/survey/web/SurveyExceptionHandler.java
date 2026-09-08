@@ -6,7 +6,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -24,8 +23,9 @@ public class SurveyExceptionHandler {
 	@ExceptionHandler(MethodArgumentNotValidException.class)
 	public ResponseEntity<SurveyErrorResponse> handleValidationException(MethodArgumentNotValidException exception,
 			HttpServletRequest request) {
-		String message = exception.getBindingResult().getFieldErrors().stream().map(FieldError::getDefaultMessage)
-				.filter(value -> value != null && !value.isBlank()).collect(Collectors.joining("; "));
+		String message = exception.getBindingResult().getFieldErrors().stream()
+				.map(fieldError -> fieldError.getDefaultMessage()).filter(value -> value != null && !value.isBlank())
+				.collect(Collectors.joining("; "));
 		if (message.isBlank()) {
 			message = "Ungültige Anfrage";
 		}
