@@ -136,6 +136,10 @@ Common overrides:
 - `DSB_USERNAME` -> `dsb.username`
 - `DSB_PASSWORD` -> `dsb.password`
 - `CALENDAR_ICS_URL` -> `calendar.ics-url`
+- `WARNINGS_ENABLED` -> `warnings.enabled` (must be explicitly enabled)
+- `WARNINGS_REGION_CODE` -> `warnings.region-code` (12-digit ARS; Berlin is `110000000000`)
+- `WARNINGS_API_BASE_URL` -> `warnings.api-base-url`
+- `WARNINGS_POLL_INTERVAL_MS` -> `warnings.poll-interval-ms` (default: 10 seconds)
 - `SPRING_DATASOURCE_URL` -> `spring.datasource.url`
 - `SERVER_SERVLET_SESSION_COOKIE_SECURE` -> `server.servlet.session.cookie.secure`
 
@@ -236,7 +240,19 @@ SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/school_dashboard
 SPRING_DATASOURCE_USERNAME=school_dashboard
 SPRING_DATASOURCE_PASSWORD=<strong-password>
 SPRING_FLYWAY_LOCATIONS=classpath:db/migration/postgresql
+
+# Optional school-display warning overlay
+WARNINGS_ENABLED=true
+WARNINGS_REGION_CODE=110000000000
+WARNINGS_POLL_INTERVAL_MS=10000
 ```
+
+When enabled, the backend polls the official regional NINA/MoWaS JSON endpoint,
+keeps a last-known-good snapshot, and exposes the normalized current state at
+`/api/warnings/current`. The display frontend polls its own backend route every
+10 seconds. This is an additional information channel and does not replace
+official instructions, NINA, Cell Broadcast, sirens, or local emergency
+procedures.
 
 Docker deployment:
 

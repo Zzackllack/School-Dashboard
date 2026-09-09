@@ -1,6 +1,7 @@
 import { useParams } from "@tanstack/react-router";
 import { useMemo } from "react";
 import { resolveDisplayTheme } from "#/components/display/themes/registry";
+import { WarningOverlay } from "#/components/display/WarningOverlay";
 
 interface DisplayPageProps {
   themeId: string | null;
@@ -14,6 +15,7 @@ export function DisplayPage({ themeId }: DisplayPageProps) {
   return (
     <main className="relative" data-display-theme={resolvedTheme.theme.id}>
       <ThemeRenderer displayId={displayId} />
+      <WarningOverlay />
     </main>
   );
 }

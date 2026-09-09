@@ -14,6 +14,10 @@ vi.mock("#/components/display/themes/registry", () => ({
   resolveDisplayTheme: (...args: unknown[]) => resolveDisplayThemeMock(...args),
 }));
 
+vi.mock("#/components/display/WarningOverlay", () => ({
+  WarningOverlay: () => null,
+}));
+
 describe("DisplayPage", () => {
   beforeEach(() => {
     useParamsMock.mockClear();
