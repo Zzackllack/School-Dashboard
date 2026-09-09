@@ -1,14 +1,24 @@
 package com.schooldashboard.service;
 
 import com.schooldashboard.model.ParsedPlanDocument;
+import com.schooldashboard.model.PlanParseDiagnostics;
+import com.schooldashboard.model.SubstitutionEntry;
 import com.schooldashboard.model.SubstitutionPlan;
 import com.schooldashboard.util.DSBMobile.TimeTable;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+import java.util.stream.Stream;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CacheEvict;
@@ -19,6 +29,8 @@ import org.springframework.stereotype.Service;
 public class SubstitutionPlanService {
 
 	private static final Logger logger = LoggerFactory.getLogger(SubstitutionPlanService.class);
+	private static final Pattern PAGE_IN_NAME_PATTERN = Pattern.compile("(?i)(?:seite|page)[-_ ]*(\\d+)");
+	private static final Pattern TRAILING_PAGE_PATTERN = Pattern.compile("(\\d+)(?=\\.html?(?:$|[?#]))");
 
 	private final DSBService dsbService;
 	private final SubstitutionPlanParserService parserService;
@@ -34,173 +46,272 @@ public class SubstitutionPlanService {
 		this.cacheService = cacheService;
 	}
 
-	/** Gets the latest substitution plans, either from cache or by fetching them */
+	/** Gets the latest validated substitution plans. */
 	public List<SubstitutionPlan> getSubstitutionPlans() {
 		return latestPlans;
 	}
 
 	/**
-	 * Fetches the latest substitution plans from the DSB service and parses them
-	 * This method is scheduled to run every 5 minutes and evicts the cache
+	 * Fetches, validates, and atomically publishes the latest substitution plans.
+	 * The scheduled refresh keeps the previous response when any source group is
+	 * structurally invalid or incomplete.
 	 */
-	@Scheduled(fixedRate = 300000) // Run every 5 minutes (300000 ms)
+	@Scheduled(fixedRate = 300000)
 	@CacheEvict(value = "substitutionPlans", allEntries = true)
-	@SuppressWarnings("CallToPrintStackTrace")
 	public void updateSubstitutionPlans() {
-		logger.info("===============================================================");
-		logger.info("[SubstitutionPlanService] Starting plan update at {}", new java.util.Date());
 		long startTime = System.currentTimeMillis();
+		logger.info("[SubstitutionPlanService] Starting plan update");
 
 		try {
-			// Get fresh timetables from DSB service
-			logger.info("[SubstitutionPlanService] Fetching timetables from DSB service...");
-			List<TimeTable> timeTables = dsbService.getTimeTables();
-			logger.info("[SubstitutionPlanService] Received {} timetables from DSB", timeTables.size());
-
-			// Group timetables by UUID (same UUID = same day plan)
-			Map<UUID, List<TimeTable>> timeTablesByUuid = new HashMap<>();
-
-			int validTables = 0;
-			for (TimeTable table : timeTables) {
-				if (table.getDetail() != null && !table.getDetail().isEmpty()) {
-					logger.info("[SubstitutionPlanService] Found timetable: UUID={} , Group={} , Detail URL={}",
-							table.getUUID(), table.getGroupName(), table.getDetail());
-					timeTablesByUuid.computeIfAbsent(table.getUUID(), k -> new ArrayList<>()).add(table);
-					validTables++;
-				} else {
-					logger.info("[SubstitutionPlanService] Skipping timetable with empty detail URL: {}",
-							table.getTitle());
-				}
-			}
-			logger.info("[SubstitutionPlanService] Found {} valid timetables in {} distinct groups", validTables,
+			List<TimeTable> fetchedTimeTables = dsbService.getTimeTables();
+			List<TimeTable> timeTables = fetchedTimeTables == null ? List.of() : fetchedTimeTables;
+			Map<UUID, List<TimeTable>> timeTablesByUuid = groupTimetables(timeTables);
+			logger.info("[SubstitutionPlanService] Received {} timetables in {} groups", timeTables.size(),
 					timeTablesByUuid.size());
 
 			List<SubstitutionPlan> combinedPlans = new ArrayList<>();
+			boolean refreshValid = !timeTablesByUuid.isEmpty();
+			int invalidGroups = 0;
 
-			// Process each group of timetables (each UUID represents one day's plan)
-			for (UUID uuid : timeTablesByUuid.keySet()) {
-				List<TimeTable> tables = timeTablesByUuid.get(uuid);
-				if (tables.isEmpty())
+			for (Map.Entry<UUID, List<TimeTable>> group : sortedGroups(timeTablesByUuid)) {
+				PlanGroupResult result = parseGroup(group.getKey(), group.getValue());
+				if (result.plan() == null) {
+					refreshValid = false;
+					invalidGroups++;
 					continue;
-
-				// All tables in this group should have the same groupName
-				String groupName = tables.get(0).getGroupName();
-				logger.info("[SubstitutionPlanService] Processing group: {} with {} tables (UUID: {})", groupName,
-						tables.size(), uuid);
-
-				// Create a combined plan for this UUID
-				SubstitutionPlan combinedPlan = null;
-				int totalEntries = 0;
-				int totalNewsItems = 0;
-
-				for (TimeTable table : tables) {
-					try {
-						logger.info("[SubstitutionPlanService]   - Processing detail URL: {}", table.getDetail());
-						ParsedPlanDocument parsedDocument = parserService.parsePlanDocumentFromUrl(table.getDetail());
-						SubstitutionPlan plan = parsedDocument.getPlan();
-						persistenceService.store(table, plan, parsedDocument.getRawHtml());
-
-						// Log details about the parsed plan
-						logger.info("[SubstitutionPlanService]     Date: {} , Entries: {} , News items: {}",
-								plan.getDate(), plan.getEntries().size(), plan.getNews().getNewsItems().size());
-
-						// For the first plan, initialize the combined plan
-						if (combinedPlan == null) {
-							logger.info("[SubstitutionPlanService]     Initializing combined plan with first page");
-							combinedPlan = plan;
-							totalEntries = plan.getEntries().size();
-							totalNewsItems = plan.getNews().getNewsItems().size();
-						} else {
-							// For subsequent plans, merge their entries and news into the combined plan
-							logger.info("[SubstitutionPlanService]     Combining with existing plan");
-							combinedPlan.getEntries().addAll(plan.getEntries());
-							totalEntries += plan.getEntries().size();
-
-							logger.info("[SubstitutionPlanService]     Added {} entries. Total now: {}",
-									plan.getEntries().size(), combinedPlan.getEntries().size());
-
-							// Merge news items without duplicates
-							int newNewsItems = 0;
-							for (String newsItem : plan.getNews().getNewsItems()) {
-								if (!combinedPlan.getNews().getNewsItems().contains(newsItem)) {
-									combinedPlan.getNews().addNewsItem(newsItem);
-									newNewsItems++;
-									totalNewsItems++;
-								}
-							}
-							logger.info("[SubstitutionPlanService]     Added {} unique news items. Total now: {}",
-									newNewsItems, combinedPlan.getNews().getNewsItems().size());
-						}
-					} catch (Exception e) {
-						logger.error("[SubstitutionPlanService] ERROR parsing plan from URL {}: {}", table.getDetail(),
-								e.getMessage());
-						e.printStackTrace();
-					}
 				}
-
-				// Store metadata about the source in the plan for sorting
-				if (combinedPlan != null) {
-					// Store the original groupName as metadata for sorting
-					String lowerGroupName = groupName.toLowerCase();
-					boolean isToday = lowerGroupName.contains("heute");
-					boolean isTomorrow = lowerGroupName.contains("morgen");
-
-					// Set sort priority as a property on the plan (1=today, 2=tomorrow, 3=other)
-					int priority = isToday ? 1 : (isTomorrow ? 2 : 3);
-					combinedPlan.setSortPriority(priority);
-
-					logger.info(
-							"[SubstitutionPlanService] Finished combined plan for {} (priority {}): Date={} , Total entries={} , Total news items={}",
-							groupName, priority, combinedPlan.getDate(), totalEntries, totalNewsItems);
-
-					combinedPlans.add(combinedPlan);
-				} else {
-					logger.error("[SubstitutionPlanService] WARNING: Failed to create combined plan for UUID {}", uuid);
-				}
+				combinedPlans.add(result.plan());
 			}
 
-			logger.info("[SubstitutionPlanService] Created {} combined plans, now sorting...", combinedPlans.size());
+			combinedPlans.sort(Comparator.comparing((SubstitutionPlan plan) -> plan.getSortPriority())
+					.thenComparing(plan -> plan.getDate() == null ? "" : plan.getDate()));
 
-			// Sort plans by priority (heute first, then morgen, then others)
-			// Then by date if available
-			combinedPlans.sort(Comparator.comparing(SubstitutionPlan::getSortPriority).thenComparing((p1, p2) -> {
-				if (p1.getDate() == null && p2.getDate() == null)
-					return 0;
-				if (p1.getDate() == null)
-					return 1;
-				if (p2.getDate() == null)
-					return -1;
-				return p1.getDate().compareTo(p2.getDate());
-			}));
-
-			// Log the final sorted order
-			logger.info("[SubstitutionPlanService] Final plan order:");
-			for (int i = 0; i < combinedPlans.size(); i++) {
-				SubstitutionPlan plan = combinedPlans.get(i);
-				logger.info("[SubstitutionPlanService]   {}. Priority={} , Date={} , Entries={}", i + 1,
-						plan.getSortPriority(), plan.getDate(), plan.getEntries().size());
-			}
-
-			if (!combinedPlans.isEmpty()) {
-				this.latestPlans = List.copyOf(combinedPlans);
+			if (refreshValid && !combinedPlans.isEmpty()) {
 				cacheService.store(ApiResponseCacheKeys.SUBSTITUTION_PLANS, combinedPlans);
+				latestPlans = List.copyOf(combinedPlans);
+				logger.info(
+						"[SubstitutionPlanService] Refresh published: timetableDocuments={}, dayGroups={}, "
+								+ "validGroups={}, invalidGroups={}, published=true, fallbackUsed=false",
+						timeTables.size(), timeTablesByUuid.size(), combinedPlans.size(), invalidGroups);
 			} else {
-				logger.warn("[SubstitutionPlanService] No plans parsed; keeping previously stored plans");
+				logger.warn(
+						"[SubstitutionPlanService] Refresh withheld: timetableDocuments={}, dayGroups={}, "
+								+ "validGroups={}, invalidGroups={}, published=false, fallbackUsed={}",
+						timeTables.size(), timeTablesByUuid.size(), combinedPlans.size(), invalidGroups,
+						!latestPlans.isEmpty());
 			}
-			long duration = System.currentTimeMillis() - startTime;
-			logger.info("[SubstitutionPlanService] Updated substitution plans at {} , found {} plans in {}ms",
-					new java.util.Date(), combinedPlans.size(), duration);
 
+			logger.info("[SubstitutionPlanService] Finished plan update in {}ms",
+					System.currentTimeMillis() - startTime);
 		} catch (Exception e) {
-			logger.error("[SubstitutionPlanService] CRITICAL ERROR updating substitution plans: {}", e.getMessage());
-			e.printStackTrace();
+			logger.error("[SubstitutionPlanService] Refresh failed; keeping the last validated plans: {}",
+					e.getMessage(), e);
 		}
-		logger.info("===============================================================");
 	}
 
-	/** Initialize the plans when the service starts */
+	private Map<UUID, List<TimeTable>> groupTimetables(List<TimeTable> timeTables) {
+		Map<UUID, List<TimeTable>> grouped = new HashMap<>();
+		for (TimeTable table : timeTables == null ? List.<TimeTable>of() : timeTables) {
+			if (table == null || table.getUUID() == null || table.getDetail() == null || table.getDetail().isBlank()) {
+				logger.warn("[SubstitutionPlanService] Skipping timetable without a usable detail page");
+				continue;
+			}
+			grouped.computeIfAbsent(table.getUUID(), ignored -> new ArrayList<>()).add(table);
+		}
+		return grouped;
+	}
+
+	private List<Map.Entry<UUID, List<TimeTable>>> sortedGroups(Map<UUID, List<TimeTable>> groups) {
+		return groups.entrySet().stream()
+				.sorted(Comparator
+						.comparing((Map.Entry<UUID, List<TimeTable>> entry) -> groupPriority(entry.getValue()))
+						.thenComparing(entry -> entry.getKey().toString()))
+				.toList();
+	}
+
+	private int groupPriority(List<TimeTable> tables) {
+		String groupName = tables.isEmpty() ? "" : tables.get(0).getGroupName();
+		String lowerGroupName = groupName == null ? "" : groupName.toLowerCase(Locale.ROOT);
+		return lowerGroupName.contains("heute") ? 1 : lowerGroupName.contains("morgen") ? 2 : 3;
+	}
+
+	private PlanGroupResult parseGroup(UUID uuid, List<TimeTable> unsortedTables) {
+		List<TimeTable> tables = unsortedTables.stream()
+				.sorted(Comparator.comparing(this::pageNumber, Comparator.nullsLast(Comparator.naturalOrder()))
+						.thenComparing(table -> safePageLabel(table.getDetail())))
+				.toList();
+		List<ParsedPage> pages = new ArrayList<>();
+
+		for (TimeTable table : tables) {
+			try {
+				ParsedPlanDocument parsedDocument = parserService.parsePlanDocumentFromUrl(table.getDetail());
+				if (parsedDocument == null || parsedDocument.getPlan() == null
+						|| parsedDocument.getDiagnostics() == null || !isSemanticallyPublishable(parsedDocument)) {
+					logger.warn("[SubstitutionPlanService] Withholding group {} because page {} is unsupported", uuid,
+							safePageLabel(table.getDetail()));
+					return new PlanGroupResult(null);
+				}
+				pages.add(new ParsedPage(table, parsedDocument));
+			} catch (RuntimeException e) {
+				logger.warn("[SubstitutionPlanService] Withholding group {} because page {} failed: {}", uuid,
+						safePageLabel(table.getDetail()), e.getMessage());
+				return new PlanGroupResult(null);
+			}
+		}
+
+		if (!hasCompletePageSet(pages)) {
+			logger.warn("[SubstitutionPlanService] Withholding incomplete page group {}", uuid);
+			return new PlanGroupResult(null);
+		}
+
+		SubstitutionPlan combinedPlan = pages.get(0).document().getPlan();
+		for (int i = 1; i < pages.size(); i++) {
+			SubstitutionPlan pagePlan = pages.get(i).document().getPlan();
+			combinedPlan.getEntries().addAll(pagePlan.getEntries());
+			for (String newsItem : pagePlan.getNews().getNewsItems()) {
+				if (!combinedPlan.getNews().getNewsItems().contains(newsItem)) {
+					combinedPlan.getNews().addNewsItem(newsItem);
+				}
+			}
+		}
+
+		String groupName = tables.get(0).getGroupName();
+		combinedPlan.setSortPriority(groupPriority(tables));
+		for (ParsedPage page : pages) {
+			try {
+				persistenceService.store(page.table(), page.document().getPlan(), page.document().getRawHtml());
+			} catch (RuntimeException e) {
+				// Persistence is forensic history, not the publication boundary.
+				logger.warn("[SubstitutionPlanService] Could not persist page {} for group {}: {}",
+						safePageLabel(page.table().getDetail()), uuid, e.getMessage());
+			}
+		}
+		logger.info("[SubstitutionPlanService] Published candidate group={} name={} pages={} entries={}", uuid,
+				groupName, pages.size(), combinedPlan.getEntries().size());
+		return new PlanGroupResult(combinedPlan);
+	}
+
+	private boolean hasCompletePageSet(List<ParsedPage> pages) {
+		if (pages.isEmpty()) {
+			return false;
+		}
+		Integer expectedPageCount = null;
+		List<Integer> pageNumbers = new ArrayList<>();
+		for (ParsedPage page : pages) {
+			PlanParseDiagnostics diagnostics = page.document().getDiagnostics();
+			if (diagnostics.getPageCount() != null || diagnostics.getPageNumber() != null) {
+				if (diagnostics.getPageCount() == null || diagnostics.getPageNumber() == null) {
+					return false;
+				}
+				if (expectedPageCount == null) {
+					expectedPageCount = diagnostics.getPageCount();
+				} else if (!expectedPageCount.equals(diagnostics.getPageCount())) {
+					return false;
+				}
+				pageNumbers.add(diagnostics.getPageNumber());
+			}
+		}
+		if (expectedPageCount == null) {
+			return true;
+		}
+		if (pages.size() != expectedPageCount || pageNumbers.size() != expectedPageCount) {
+			return false;
+		}
+		pageNumbers.sort(Comparator.naturalOrder());
+		for (int i = 0; i < pageNumbers.size(); i++) {
+			if (pageNumbers.get(i) != i + 1) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	private boolean isSemanticallyPublishable(ParsedPlanDocument parsedDocument) {
+		PlanParseDiagnostics diagnostics = parsedDocument.getDiagnostics();
+		SubstitutionPlan plan = parsedDocument.getPlan();
+		if (!diagnostics.isPublishable() || plan.getEntries() == null) {
+			return false;
+		}
+		if (diagnostics.getStatus() == PlanParseDiagnostics.Status.EMPTY) {
+			return plan.getEntries().isEmpty();
+		}
+		return !plan.getEntries().isEmpty() && plan.getEntries().stream().allMatch(this::isMeaningfulEntry)
+				&& (diagnostics.getValidEntries() == 0 || diagnostics.getValidEntries() == plan.getEntries().size());
+	}
+
+	private boolean isMeaningfulEntry(SubstitutionEntry entry) {
+		if (entry == null || !hasVisibleValue(entry.getClasses())) {
+			return false;
+		}
+		return Stream
+				.of(entry.getPeriod(), entry.getAbsent(), entry.getSubstitute(), entry.getOriginalSubject(),
+						entry.getSubject(), entry.getNewRoom(), entry.getType(), entry.getComment())
+				.anyMatch(this::hasVisibleValue);
+	}
+
+	private boolean hasVisibleValue(String value) {
+		return value != null && !value.isBlank() && !value.trim().equals("---");
+	}
+
+	private Integer pageNumber(TimeTable table) {
+		String detail = table == null ? null : table.getDetail();
+		if (detail == null) {
+			return null;
+		}
+		String fileName = safePageLabel(detail);
+		Matcher named = PAGE_IN_NAME_PATTERN.matcher(fileName);
+		if (named.find()) {
+			return parseInt(named.group(1));
+		}
+		Matcher trailing = TRAILING_PAGE_PATTERN.matcher(fileName);
+		return trailing.find() ? parseInt(trailing.group(1)) : null;
+	}
+
+	private String safePageLabel(String detailUrl) {
+		if (detailUrl == null || detailUrl.isBlank()) {
+			return "unknown-" + shortHash("");
+		}
+		try {
+			String path = URI.create(detailUrl).getPath();
+			if (path != null && !path.isBlank()) {
+				int slash = path.lastIndexOf('/');
+				return path.substring(slash + 1).isBlank() ? "page-" + shortHash(detailUrl) : path.substring(slash + 1);
+			}
+		} catch (IllegalArgumentException ignored) {
+			// Fall through to a non-reversible label for malformed test URLs.
+		}
+		return "page-" + shortHash(detailUrl);
+	}
+
+	private String shortHash(String value) {
+		try {
+			byte[] digest = MessageDigest.getInstance("SHA-256").digest(value.getBytes(StandardCharsets.UTF_8));
+			StringBuilder result = new StringBuilder(12);
+			for (int i = 0; i < 6; i++) {
+				result.append(String.format("%02x", digest[i]));
+			}
+			return result.toString();
+		} catch (NoSuchAlgorithmException e) {
+			throw new IllegalStateException("SHA-256 algorithm is not available", e);
+		}
+	}
+
+	private Integer parseInt(String value) {
+		try {
+			return Integer.valueOf(value);
+		} catch (NumberFormatException e) {
+			return null;
+		}
+	}
+
 	@Scheduled(initialDelay = 10000, fixedRate = Long.MAX_VALUE)
 	public void initializeSubstitutionPlans() {
 		updateSubstitutionPlans();
+	}
+
+	private record ParsedPage(TimeTable table, ParsedPlanDocument document) {
+	}
+
+	private record PlanGroupResult(SubstitutionPlan plan) {
 	}
 }

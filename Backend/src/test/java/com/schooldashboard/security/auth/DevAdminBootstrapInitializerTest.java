@@ -79,7 +79,8 @@ public class DevAdminBootstrapInitializerTest {
 		assertEquals("dev-admin", savedUser.getUsername());
 		assertEquals("hashed-secret", savedUser.getPasswordHash());
 		assertNotEquals("secret", savedUser.getPasswordHash());
-		assertTrue(savedUser.getRoles().stream().map(AppRoleEntity::getName).anyMatch("ROLE_ADMIN"::equals));
+		assertTrue(
+				savedUser.getRoles().stream().map(role -> role.getName()).anyMatch(name -> "ROLE_ADMIN".equals(name)));
 	}
 
 	@Test
@@ -108,7 +109,8 @@ public class DevAdminBootstrapInitializerTest {
 		AppUserEntity savedUser = userCaptor.getValue();
 		assertTrue(savedUser.getUsername().startsWith("admin-"));
 		assertEquals("hashed-random-password", savedUser.getPasswordHash());
-		assertTrue(savedUser.getRoles().stream().map(AppRoleEntity::getName).anyMatch("ROLE_ADMIN"::equals));
+		assertTrue(
+				savedUser.getRoles().stream().map(role -> role.getName()).anyMatch(name -> "ROLE_ADMIN".equals(name)));
 	}
 
 	@Test

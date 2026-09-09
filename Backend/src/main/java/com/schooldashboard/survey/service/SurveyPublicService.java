@@ -65,7 +65,7 @@ public class SurveyPublicService {
 	}
 
 	private String normalizeSourceIp(String sourceIp) {
-		String normalized = Optional.ofNullable(sourceIp).map(String::trim).orElse("");
+		String normalized = Optional.ofNullable(sourceIp).map(value -> value.trim()).orElse("");
 		if (normalized.isBlank()) {
 			return "unknown";
 		}

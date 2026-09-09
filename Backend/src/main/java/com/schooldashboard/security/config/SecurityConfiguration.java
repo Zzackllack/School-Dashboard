@@ -16,7 +16,6 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -87,7 +86,7 @@ public class SecurityConfiguration {
 						.requestMatchers("/api/admin/**").hasRole("ADMIN").anyRequest().denyAll())
 				.exceptionHandling(exceptionHandling -> exceptionHandling
 						.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler))
-				.formLogin(AbstractHttpConfigurer::disable).httpBasic(AbstractHttpConfigurer::disable);
+				.formLogin(formLogin -> formLogin.disable()).httpBasic(httpBasic -> httpBasic.disable());
 
 		return http.build();
 	}
@@ -106,7 +105,7 @@ public class SecurityConfiguration {
 						.permitAll().anyRequest().denyAll())
 				.exceptionHandling(exceptionHandling -> exceptionHandling
 						.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler))
-				.formLogin(AbstractHttpConfigurer::disable).httpBasic(AbstractHttpConfigurer::disable);
+				.formLogin(formLogin -> formLogin.disable()).httpBasic(httpBasic -> httpBasic.disable());
 
 		return http.build();
 	}

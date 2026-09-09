@@ -65,7 +65,7 @@ public class SurveyAdminServiceTest {
 		assertEquals(1, response.size());
 		assertEquals("Mila", response.getFirst().submitterName());
 		org.mockito.Mockito.verify(repository).findInboxItems(eq(SurveyCategory.PROBLEM), eq(null),
-				org.mockito.ArgumentMatchers.argThat(Pageable::isUnpaged));
+				org.mockito.ArgumentMatchers.argThat(pageable -> pageable.isUnpaged()));
 	}
 
 	@Test

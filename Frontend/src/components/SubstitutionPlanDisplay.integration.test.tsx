@@ -17,7 +17,7 @@ describe("SubstitutionPlanDisplay", () => {
     vi.restoreAllMocks();
   });
 
-  it("hides empty upstream entries and keeps meaningful substitutions", async () => {
+  it("hides empty and classless upstream entries and keeps meaningful substitutions", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(
         JSON.stringify([
@@ -36,6 +36,18 @@ describe("SubstitutionPlanDisplay", () => {
                 subject: "",
                 substitute: "",
                 type: "",
+              },
+              {
+                absent: "",
+                classes: "",
+                comment: "orphan entry must not render",
+                date: "9.3.2026 Montag",
+                newRoom: "",
+                originalSubject: "",
+                period: "99",
+                subject: "",
+                substitute: "",
+                type: "Vertr.",
               },
               {
                 absent: "Müller",
@@ -76,7 +88,63 @@ describe("SubstitutionPlanDisplay", () => {
     });
 
     expect(screen.queryByText("10d, 10a")).toBeNull();
+    expect(screen.queryByText("orphan entry must not render")).toBeNull();
     expect(screen.getAllByText("10b")).toHaveLength(2);
     expect(screen.getByText("Entfall")).toBeDefined();
+  });
+
+  it("renders multiple repaired grouped rows and their Text comments", async () => {
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify([
+          {
+            date: "16.9.2026 Mittwoch",
+            title: "Vertretungsplan",
+            entries: [
+              {
+                absent: "",
+                classes: "7c",
+                comment: "Bitte Material mitbringen",
+                date: "16.9.2026 Mittwoch",
+                newRoom: "R-101",
+                originalSubject: "",
+                period: "1",
+                subject: "Mathe",
+                substitute: "Nguyen",
+                type: "Vertr.",
+              },
+              {
+                absent: "",
+                classes: "11",
+                comment: "Vertretungsraum",
+                date: "16.9.2026 Mittwoch",
+                newRoom: "R-302",
+                originalSubject: "",
+                period: "5",
+                subject: "Physik",
+                substitute: "Schubert",
+                type: "Vertr.",
+              },
+            ],
+            news: { date: "16.9.2026", newsItems: [] },
+          },
+        ]),
+        { status: 200, headers: { "Content-Type": "application/json" } },
+      ),
+    );
+
+    render(
+      <QueryClientProvider client={makeQueryClient()}>
+        <SubstitutionPlanDisplay />
+      </QueryClientProvider>,
+    );
+
+    await waitFor(() => {
+      expect(screen.getByText("Bitte Material mitbringen")).toBeDefined();
+      expect(screen.getByText("Vertretungsraum")).toBeDefined();
+    });
+    expect(
+      screen.queryByText("Keine Vertretungen für dieses Datum verfügbar."),
+    ).toBeNull();
   });
 });

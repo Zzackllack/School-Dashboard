@@ -23,6 +23,46 @@ afterEach(() => {
 });
 
 describe("substitution plans API route", () => {
+  it("forwards repaired plans without changing shape or cache policy", async () => {
+    const handler = getSubstitutionPlansGetHandler();
+    const payload = [
+      {
+        date: "16.9.2026 Mittwoch",
+        title: "Vertretungsplan",
+        entries: [
+          {
+            classes: "7c",
+            period: "1",
+            absent: "",
+            substitute: "Nguyen",
+            originalSubject: "",
+            subject: "Mathe",
+            newRoom: "R-101",
+            type: "Vertr.",
+            comment: "Bitte Material mitbringen",
+            date: "16.9.2026 Mittwoch",
+          },
+        ],
+        news: { date: "16.9.2026", newsItems: [] },
+      },
+    ];
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(JSON.stringify(payload), {
+        status: 200,
+        headers: { "Content-Type": "application/json" },
+      }),
+    );
+
+    const response = await handler({
+      request: new Request("https://dashboard.local/api/substitution/plans"),
+    });
+
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Cache-Control")).toContain("no-store");
+    expect(response.headers.get("Pragma")).toBe("no-cache");
+    await expect(response.json()).resolves.toEqual(payload);
+  });
+
   it("aborts slow upstream requests and returns 504 Gateway Timeout", async () => {
     vi.useFakeTimers();
     const handler = getSubstitutionPlansGetHandler();

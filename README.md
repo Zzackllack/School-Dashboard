@@ -92,7 +92,6 @@ The repository may continue under the school's GitHub organization, and I will s
 
 </details>
 
-
 ## Developer notes
 
 <details>

@@ -230,11 +230,9 @@ public class DisplayEnrollmentService {
 		requestEntity.setRejectedAt(Instant.now());
 		enrollmentRequestRepository.save(requestEntity);
 
+		String rejectionReason = trimToNull(request == null ? null : request.reason());
 		auditLogService.log(adminId, "ENROLLMENT_REQUEST_REJECTED", "display_enrollment_request", requestEntity.getId(),
-				Map.of("reason",
-						trimToNull(request == null ? null : request.reason()) == null
-								? "unspecified"
-								: trimToNull(request.reason())));
+				Map.of("reason", rejectionReason == null ? "unspecified" : rejectionReason));
 
 		return new EnrollmentStatusResponse(requestEntity.getId(), requestEntity.getStatus().name(), null, null, null);
 	}
@@ -358,8 +356,9 @@ public class DisplayEnrollmentService {
 
 	@Transactional(readOnly = true)
 	public List<DisplaySummaryResponse> listDisplays() {
-		return displayRepository.findAll().stream().sorted(Comparator.comparing(DisplayEntity::getName))
-				.map(this::mapDisplay).toList();
+		return displayRepository.findAll().stream()
+				.sorted(Comparator.comparing((DisplayEntity display) -> display.getName()))
+				.map(display -> mapDisplay(display)).toList();
 	}
 
 	@Transactional(readOnly = true)

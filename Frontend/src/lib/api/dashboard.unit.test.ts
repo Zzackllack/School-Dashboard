@@ -100,7 +100,7 @@ describe("substitution plan sanitizing", () => {
               {
                 absent: "Müller",
                 classes: "10a",
-                comment: "",
+                comment: "Text from grouped Untis row",
                 date: "9.3.2026 Montag",
                 newRoom: "",
                 originalSubject: "Mathe",
@@ -129,6 +129,7 @@ describe("substitution plan sanitizing", () => {
     expect(fetchSpy).toHaveBeenCalledWith("/api/substitution/plans", undefined);
     expect(plans[0]?.entries).toHaveLength(1);
     expect(plans[0]?.entries[0]?.classes).toBe("10a");
+    expect(plans[0]?.entries[0]?.comment).toBe("Text from grouped Untis row");
     expect(
       sanitizeSubstitutionPlans([
         {
