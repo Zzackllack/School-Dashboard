@@ -17,7 +17,7 @@ describe("SubstitutionPlanDisplay", () => {
     vi.restoreAllMocks();
   });
 
-  it("hides empty upstream entries and keeps meaningful substitutions", async () => {
+  it("hides empty and classless upstream entries and keeps meaningful substitutions", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response(
         JSON.stringify([
@@ -36,6 +36,18 @@ describe("SubstitutionPlanDisplay", () => {
                 subject: "",
                 substitute: "",
                 type: "",
+              },
+              {
+                absent: "",
+                classes: "",
+                comment: "orphan entry must not render",
+                date: "9.3.2026 Montag",
+                newRoom: "",
+                originalSubject: "",
+                period: "99",
+                subject: "",
+                substitute: "",
+                type: "Vertr.",
               },
               {
                 absent: "Müller",
@@ -76,6 +88,7 @@ describe("SubstitutionPlanDisplay", () => {
     });
 
     expect(screen.queryByText("10d, 10a")).toBeNull();
+    expect(screen.queryByText("orphan entry must not render")).toBeNull();
     expect(screen.getAllByText("10b")).toHaveLength(2);
     expect(screen.getByText("Entfall")).toBeDefined();
   });

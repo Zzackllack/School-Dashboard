@@ -165,6 +165,27 @@ public class SubstitutionPlanParserServiceTest {
 		assertTrue(parsed.getPlan().getEntries().isEmpty());
 	}
 
+	@Test
+	public void skipsClasslessRowsInExplicitLayoutButPublishesValidRows() throws Exception {
+		String mixedHtml = "<div class='mon_title'>19.09.2026</div><table class='mon_list'>"
+				+ "<tr class='list'><th>Klasse</th><th>Stunde</th><th>Text</th></tr>"
+				+ "<tr class='list odd'><td></td><td>1</td><td>orphan</td></tr>"
+				+ "<tr class='list even'><td>10a</td><td>2</td><td>valid</td></tr></table>";
+		ParsedPlanDocument mixed = parseDocument(mixedHtml);
+
+		assertEquals(PlanParseDiagnostics.Status.VALID, mixed.getDiagnostics().getStatus());
+		assertEquals(1, mixed.getPlan().getEntries().size());
+		assertEquals("10a", mixed.getPlan().getEntries().get(0).getClasses());
+
+		String invalidHtml = "<div class='mon_title'>19.09.2026</div><table class='mon_list'>"
+				+ "<tr class='list'><th>Klasse</th><th>Stunde</th><th>Text</th></tr>"
+				+ "<tr class='list odd'><td></td><td>1</td><td>orphan</td></tr></table>";
+		ParsedPlanDocument invalid = parseDocument(invalidHtml);
+
+		assertEquals(PlanParseDiagnostics.Status.UNSUPPORTED, invalid.getDiagnostics().getStatus());
+		assertTrue(invalid.getPlan().getEntries().isEmpty());
+	}
+
 	private static String url(String path) {
 		return baseUrl.substring(0, baseUrl.lastIndexOf('/')) + path;
 	}

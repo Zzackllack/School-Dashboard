@@ -72,6 +72,7 @@ public class SubstitutionPlanParserService {
 		int dataRows = 0;
 		int skippedRows = 0;
 		boolean structuralFailure = false;
+		boolean sawClasslessDataRow = false;
 		boolean sawGroupRow = false;
 		List<String> classCandidates = extractClassCandidates(doc);
 
@@ -102,9 +103,9 @@ public class SubstitutionPlanParserService {
 
 			SubstitutionEntry entry = mapEntry(cells, headerMapping.columnMap(), activeClass, plan.getDate());
 			if (!hasVisibleValue(entry.getClasses())) {
-				// A grouped row without context is unsafe to publish.
+				// Skip rows without class context; grouped layouts are rejected below.
 				skippedRows++;
-				structuralFailure = true;
+				sawClasslessDataRow = true;
 				continue;
 			}
 			if (!isMeaningfulEntry(entry)) {
@@ -114,6 +115,9 @@ public class SubstitutionPlanParserService {
 				continue;
 			}
 			entries.add(entry);
+		}
+		if (sawGroupRow && sawClasslessDataRow) {
+			structuralFailure = true;
 		}
 
 		for (SubstitutionEntry entry : entries) {

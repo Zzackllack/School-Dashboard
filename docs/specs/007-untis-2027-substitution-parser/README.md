@@ -5,9 +5,12 @@
 - Investigation: complete
 - Root cause: confirmed against production, a local end-to-end run, current
   upstream HTML, and archived HTML
-- Implementation: not started
-- Production changes: none
-- Repository changes covered by this spec: documentation only
+- Implementation: complete; substitution parser, diagnostics model, and safe
+  publication path are implemented
+- Production changes: parser compatibility, diagnostics, and safe publication /
+  fallback behavior are implemented
+- Repository changes covered by this spec: production parser/service changes,
+  diagnostics model, tests, and documentation
 - Incident snapshot: 8 September 2026, Europe/Berlin
 
 ## Purpose
@@ -112,7 +115,7 @@ Repository sources:
 
 Runtime and external sources:
 
-- [authenticated Coolify runtime logs supplied by the project owner](https://zlc.zacklack.de/project/t0w84kcsccwswkwgc8g8goo4/environment/bo4wwwo0ws0kksskso08808g/application/d4c4kw8kcs0o4gsgc0o04044/logs);
+- authenticated Coolify runtime logs supplied by the project owner: `<private Coolify runtime logs URL omitted>`;
 - public frontend API:
   `https://goethe-dashboard.zacklack.de/api/substitution/plans`;
 - public backend API:
