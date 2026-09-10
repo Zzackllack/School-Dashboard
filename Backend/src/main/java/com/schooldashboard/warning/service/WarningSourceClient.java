@@ -239,14 +239,14 @@ public class WarningSourceClient {
 		return trimmed;
 	}
 
-	private String buildWarningUrl(String id, String headline) {
+	private static String buildWarningUrl(String id, String headline) {
 		if (id == null || id.isBlank() || headline == null || headline.isBlank()) {
 			return null;
 		}
 		return WARNING_WEB_BASE_URL + encodePathSegment(id) + "/" + encodePathSegment(headline);
 	}
 
-	private String encodePathSegment(String value) {
+	private static String encodePathSegment(String value) {
 		return URLEncoder.encode(value.trim().replaceAll("\\s+", "_"), StandardCharsets.UTF_8).replace("+", "%20");
 	}
 
