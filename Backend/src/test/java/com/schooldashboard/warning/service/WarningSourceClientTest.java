@@ -51,9 +51,9 @@ class WarningSourceClientTest {
 
 		WarningNotice notice = client.fetchDetails(summary);
 		assertEquals("Starke Rauchentwicklung", notice.headline());
-		assertEquals("Bleiben Sie im Gebäude. Fenster schließen.", notice.description());
+		assertEquals("Bleiben Sie im Gebäude & schließen Sie die Fenster.", notice.description());
 		assertEquals("Berlin-Lichterfelde", notice.affectedAreas().get(0));
-		assertTrue(notice.instruction().contains("Fenster"));
+		assertEquals("Fenster und Türen geschlossen halten & Ruhe bewahren.", notice.instruction());
 		server.verify();
 	}
 
@@ -116,8 +116,8 @@ class WarningSourceClientTest {
 				    "severity": "Severe",
 				    "certainty": "Observed",
 				    "headline": "Starke Rauchentwicklung",
-				    "description": "Bleiben Sie im Gebäude.<br/>Fenster schließen.",
-				    "instruction": "Fenster und Türen geschlossen halten.",
+				    "description": "Bleiben Sie im Gebäude &amp; schließen Sie die Fenster.",
+				    "instruction": "Fenster und Türen geschlossen halten &amp; Ruhe bewahren.",
 				    "area": [{"areaDesc": "Berlin-Lichterfelde"}]
 				  }]
 				}

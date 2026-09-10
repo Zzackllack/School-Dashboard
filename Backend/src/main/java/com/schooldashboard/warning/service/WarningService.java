@@ -14,7 +14,9 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -98,15 +100,15 @@ public class WarningService {
 	}
 
 	private WarningSnapshot buildSnapshot(List<WarningSourceClient.SourceWarning> summaries, Instant checkedAt) {
+		Set<String> cancelledBaseIds = summaries.stream().filter(this::isCancellation)
+				.map(summary -> baseId(summary.id())).collect(Collectors.toSet());
 		Map<String, WarningNotice> active = new LinkedHashMap<>();
-		for (WarningSourceClient.SourceWarning summary : summaries.stream().limit(properties.getMaxWarnings())
+		active.entrySet().removeIf(entry -> cancelledBaseIds.contains(baseId(entry.getKey())));
+		detailCache.keySet().removeIf(id -> cancelledBaseIds.contains(baseId(id)));
+
+		for (WarningSourceClient.SourceWarning summary : summaries.stream().filter(summary -> !isCancellation(summary))
+				.filter(summary -> !cancelledBaseIds.contains(baseId(summary.id()))).limit(properties.getMaxWarnings())
 				.toList()) {
-			String baseId = baseId(summary.id());
-			if (summary.messageType() != null && "cancel".equalsIgnoreCase(summary.messageType())) {
-				active.entrySet().removeIf(entry -> baseId(entry.getKey()).equals(baseId));
-				detailCache.remove(summary.id());
-				continue;
-			}
 
 			CachedNotice cachedNotice = detailCache.get(summary.id());
 			WarningNotice notice;
@@ -151,6 +153,10 @@ public class WarningService {
 			return "";
 		}
 		return id.replaceFirst("-\\d{3}$", "");
+	}
+
+	private boolean isCancellation(WarningSourceClient.SourceWarning summary) {
+		return summary.messageType() != null && "cancel".equalsIgnoreCase(summary.messageType());
 	}
 
 	private boolean equalsNullable(String left, String right) {

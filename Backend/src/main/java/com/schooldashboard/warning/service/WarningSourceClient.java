@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.regex.Pattern;
 import org.jsoup.Jsoup;
+import org.jsoup.parser.Parser;
 import org.jsoup.safety.Safelist;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -223,7 +224,8 @@ public class WarningSourceClient {
 			return "";
 		}
 		String withLineBreaks = value.replaceAll("(?i)<br\\s*/?>", "\n");
-		return Jsoup.clean(withLineBreaks, Safelist.none()).trim();
+		String sanitized = Jsoup.clean(withLineBreaks, Safelist.none());
+		return Parser.unescapeEntities(sanitized, false).trim();
 	}
 
 	private String encodeRegionCode(String value) {

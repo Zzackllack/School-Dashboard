@@ -204,6 +204,7 @@ All endpoints are served from the backend base URL, usually `http://localhost:80
 | `GET /api/dsb/timetables` | Raw DSBmobile timetables list |
 | `GET /api/dsb/news` | DSBmobile news payload |
 | `GET /api/calendar/events?limit=5` | Parsed calendar events with epoch millis and `allDay` |
+| `GET /api/warnings/current` | Unauthenticated current regional NINA/MoWaS warning snapshot for the kiosk overlay |
 | `GET /error` | HTML error page handler |
 
 Optional actuator endpoints depend on `management.endpoints.web.exposure.include`:
@@ -253,6 +254,10 @@ keeps a last-known-good snapshot, and exposes the normalized current state at
 10 seconds. This is an additional information channel and does not replace
 official instructions, NINA, Cell Broadcast, sirens, or local emergency
 procedures.
+
+For a local visual preview with mock warning data, open `/warning-demo` on the
+frontend. The demo uses the same production overlay component and does not
+call the external warning source.
 
 Docker deployment:
 

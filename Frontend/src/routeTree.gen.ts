@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WarningDemoRouteImport } from './routes/warning-demo'
 import { Route as ThrowErrorRouteImport } from './routes/throw-error'
 import { Route as SetupRouteRouteImport } from './routes/setup/route'
 import { Route as AdminRouteRouteImport } from './routes/admin/route'
@@ -49,6 +50,11 @@ import { Route as ApiAdminDisplaysDisplayIdRevokeSessionRouteImport } from './ro
 import { Route as ApiAdminDisplaysEnrollmentsRequestIdRejectRouteImport } from './routes/api/admin/displays/enrollments/$requestId/reject'
 import { Route as ApiAdminDisplaysEnrollmentsRequestIdApproveRouteImport } from './routes/api/admin/displays/enrollments/$requestId/approve'
 
+const WarningDemoRoute = WarningDemoRouteImport.update({
+  id: '/warning-demo',
+  path: '/warning-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ThrowErrorRoute = ThrowErrorRouteImport.update({
   id: '/throw-error',
   path: '/throw-error',
@@ -261,6 +267,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteRouteWithChildren
   '/setup': typeof SetupRouteRouteWithChildren
   '/throw-error': typeof ThrowErrorRoute
+  '/warning-demo': typeof WarningDemoRoute
   '/admin/displays': typeof AdminDisplaysRouteRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/display/$displayId': typeof DisplayDisplayIdRoute
@@ -300,6 +307,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/throw-error': typeof ThrowErrorRoute
+  '/warning-demo': typeof WarningDemoRoute
   '/admin/login': typeof AdminLoginRoute
   '/display/$displayId': typeof DisplayDisplayIdRoute
   '/rueckmeldung/$displayId': typeof RueckmeldungDisplayIdRoute
@@ -341,6 +349,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteRouteWithChildren
   '/setup': typeof SetupRouteRouteWithChildren
   '/throw-error': typeof ThrowErrorRoute
+  '/warning-demo': typeof WarningDemoRoute
   '/admin/displays': typeof AdminDisplaysRouteRouteWithChildren
   '/admin/login': typeof AdminLoginRoute
   '/display/$displayId': typeof DisplayDisplayIdRoute
@@ -384,6 +393,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/setup'
     | '/throw-error'
+    | '/warning-demo'
     | '/admin/displays'
     | '/admin/login'
     | '/display/$displayId'
@@ -423,6 +433,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/throw-error'
+    | '/warning-demo'
     | '/admin/login'
     | '/display/$displayId'
     | '/rueckmeldung/$displayId'
@@ -463,6 +474,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/setup'
     | '/throw-error'
+    | '/warning-demo'
     | '/admin/displays'
     | '/admin/login'
     | '/display/$displayId'
@@ -505,6 +517,7 @@ export interface RootRouteChildren {
   AdminRouteRoute: typeof AdminRouteRouteWithChildren
   SetupRouteRoute: typeof SetupRouteRouteWithChildren
   ThrowErrorRoute: typeof ThrowErrorRoute
+  WarningDemoRoute: typeof WarningDemoRoute
   DisplayDisplayIdRoute: typeof DisplayDisplayIdRoute
   RueckmeldungDisplayIdRoute: typeof RueckmeldungDisplayIdRoute
   ApiAdminDisplaysRouteRoute: typeof ApiAdminDisplaysRouteRouteWithChildren
@@ -528,6 +541,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/warning-demo': {
+      id: '/warning-demo'
+      path: '/warning-demo'
+      fullPath: '/warning-demo'
+      preLoaderRoute: typeof WarningDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/throw-error': {
       id: '/throw-error'
       path: '/throw-error'
@@ -910,6 +930,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRouteRoute: AdminRouteRouteWithChildren,
   SetupRouteRoute: SetupRouteRouteWithChildren,
   ThrowErrorRoute: ThrowErrorRoute,
+  WarningDemoRoute: WarningDemoRoute,
   DisplayDisplayIdRoute: DisplayDisplayIdRoute,
   RueckmeldungDisplayIdRoute: RueckmeldungDisplayIdRoute,
   ApiAdminDisplaysRouteRoute: ApiAdminDisplaysRouteRouteWithChildren,

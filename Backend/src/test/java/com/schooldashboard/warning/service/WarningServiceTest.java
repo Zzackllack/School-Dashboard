@@ -76,6 +76,20 @@ class WarningServiceTest {
 	}
 
 	@Test
+	void cancellationBeyondWarningLimitStillSuppressesAlert() {
+		properties.setMaxWarnings(1);
+		WarningSourceClient.SourceWarning alert = summary("alert-1-000", "hash-1", "Alert");
+		WarningSourceClient.SourceWarning cancel = summary("alert-1-001", "hash-2", "Cancel");
+		when(sourceClient.fetchSummaries(any())).thenReturn(new WarningSourceClient.SourceFetch(false,
+				List.of(alert, cancel), new WarningSourceClient.SourceCursor(null, 0L)));
+
+		service.poll();
+
+		assertEquals(0, service.getCurrentSnapshot().warnings().size());
+		verify(sourceClient, never()).fetchDetails(alert);
+	}
+
+	@Test
 	void retainsLastKnownWarningWhenSourceFails() {
 		WarningSourceClient.SourceWarning summary = summary("alert-1", "hash-1", "Alert");
 		when(sourceClient.fetchSummaries(any())).thenReturn(new WarningSourceClient.SourceFetch(false, List.of(summary),
