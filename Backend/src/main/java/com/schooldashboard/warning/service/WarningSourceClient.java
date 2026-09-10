@@ -192,9 +192,8 @@ public class WarningSourceClient {
 			messageType = summary.messageType();
 		}
 		String headline = firstText(info, "headline") != null ? firstText(info, "headline") : summary.headline();
-		return new WarningNotice(summary.id(), messageType,
-				headline,
-				cleanMarkup(firstText(info, "description")), cleanMarkup(firstText(info, "instruction")),
+		return new WarningNotice(summary.id(), messageType, headline, cleanMarkup(firstText(info, "description")),
+				cleanMarkup(firstText(info, "instruction")),
 				firstText(root, "sender", "provider") != null
 						? firstText(root, "sender", "provider")
 						: summary.provider(),
@@ -248,8 +247,7 @@ public class WarningSourceClient {
 	}
 
 	private String encodePathSegment(String value) {
-		return URLEncoder.encode(value.trim().replaceAll("\\s+", "_"), StandardCharsets.UTF_8)
-				.replace("+", "%20");
+		return URLEncoder.encode(value.trim().replaceAll("\\s+", "_"), StandardCharsets.UTF_8).replace("+", "%20");
 	}
 
 	private String normalizeMessageType(String value) {
