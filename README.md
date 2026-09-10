@@ -255,10 +255,6 @@ keeps a last-known-good snapshot, and exposes the normalized current state at
 official instructions, NINA, Cell Broadcast, sirens, or local emergency
 procedures.
 
-For a local visual preview with mock warning data, open `/warning-demo` on the
-frontend. The demo uses the same production overlay component and does not
-call the external warning source.
-
 Docker deployment:
 
 ```bash

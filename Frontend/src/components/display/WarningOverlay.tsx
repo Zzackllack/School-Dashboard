@@ -10,11 +10,6 @@ import {
   getMostUrgentWarning,
   warningSnapshotQueryOptions,
 } from "#/lib/api/warnings";
-import type { WarningSnapshot } from "#/lib/api/warnings";
-
-interface WarningOverlayProps {
-  snapshotOverride?: WarningSnapshot | null;
-}
 
 function formatWarningTime(value: string | null): string {
   if (!value) return "Zeitpunkt nicht verfügbar";
@@ -41,19 +36,14 @@ function severityLabel(severity: string | null): string {
   }
 }
 
-export function WarningOverlay({ snapshotOverride }: WarningOverlayProps = {}) {
-  const shouldFetch = snapshotOverride === undefined;
-  const { data } = useQuery({
-    ...warningSnapshotQueryOptions,
-    enabled: shouldFetch,
-  });
-  const snapshot = shouldFetch ? data : snapshotOverride;
-  const warning = getMostUrgentWarning(snapshot?.warnings ?? []);
+export function WarningOverlay() {
+  const { data } = useQuery(warningSnapshotQueryOptions);
+  const warning = getMostUrgentWarning(data?.warnings ?? []);
 
   if (!warning) return null;
 
   const areas = warning.affectedAreas.filter(Boolean);
-  const stale = snapshot?.sourceAvailable === false;
+  const stale = data?.sourceAvailable === false;
   const isTestWarning = warning.test;
 
   return (
