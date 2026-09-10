@@ -19,6 +19,9 @@ vi.mock("../components/Transportation", () => ({
   default: () => <div>Transportation</div>,
 }));
 vi.mock("../components/Weather", () => ({ default: () => <div>Weather</div> }));
+vi.mock("../components/display/WarningModule", () => ({
+  WarningModule: () => null,
+}));
 vi.mock("../hooks/useAutoScroll", () => ({ default: () => undefined }));
 
 describe("DashboardPage hydration", () => {

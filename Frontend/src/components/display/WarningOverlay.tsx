@@ -8,7 +8,10 @@ import {
 import { useQuery } from "@tanstack/react-query";
 import {
   getMostUrgentWarning,
+  formatWarningCountdown,
+  useWarningAttention,
   warningSnapshotQueryOptions,
+  type WarningNotice,
 } from "#/lib/api/warnings";
 
 function formatWarningTime(value: string | null): string {
@@ -42,8 +45,28 @@ export function WarningOverlay() {
 
   if (!warning) return null;
 
+  return (
+    <WarningOverlayContent
+      key={warning.id}
+      warning={warning}
+      sourceAvailable={data?.sourceAvailable}
+    />
+  );
+}
+
+function WarningOverlayContent({
+  warning,
+  sourceAvailable,
+}: {
+  warning: WarningNotice;
+  sourceAvailable: boolean | undefined;
+}) {
+  const attention = useWarningAttention(warning.id);
+
+  if (!attention.isExpanded) return null;
+
   const areas = warning.affectedAreas.filter(Boolean);
-  const stale = data?.sourceAvailable === false;
+  const stale = sourceAvailable === false;
   const isTestWarning = warning.test;
 
   return (
@@ -66,7 +89,12 @@ export function WarningOverlay() {
               {isTestWarning ? "Probewarnung" : "Amtliche Warnung"}
             </p>
           </div>
-          <Radio className="size-6 shrink-0" aria-hidden="true" />
+          <div className="flex items-center gap-3">
+            <span className="font-mono text-[10px] font-black uppercase tracking-[0.12em] sm:text-xs">
+              Minimierung in {formatWarningCountdown(attention.remainingMs)}
+            </span>
+            <Radio className="size-6 shrink-0" aria-hidden="true" />
+          </div>
         </div>
 
         <div className="grid gap-7 p-5 sm:p-8 lg:grid-cols-[minmax(0,1fr)_18rem] lg:gap-10">

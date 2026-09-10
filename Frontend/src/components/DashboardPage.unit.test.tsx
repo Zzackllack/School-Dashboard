@@ -18,6 +18,9 @@ vi.mock("./Weather", () => ({ default: () => <div>Weather</div> }));
 vi.mock("./display/SurveyQrModule", () => ({
   SurveyQrModule: () => <div>SurveyQrModule</div>,
 }));
+vi.mock("./display/WarningModule", () => ({
+  WarningModule: () => null,
+}));
 vi.mock("./display/useDisplayRuntime", () => ({
   useDisplayRuntime: () => ({
     isHydrated: false,

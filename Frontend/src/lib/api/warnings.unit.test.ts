@@ -1,9 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
+  formatWarningCountdown,
+  getWarningAttentionState,
   getMostUrgentWarning,
   severityRank,
   type WarningNotice,
   type WarningSnapshot,
+  WARNING_ATTENTION_WINDOW_MS,
   warningSnapshotQueryOptions,
 } from "./warnings";
 
@@ -59,5 +62,13 @@ describe("warning API contract", () => {
 
     expect(snapshot.warnings).toEqual([]);
     expect(snapshot.sourceAvailable).toBe(true);
+  });
+
+  it("keeps the full-screen attention window separate from warning lifetime", () => {
+    const seenAt = 1_000_000;
+    expect(
+      getWarningAttentionState(seenAt, seenAt + WARNING_ATTENTION_WINDOW_MS),
+    ).toEqual({ isExpanded: false, remainingMs: 0 });
+    expect(formatWarningCountdown(29 * 60 * 1_000 + 4_000)).toBe("29:04");
   });
 });

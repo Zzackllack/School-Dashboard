@@ -8,6 +8,7 @@ import Weather from "./Weather";
 import schoolLogo from "../assets/Goethe-Logo.webp";
 import { useDisplayRuntime } from "./display/useDisplayRuntime";
 import { SurveyQrModule } from "./display/SurveyQrModule";
+import { WarningModule } from "./display/WarningModule";
 
 const FOOTER_DATETIME_OPTIONS: Intl.DateTimeFormatOptions = {
   year: "numeric",
@@ -52,6 +53,7 @@ const DashboardPage = ({ displayId }: DashboardPageProps) => {
             <SubstitutionPlanDisplay />
           </div>
           <div className="flex flex-col gap-5 lg:w-1/4">
+            <WarningModule variant="default" />
             <Weather />
             <Transportation />
             <CalendarEvents />

@@ -14,6 +14,7 @@ import { WeatherModule } from "./modules/WeatherModule";
 import { HolidaysModule } from "./modules/HolidaysModule";
 import { CalendarModule } from "./modules/CalendarModule";
 import { SurveyQrModule } from "#/components/display/SurveyQrModule";
+import { WarningModule } from "#/components/display/WarningModule";
 
 // ─── Constants ──────────────────────────────────────────────────────────────────
 
@@ -490,6 +491,7 @@ export function BrutalistHighDensityTheme({ displayId }: DisplayThemeProps) {
           className="flex min-h-0 w-[30%] shrink-0 flex-col overflow-y-scroll bg-white"
           style={{ scrollbarWidth: "none" }}
         >
+          <WarningModule variant="brutalist" />
           <WeatherModule />
           <TransportModule />
           <CalendarModule />

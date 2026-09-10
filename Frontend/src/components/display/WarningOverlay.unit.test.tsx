@@ -24,6 +24,7 @@ function renderOverlay(warnings: Array<Record<string, unknown>>) {
 
 afterEach(() => {
   cleanup();
+  window.localStorage?.clear();
 });
 
 describe("WarningOverlay", () => {
