@@ -52,6 +52,7 @@ describe("WarningModule", () => {
     expect(screen.getByRole("status")).toBeDefined();
     expect(screen.getByText("Wasserrohrbruch in Tempelhof")).toBeDefined();
     expect(screen.getByText(/Vollbild noch/)).toBeDefined();
+    expect(screen.getByTestId("warning-qr-code")).toBeDefined();
   });
 
   it("does not render when the warning list is empty", () => {

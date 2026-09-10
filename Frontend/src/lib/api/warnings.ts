@@ -19,7 +19,7 @@ export interface WarningNotice {
   affectedAreas: string[];
   sentAt: string | null;
   expiresAt: string | null;
-  sourceUrl: string;
+  sourceUrl: string | null;
   test: boolean;
 }
 

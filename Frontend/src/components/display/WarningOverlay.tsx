@@ -1,10 +1,4 @@
-import {
-  AlertOctagon,
-  ExternalLink,
-  MapPin,
-  Radio,
-  ShieldAlert,
-} from "lucide-react";
+import { AlertOctagon, MapPin, Radio, ShieldAlert } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import {
   getMostUrgentWarning,
@@ -13,6 +7,7 @@ import {
   warningSnapshotQueryOptions,
   type WarningNotice,
 } from "#/lib/api/warnings";
+import { WarningQrCode } from "./WarningQrCode";
 
 function formatWarningTime(value: string | null): string {
   if (!value) return "Zeitpunkt nicht verfügbar";
@@ -164,15 +159,7 @@ function WarningOverlayContent({
               ) : null}
             </div>
 
-            <a
-              className="pointer-events-auto inline-flex items-center justify-center gap-2 border border-white/30 px-4 py-3 text-center font-mono text-xs font-black uppercase tracking-[0.12em] text-white transition-colors hover:bg-white/10 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#ff9f0a]"
-              href={warning.sourceUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Weitere Informationen
-              <ExternalLink className="size-4" aria-hidden="true" />
-            </a>
+            <WarningQrCode url={warning.sourceUrl} variant="overlay" />
           </aside>
         </div>
       </section>

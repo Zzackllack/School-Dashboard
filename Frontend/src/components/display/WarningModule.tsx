@@ -1,4 +1,4 @@
-import { ExternalLink, MapPin, ShieldAlert } from "lucide-react";
+import { MapPin, ShieldAlert } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import {
   formatWarningCountdown,
@@ -7,6 +7,7 @@ import {
   warningSnapshotQueryOptions,
   type WarningNotice,
 } from "#/lib/api/warnings";
+import { WarningQrCode } from "./WarningQrCode";
 
 export type WarningModuleVariant = "default" | "brutalist";
 
@@ -99,15 +100,7 @@ function WarningModuleContent({
             ? `Vollbild noch ${formatWarningCountdown(attention.remainingMs)}`
             : "Vollbild minimiert"}
         </span>
-        <a
-          className="inline-flex shrink-0 items-center gap-1 font-black underline decoration-current/30 underline-offset-2 hover:decoration-current focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-red-600"
-          href={warning.sourceUrl}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Details
-          <ExternalLink className="size-3" aria-hidden="true" />
-        </a>
+        <WarningQrCode url={warning.sourceUrl} variant="module" />
       </div>
     </section>
   );

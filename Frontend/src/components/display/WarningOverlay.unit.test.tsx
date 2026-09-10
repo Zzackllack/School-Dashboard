@@ -53,7 +53,32 @@ describe("WarningOverlay", () => {
     expect(screen.getByText("Starke Rauchentwicklung")).toBeDefined();
     expect(screen.getByText("Fenster schließen.")).toBeDefined();
     expect(screen.getByText("Berlin-Lichterfelde")).toBeDefined();
+    expect(screen.getByTestId("warning-qr-code")).toBeDefined();
     expect(screen.queryByText("<script>")).toBeNull();
+  });
+
+  it("does not render a QR code when no information link is available", () => {
+    renderOverlay([
+      {
+        id: "warning-without-source",
+        messageType: "Alert",
+        headline: "Lokale Warnung",
+        description: "Keine weiteren Informationen verfügbar.",
+        instruction: "Bitte beachten Sie die örtlichen Hinweise.",
+        provider: "Berliner Feuerwehr",
+        severity: "Minor",
+        urgency: "Future",
+        certainty: "Observed",
+        event: "Information",
+        affectedAreas: ["Berlin-Lichterfelde"],
+        sentAt: "2026-09-09T02:15:00+02:00",
+        expiresAt: null,
+        sourceUrl: null,
+        test: false,
+      },
+    ]);
+
+    expect(screen.queryByTestId("warning-qr-code")).toBeNull();
   });
 
   it("stays absent when no warning is active", () => {
