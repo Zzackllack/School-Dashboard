@@ -20,7 +20,7 @@ export function WarningQrCode({ url, variant }: WarningQrCodeProps) {
     <div
       className={
         isOverlay
-          ? "flex items-center gap-4 border border-white/15 bg-white/[0.06] p-3 sm:p-4"
+          ? "flex w-full max-w-full flex-col items-center gap-3 border border-white/15 bg-white/[0.06] p-3 text-center sm:p-4"
           : "flex shrink-0 items-center gap-2"
       }
       data-testid="warning-qr-code"
@@ -42,8 +42,8 @@ export function WarningQrCode({ url, variant }: WarningQrCodeProps) {
           title="Weitere Informationen zur Warnung scannen"
         />
       </div>
-      <div className={isOverlay ? "min-w-0" : "sr-only"}>
-        <div className="flex items-center gap-1.5 font-mono text-[10px] font-black uppercase tracking-[0.14em]">
+      <div className={isOverlay ? "min-w-0 max-w-full" : "sr-only"}>
+        <div className="flex flex-wrap items-center justify-center gap-1.5 break-words font-mono text-[10px] font-black uppercase tracking-[0.14em]">
           <QrCode className="size-3.5 shrink-0" aria-hidden="true" />
           Weitere Informationen
         </div>
