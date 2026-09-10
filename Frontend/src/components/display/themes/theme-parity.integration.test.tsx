@@ -36,6 +36,9 @@ vi.mock("#/components/Credits", () => ({
 vi.mock("#/components/display/SurveyQrModule", () => ({
   SurveyQrModule: () => <div data-testid="module-survey">SURVEY</div>,
 }));
+vi.mock("#/components/display/WarningModule", () => ({
+  WarningModule: () => null,
+}));
 
 /** QueryClient with all fetching disabled so no real network requests are made. */
 function makeTestQueryClient() {

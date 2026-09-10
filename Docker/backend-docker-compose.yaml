@@ -1,5 +1,3 @@
-version: '3.8'
-
 services:
   backend:
     build:
@@ -13,6 +11,10 @@ services:
       SPRING_DATASOURCE_USERNAME: "${SPRING_DATASOURCE_USERNAME:-school_dashboard}"
       SPRING_DATASOURCE_PASSWORD: "${SPRING_DATASOURCE_PASSWORD:-change-me}"
       SPRING_FLYWAY_LOCATIONS: "classpath:db/migration/postgresql"
+      WARNINGS_ENABLED: "${WARNINGS_ENABLED:-false}"
+      WARNINGS_REGION_CODE: "${WARNINGS_REGION_CODE:-}"
+      WARNINGS_API_BASE_URL: "${WARNINGS_API_BASE_URL:-https://warnung.bund.de/api31}"
+      WARNINGS_POLL_INTERVAL_MS: "${WARNINGS_POLL_INTERVAL_MS:-10000}"
       # Uncomment and supply credentials for production use
       # DSB_USERNAME: your-user
       # DSB_PASSWORD: your-pass

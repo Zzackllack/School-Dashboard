@@ -101,7 +101,7 @@ public class SecurityConfiguration {
 				.authorizeHttpRequests(authorize -> authorize.requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 						.requestMatchers("/error", "/health", "/css/**").permitAll()
 						.requestMatchers("/api/displays/**", "/api/substitution/**", "/api/calendar/**", "/api/dsb/**",
-								"/api/surveys/**")
+								"/api/surveys/**", "/api/warnings/**")
 						.permitAll().anyRequest().denyAll())
 				.exceptionHandling(exceptionHandling -> exceptionHandling
 						.authenticationEntryPoint(authenticationEntryPoint).accessDeniedHandler(accessDeniedHandler))

@@ -22,6 +22,7 @@ import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminDisplaysRouteRouteImport } from './routes/admin/displays/route'
 import { Route as AdminSurveysIndexRouteImport } from './routes/admin/surveys/index'
 import { Route as AdminDisplaysIndexRouteImport } from './routes/admin/displays/index'
+import { Route as ApiWarningsCurrentRouteImport } from './routes/api/warnings/current'
 import { Route as ApiSurveysSubmissionsRouteImport } from './routes/api/surveys/submissions'
 import { Route as ApiSubstitutionPlansRouteImport } from './routes/api/substitution/plans'
 import { Route as ApiDisplaysSessionRouteImport } from './routes/api/displays/session'
@@ -112,6 +113,11 @@ const AdminDisplaysIndexRoute = AdminDisplaysIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AdminDisplaysRouteRoute,
+} as any)
+const ApiWarningsCurrentRoute = ApiWarningsCurrentRouteImport.update({
+  id: '/api/warnings/current',
+  path: '/api/warnings/current',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ApiSurveysSubmissionsRoute = ApiSurveysSubmissionsRouteImport.update({
   id: '/api/surveys/submissions',
@@ -270,6 +276,7 @@ export interface FileRoutesByFullPath {
   '/api/displays/session': typeof ApiDisplaysSessionRoute
   '/api/substitution/plans': typeof ApiSubstitutionPlansRoute
   '/api/surveys/submissions': typeof ApiSurveysSubmissionsRoute
+  '/api/warnings/current': typeof ApiWarningsCurrentRoute
   '/admin/displays/': typeof AdminDisplaysIndexRoute
   '/admin/surveys/': typeof AdminSurveysIndexRoute
   '/api/admin/displays/$displayId': typeof ApiAdminDisplaysDisplayIdRouteRouteWithChildren
@@ -307,6 +314,7 @@ export interface FileRoutesByTo {
   '/api/displays/session': typeof ApiDisplaysSessionRoute
   '/api/substitution/plans': typeof ApiSubstitutionPlansRoute
   '/api/surveys/submissions': typeof ApiSurveysSubmissionsRoute
+  '/api/warnings/current': typeof ApiWarningsCurrentRoute
   '/admin/displays': typeof AdminDisplaysIndexRoute
   '/admin/surveys': typeof AdminSurveysIndexRoute
   '/api/admin/displays/$displayId': typeof ApiAdminDisplaysDisplayIdRouteRouteWithChildren
@@ -348,6 +356,7 @@ export interface FileRoutesById {
   '/api/displays/session': typeof ApiDisplaysSessionRoute
   '/api/substitution/plans': typeof ApiSubstitutionPlansRoute
   '/api/surveys/submissions': typeof ApiSurveysSubmissionsRoute
+  '/api/warnings/current': typeof ApiWarningsCurrentRoute
   '/admin/displays/': typeof AdminDisplaysIndexRoute
   '/admin/surveys/': typeof AdminSurveysIndexRoute
   '/api/admin/displays/$displayId': typeof ApiAdminDisplaysDisplayIdRouteRouteWithChildren
@@ -390,6 +399,7 @@ export interface FileRouteTypes {
     | '/api/displays/session'
     | '/api/substitution/plans'
     | '/api/surveys/submissions'
+    | '/api/warnings/current'
     | '/admin/displays/'
     | '/admin/surveys/'
     | '/api/admin/displays/$displayId'
@@ -427,6 +437,7 @@ export interface FileRouteTypes {
     | '/api/displays/session'
     | '/api/substitution/plans'
     | '/api/surveys/submissions'
+    | '/api/warnings/current'
     | '/admin/displays'
     | '/admin/surveys'
     | '/api/admin/displays/$displayId'
@@ -467,6 +478,7 @@ export interface FileRouteTypes {
     | '/api/displays/session'
     | '/api/substitution/plans'
     | '/api/surveys/submissions'
+    | '/api/warnings/current'
     | '/admin/displays/'
     | '/admin/surveys/'
     | '/api/admin/displays/$displayId'
@@ -501,6 +513,7 @@ export interface RootRouteChildren {
   ApiDisplaysSessionRoute: typeof ApiDisplaysSessionRoute
   ApiSubstitutionPlansRoute: typeof ApiSubstitutionPlansRoute
   ApiSurveysSubmissionsRoute: typeof ApiSurveysSubmissionsRoute
+  ApiWarningsCurrentRoute: typeof ApiWarningsCurrentRoute
   ApiAdminAuthCredentialsRoute: typeof ApiAdminAuthCredentialsRoute
   ApiAdminAuthCsrfRoute: typeof ApiAdminAuthCsrfRoute
   ApiAdminAuthLoginRoute: typeof ApiAdminAuthLoginRoute
@@ -605,6 +618,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/admin/displays/'
       preLoaderRoute: typeof AdminDisplaysIndexRouteImport
       parentRoute: typeof AdminDisplaysRouteRoute
+    }
+    '/api/warnings/current': {
+      id: '/api/warnings/current'
+      path: '/api/warnings/current'
+      fullPath: '/api/warnings/current'
+      preLoaderRoute: typeof ApiWarningsCurrentRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/surveys/submissions': {
       id: '/api/surveys/submissions'
@@ -898,6 +918,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApiDisplaysSessionRoute: ApiDisplaysSessionRoute,
   ApiSubstitutionPlansRoute: ApiSubstitutionPlansRoute,
   ApiSurveysSubmissionsRoute: ApiSurveysSubmissionsRoute,
+  ApiWarningsCurrentRoute: ApiWarningsCurrentRoute,
   ApiAdminAuthCredentialsRoute: ApiAdminAuthCredentialsRoute,
   ApiAdminAuthCsrfRoute: ApiAdminAuthCsrfRoute,
   ApiAdminAuthLoginRoute: ApiAdminAuthLoginRoute,
