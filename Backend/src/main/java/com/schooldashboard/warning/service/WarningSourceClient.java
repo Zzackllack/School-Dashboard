@@ -5,6 +5,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.schooldashboard.warning.config.WarningProperties;
 import com.schooldashboard.warning.model.WarningNotice;
 import java.net.URI;
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.time.format.DateTimeParseException;
@@ -32,6 +34,7 @@ public class WarningSourceClient {
 
 	private static final Logger logger = LoggerFactory.getLogger(WarningSourceClient.class);
 	private static final Pattern SAFE_IDENTIFIER = Pattern.compile("[A-Za-z0-9._-]+");
+	private static final String WARNING_WEB_BASE_URL = "https://warnung.bund.de/meldung/";
 
 	private final WarningProperties properties;
 	private final RestTemplate restTemplate;
@@ -188,8 +191,9 @@ public class WarningSourceClient {
 		if (messageType == null) {
 			messageType = summary.messageType();
 		}
+		String headline = firstText(info, "headline") != null ? firstText(info, "headline") : summary.headline();
 		return new WarningNotice(summary.id(), messageType,
-				firstText(info, "headline") != null ? firstText(info, "headline") : summary.headline(),
+				headline,
 				cleanMarkup(firstText(info, "description")), cleanMarkup(firstText(info, "instruction")),
 				firstText(root, "sender", "provider") != null
 						? firstText(root, "sender", "provider")
@@ -200,7 +204,7 @@ public class WarningSourceClient {
 				firstText(info, "event") != null ? firstText(info, "event") : summary.event(), areas,
 				firstInstant(root, "sent") != null ? firstInstant(root, "sent") : summary.sentAt(),
 				firstInstant(info, "expires") != null ? firstInstant(info, "expires") : summary.expiresAt(),
-				"https://warnung.bund.de/meldungen", "Test".equalsIgnoreCase(textAt(root, "status")));
+				buildWarningUrl(summary.id(), headline), "Test".equalsIgnoreCase(textAt(root, "status")));
 	}
 
 	private JsonNode selectGermanInfo(JsonNode infos) {
@@ -234,6 +238,18 @@ public class WarningSourceClient {
 			throw new IllegalStateException("Warning region code must contain exactly 12 digits");
 		}
 		return trimmed;
+	}
+
+	private String buildWarningUrl(String id, String headline) {
+		if (id == null || id.isBlank() || headline == null || headline.isBlank()) {
+			return null;
+		}
+		return WARNING_WEB_BASE_URL + encodePathSegment(id) + "/" + encodePathSegment(headline);
+	}
+
+	private String encodePathSegment(String value) {
+		return URLEncoder.encode(value.trim().replaceAll("\\s+", "_"), StandardCharsets.UTF_8)
+				.replace("+", "%20");
 	}
 
 	private String normalizeMessageType(String value) {
@@ -317,7 +333,7 @@ public class WarningSourceClient {
 			return new WarningNotice(id, messageType, headline == null ? "Amtliche Warnung" : headline, "", "",
 					provider, severity, urgency, certainty, event,
 					areaData == null || areaData.isBlank() ? List.of() : List.of(areaData), sentAt, expiresAt,
-					"https://warnung.bund.de/meldungen", test);
+					buildWarningUrl(id, headline), test);
 		}
 	}
 }

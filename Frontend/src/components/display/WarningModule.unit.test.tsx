@@ -51,7 +51,12 @@ describe("WarningModule", () => {
 
     expect(screen.getByRole("status")).toBeDefined();
     expect(screen.getByText("Wasserrohrbruch in Tempelhof")).toBeDefined();
-    expect(screen.getByText(/Vollbild noch/)).toBeDefined();
+    expect(
+      screen.getByText("Weitere Informationen", { selector: "p" }),
+    ).toBeDefined();
+    expect(
+      screen.getByText("QR-Code mit dem Smartphone scannen"),
+    ).toBeDefined();
     expect(screen.getByTestId("warning-qr-code")).toBeDefined();
   });
 
@@ -59,5 +64,14 @@ describe("WarningModule", () => {
     renderModule([]);
 
     expect(screen.queryByRole("status")).toBeNull();
+  });
+
+  it("explains when no further information link is available", () => {
+    renderModule([{ ...warning, sourceUrl: null }]);
+
+    expect(
+      screen.getByText("Keine weiteren Informationen verfügbar"),
+    ).toBeDefined();
+    expect(screen.queryByTestId("warning-qr-code")).toBeNull();
   });
 });

@@ -1,9 +1,7 @@
 import { MapPin, ShieldAlert } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
 import {
-  formatWarningCountdown,
   getMostUrgentWarning,
-  useWarningAttention,
   warningSnapshotQueryOptions,
   type WarningNotice,
 } from "#/lib/api/warnings";
@@ -52,8 +50,6 @@ function WarningModuleContent({
   warning: WarningNotice;
   variant: WarningModuleVariant;
 }) {
-  const attention = useWarningAttention(warning.id);
-
   const area = warning.affectedAreas.find(Boolean);
   const isBrutalist = variant === "brutalist";
   const panelClass = isBrutalist
@@ -95,11 +91,20 @@ function WarningModuleContent({
       ) : null}
 
       <div className="mt-3 flex items-center justify-between gap-3 border-t border-current/15 pt-3 font-mono text-[10px] uppercase tracking-[0.08em] opacity-70">
-        <span>
-          {attention.isExpanded
-            ? `Vollbild noch ${formatWarningCountdown(attention.remainingMs)}`
-            : "Vollbild minimiert"}
-        </span>
+        <div className="min-w-0">
+          {warning.sourceUrl?.trim() ? (
+            <>
+              <p className="font-black">Weitere Informationen</p>
+              <p className="mt-1 normal-case tracking-normal">
+                QR-Code mit dem Smartphone scannen
+              </p>
+            </>
+          ) : (
+            <p className="normal-case tracking-normal">
+              Keine weiteren Informationen verfügbar
+            </p>
+          )}
+        </div>
         <WarningQrCode url={warning.sourceUrl} variant="module" />
       </div>
     </section>

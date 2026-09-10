@@ -54,6 +54,8 @@ class WarningSourceClientTest {
 		assertEquals("Bleiben Sie im Gebäude & schließen Sie die Fenster.", notice.description());
 		assertEquals("Berlin-Lichterfelde", notice.affectedAreas().get(0));
 		assertEquals("Fenster und Türen geschlossen halten & Ruhe bewahren.", notice.instruction());
+		assertEquals("https://warnung.bund.de/meldung/" + WARNING_ID + "/Starke_Rauchentwicklung",
+				notice.sourceUrl());
 		server.verify();
 	}
 
