@@ -9,54 +9,49 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ThrowErrorRouteImport } from './routes/throw-error'
-import { Route as SetupRouteRouteImport } from './routes/setup/route'
-import { Route as AdminRouteRouteImport } from './routes/admin/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as SetupIndexRouteImport } from './routes/setup/index'
+import { Route as AdminRouteRouteImport } from './routes/admin/route'
+import { Route as SetupRouteRouteImport } from './routes/setup/route'
+import { Route as ThrowErrorRouteImport } from './routes/throw-error'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
-import { Route as SetupPendingRouteImport } from './routes/setup/pending'
-import { Route as RueckmeldungDisplayIdRouteImport } from './routes/rueckmeldung/$displayId'
-import { Route as DisplayDisplayIdRouteImport } from './routes/display/$displayId'
-import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminDisplaysRouteRouteImport } from './routes/admin/displays/route'
-import { Route as AdminSurveysIndexRouteImport } from './routes/admin/surveys/index'
+import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as DisplayDisplayIdRouteImport } from './routes/display/$displayId'
+import { Route as RueckmeldungDisplayIdRouteImport } from './routes/rueckmeldung/$displayId'
+import { Route as SetupIndexRouteImport } from './routes/setup/index'
+import { Route as SetupPendingRouteImport } from './routes/setup/pending'
 import { Route as AdminDisplaysIndexRouteImport } from './routes/admin/displays/index'
-import { Route as ApiWarningsCurrentRouteImport } from './routes/api/warnings/current'
-import { Route as ApiSurveysSubmissionsRouteImport } from './routes/api/surveys/submissions'
-import { Route as ApiSubstitutionPlansRouteImport } from './routes/api/substitution/plans'
-import { Route as ApiDisplaysSessionRouteImport } from './routes/api/displays/session'
-import { Route as ApiCalendarEventsRouteImport } from './routes/api/calendar/events'
-import { Route as ApiAdminSurveysRouteImport } from './routes/api/admin/surveys'
-import { Route as AdminDisplaysPendingRouteImport } from './routes/admin/displays/pending'
 import { Route as AdminDisplaysDisplayIdRouteImport } from './routes/admin/displays/$displayId'
+import { Route as AdminDisplaysPendingRouteImport } from './routes/admin/displays/pending'
+import { Route as AdminSurveysIndexRouteImport } from './routes/admin/surveys/index'
 import { Route as ApiAdminDisplaysRouteRouteImport } from './routes/api/admin/displays/route'
-import { Route as ApiDisplaysEnrollmentsIndexRouteImport } from './routes/api/displays/enrollments/index'
-import { Route as ApiTransportStopsNearbyRouteImport } from './routes/api/transport/stops/nearby'
-import { Route as ApiSurveysDisplaysDisplayIdRouteImport } from './routes/api/surveys/displays/$displayId'
-import { Route as ApiDisplaysEnrollmentsRequestIdRouteImport } from './routes/api/displays/enrollments/$requestId'
-import { Route as ApiAdminDisplaysEnrollmentCodesRouteImport } from './routes/api/admin/displays/enrollment-codes'
-import { Route as ApiAdminDisplaysAuditLogsRouteImport } from './routes/api/admin/displays/audit-logs'
-import { Route as ApiAdminAuthMeRouteImport } from './routes/api/admin/auth/me'
-import { Route as ApiAdminAuthLogoutRouteImport } from './routes/api/admin/auth/logout'
-import { Route as ApiAdminAuthLoginRouteImport } from './routes/api/admin/auth/login'
-import { Route as ApiAdminAuthCsrfRouteImport } from './routes/api/admin/auth/csrf'
+import { Route as ApiAdminSurveysRouteImport } from './routes/api/admin/surveys'
+import { Route as ApiCalendarEventsRouteImport } from './routes/api/calendar/events'
+import { Route as ApiDisplaysSessionRouteImport } from './routes/api/displays/session'
+import { Route as ApiSubstitutionPlansRouteImport } from './routes/api/substitution/plans'
+import { Route as ApiSurveysSubmissionsRouteImport } from './routes/api/surveys/submissions'
+import { Route as ApiWarningsCurrentRouteImport } from './routes/api/warnings/current'
 import { Route as ApiAdminAuthCredentialsRouteImport } from './routes/api/admin/auth/credentials'
-import { Route as ApiAdminDisplaysEnrollmentsRouteRouteImport } from './routes/api/admin/displays/enrollments/route'
+import { Route as ApiAdminAuthCsrfRouteImport } from './routes/api/admin/auth/csrf'
+import { Route as ApiAdminAuthLoginRouteImport } from './routes/api/admin/auth/login'
+import { Route as ApiAdminAuthLogoutRouteImport } from './routes/api/admin/auth/logout'
+import { Route as ApiAdminAuthMeRouteImport } from './routes/api/admin/auth/me'
 import { Route as ApiAdminDisplaysDisplayIdRouteRouteImport } from './routes/api/admin/displays/$displayId/route'
-import { Route as ApiTransportStopsStopIdDeparturesRouteImport } from './routes/api/transport/stops/$stopId/departures'
+import { Route as ApiAdminDisplaysAuditLogsRouteImport } from './routes/api/admin/displays/audit-logs'
+import { Route as ApiAdminDisplaysEnrollmentCodesRouteImport } from './routes/api/admin/displays/enrollment-codes'
+import { Route as ApiAdminDisplaysEnrollmentsRouteRouteImport } from './routes/api/admin/displays/enrollments/route'
+import { Route as ApiDisplaysEnrollmentsIndexRouteImport } from './routes/api/displays/enrollments/index'
+import { Route as ApiDisplaysEnrollmentsRequestIdRouteImport } from './routes/api/displays/enrollments/$requestId'
+import { Route as ApiSurveysDisplaysDisplayIdRouteImport } from './routes/api/surveys/displays/$displayId'
+import { Route as ApiTransportStopsNearbyRouteImport } from './routes/api/transport/stops/nearby'
 import { Route as ApiAdminDisplaysDisplayIdRevokeSessionRouteImport } from './routes/api/admin/displays/$displayId/revoke-session'
-import { Route as ApiAdminDisplaysEnrollmentsRequestIdRejectRouteImport } from './routes/api/admin/displays/enrollments/$requestId/reject'
+import { Route as ApiTransportStopsStopIdDeparturesRouteImport } from './routes/api/transport/stops/$stopId/departures'
 import { Route as ApiAdminDisplaysEnrollmentsRequestIdApproveRouteImport } from './routes/api/admin/displays/enrollments/$requestId/approve'
+import { Route as ApiAdminDisplaysEnrollmentsRequestIdRejectRouteImport } from './routes/api/admin/displays/enrollments/$requestId/reject'
 
-const ThrowErrorRoute = ThrowErrorRouteImport.update({
-  id: '/throw-error',
-  path: '/throw-error',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SetupRouteRoute = SetupRouteRouteImport.update({
-  id: '/setup',
-  path: '/setup',
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AdminRouteRoute = AdminRouteRouteImport.update({
@@ -64,39 +59,19 @@ const AdminRouteRoute = AdminRouteRouteImport.update({
   path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
+const SetupRouteRoute = SetupRouteRouteImport.update({
+  id: '/setup',
+  path: '/setup',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SetupIndexRoute = SetupIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => SetupRouteRoute,
+const ThrowErrorRoute = ThrowErrorRouteImport.update({
+  id: '/throw-error',
+  path: '/throw-error',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AdminRouteRoute,
-} as any)
-const SetupPendingRoute = SetupPendingRouteImport.update({
-  id: '/pending',
-  path: '/pending',
-  getParentRoute: () => SetupRouteRoute,
-} as any)
-const RueckmeldungDisplayIdRoute = RueckmeldungDisplayIdRouteImport.update({
-  id: '/rueckmeldung/$displayId',
-  path: '/rueckmeldung/$displayId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DisplayDisplayIdRoute = DisplayDisplayIdRouteImport.update({
-  id: '/display/$displayId',
-  path: '/display/$displayId',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminLoginRoute = AdminLoginRouteImport.update({
-  id: '/login',
-  path: '/login',
   getParentRoute: () => AdminRouteRoute,
 } as any)
 const AdminDisplaysRouteRoute = AdminDisplaysRouteRouteImport.update({
@@ -104,49 +79,34 @@ const AdminDisplaysRouteRoute = AdminDisplaysRouteRouteImport.update({
   path: '/displays',
   getParentRoute: () => AdminRouteRoute,
 } as any)
-const AdminSurveysIndexRoute = AdminSurveysIndexRouteImport.update({
-  id: '/surveys/',
-  path: '/surveys/',
+const AdminLoginRoute = AdminLoginRouteImport.update({
+  id: '/login',
+  path: '/login',
   getParentRoute: () => AdminRouteRoute,
+} as any)
+const DisplayDisplayIdRoute = DisplayDisplayIdRouteImport.update({
+  id: '/display/$displayId',
+  path: '/display/$displayId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RueckmeldungDisplayIdRoute = RueckmeldungDisplayIdRouteImport.update({
+  id: '/rueckmeldung/$displayId',
+  path: '/rueckmeldung/$displayId',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SetupIndexRoute = SetupIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => SetupRouteRoute,
+} as any)
+const SetupPendingRoute = SetupPendingRouteImport.update({
+  id: '/pending',
+  path: '/pending',
+  getParentRoute: () => SetupRouteRoute,
 } as any)
 const AdminDisplaysIndexRoute = AdminDisplaysIndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => AdminDisplaysRouteRoute,
-} as any)
-const ApiWarningsCurrentRoute = ApiWarningsCurrentRouteImport.update({
-  id: '/api/warnings/current',
-  path: '/api/warnings/current',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSurveysSubmissionsRoute = ApiSurveysSubmissionsRouteImport.update({
-  id: '/api/surveys/submissions',
-  path: '/api/surveys/submissions',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiSubstitutionPlansRoute = ApiSubstitutionPlansRouteImport.update({
-  id: '/api/substitution/plans',
-  path: '/api/substitution/plans',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiDisplaysSessionRoute = ApiDisplaysSessionRouteImport.update({
-  id: '/api/displays/session',
-  path: '/api/displays/session',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiCalendarEventsRoute = ApiCalendarEventsRouteImport.update({
-  id: '/api/calendar/events',
-  path: '/api/calendar/events',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminSurveysRoute = ApiAdminSurveysRouteImport.update({
-  id: '/api/admin/surveys',
-  path: '/api/admin/surveys',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AdminDisplaysPendingRoute = AdminDisplaysPendingRouteImport.update({
-  id: '/pending',
-  path: '/pending',
   getParentRoute: () => AdminDisplaysRouteRoute,
 } as any)
 const AdminDisplaysDisplayIdRoute = AdminDisplaysDisplayIdRouteImport.update({
@@ -154,38 +114,80 @@ const AdminDisplaysDisplayIdRoute = AdminDisplaysDisplayIdRouteImport.update({
   path: '/$displayId',
   getParentRoute: () => AdminDisplaysRouteRoute,
 } as any)
+const AdminDisplaysPendingRoute = AdminDisplaysPendingRouteImport.update({
+  id: '/pending',
+  path: '/pending',
+  getParentRoute: () => AdminDisplaysRouteRoute,
+} as any)
+const AdminSurveysIndexRoute = AdminSurveysIndexRouteImport.update({
+  id: '/surveys/',
+  path: '/surveys/',
+  getParentRoute: () => AdminRouteRoute,
+} as any)
 const ApiAdminDisplaysRouteRoute = ApiAdminDisplaysRouteRouteImport.update({
   id: '/api/admin/displays',
   path: '/api/admin/displays',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiDisplaysEnrollmentsIndexRoute =
-  ApiDisplaysEnrollmentsIndexRouteImport.update({
-    id: '/api/displays/enrollments/',
-    path: '/api/displays/enrollments/',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiTransportStopsNearbyRoute = ApiTransportStopsNearbyRouteImport.update({
-  id: '/api/transport/stops/nearby',
-  path: '/api/transport/stops/nearby',
+const ApiAdminSurveysRoute = ApiAdminSurveysRouteImport.update({
+  id: '/api/admin/surveys',
+  path: '/api/admin/surveys',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiSurveysDisplaysDisplayIdRoute =
-  ApiSurveysDisplaysDisplayIdRouteImport.update({
-    id: '/api/surveys/displays/$displayId',
-    path: '/api/surveys/displays/$displayId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiDisplaysEnrollmentsRequestIdRoute =
-  ApiDisplaysEnrollmentsRequestIdRouteImport.update({
-    id: '/api/displays/enrollments/$requestId',
-    path: '/api/displays/enrollments/$requestId',
-    getParentRoute: () => rootRouteImport,
-  } as any)
-const ApiAdminDisplaysEnrollmentCodesRoute =
-  ApiAdminDisplaysEnrollmentCodesRouteImport.update({
-    id: '/enrollment-codes',
-    path: '/enrollment-codes',
+const ApiCalendarEventsRoute = ApiCalendarEventsRouteImport.update({
+  id: '/api/calendar/events',
+  path: '/api/calendar/events',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiDisplaysSessionRoute = ApiDisplaysSessionRouteImport.update({
+  id: '/api/displays/session',
+  path: '/api/displays/session',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSubstitutionPlansRoute = ApiSubstitutionPlansRouteImport.update({
+  id: '/api/substitution/plans',
+  path: '/api/substitution/plans',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiSurveysSubmissionsRoute = ApiSurveysSubmissionsRouteImport.update({
+  id: '/api/surveys/submissions',
+  path: '/api/surveys/submissions',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiWarningsCurrentRoute = ApiWarningsCurrentRouteImport.update({
+  id: '/api/warnings/current',
+  path: '/api/warnings/current',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminAuthCredentialsRoute = ApiAdminAuthCredentialsRouteImport.update({
+  id: '/api/admin/auth/credentials',
+  path: '/api/admin/auth/credentials',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminAuthCsrfRoute = ApiAdminAuthCsrfRouteImport.update({
+  id: '/api/admin/auth/csrf',
+  path: '/api/admin/auth/csrf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminAuthLoginRoute = ApiAdminAuthLoginRouteImport.update({
+  id: '/api/admin/auth/login',
+  path: '/api/admin/auth/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminAuthLogoutRoute = ApiAdminAuthLogoutRouteImport.update({
+  id: '/api/admin/auth/logout',
+  path: '/api/admin/auth/logout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminAuthMeRoute = ApiAdminAuthMeRouteImport.update({
+  id: '/api/admin/auth/me',
+  path: '/api/admin/auth/me',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminDisplaysDisplayIdRouteRoute =
+  ApiAdminDisplaysDisplayIdRouteRouteImport.update({
+    id: '/$displayId',
+    path: '/$displayId',
     getParentRoute: () => ApiAdminDisplaysRouteRoute,
   } as any)
 const ApiAdminDisplaysAuditLogsRoute =
@@ -194,42 +196,46 @@ const ApiAdminDisplaysAuditLogsRoute =
     path: '/audit-logs',
     getParentRoute: () => ApiAdminDisplaysRouteRoute,
   } as any)
-const ApiAdminAuthMeRoute = ApiAdminAuthMeRouteImport.update({
-  id: '/api/admin/auth/me',
-  path: '/api/admin/auth/me',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminAuthLogoutRoute = ApiAdminAuthLogoutRouteImport.update({
-  id: '/api/admin/auth/logout',
-  path: '/api/admin/auth/logout',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminAuthLoginRoute = ApiAdminAuthLoginRouteImport.update({
-  id: '/api/admin/auth/login',
-  path: '/api/admin/auth/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminAuthCsrfRoute = ApiAdminAuthCsrfRouteImport.update({
-  id: '/api/admin/auth/csrf',
-  path: '/api/admin/auth/csrf',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiAdminAuthCredentialsRoute = ApiAdminAuthCredentialsRouteImport.update({
-  id: '/api/admin/auth/credentials',
-  path: '/api/admin/auth/credentials',
-  getParentRoute: () => rootRouteImport,
-} as any)
+const ApiAdminDisplaysEnrollmentCodesRoute =
+  ApiAdminDisplaysEnrollmentCodesRouteImport.update({
+    id: '/enrollment-codes',
+    path: '/enrollment-codes',
+    getParentRoute: () => ApiAdminDisplaysRouteRoute,
+  } as any)
 const ApiAdminDisplaysEnrollmentsRouteRoute =
   ApiAdminDisplaysEnrollmentsRouteRouteImport.update({
     id: '/enrollments',
     path: '/enrollments',
     getParentRoute: () => ApiAdminDisplaysRouteRoute,
   } as any)
-const ApiAdminDisplaysDisplayIdRouteRoute =
-  ApiAdminDisplaysDisplayIdRouteRouteImport.update({
-    id: '/$displayId',
-    path: '/$displayId',
-    getParentRoute: () => ApiAdminDisplaysRouteRoute,
+const ApiDisplaysEnrollmentsIndexRoute =
+  ApiDisplaysEnrollmentsIndexRouteImport.update({
+    id: '/api/displays/enrollments/',
+    path: '/api/displays/enrollments/',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiDisplaysEnrollmentsRequestIdRoute =
+  ApiDisplaysEnrollmentsRequestIdRouteImport.update({
+    id: '/api/displays/enrollments/$requestId',
+    path: '/api/displays/enrollments/$requestId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiSurveysDisplaysDisplayIdRoute =
+  ApiSurveysDisplaysDisplayIdRouteImport.update({
+    id: '/api/surveys/displays/$displayId',
+    path: '/api/surveys/displays/$displayId',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const ApiTransportStopsNearbyRoute = ApiTransportStopsNearbyRouteImport.update({
+  id: '/api/transport/stops/nearby',
+  path: '/api/transport/stops/nearby',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ApiAdminDisplaysDisplayIdRevokeSessionRoute =
+  ApiAdminDisplaysDisplayIdRevokeSessionRouteImport.update({
+    id: '/revoke-session',
+    path: '/revoke-session',
+    getParentRoute: () => ApiAdminDisplaysDisplayIdRouteRoute,
   } as any)
 const ApiTransportStopsStopIdDeparturesRoute =
   ApiTransportStopsStopIdDeparturesRouteImport.update({
@@ -237,22 +243,16 @@ const ApiTransportStopsStopIdDeparturesRoute =
     path: '/api/transport/stops/$stopId/departures',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiAdminDisplaysDisplayIdRevokeSessionRoute =
-  ApiAdminDisplaysDisplayIdRevokeSessionRouteImport.update({
-    id: '/revoke-session',
-    path: '/revoke-session',
-    getParentRoute: () => ApiAdminDisplaysDisplayIdRouteRoute,
+const ApiAdminDisplaysEnrollmentsRequestIdApproveRoute =
+  ApiAdminDisplaysEnrollmentsRequestIdApproveRouteImport.update({
+    id: '/$requestId/approve',
+    path: '/$requestId/approve',
+    getParentRoute: () => ApiAdminDisplaysEnrollmentsRouteRoute,
   } as any)
 const ApiAdminDisplaysEnrollmentsRequestIdRejectRoute =
   ApiAdminDisplaysEnrollmentsRequestIdRejectRouteImport.update({
     id: '/$requestId/reject',
     path: '/$requestId/reject',
-    getParentRoute: () => ApiAdminDisplaysEnrollmentsRouteRoute,
-  } as any)
-const ApiAdminDisplaysEnrollmentsRequestIdApproveRoute =
-  ApiAdminDisplaysEnrollmentsRequestIdApproveRouteImport.update({
-    id: '/$requestId/approve',
-    path: '/$requestId/approve',
     getParentRoute: () => ApiAdminDisplaysEnrollmentsRouteRoute,
   } as any)
 
@@ -528,18 +528,11 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/throw-error': {
-      id: '/throw-error'
-      path: '/throw-error'
-      fullPath: '/throw-error'
-      preLoaderRoute: typeof ThrowErrorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/setup': {
-      id: '/setup'
-      path: '/setup'
-      fullPath: '/setup'
-      preLoaderRoute: typeof SetupRouteRouteImport
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/admin': {
@@ -549,53 +542,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/': {
-      id: '/'
-      path: '/'
-      fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
+    '/setup': {
+      id: '/setup'
+      path: '/setup'
+      fullPath: '/setup'
+      preLoaderRoute: typeof SetupRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/setup/': {
-      id: '/setup/'
-      path: '/'
-      fullPath: '/setup/'
-      preLoaderRoute: typeof SetupIndexRouteImport
-      parentRoute: typeof SetupRouteRoute
+    '/throw-error': {
+      id: '/throw-error'
+      path: '/throw-error'
+      fullPath: '/throw-error'
+      preLoaderRoute: typeof ThrowErrorRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/admin/': {
       id: '/admin/'
       path: '/'
       fullPath: '/admin/'
       preLoaderRoute: typeof AdminIndexRouteImport
-      parentRoute: typeof AdminRouteRoute
-    }
-    '/setup/pending': {
-      id: '/setup/pending'
-      path: '/pending'
-      fullPath: '/setup/pending'
-      preLoaderRoute: typeof SetupPendingRouteImport
-      parentRoute: typeof SetupRouteRoute
-    }
-    '/rueckmeldung/$displayId': {
-      id: '/rueckmeldung/$displayId'
-      path: '/rueckmeldung/$displayId'
-      fullPath: '/rueckmeldung/$displayId'
-      preLoaderRoute: typeof RueckmeldungDisplayIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/display/$displayId': {
-      id: '/display/$displayId'
-      path: '/display/$displayId'
-      fullPath: '/display/$displayId'
-      preLoaderRoute: typeof DisplayDisplayIdRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/login': {
-      id: '/admin/login'
-      path: '/login'
-      fullPath: '/admin/login'
-      preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRouteRoute
     }
     '/admin/displays': {
@@ -605,67 +570,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDisplaysRouteRouteImport
       parentRoute: typeof AdminRouteRoute
     }
-    '/admin/surveys/': {
-      id: '/admin/surveys/'
-      path: '/surveys'
-      fullPath: '/admin/surveys/'
-      preLoaderRoute: typeof AdminSurveysIndexRouteImport
+    '/admin/login': {
+      id: '/admin/login'
+      path: '/login'
+      fullPath: '/admin/login'
+      preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRouteRoute
+    }
+    '/display/$displayId': {
+      id: '/display/$displayId'
+      path: '/display/$displayId'
+      fullPath: '/display/$displayId'
+      preLoaderRoute: typeof DisplayDisplayIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/rueckmeldung/$displayId': {
+      id: '/rueckmeldung/$displayId'
+      path: '/rueckmeldung/$displayId'
+      fullPath: '/rueckmeldung/$displayId'
+      preLoaderRoute: typeof RueckmeldungDisplayIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/setup/': {
+      id: '/setup/'
+      path: '/'
+      fullPath: '/setup/'
+      preLoaderRoute: typeof SetupIndexRouteImport
+      parentRoute: typeof SetupRouteRoute
+    }
+    '/setup/pending': {
+      id: '/setup/pending'
+      path: '/pending'
+      fullPath: '/setup/pending'
+      preLoaderRoute: typeof SetupPendingRouteImport
+      parentRoute: typeof SetupRouteRoute
     }
     '/admin/displays/': {
       id: '/admin/displays/'
       path: '/'
       fullPath: '/admin/displays/'
       preLoaderRoute: typeof AdminDisplaysIndexRouteImport
-      parentRoute: typeof AdminDisplaysRouteRoute
-    }
-    '/api/warnings/current': {
-      id: '/api/warnings/current'
-      path: '/api/warnings/current'
-      fullPath: '/api/warnings/current'
-      preLoaderRoute: typeof ApiWarningsCurrentRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/surveys/submissions': {
-      id: '/api/surveys/submissions'
-      path: '/api/surveys/submissions'
-      fullPath: '/api/surveys/submissions'
-      preLoaderRoute: typeof ApiSurveysSubmissionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/substitution/plans': {
-      id: '/api/substitution/plans'
-      path: '/api/substitution/plans'
-      fullPath: '/api/substitution/plans'
-      preLoaderRoute: typeof ApiSubstitutionPlansRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/displays/session': {
-      id: '/api/displays/session'
-      path: '/api/displays/session'
-      fullPath: '/api/displays/session'
-      preLoaderRoute: typeof ApiDisplaysSessionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/calendar/events': {
-      id: '/api/calendar/events'
-      path: '/api/calendar/events'
-      fullPath: '/api/calendar/events'
-      preLoaderRoute: typeof ApiCalendarEventsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/surveys': {
-      id: '/api/admin/surveys'
-      path: '/api/admin/surveys'
-      fullPath: '/api/admin/surveys'
-      preLoaderRoute: typeof ApiAdminSurveysRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/admin/displays/pending': {
-      id: '/admin/displays/pending'
-      path: '/pending'
-      fullPath: '/admin/displays/pending'
-      preLoaderRoute: typeof AdminDisplaysPendingRouteImport
       parentRoute: typeof AdminDisplaysRouteRoute
     }
     '/admin/displays/$displayId': {
@@ -675,6 +619,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminDisplaysDisplayIdRouteImport
       parentRoute: typeof AdminDisplaysRouteRoute
     }
+    '/admin/displays/pending': {
+      id: '/admin/displays/pending'
+      path: '/pending'
+      fullPath: '/admin/displays/pending'
+      preLoaderRoute: typeof AdminDisplaysPendingRouteImport
+      parentRoute: typeof AdminDisplaysRouteRoute
+    }
+    '/admin/surveys/': {
+      id: '/admin/surveys/'
+      path: '/surveys'
+      fullPath: '/admin/surveys/'
+      preLoaderRoute: typeof AdminSurveysIndexRouteImport
+      parentRoute: typeof AdminRouteRoute
+    }
     '/api/admin/displays': {
       id: '/api/admin/displays'
       path: '/api/admin/displays'
@@ -682,74 +640,46 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminDisplaysRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/displays/enrollments/': {
-      id: '/api/displays/enrollments/'
-      path: '/api/displays/enrollments'
-      fullPath: '/api/displays/enrollments/'
-      preLoaderRoute: typeof ApiDisplaysEnrollmentsIndexRouteImport
+    '/api/admin/surveys': {
+      id: '/api/admin/surveys'
+      path: '/api/admin/surveys'
+      fullPath: '/api/admin/surveys'
+      preLoaderRoute: typeof ApiAdminSurveysRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/transport/stops/nearby': {
-      id: '/api/transport/stops/nearby'
-      path: '/api/transport/stops/nearby'
-      fullPath: '/api/transport/stops/nearby'
-      preLoaderRoute: typeof ApiTransportStopsNearbyRouteImport
+    '/api/calendar/events': {
+      id: '/api/calendar/events'
+      path: '/api/calendar/events'
+      fullPath: '/api/calendar/events'
+      preLoaderRoute: typeof ApiCalendarEventsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/surveys/displays/$displayId': {
-      id: '/api/surveys/displays/$displayId'
-      path: '/api/surveys/displays/$displayId'
-      fullPath: '/api/surveys/displays/$displayId'
-      preLoaderRoute: typeof ApiSurveysDisplaysDisplayIdRouteImport
+    '/api/displays/session': {
+      id: '/api/displays/session'
+      path: '/api/displays/session'
+      fullPath: '/api/displays/session'
+      preLoaderRoute: typeof ApiDisplaysSessionRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/displays/enrollments/$requestId': {
-      id: '/api/displays/enrollments/$requestId'
-      path: '/api/displays/enrollments/$requestId'
-      fullPath: '/api/displays/enrollments/$requestId'
-      preLoaderRoute: typeof ApiDisplaysEnrollmentsRequestIdRouteImport
+    '/api/substitution/plans': {
+      id: '/api/substitution/plans'
+      path: '/api/substitution/plans'
+      fullPath: '/api/substitution/plans'
+      preLoaderRoute: typeof ApiSubstitutionPlansRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/admin/displays/enrollment-codes': {
-      id: '/api/admin/displays/enrollment-codes'
-      path: '/enrollment-codes'
-      fullPath: '/api/admin/displays/enrollment-codes'
-      preLoaderRoute: typeof ApiAdminDisplaysEnrollmentCodesRouteImport
-      parentRoute: typeof ApiAdminDisplaysRouteRoute
-    }
-    '/api/admin/displays/audit-logs': {
-      id: '/api/admin/displays/audit-logs'
-      path: '/audit-logs'
-      fullPath: '/api/admin/displays/audit-logs'
-      preLoaderRoute: typeof ApiAdminDisplaysAuditLogsRouteImport
-      parentRoute: typeof ApiAdminDisplaysRouteRoute
-    }
-    '/api/admin/auth/me': {
-      id: '/api/admin/auth/me'
-      path: '/api/admin/auth/me'
-      fullPath: '/api/admin/auth/me'
-      preLoaderRoute: typeof ApiAdminAuthMeRouteImport
+    '/api/surveys/submissions': {
+      id: '/api/surveys/submissions'
+      path: '/api/surveys/submissions'
+      fullPath: '/api/surveys/submissions'
+      preLoaderRoute: typeof ApiSurveysSubmissionsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/admin/auth/logout': {
-      id: '/api/admin/auth/logout'
-      path: '/api/admin/auth/logout'
-      fullPath: '/api/admin/auth/logout'
-      preLoaderRoute: typeof ApiAdminAuthLogoutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/auth/login': {
-      id: '/api/admin/auth/login'
-      path: '/api/admin/auth/login'
-      fullPath: '/api/admin/auth/login'
-      preLoaderRoute: typeof ApiAdminAuthLoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/admin/auth/csrf': {
-      id: '/api/admin/auth/csrf'
-      path: '/api/admin/auth/csrf'
-      fullPath: '/api/admin/auth/csrf'
-      preLoaderRoute: typeof ApiAdminAuthCsrfRouteImport
+    '/api/warnings/current': {
+      id: '/api/warnings/current'
+      path: '/api/warnings/current'
+      fullPath: '/api/warnings/current'
+      preLoaderRoute: typeof ApiWarningsCurrentRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin/auth/credentials': {
@@ -759,12 +689,33 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminAuthCredentialsRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/admin/displays/enrollments': {
-      id: '/api/admin/displays/enrollments'
-      path: '/enrollments'
-      fullPath: '/api/admin/displays/enrollments'
-      preLoaderRoute: typeof ApiAdminDisplaysEnrollmentsRouteRouteImport
-      parentRoute: typeof ApiAdminDisplaysRouteRoute
+    '/api/admin/auth/csrf': {
+      id: '/api/admin/auth/csrf'
+      path: '/api/admin/auth/csrf'
+      fullPath: '/api/admin/auth/csrf'
+      preLoaderRoute: typeof ApiAdminAuthCsrfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/auth/login': {
+      id: '/api/admin/auth/login'
+      path: '/api/admin/auth/login'
+      fullPath: '/api/admin/auth/login'
+      preLoaderRoute: typeof ApiAdminAuthLoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/auth/logout': {
+      id: '/api/admin/auth/logout'
+      path: '/api/admin/auth/logout'
+      fullPath: '/api/admin/auth/logout'
+      preLoaderRoute: typeof ApiAdminAuthLogoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/admin/auth/me': {
+      id: '/api/admin/auth/me'
+      path: '/api/admin/auth/me'
+      fullPath: '/api/admin/auth/me'
+      preLoaderRoute: typeof ApiAdminAuthMeRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/admin/displays/$displayId': {
       id: '/api/admin/displays/$displayId'
@@ -773,11 +724,53 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminDisplaysDisplayIdRouteRouteImport
       parentRoute: typeof ApiAdminDisplaysRouteRoute
     }
-    '/api/transport/stops/$stopId/departures': {
-      id: '/api/transport/stops/$stopId/departures'
-      path: '/api/transport/stops/$stopId/departures'
-      fullPath: '/api/transport/stops/$stopId/departures'
-      preLoaderRoute: typeof ApiTransportStopsStopIdDeparturesRouteImport
+    '/api/admin/displays/audit-logs': {
+      id: '/api/admin/displays/audit-logs'
+      path: '/audit-logs'
+      fullPath: '/api/admin/displays/audit-logs'
+      preLoaderRoute: typeof ApiAdminDisplaysAuditLogsRouteImport
+      parentRoute: typeof ApiAdminDisplaysRouteRoute
+    }
+    '/api/admin/displays/enrollment-codes': {
+      id: '/api/admin/displays/enrollment-codes'
+      path: '/enrollment-codes'
+      fullPath: '/api/admin/displays/enrollment-codes'
+      preLoaderRoute: typeof ApiAdminDisplaysEnrollmentCodesRouteImport
+      parentRoute: typeof ApiAdminDisplaysRouteRoute
+    }
+    '/api/admin/displays/enrollments': {
+      id: '/api/admin/displays/enrollments'
+      path: '/enrollments'
+      fullPath: '/api/admin/displays/enrollments'
+      preLoaderRoute: typeof ApiAdminDisplaysEnrollmentsRouteRouteImport
+      parentRoute: typeof ApiAdminDisplaysRouteRoute
+    }
+    '/api/displays/enrollments/': {
+      id: '/api/displays/enrollments/'
+      path: '/api/displays/enrollments'
+      fullPath: '/api/displays/enrollments/'
+      preLoaderRoute: typeof ApiDisplaysEnrollmentsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/displays/enrollments/$requestId': {
+      id: '/api/displays/enrollments/$requestId'
+      path: '/api/displays/enrollments/$requestId'
+      fullPath: '/api/displays/enrollments/$requestId'
+      preLoaderRoute: typeof ApiDisplaysEnrollmentsRequestIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/surveys/displays/$displayId': {
+      id: '/api/surveys/displays/$displayId'
+      path: '/api/surveys/displays/$displayId'
+      fullPath: '/api/surveys/displays/$displayId'
+      preLoaderRoute: typeof ApiSurveysDisplaysDisplayIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/api/transport/stops/nearby': {
+      id: '/api/transport/stops/nearby'
+      path: '/api/transport/stops/nearby'
+      fullPath: '/api/transport/stops/nearby'
+      preLoaderRoute: typeof ApiTransportStopsNearbyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/admin/displays/$displayId/revoke-session': {
@@ -787,18 +780,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAdminDisplaysDisplayIdRevokeSessionRouteImport
       parentRoute: typeof ApiAdminDisplaysDisplayIdRouteRoute
     }
-    '/api/admin/displays/enrollments/$requestId/reject': {
-      id: '/api/admin/displays/enrollments/$requestId/reject'
-      path: '/$requestId/reject'
-      fullPath: '/api/admin/displays/enrollments/$requestId/reject'
-      preLoaderRoute: typeof ApiAdminDisplaysEnrollmentsRequestIdRejectRouteImport
-      parentRoute: typeof ApiAdminDisplaysEnrollmentsRouteRoute
+    '/api/transport/stops/$stopId/departures': {
+      id: '/api/transport/stops/$stopId/departures'
+      path: '/api/transport/stops/$stopId/departures'
+      fullPath: '/api/transport/stops/$stopId/departures'
+      preLoaderRoute: typeof ApiTransportStopsStopIdDeparturesRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/api/admin/displays/enrollments/$requestId/approve': {
       id: '/api/admin/displays/enrollments/$requestId/approve'
       path: '/$requestId/approve'
       fullPath: '/api/admin/displays/enrollments/$requestId/approve'
       preLoaderRoute: typeof ApiAdminDisplaysEnrollmentsRequestIdApproveRouteImport
+      parentRoute: typeof ApiAdminDisplaysEnrollmentsRouteRoute
+    }
+    '/api/admin/displays/enrollments/$requestId/reject': {
+      id: '/api/admin/displays/enrollments/$requestId/reject'
+      path: '/$requestId/reject'
+      fullPath: '/api/admin/displays/enrollments/$requestId/reject'
+      preLoaderRoute: typeof ApiAdminDisplaysEnrollmentsRequestIdRejectRouteImport
       parentRoute: typeof ApiAdminDisplaysEnrollmentsRouteRoute
     }
   }

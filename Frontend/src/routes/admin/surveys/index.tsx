@@ -14,7 +14,7 @@ const CATEGORY_OPTIONS: Array<{ value: SurveyCategory; label: string }> = [
   { value: "ALLGEMEINES_FEEDBACK", label: "Allgemeines Feedback" },
 ];
 
-export const Route = createFileRoute("/admin/surveys/" as never)({
+export const Route = createFileRoute("/admin/surveys/")({
   beforeLoad: async () => {
     if (typeof window === "undefined") {
       return;

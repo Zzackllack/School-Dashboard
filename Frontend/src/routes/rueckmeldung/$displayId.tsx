@@ -14,7 +14,7 @@ const CATEGORY_OPTIONS: Array<{ value: SurveyCategory; label: string }> = [
   { value: "ALLGEMEINES_FEEDBACK", label: "Allgemeines Feedback" },
 ];
 
-export const Route = createFileRoute("/rueckmeldung/$displayId" as never)({
+export const Route = createFileRoute("/rueckmeldung/$displayId")({
   component: SurveyFeedbackPage,
 });
 
