@@ -40,14 +40,7 @@ const GRADE_COLUMNS = [
 // ─── Helpers ─────────────────────────────────────────────────────────────────────
 
 type BadgeVariant =
-  | "red"
-  | "amber"
-  | "blue"
-  | "cyan"
-  | "green"
-  | "indigo"
-  | "purple"
-  | "gray";
+  "red" | "amber" | "blue" | "cyan" | "green" | "indigo" | "purple" | "gray";
 
 const BADGE_CLS: Record<BadgeVariant, string> = {
   red: "bg-red-600 text-white",

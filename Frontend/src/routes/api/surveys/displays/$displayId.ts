@@ -1,9 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { createProxyGetHandler } from "#/lib/proxy/proxy-get-handler";
 
-export const Route = createFileRoute(
-  "/api/surveys/displays/$displayId",
-)({
+export const Route = createFileRoute("/api/surveys/displays/$displayId")({
   server: {
     handlers: {
       GET: ({ request, params }) =>

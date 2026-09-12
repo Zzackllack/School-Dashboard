@@ -244,9 +244,7 @@ export function AdminDisplayDetailPage() {
                 setFormState((current) => ({
                   ...current,
                   status: event.target.value as
-                    | "ACTIVE"
-                    | "INACTIVE"
-                    | "REVOKED",
+                    "ACTIVE" | "INACTIVE" | "REVOKED",
                 }))
               }
             >

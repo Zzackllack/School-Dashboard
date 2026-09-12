@@ -1,23 +1,23 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { proxyTransportRestGetRequest } from "#/lib/proxy/transport-rest-proxy";
 
-export const Route = createFileRoute(
-  "/api/transport/stops/$stopId/departures",
-)({
-  server: {
-    handlers: {
-      GET: ({
-        request,
-        params,
-      }: {
-        request: Request;
-        params: { stopId: string };
-      }) =>
-        proxyTransportRestGetRequest(
-          `/stops/${encodeURIComponent(params.stopId)}/departures`,
+export const Route = createFileRoute("/api/transport/stops/$stopId/departures")(
+  {
+    server: {
+      handlers: {
+        GET: ({
           request,
-          "transport-stop-departures",
-        ),
+          params,
+        }: {
+          request: Request;
+          params: { stopId: string };
+        }) =>
+          proxyTransportRestGetRequest(
+            `/stops/${encodeURIComponent(params.stopId)}/departures`,
+            request,
+            "transport-stop-departures",
+          ),
+      },
     },
   },
-});
+);
