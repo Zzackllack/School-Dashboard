@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { proxyTransportRestGetRequest } from "#/lib/proxy/transport-rest-proxy";
 
-export const Route = createFileRoute("/api/transport/stops/nearby" as never)({
+export const Route = createFileRoute("/api/transport/stops/nearby")({
   server: {
     handlers: {
       GET: ({ request }) =>
