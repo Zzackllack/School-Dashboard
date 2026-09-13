@@ -6,7 +6,7 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>4.1.0</version>
+        <version>4.1.1</version>
         <relativePath />
     </parent>
     <groupId>com.schooldashboard</groupId>
@@ -95,6 +95,12 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-classic</artifactId>
+        </dependency>
+
+        <!-- Boot's classic auto-configuration includes gRPC security hooks. -->
+        <dependency>
+            <groupId>org.springframework.grpc</groupId>
+            <artifactId>spring-grpc-core</artifactId>
         </dependency>
 
         <dependency>
