@@ -17,8 +17,16 @@ import com.schooldashboard.display.dto.CreateEnrollmentCodeRequest;
 import com.schooldashboard.display.dto.CreateEnrollmentRequest;
 import com.schooldashboard.display.dto.DeviceInfoDto;
 import com.schooldashboard.display.dto.RejectEnrollmentRequest;
+import com.schooldashboard.display.repository.DisplayEnrollmentCodeRepository;
+import com.schooldashboard.display.repository.DisplayEnrollmentRequestRepository;
+import com.schooldashboard.display.repository.DisplayRepository;
+import com.schooldashboard.display.repository.DisplaySessionRepository;
 import com.schooldashboard.security.auth.dto.AdminLoginRequest;
+import com.schooldashboard.survey.repository.SurveySubmissionRepository;
+import com.schooldashboard.support.DisplayFixtureCleaner;
 import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,6 +48,43 @@ public class DisplayEnrollmentFlowIntegrationTest {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Autowired
+	private SurveySubmissionRepository surveySubmissionRepository;
+
+	@Autowired
+	private DisplayEnrollmentRequestRepository enrollmentRequestRepository;
+
+	@Autowired
+	private DisplaySessionRepository displaySessionRepository;
+
+	@Autowired
+	private DisplayEnrollmentCodeRepository enrollmentCodeRepository;
+
+	@Autowired
+	private DisplayRepository displayRepository;
+
+	/**
+	 * Approving an enrollment leaves a {@code display_enrollment_request} row
+	 * pointing at the display it created. Nothing deletes it, so any later test
+	 * that clears the display table dies on
+	 * {@code fk_display_enrollment_request_display}. Without this, the suite only
+	 * passes because no test happened to run after this one in a given order.
+	 */
+	@AfterEach
+	public void tearDown() {
+		clearDisplayFixtures();
+	}
+
+	@BeforeEach
+	public void setUp() {
+		clearDisplayFixtures();
+	}
+
+	private void clearDisplayFixtures() {
+		new DisplayFixtureCleaner(surveySubmissionRepository, enrollmentRequestRepository, displaySessionRepository,
+				enrollmentCodeRepository, displayRepository).clearAll();
+	}
 
 	@Test
 	public void enrollApproveValidateAndRevokeFlowWorks() throws Exception {
