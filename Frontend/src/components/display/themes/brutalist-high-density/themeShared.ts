@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useEffect, useMemo } from "react";
+import { useMemo } from "react";
 import { fetchJson } from "#/lib/api/http";
 import { TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS } from "#/lib/transport";
 
@@ -199,12 +199,20 @@ export function useTransport() {
     queryFn: async () => {
       const url = buildNearbyStopsUrl(SCHOOL_LAT, SCHOOL_LNG);
       console.info("[transport] fetching nearby stops", { url });
-      const stops = await fetchJson<BvgStop[]>(url);
-      console.info("[transport] nearby stops loaded", {
-        url,
-        count: stops?.length ?? 0,
-      });
-      return stops ?? [];
+      try {
+        const stops = await fetchJson<BvgStop[]>(url);
+        console.info("[transport] nearby stops loaded", {
+          url,
+          count: stops?.length ?? 0,
+        });
+        return stops ?? [];
+      } catch (error) {
+        // Logged here rather than from an effect: this used to be a separate
+        // effect that only existed to observe the error, and it re-ran on every
+        // nearby refetch.
+        console.error("[transport] nearby stops failed", { url, error });
+        throw error;
+      }
     },
     refetchInterval: 30 * 60 * 1_000,
   });
@@ -212,14 +220,26 @@ export function useTransport() {
   // Derived from the nearby query instead of mirrored into state by an effect.
   // The effect version also could not clear itself, so a stop that went away
   // left the previous one selected until some later fetch replaced it.
-  const { busStop, sBahnStop } = useMemo(
-    () => resolveTransportStops(nearby ?? []),
-    [nearby],
-  );
+  const { busStop, sBahnStop } = useMemo(() => {
+    const resolved = resolveTransportStops(nearby ?? []);
+    if (nearby?.length) {
+      console.info("[transport] resolved nearest stops", {
+        busStopId: resolved.busStop?.id ?? null,
+        busStopName: resolved.busStop?.name ?? null,
+        sBahnStopId: resolved.sBahnStop?.id ?? null,
+        sBahnStopName: resolved.sBahnStop?.name ?? null,
+      });
+    }
+    return resolved;
+  }, [nearby]);
 
+  // `isLoading` (isPending && isFetching), not `isPending`: a query disabled via
+  // `enabled` with no stop to resolve stays pending forever, so `isPending`
+  // latched the module into its loading branch whenever no stop was found, and
+  // swallowed the nearby-stops error that branch is supposed to fall through to.
   const {
     data: busDeparturesResponse,
-    isPending: isBusPending,
+    isLoading: isBusLoading,
     isError: isBusError,
   } = useQuery<{ departures?: BvgDeparture[] }>({
     queryKey: ["bvg-departures-bus", busStop?.id],
@@ -246,7 +266,7 @@ export function useTransport() {
 
   const {
     data: sBahnDeparturesResponse,
-    isPending: isSBahnPending,
+    isLoading: isSBahnLoading,
     isError: isSBahnError,
   } = useQuery<{ departures?: BvgDeparture[] }>({
     queryKey: ["bvg-departures-sbahn", sBahnStop?.id],
@@ -288,24 +308,8 @@ export function useTransport() {
     ? "Abfahrten konnten nicht aktualisiert werden (suburban)."
     : null;
 
-  const isBusLoading = isBusPending;
-  const isSBahnLoading = isSBahnPending;
-
-  useEffect(() => {
-    if (nearbyStopsError) {
-      console.error("[transport] nearby stops failed", nearbyStopsError);
-    }
-    if (nearbyStopsError || !nearby?.length) {
-      return;
-    }
-    console.info("[transport] resolved nearest stops", {
-      busStopId: busStop?.id ?? null,
-      busStopName: busStop?.name ?? null,
-      sBahnStopId: sBahnStop?.id ?? null,
-      sBahnStopName: sBahnStop?.name ?? null,
-    });
-  }, [nearby, nearbyStopsError, busStop, sBahnStop]);
-
+  // Side effect of using isLoading: a background refetch no longer flips the
+  // loading indicator, which the old setInterval version did.
   const bus: TransportStreamState = {
     stopName: busStop?.name ?? "",
     departures: busDepartures,
