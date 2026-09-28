@@ -83,7 +83,7 @@ jobs:
 
       - name: Lint backend Dockerfile
         if: needs.changes.outputs.backend == 'true'
-        uses: hadolint/hadolint-action@v3.3.0
+        uses: hadolint/hadolint-action@v3.5.0
         with:
           dockerfile: Docker/backend.Dockerfile
 
@@ -151,7 +151,7 @@ jobs:
 
       - name: Lint frontend Dockerfile
         if: needs.changes.outputs.frontend == 'true'
-        uses: hadolint/hadolint-action@v3.3.0
+        uses: hadolint/hadolint-action@v3.5.0
         with:
           dockerfile: Docker/frontend.Dockerfile
 
