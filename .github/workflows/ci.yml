@@ -12,14 +12,17 @@ on:
       - ".github/workflows/ci.yml"
 
 jobs:
+  # No actor check. This used to skip dependabot[bot], which meant the two jobs
+  # gated on it never ran for a single dependency PR -- the exact PRs most likely
+  # to break a build. TypeScript 7 (typescript-eslint hard-fails on it) and Vitest 5
+  # (relative-URL fetch) both shipped through as unmergeable PRs because of it.
+  #
+  # Kept as a separate job rather than dropping the `if:` into `backend`/`frontend`
+  # because the Playwright download in `frontend` is the expensive part, and a
+  # lockfile mismatch should not have to wait behind it.
   changes:
     name: Detect changed areas
     runs-on: ubuntu-latest
-    # Skipped for dependabot[bot] so the expensive backend/frontend suites do not
-    # run on every dependency PR. The cost is that those suites never run for
-    # dependabot at all -- see the `lockfile` job below for the one check that
-    # must not be skipped along with them.
-    if: github.event.pull_request.user.login != 'dependabot[bot]'
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
       frontend: ${{ steps.filter.outputs.frontend }}
@@ -43,9 +46,9 @@ jobs:
               - '.github/workflows/ci.yml'
 
   # Cheapest possible signal, and the only one that catches a lockfile left out
-  # of sync with a manifest. Deliberately not gated on the `changes` job: that
-  # job is skipped for dependabot[bot], so gating here would skip the check
-  # that dependency PRs most need to pass.
+  # of sync with a manifest. Not gated on `changes`, so a pull request that
+  # touches only a manifest still gets checked -- which is the shape a Dependabot
+  # PR has when its job is misconfigured, and used to be invisible here.
   #
   # Kept separate from `frontend` so it stays fast -- no lint, no typecheck, no
   # browser download -- and so a stale lockfile reports as its own failure
