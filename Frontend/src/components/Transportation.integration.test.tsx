@@ -176,6 +176,21 @@ describe("transportation panel data states", () => {
     expect(screen.getByText("No S-Bahn stations found nearby.")).toBeDefined();
   });
 
+  it("does not announce a missing S-Bahn stop before the nearby list arrives", async () => {
+    // nearbyStops is [] until the query resolves, so an ungated
+    // missingSBahnStopMessage claims there is no S-Bahn station on the very
+    // first render, before any request has gone out.
+    vi.mocked(fetchJson).mockImplementation(
+      () => new Promise(() => {}), // never settles
+    );
+
+    renderPanel();
+
+    // One per table, hence findAllByText.
+    expect((await screen.findAllByText("Lade Abfahrten...")).length).toBe(2);
+    expect(screen.queryByText("No S-Bahn stations found nearby.")).toBeNull();
+  });
+
   it("shows a dash instead of a running clock before the first successful fetch", async () => {
     vi.mocked(fetchJson).mockResolvedValue([]);
 
@@ -185,5 +200,26 @@ describe("transportation panel data states", () => {
     // re-rendered a live "last updated" timestamp on every pass.
     expect(await screen.findByText(/Zuletzt aktualisiert:/)).toBeDefined();
     expect(screen.getByText(/Zuletzt aktualisiert: –/)).toBeDefined();
+  });
+
+  it("reports a real last-updated time when only the S-Bahn query has data", async () => {
+    // The nearby list leads with the S-Bahn stop, so it is also the selected bus
+    // stop: the bus query runs and fails, leaving its dataUpdatedAt at 0.
+    // dataUpdatedAt is 0 rather than undefined before a fetch, so the old
+    // `departuresUpdatedAt ?? sBahnUpdatedAt` never reached the S-Bahn value and
+    // the footer sat on a dash despite having a timestamp to report.
+    vi.mocked(fetchJson).mockImplementation(async (url: string) => {
+      if (url.includes("/nearby")) return [S_BAHN_STOP];
+      if (url.includes("suburban=true"))
+        return { departures: [departureIn(4, "suburban")] };
+      throw new Error("bus endpoint 500");
+    });
+
+    renderPanel();
+
+    expect(await screen.findByText("S 25")).toBeDefined();
+    await waitFor(() => {
+      expect(screen.queryByText(/Zuletzt aktualisiert: –/)).toBeNull();
+    });
   });
 });

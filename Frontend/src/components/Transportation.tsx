@@ -109,9 +109,14 @@ const Transportation = () => {
   // Also derived: this used to be written into sBahnError by the same effect,
   // which meant it replaced genuine departure-fetch failures. Departure errors
   // now take precedence over it.
-  const missingSBahnStopMessage = currentSBahnStop
-    ? null
-    : "No S-Bahn stations found nearby.";
+  //
+  // Gated on the nearby query having settled: on the first render `nearbyStops`
+  // is still the empty default, so an ungated version announced that no S-Bahn
+  // stations exist before a single request had gone out.
+  const missingSBahnStopMessage =
+    currentSBahnStop || isLoadingStops || nearbyStopsError
+      ? null
+      : "No S-Bahn stations found nearby.";
 
   const {
     data: departuresResponse,
@@ -186,7 +191,11 @@ const Transportation = () => {
   // Renders a dash until something has actually been fetched. Falling back to
   // `new Date()` produced a new timestamp on every render, so the footer showed
   // a running clock while claiming to be a "last updated" stamp.
-  const lastUpdatedTimestamp = departuresUpdatedAt ?? sBahnUpdatedAt;
+  //
+  // `dataUpdatedAt` is 0 rather than undefined before the first fetch, so a `??`
+  // here never reached the S-Bahn timestamp; it just handed back 0. Math.max
+  // picks the more recent of the two and still yields 0 when neither has data.
+  const lastUpdatedTimestamp = Math.max(departuresUpdatedAt, sBahnUpdatedAt);
   const lastUpdatedText = lastUpdatedTimestamp
     ? new Date(lastUpdatedTimestamp).toLocaleTimeString(
         "de-DE",
@@ -235,7 +244,6 @@ const Transportation = () => {
         <div className="w-full mb-4">
           <h3 className="text-lg font-semibold text-[#3E3128] mb-2">{title}</h3>
           <div className="p-4 text-center">
-            <p>Lade Abfahrten...</p>
             <p>Lade Abfahrten...</p>
           </div>
         </div>
@@ -370,7 +378,7 @@ const Transportation = () => {
         {renderDepartureTable(
           departures,
           currentStop,
-          isLoadingDepartures,
+          isLoadingStops || isLoadingDepartures,
           departuresErrorMessage ?? nearbyStopsErrorMessage,
           "Nächster Bahnhof",
         )}
@@ -379,7 +387,7 @@ const Transportation = () => {
         {renderDepartureTable(
           sBahnDepartures,
           currentSBahnStop,
-          isLoadingSBahnDepartures,
+          isLoadingStops || isLoadingSBahnDepartures,
           sBahnErrorMessage ?? missingSBahnStopMessage,
           "S-Bahn Station",
         )}
