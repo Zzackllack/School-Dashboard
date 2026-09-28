@@ -127,52 +127,61 @@ const nearbyStopsFixture = [
 
 // Departure times are relative to now on purpose: the transport modules filter
 // out anything in the past, so a hard-coded date silently turns these fixtures
-// into an empty-departures test the moment it goes by.
-const busDepartureWhen = new Date(Date.now() + 2 * 60_000).toISOString();
-const sBahnDepartureWhen = new Date(Date.now() + 4 * 60_000).toISOString();
+// into an empty-departures test the moment it goes by. These are factories
+// rather than constants so the offset is counted from the moment the response is
+// actually served -- a module-level `Date.now()` drifts by however long
+// Playwright takes to reach the route handler, and the 2-minute bus fixture
+// would quietly expire on a slow or retried run.
+const busDeparturesFixture = () => {
+  const when = new Date(Date.now() + 2 * 60_000).toISOString();
 
-const busDeparturesFixture = {
-  departures: [
-    {
-      tripId: "trip-bus-1",
-      direction: "U Dahlem-Dorf",
-      line: {
-        type: "line",
-        id: "line-m11",
-        name: "M11",
-        mode: "bus",
-        product: "bus",
+  return {
+    departures: [
+      {
+        tripId: "trip-bus-1",
+        direction: "U Dahlem-Dorf",
+        line: {
+          type: "line",
+          id: "line-m11",
+          name: "M11",
+          mode: "bus",
+          product: "bus",
+        },
+        when,
+        plannedWhen: when,
+        delay: null,
+        platform: null,
+        plannedPlatform: null,
+        stop: nearbyStopsFixture[0],
       },
-      when: busDepartureWhen,
-      plannedWhen: busDepartureWhen,
-      delay: null,
-      platform: null,
-      plannedPlatform: null,
-      stop: nearbyStopsFixture[0],
-    },
-  ],
+    ],
+  };
 };
 
-const sBahnDeparturesFixture = {
-  departures: [
-    {
-      tripId: "trip-sbahn-1",
-      direction: "S Südkreuz",
-      line: {
-        type: "line",
-        id: "line-s1",
-        name: "S1",
-        mode: "train",
-        product: "suburban",
+const sBahnDeparturesFixture = () => {
+  const when = new Date(Date.now() + 4 * 60_000).toISOString();
+
+  return {
+    departures: [
+      {
+        tripId: "trip-sbahn-1",
+        direction: "S Südkreuz",
+        line: {
+          type: "line",
+          id: "line-s1",
+          name: "S1",
+          mode: "train",
+          product: "suburban",
+        },
+        when,
+        plannedWhen: when,
+        delay: 120,
+        platform: "1",
+        plannedPlatform: "1",
+        stop: nearbyStopsFixture[0],
       },
-      when: sBahnDepartureWhen,
-      plannedWhen: sBahnDepartureWhen,
-      delay: 120,
-      platform: "1",
-      plannedPlatform: "1",
-      stop: nearbyStopsFixture[0],
-    },
-  ],
+    ],
+  };
 };
 
 async function startMockBackend(
@@ -254,7 +263,7 @@ test.beforeEach(async ({ page }) => {
       status: 200,
       contentType: "application/json",
       body: JSON.stringify(
-        isSBahnStop ? sBahnDeparturesFixture : busDeparturesFixture,
+        isSBahnStop ? sBahnDeparturesFixture() : busDeparturesFixture(),
       ),
     });
   });
