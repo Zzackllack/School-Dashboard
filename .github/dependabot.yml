@@ -1,20 +1,39 @@
 version: 2
 updates:
+  # Must stay at the workspace root, not /Frontend.
+  #
+  # pnpm-lock.yaml and pnpm-workspace.yaml both live in the repository root, and
+  # Dependabot cannot regenerate a lockfile it did not fetch from the job
+  # directory. Pointing this at /Frontend made every frontend dependency PR
+  # arrive touching Frontend/package.json only, so `pnpm install
+  # --frozen-lockfile` failed on all of them and Dependabot silently never ran
+  # the pnpm lockfile updater.
+  #
+  # Dependabot itself flags this layout as unsupported
+  # (dependabot-core: "Updating workspaces from inside a workspace subdirectory
+  # is not supported ... Dependabot should only update from the root
+  # workspace"), but the check only fires when a PR ends up lockfile-only. With
+  # a package.json edit alongside it, the misconfiguration is swallowed and the
+  # PR just looks like a normal update.
+  #
+  # From "/" Dependabot reads pnpm-workspace.yaml, picks up Frontend as a
+  # workspace member, and owns the shared root lockfile. The root package.json
+  # (concurrently) becomes managed here too, which it previously was not.
   - package-ecosystem: "npm"
-    directory: "/Frontend"
+    directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "07:00"
       timezone: "Europe/Berlin"
-    open-pull-requests-limit: 5
+    open-pull-requests-limit: 10
     commit-message:
       prefix: "chore(deps)"
     labels:
       - "dependencies"
-      - "frontend"
+      - "javascript"
     groups:
-      frontend-minor-patch:
+      js-minor-patch:
         patterns:
           - "*"
         update-types:
