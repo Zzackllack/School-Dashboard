@@ -18,7 +18,10 @@ import com.schooldashboard.display.dto.CreateEnrollmentRequest;
 import com.schooldashboard.display.dto.DeviceInfoDto;
 import com.schooldashboard.display.dto.RejectEnrollmentRequest;
 import com.schooldashboard.security.auth.dto.AdminLoginRequest;
+import com.schooldashboard.support.DisplayFixtureCleaner;
 import java.util.Map;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -40,6 +43,26 @@ public class DisplayEnrollmentFlowIntegrationTest {
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	@Autowired
+	private DisplayFixtureCleaner displayFixtureCleaner;
+
+	/**
+	 * Approving an enrollment leaves a {@code display_enrollment_request} row
+	 * pointing at the display it created. Nothing deletes it, so any later test
+	 * that clears the display table dies on
+	 * {@code fk_display_enrollment_request_display}. Without this, the suite only
+	 * passes because no test happened to run after this one in a given order.
+	 */
+	@AfterEach
+	public void tearDown() {
+		displayFixtureCleaner.clearAll();
+	}
+
+	@BeforeEach
+	public void setUp() {
+		displayFixtureCleaner.clearAll();
+	}
 
 	@Test
 	public void enrollApproveValidateAndRevokeFlowWorks() throws Exception {

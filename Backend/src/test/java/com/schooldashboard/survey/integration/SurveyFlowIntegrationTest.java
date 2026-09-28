@@ -15,6 +15,7 @@ import com.schooldashboard.display.repository.DisplayRepository;
 import com.schooldashboard.security.auth.dto.AdminLoginRequest;
 import com.schooldashboard.survey.entity.SurveySubmissionEntity;
 import com.schooldashboard.survey.repository.SurveySubmissionRepository;
+import com.schooldashboard.support.DisplayFixtureCleaner;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,10 +48,15 @@ public class SurveyFlowIntegrationTest {
 	@Autowired
 	private SurveySubmissionRepository surveySubmissionRepository;
 
+	@Autowired
+	private DisplayFixtureCleaner displayFixtureCleaner;
+
 	@BeforeEach
 	public void setUp() {
-		surveySubmissionRepository.deleteAll();
-		displayRepository.deleteAll();
+		// Clears more than this class creates. Other @SpringBootTest classes share this
+		// database, and a plain displayRepository.deleteAll() fails on the foreign keys
+		// their rows left behind.
+		displayFixtureCleaner.clearAll();
 
 		DisplayEntity activeDisplay = new DisplayEntity("Haupteingang", "haupteingang", "Lobby", "main-profile");
 		activeDisplay.setSlug("haupteingang");

@@ -1,4 +1,5 @@
 // @vitest-environment jsdom
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   cleanup,
   fireEvent,
@@ -28,6 +29,19 @@ vi.mock("#/lib/api/surveys", () => ({
 
 const { SurveyFeedbackPage } = await import("./$displayId");
 
+// The route reads its display context through useQuery, so it needs the same
+// provider the router sets up in src/router.tsx.
+function renderPage() {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: 0 } },
+  });
+  return render(
+    <QueryClientProvider client={queryClient}>
+      <SurveyFeedbackPage />
+    </QueryClientProvider>,
+  );
+}
+
 describe("survey feedback route", () => {
   afterEach(() => {
     cleanup();
@@ -52,7 +66,7 @@ describe("survey feedback route", () => {
   });
 
   it("loads context and submits valid feedback", async () => {
-    render(<SurveyFeedbackPage />);
+    renderPage();
 
     await screen.findByText("Haupteingang");
 
@@ -90,7 +104,7 @@ describe("survey feedback route", () => {
   });
 
   it("shows a German validation message for an empty message", async () => {
-    render(<SurveyFeedbackPage />);
+    renderPage();
 
     await screen.findByText("Haupteingang");
 

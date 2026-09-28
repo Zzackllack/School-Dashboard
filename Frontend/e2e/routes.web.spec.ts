@@ -125,48 +125,63 @@ const nearbyStopsFixture = [
   },
 ];
 
-const busDeparturesFixture = {
-  departures: [
-    {
-      tripId: "trip-bus-1",
-      direction: "U Dahlem-Dorf",
-      line: {
-        type: "line",
-        id: "line-m11",
-        name: "M11",
-        mode: "bus",
-        product: "bus",
+// Departure times are relative to now on purpose: the transport modules filter
+// out anything in the past, so a hard-coded date silently turns these fixtures
+// into an empty-departures test the moment it goes by. These are factories
+// rather than constants so the offset is counted from the moment the response is
+// actually served -- a module-level `Date.now()` drifts by however long
+// Playwright takes to reach the route handler, and the 2-minute bus fixture
+// would quietly expire on a slow or retried run.
+const busDeparturesFixture = () => {
+  const when = new Date(Date.now() + 2 * 60_000).toISOString();
+
+  return {
+    departures: [
+      {
+        tripId: "trip-bus-1",
+        direction: "U Dahlem-Dorf",
+        line: {
+          type: "line",
+          id: "line-m11",
+          name: "M11",
+          mode: "bus",
+          product: "bus",
+        },
+        when,
+        plannedWhen: when,
+        delay: null,
+        platform: null,
+        plannedPlatform: null,
+        stop: nearbyStopsFixture[0],
       },
-      when: "2026-02-28T12:18:00+01:00",
-      plannedWhen: "2026-02-28T12:18:00+01:00",
-      delay: null,
-      platform: null,
-      plannedPlatform: null,
-      stop: nearbyStopsFixture[0],
-    },
-  ],
+    ],
+  };
 };
 
-const sBahnDeparturesFixture = {
-  departures: [
-    {
-      tripId: "trip-sbahn-1",
-      direction: "S Südkreuz",
-      line: {
-        type: "line",
-        id: "line-s1",
-        name: "S1",
-        mode: "train",
-        product: "suburban",
+const sBahnDeparturesFixture = () => {
+  const when = new Date(Date.now() + 4 * 60_000).toISOString();
+
+  return {
+    departures: [
+      {
+        tripId: "trip-sbahn-1",
+        direction: "S Südkreuz",
+        line: {
+          type: "line",
+          id: "line-s1",
+          name: "S1",
+          mode: "train",
+          product: "suburban",
+        },
+        when,
+        plannedWhen: when,
+        delay: 120,
+        platform: "1",
+        plannedPlatform: "1",
+        stop: nearbyStopsFixture[0],
       },
-      when: "2026-02-28T12:20:00+01:00",
-      plannedWhen: "2026-02-28T12:20:00+01:00",
-      delay: 120,
-      platform: "1",
-      plannedPlatform: "1",
-      stop: nearbyStopsFixture[0],
-    },
-  ],
+    ],
+  };
 };
 
 async function startMockBackend(
@@ -248,7 +263,7 @@ test.beforeEach(async ({ page }) => {
       status: 200,
       contentType: "application/json",
       body: JSON.stringify(
-        isSBahnStop ? sBahnDeparturesFixture : busDeparturesFixture,
+        isSBahnStop ? sBahnDeparturesFixture() : busDeparturesFixture(),
       ),
     });
   });
@@ -902,11 +917,13 @@ test("admin can switch display theme and display route keeps module parity", asy
   await expect(
     page.getByRole("heading", { name: "Öffentliche Verkehrsmittel" }),
   ).toBeVisible();
-  await expect(
-    page
-      .getByText("Keine Abfahrten verfügbar")
-      .or(page.getByRole("heading", { name: "Bus" })),
-  ).toBeVisible();
+  // The transport fetch path end to end: both fixtures are in the future, so
+  // both departures have to reach the screen. This used to accept either the
+  // empty state or a departure heading, which passed even when departures never
+  // rendered at all.
+  await expect(page.getByText("M11").first()).toBeVisible();
+  await expect(page.getByText("S1").first()).toBeVisible();
+  await expect(page.getByText("Keine Abfahrten verfügbar")).toHaveCount(0);
   await expect(
     page.getByRole("heading", { name: "Kommende Termine" }),
   ).toBeVisible();

@@ -1,5 +1,6 @@
 import { createFileRoute, useParams } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { useState } from "react";
 import type { FormEvent } from "react";
 import {
   createSurveySubmission,
@@ -20,53 +21,43 @@ export const Route = createFileRoute("/rueckmeldung/$displayId")({
 
 export function SurveyFeedbackPage() {
   const { displayId } = useParams({ strict: false }) as { displayId: string };
-  const [displayContext, setDisplayContext] =
-    useState<SurveyDisplayContextResponse | null>(null);
   const [category, setCategory] = useState<SurveyCategory | "">("");
   const [message, setMessage] = useState("");
   const [name, setName] = useState("");
   const [schoolClass, setSchoolClass] = useState("");
   const [contactAllowed, setContactAllowed] = useState(false);
-  const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [submitErrorMessage, setSubmitErrorMessage] = useState<string | null>(
+    null,
+  );
   const [validationMessage, setValidationMessage] = useState<string | null>(
     null,
   );
 
-  useEffect(() => {
-    let cancelled = false;
-    setIsLoading(true);
-    setErrorMessage(null);
+  // useQuery rather than an effect: the display context is server state, so it
+  // belongs in the query cache with the rest of the dashboard's fetches. It also
+  // keeps the load error separate from submit errors, which used to share one
+  // message slot and would surface a failed submit in the "display unavailable"
+  // banner.
+  const {
+    data: displayContext,
+    isLoading,
+    error: displayContextError,
+  } = useQuery<SurveyDisplayContextResponse>({
+    queryKey: ["survey-display-context", displayId],
+    queryFn: () => getSurveyDisplayContext(displayId),
+    // A display that does not exist will not start existing on a retry. The
+    // inherited default of 1 left a stale or mistyped QR link sitting on
+    // "Display wird geladen" for a second before it admits the display is gone.
+    retry: false,
+  });
 
-    async function loadDisplayContext() {
-      try {
-        const response = await getSurveyDisplayContext(displayId);
-        if (!cancelled) {
-          setDisplayContext(response);
-        }
-      } catch (error) {
-        if (!cancelled) {
-          setErrorMessage(
-            error instanceof Error
-              ? error.message
-              : "Das Display konnte nicht geladen werden.",
-          );
-        }
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    }
-
-    void loadDisplayContext();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [displayId]);
+  // Only treat this as a hard failure while there is nothing to show. Once
+  // context has loaded, a failed background refetch must not tear the form down
+  // and discard whatever the visitor has already typed.
+  const showDisplayContextError =
+    displayContextError !== null && displayContext === undefined;
 
   function validateForm() {
     if (!category) {
@@ -99,7 +90,7 @@ export function SurveyFeedbackPage() {
 
     const nextValidationMessage = validateForm();
     setValidationMessage(nextValidationMessage);
-    setErrorMessage(null);
+    setSubmitErrorMessage(null);
     if (nextValidationMessage) {
       return;
     }
@@ -123,7 +114,7 @@ export function SurveyFeedbackPage() {
       setSchoolClass("");
       setContactAllowed(false);
     } catch (error) {
-      setErrorMessage(
+      setSubmitErrorMessage(
         error instanceof Error
           ? error.message
           : "Die Rückmeldung konnte nicht gespeichert werden.",
@@ -155,12 +146,16 @@ export function SurveyFeedbackPage() {
             <h2 className="text-lg font-semibold">Display wird geladen</h2>
             <p className="mt-2 text-sm text-slate-600">Einen Moment bitte.</p>
           </section>
-        ) : errorMessage ? (
+        ) : showDisplayContextError ? (
           <section className="mt-8 rounded-2xl border border-rose-200 bg-rose-50 p-6">
             <h2 className="text-lg font-semibold text-rose-900">
               Display nicht verfügbar
             </h2>
-            <p className="mt-2 text-sm text-rose-700">{errorMessage}</p>
+            <p className="mt-2 text-sm text-rose-700">
+              {displayContextError instanceof Error
+                ? displayContextError.message
+                : "Das Display konnte nicht geladen werden."}
+            </p>
           </section>
         ) : displayContext ? (
           <>
@@ -260,9 +255,9 @@ export function SurveyFeedbackPage() {
                   {validationMessage}
                 </p>
               ) : null}
-              {errorMessage && !isLoading ? (
+              {submitErrorMessage ? (
                 <p className="rounded-xl border border-rose-200 bg-rose-50 px-4 py-3 text-sm text-rose-700">
-                  {errorMessage}
+                  {submitErrorMessage}
                 </p>
               ) : null}
 

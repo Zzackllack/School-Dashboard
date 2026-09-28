@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
+import { useMemo } from "react";
 import { fetchJson } from "#/lib/api/http";
 import { TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS } from "#/lib/transport";
 
@@ -190,15 +190,6 @@ export function useWeather() {
 }
 
 export function useTransport() {
-  const [busStop, setBusStop] = useState<BvgStop | null>(null);
-  const [sBahnStop, setSBahnStop] = useState<BvgStop | null>(null);
-  const [busDepartures, setBusDepartures] = useState<BvgDeparture[]>([]);
-  const [sBahnDepartures, setSBahnDepartures] = useState<BvgDeparture[]>([]);
-  const [isBusLoading, setIsBusLoading] = useState(false);
-  const [isSBahnLoading, setIsSBahnLoading] = useState(false);
-  const [busError, setBusError] = useState<string | null>(null);
-  const [sBahnError, setSBahnError] = useState<string | null>(null);
-
   const {
     data: nearby,
     isPending: isNearbyPending,
@@ -208,154 +199,117 @@ export function useTransport() {
     queryFn: async () => {
       const url = buildNearbyStopsUrl(SCHOOL_LAT, SCHOOL_LNG);
       console.info("[transport] fetching nearby stops", { url });
-      const stops = await fetchJson<BvgStop[]>(url);
-      console.info("[transport] nearby stops loaded", {
-        url,
-        count: stops?.length ?? 0,
-      });
-      return stops ?? [];
+      try {
+        const stops = await fetchJson<BvgStop[]>(url);
+        console.info("[transport] nearby stops loaded", {
+          url,
+          count: stops?.length ?? 0,
+        });
+        return stops ?? [];
+      } catch (error) {
+        // Logged here rather than from an effect: this used to be a separate
+        // effect that only existed to observe the error, and it re-ran on every
+        // nearby refetch.
+        console.error("[transport] nearby stops failed", { url, error });
+        throw error;
+      }
     },
     refetchInterval: 30 * 60 * 1_000,
   });
 
-  useEffect(() => {
-    if (nearbyStopsError) {
-      console.error("[transport] nearby stops failed", nearbyStopsError);
+  // Derived from the nearby query instead of mirrored into state by an effect.
+  // The effect version also could not clear itself, so a stop that went away
+  // left the previous one selected until some later fetch replaced it.
+  const { busStop, sBahnStop } = useMemo(() => {
+    const resolved = resolveTransportStops(nearby ?? []);
+    if (nearby?.length) {
+      console.info("[transport] resolved nearest stops", {
+        busStopId: resolved.busStop?.id ?? null,
+        busStopName: resolved.busStop?.name ?? null,
+        sBahnStopId: resolved.sBahnStop?.id ?? null,
+        sBahnStopName: resolved.sBahnStop?.name ?? null,
+      });
     }
+    return resolved;
+  }, [nearby]);
 
-    if (!nearby?.length) {
-      setBusStop(null);
-      setSBahnStop(null);
-      return;
-    }
-
-    const { busStop: nearestBusStop, sBahnStop: nearestSBahnStop } =
-      resolveTransportStops(nearby);
-
-    setBusStop((prev) =>
-      nearestBusStop && prev?.id === nearestBusStop.id ? prev : nearestBusStop,
-    );
-    setSBahnStop((prev) =>
-      nearestSBahnStop && prev?.id === nearestSBahnStop.id
-        ? prev
-        : nearestSBahnStop,
-    );
-    console.info("[transport] resolved nearest stops", {
-      busStopId: nearestBusStop?.id ?? null,
-      busStopName: nearestBusStop?.name ?? null,
-      sBahnStopId: nearestSBahnStop?.id ?? null,
-      sBahnStopName: nearestSBahnStop?.name ?? null,
-    });
-  }, [nearby, nearbyStopsError]);
-
-  const fetchDeps = useCallback(
-    async (
-      stopId: string,
-      setDepartures: (departures: BvgDeparture[]) => void,
-      setLoading: (loading: boolean) => void,
-      options?: {
-        product?: string;
-        suburbanOnly?: boolean;
-      },
-    ) => {
-      setLoading(true);
-      try {
-        const url = buildDeparturesUrl(stopId, {
-          suburbanOnly: options?.suburbanOnly,
-        });
-        console.info("[transport] fetching departures", {
-          stopId,
-          product: options?.product ?? null,
-          url,
-        });
-        const d = (await fetchJson<{ departures?: BvgDeparture[] }>(url)) ?? {};
-        const departures = Array.isArray(d.departures) ? d.departures : [];
-        console.info("[transport] departures loaded", {
-          stopId,
-          product: options?.product ?? null,
-          count: departures.length,
-        });
-        setDepartures(
-          options?.product
-            ? departures.filter(
-                (departure: BvgDeparture) =>
-                  departure.line.product === options.product,
-              )
-            : departures,
-        );
-        if (options?.product === "bus") {
-          setBusError(null);
-        } else if (options?.product === "suburban") {
-          setSBahnError(null);
-        }
-      } catch (error) {
-        console.warn(
-          "Keeping previous departures after transport refresh error",
-          {
-            stopId,
-            product: options?.product ?? null,
-            error,
-          },
-        );
-        const message = `Abfahrten konnten nicht aktualisiert werden (${options?.product ?? "unknown"}).`;
-        if (options?.product === "bus") {
-          setBusError(message);
-        } else if (options?.product === "suburban") {
-          setSBahnError(message);
-        }
-      } finally {
-        setLoading(false);
-      }
+  // `isLoading` (isPending && isFetching), not `isPending`: a query disabled via
+  // `enabled` with no stop to resolve stays pending forever, so `isPending`
+  // latched the module into its loading branch whenever no stop was found, and
+  // swallowed the nearby-stops error that branch is supposed to fall through to.
+  const {
+    data: busDeparturesResponse,
+    isLoading: isBusLoading,
+    isError: isBusError,
+  } = useQuery<{ departures?: BvgDeparture[] }>({
+    queryKey: ["bvg-departures-bus", busStop?.id],
+    queryFn: async () => {
+      if (!busStop) throw new Error("no bus stop selected");
+      const url = buildDeparturesUrl(busStop.id, { suburbanOnly: false });
+      console.info("[transport] fetching departures", {
+        stopId: busStop.id,
+        product: "bus",
+        url,
+      });
+      const d = (await fetchJson<{ departures?: BvgDeparture[] }>(url)) ?? {};
+      console.info("[transport] departures loaded", {
+        stopId: busStop?.id,
+        product: "bus",
+        count: d.departures?.length ?? 0,
+      });
+      return d;
     },
-    [],
+    enabled: busStop !== null,
+    // Replaces a setInterval effect plus a second effect keyed on the stop.
+    refetchInterval: TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS,
+  });
+
+  const {
+    data: sBahnDeparturesResponse,
+    isLoading: isSBahnLoading,
+    isError: isSBahnError,
+  } = useQuery<{ departures?: BvgDeparture[] }>({
+    queryKey: ["bvg-departures-sbahn", sBahnStop?.id],
+    queryFn: async () => {
+      if (!sBahnStop) throw new Error("no S-Bahn stop selected");
+      const url = buildDeparturesUrl(sBahnStop.id, { suburbanOnly: true });
+      console.info("[transport] fetching departures", {
+        stopId: sBahnStop.id,
+        product: "suburban",
+        url,
+      });
+      const d = (await fetchJson<{ departures?: BvgDeparture[] }>(url)) ?? {};
+      console.info("[transport] departures loaded", {
+        stopId: sBahnStop?.id,
+        product: "suburban",
+        count: d.departures?.length ?? 0,
+      });
+      return d;
+    },
+    enabled: sBahnStop !== null,
+    refetchInterval: TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS,
+  });
+
+  const busDepartures = useMemo(
+    () =>
+      (busDeparturesResponse?.departures ?? []).filter(
+        (departure) => departure.line.product === "bus",
+      ),
+    [busDeparturesResponse],
   );
 
-  useEffect(() => {
-    if (!busStop?.id) return;
-    fetchDeps(
-      busStop.id,
-      (departures) =>
-        setBusDepartures(
-          departures.filter((departure) => departure.line.product === "bus"),
-        ),
-      setIsBusLoading,
-      { product: "bus" },
-    );
-    const iv = setInterval(
-      () =>
-        fetchDeps(
-          busStop.id,
-          (departures) =>
-            setBusDepartures(
-              departures.filter(
-                (departure) => departure.line.product === "bus",
-              ),
-            ),
-          setIsBusLoading,
-          { product: "bus" },
-        ),
-      TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS,
-    );
-    return () => clearInterval(iv);
-  }, [busStop, fetchDeps]);
+  const sBahnDepartures = sBahnDeparturesResponse?.departures ?? [];
 
-  useEffect(() => {
-    if (!sBahnStop?.id) return;
-    fetchDeps(sBahnStop.id, setSBahnDepartures, setIsSBahnLoading, {
-      product: "suburban",
-      suburbanOnly: true,
-    });
-    const iv = setInterval(
-      () =>
-        fetchDeps(sBahnStop.id, setSBahnDepartures, setIsSBahnLoading, {
-          product: "suburban",
-          suburbanOnly: true,
-        }),
-      TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS,
-    );
-    return () => clearInterval(iv);
-  }, [sBahnStop, fetchDeps]);
+  // User-facing strings are unchanged; only their source moved off setState.
+  const busError = isBusError
+    ? "Abfahrten konnten nicht aktualisiert werden (bus)."
+    : null;
+  const sBahnError = isSBahnError
+    ? "Abfahrten konnten nicht aktualisiert werden (suburban)."
+    : null;
 
+  // Side effect of using isLoading: a background refetch no longer flips the
+  // loading indicator, which the old setInterval version did.
   const bus: TransportStreamState = {
     stopName: busStop?.name ?? "",
     departures: busDepartures,

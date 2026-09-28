@@ -1,5 +1,4 @@
 import { QRCodeSVG } from "qrcode.react";
-import { useEffect, useState } from "react";
 import { ModuleHeader } from "#/components/display/themes/brutalist-high-density/ModuleHeader";
 
 type SurveyQrVariant = "default" | "brutalist";
@@ -20,11 +19,10 @@ export function SurveyQrModule({
   displayId,
   variant = "default",
 }: SurveyQrModuleProps) {
-  const [surveyUrl, setSurveyUrl] = useState(() => buildSurveyUrl(displayId));
-
-  useEffect(() => {
-    setSurveyUrl(buildSurveyUrl(displayId));
-  }, [displayId]);
+  // Derived straight from props. This was state plus an effect that recomputed
+  // it on every displayId change, which cost an extra render per change and is
+  // what react-hooks/set-state-in-effect flags.
+  const surveyUrl = buildSurveyUrl(displayId);
 
   const isBrutalist = variant === "brutalist";
 
