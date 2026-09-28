@@ -5,6 +5,7 @@ import com.schooldashboard.display.repository.DisplayEnrollmentRequestRepository
 import com.schooldashboard.display.repository.DisplayRepository;
 import com.schooldashboard.display.repository.DisplaySessionRepository;
 import com.schooldashboard.survey.repository.SurveySubmissionRepository;
+import org.springframework.stereotype.Component;
 
 /**
  * Wipes the display aggregate so integration tests do not leak state into each
@@ -22,8 +23,14 @@ import com.schooldashboard.survey.repository.SurveySubmissionRepository;
  * <p>
  * The order below is the foreign-key order. {@code display_enrollment_request}
  * references both {@code display} and {@code display_enrollment_code}, so
- * requests go before codes.
+ * requests go before codes. Adding a table that references {@code display}
+ * means adding its delete here too, before {@link DisplayRepository}.
+ *
+ * <p>
+ * A component rather than something each test news up, so the repository wiring
+ * lives in one place instead of being copied into every test that needs it.
  */
+@Component
 public class DisplayFixtureCleaner {
 
 	private final SurveySubmissionRepository surveySubmissionRepository;

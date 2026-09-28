@@ -11,10 +11,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.schooldashboard.display.entity.DisplayEntity;
 import com.schooldashboard.display.entity.DisplayStatus;
-import com.schooldashboard.display.repository.DisplayEnrollmentCodeRepository;
-import com.schooldashboard.display.repository.DisplayEnrollmentRequestRepository;
 import com.schooldashboard.display.repository.DisplayRepository;
-import com.schooldashboard.display.repository.DisplaySessionRepository;
 import com.schooldashboard.security.auth.dto.AdminLoginRequest;
 import com.schooldashboard.survey.entity.SurveySubmissionEntity;
 import com.schooldashboard.survey.repository.SurveySubmissionRepository;
@@ -52,21 +49,14 @@ public class SurveyFlowIntegrationTest {
 	private SurveySubmissionRepository surveySubmissionRepository;
 
 	@Autowired
-	private DisplayEnrollmentRequestRepository enrollmentRequestRepository;
-
-	@Autowired
-	private DisplaySessionRepository displaySessionRepository;
-
-	@Autowired
-	private DisplayEnrollmentCodeRepository enrollmentCodeRepository;
+	private DisplayFixtureCleaner displayFixtureCleaner;
 
 	@BeforeEach
 	public void setUp() {
 		// Clears more than this class creates. Other @SpringBootTest classes share this
 		// database, and a plain displayRepository.deleteAll() fails on the foreign keys
 		// their rows left behind.
-		new DisplayFixtureCleaner(surveySubmissionRepository, enrollmentRequestRepository, displaySessionRepository,
-				enrollmentCodeRepository, displayRepository).clearAll();
+		displayFixtureCleaner.clearAll();
 
 		DisplayEntity activeDisplay = new DisplayEntity("Haupteingang", "haupteingang", "Lobby", "main-profile");
 		activeDisplay.setSlug("haupteingang");

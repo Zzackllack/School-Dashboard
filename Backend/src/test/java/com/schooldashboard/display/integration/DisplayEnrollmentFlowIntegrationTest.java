@@ -17,12 +17,7 @@ import com.schooldashboard.display.dto.CreateEnrollmentCodeRequest;
 import com.schooldashboard.display.dto.CreateEnrollmentRequest;
 import com.schooldashboard.display.dto.DeviceInfoDto;
 import com.schooldashboard.display.dto.RejectEnrollmentRequest;
-import com.schooldashboard.display.repository.DisplayEnrollmentCodeRepository;
-import com.schooldashboard.display.repository.DisplayEnrollmentRequestRepository;
-import com.schooldashboard.display.repository.DisplayRepository;
-import com.schooldashboard.display.repository.DisplaySessionRepository;
 import com.schooldashboard.security.auth.dto.AdminLoginRequest;
-import com.schooldashboard.survey.repository.SurveySubmissionRepository;
 import com.schooldashboard.support.DisplayFixtureCleaner;
 import java.util.Map;
 import org.junit.jupiter.api.AfterEach;
@@ -50,19 +45,7 @@ public class DisplayEnrollmentFlowIntegrationTest {
 	private ObjectMapper objectMapper;
 
 	@Autowired
-	private SurveySubmissionRepository surveySubmissionRepository;
-
-	@Autowired
-	private DisplayEnrollmentRequestRepository enrollmentRequestRepository;
-
-	@Autowired
-	private DisplaySessionRepository displaySessionRepository;
-
-	@Autowired
-	private DisplayEnrollmentCodeRepository enrollmentCodeRepository;
-
-	@Autowired
-	private DisplayRepository displayRepository;
+	private DisplayFixtureCleaner displayFixtureCleaner;
 
 	/**
 	 * Approving an enrollment leaves a {@code display_enrollment_request} row
@@ -73,17 +56,12 @@ public class DisplayEnrollmentFlowIntegrationTest {
 	 */
 	@AfterEach
 	public void tearDown() {
-		clearDisplayFixtures();
+		displayFixtureCleaner.clearAll();
 	}
 
 	@BeforeEach
 	public void setUp() {
-		clearDisplayFixtures();
-	}
-
-	private void clearDisplayFixtures() {
-		new DisplayFixtureCleaner(surveySubmissionRepository, enrollmentRequestRepository, displaySessionRepository,
-				enrollmentCodeRepository, displayRepository).clearAll();
+		displayFixtureCleaner.clearAll();
 	}
 
 	@Test
