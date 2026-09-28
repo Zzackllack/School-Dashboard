@@ -183,8 +183,16 @@ const Transportation = () => {
     ? "Failed to load S-Bahn departures. Please try again later."
     : null;
 
-  const lastUpdatedDate = departuresUpdatedAt ?? sBahnUpdatedAt;
-  const lastUpdated = lastUpdatedDate ? new Date(lastUpdatedDate) : new Date();
+  // Renders a dash until something has actually been fetched. Falling back to
+  // `new Date()` produced a new timestamp on every render, so the footer showed
+  // a running clock while claiming to be a "last updated" stamp.
+  const lastUpdatedTimestamp = departuresUpdatedAt ?? sBahnUpdatedAt;
+  const lastUpdatedText = lastUpdatedTimestamp
+    ? new Date(lastUpdatedTimestamp).toLocaleTimeString(
+        "de-DE",
+        GERMAN_TIME_FORMAT_OPTIONS,
+      )
+    : "–";
 
   const isLoadingAnything =
     isLoadingStops || isLoadingDepartures || isLoadingSBahnDepartures;
@@ -384,8 +392,7 @@ const Transportation = () => {
           <code className="bg-gray-100/80 px-1 rounded">
             v6.bvg.transport.rest
           </code>{" "}
-          - Zuletzt aktualisiert:{" "}
-          {lastUpdated.toLocaleTimeString("de-DE", GERMAN_TIME_FORMAT_OPTIONS)}
+          - Zuletzt aktualisiert: {lastUpdatedText}
         </p>
       </div>
     </div>

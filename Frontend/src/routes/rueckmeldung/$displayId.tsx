@@ -47,7 +47,17 @@ export function SurveyFeedbackPage() {
   } = useQuery<SurveyDisplayContextResponse>({
     queryKey: ["survey-display-context", displayId],
     queryFn: () => getSurveyDisplayContext(displayId),
+    // A display that does not exist will not start existing on a retry. The
+    // inherited default of 1 left a stale or mistyped QR link sitting on
+    // "Display wird geladen" for a second before it admits the display is gone.
+    retry: false,
   });
+
+  // Only treat this as a hard failure while there is nothing to show. Once
+  // context has loaded, a failed background refetch must not tear the form down
+  // and discard whatever the visitor has already typed.
+  const showDisplayContextError =
+    displayContextError !== null && displayContext === undefined;
 
   function validateForm() {
     if (!category) {
@@ -136,7 +146,7 @@ export function SurveyFeedbackPage() {
             <h2 className="text-lg font-semibold">Display wird geladen</h2>
             <p className="mt-2 text-sm text-slate-600">Einen Moment bitte.</p>
           </section>
-        ) : displayContextError ? (
+        ) : showDisplayContextError ? (
           <section className="mt-8 rounded-2xl border border-rose-200 bg-rose-50 p-6">
             <h2 className="text-lg font-semibold text-rose-900">
               Display nicht verfügbar
