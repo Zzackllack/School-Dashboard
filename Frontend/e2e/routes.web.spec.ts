@@ -125,6 +125,12 @@ const nearbyStopsFixture = [
   },
 ];
 
+// Departure times are relative to now on purpose: the transport modules filter
+// out anything in the past, so a hard-coded date silently turns these fixtures
+// into an empty-departures test the moment it goes by.
+const busDepartureWhen = new Date(Date.now() + 2 * 60_000).toISOString();
+const sBahnDepartureWhen = new Date(Date.now() + 4 * 60_000).toISOString();
+
 const busDeparturesFixture = {
   departures: [
     {
@@ -137,8 +143,8 @@ const busDeparturesFixture = {
         mode: "bus",
         product: "bus",
       },
-      when: "2026-02-28T12:18:00+01:00",
-      plannedWhen: "2026-02-28T12:18:00+01:00",
+      when: busDepartureWhen,
+      plannedWhen: busDepartureWhen,
       delay: null,
       platform: null,
       plannedPlatform: null,
@@ -159,8 +165,8 @@ const sBahnDeparturesFixture = {
         mode: "train",
         product: "suburban",
       },
-      when: "2026-02-28T12:20:00+01:00",
-      plannedWhen: "2026-02-28T12:20:00+01:00",
+      when: sBahnDepartureWhen,
+      plannedWhen: sBahnDepartureWhen,
       delay: 120,
       platform: "1",
       plannedPlatform: "1",
@@ -902,11 +908,13 @@ test("admin can switch display theme and display route keeps module parity", asy
   await expect(
     page.getByRole("heading", { name: "Öffentliche Verkehrsmittel" }),
   ).toBeVisible();
-  await expect(
-    page
-      .getByText("Keine Abfahrten verfügbar")
-      .or(page.getByRole("heading", { name: "Bus" })),
-  ).toBeVisible();
+  // The transport fetch path end to end: both fixtures are in the future, so
+  // both departures have to reach the screen. This used to accept either the
+  // empty state or a departure heading, which passed even when departures never
+  // rendered at all.
+  await expect(page.getByText("M11").first()).toBeVisible();
+  await expect(page.getByText("S1").first()).toBeVisible();
+  await expect(page.getByText("Keine Abfahrten verfügbar")).toHaveCount(0);
   await expect(
     page.getByRole("heading", { name: "Kommende Termine" }),
   ).toBeVisible();
