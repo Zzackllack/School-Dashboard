@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { fetchJson } from "#/lib/api/http";
 import { TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS } from "#/lib/transport";
@@ -64,17 +64,6 @@ const GERMAN_TIME_FORMAT_OPTIONS: Intl.DateTimeFormatOptions = {
 };
 
 const Transportation = () => {
-  const [departures, setDepartures] = useState<Departure[]>([]);
-  const [sBahnDepartures, setSBahnDepartures] = useState<Departure[]>([]);
-  const [isLoadingDepartures, setIsLoadingDepartures] = useState(false);
-  const [isLoadingSBahnDepartures, setIsLoadingSBahnDepartures] =
-    useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [sBahnError, setSBahnError] = useState<string | null>(null);
-  const [currentStop, setCurrentStop] = useState<Stop | null>(null);
-  const [currentSBahnStop, setCurrentSBahnStop] = useState<Stop | null>(null);
-  const [lastUpdated, setLastUpdated] = useState<Date>(new Date());
-
   // School coordinates
   const schoolLat = 52.43432378391319;
   const schoolLng = 13.305375391277634;
@@ -102,130 +91,103 @@ const Transportation = () => {
     refetchInterval: 30 * 60 * 1000,
   });
 
-  // Create fetchDepartures as a useCallback function so it can be used in useEffect and in the interval
-  const fetchDepartures = useCallback(async (stopId: string) => {
-    setIsLoadingDepartures(true);
-    try {
-      console.log("Fetching departures for stop:", stopId);
-      const data = (await fetchJson<DeparturesResponse>(
-        buildDeparturesApiPath(stopId),
-      )) ?? { departures: [] };
+  // The nearest stops are derived from the nearby query rather than mirrored into
+  // state by an effect. Besides the extra render per fetch, the effect version
+  // could not clear itself: a "Failed to load nearby stops" message written on a
+  // failed fetch survived a later successful refetch.
+  const currentStop = useMemo(() => nearbyStops[0] ?? null, [nearbyStops]);
 
-      // Check if data has the expected structure
+  const currentSBahnStop = useMemo(
+    () => nearbyStops.find((stop) => stop.products.suburban === true) ?? null,
+    [nearbyStops],
+  );
+
+  const nearbyStopsErrorMessage = nearbyStopsError
+    ? "Failed to load nearby stops. Please try again later."
+    : null;
+
+  // Also derived: this used to be written into sBahnError by the same effect,
+  // which meant it replaced genuine departure-fetch failures. Departure errors
+  // now take precedence over it.
+  const missingSBahnStopMessage = currentSBahnStop
+    ? null
+    : "No S-Bahn stations found nearby.";
+
+  const {
+    data: departuresResponse,
+    isLoading: isLoadingDepartures,
+    isError: isDeparturesError,
+    dataUpdatedAt: departuresUpdatedAt,
+  } = useQuery<DeparturesResponse>({
+    queryKey: ["transport-departures", currentStop?.id],
+    queryFn: async () => {
+      // Narrowed instead of asserted: `enabled` already guarantees this, but
+      // throwing keeps TypeScript honest if that guard is ever loosened.
+      if (!currentStop) throw new Error("no bus stop selected");
+      console.log("Fetching departures for stop:", currentStop.id);
+      const data = (await fetchJson<DeparturesResponse>(
+        buildDeparturesApiPath(currentStop.id),
+      )) ?? { departures: [] };
       if (!data.departures || !Array.isArray(data.departures)) {
         throw new Error("Unexpected API response format");
       }
+      return data;
+    },
+    enabled: currentStop !== null,
+    // Refresh often enough to feel live without approaching the upstream API
+    // rate limits. This replaces a setInterval effect plus a second effect that
+    // refetched whenever the stop changed.
+    refetchInterval: TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS,
+  });
 
-      setDepartures(data.departures);
-      setError(null);
-    } catch (err) {
-      console.error("Failed to fetch departures:", err);
-      setError(
-        "Problem beim Laden der Abfahrten. Bitte später erneut versuchen, oder Cédric kontaktieren.",
-      );
-    } finally {
-      setIsLoadingDepartures(false);
-    }
-  }, []);
-
-  // Create fetchSBahnDepartures as a useCallback function
-  const fetchSBahnDepartures = useCallback(async (stopId: string) => {
-    setIsLoadingSBahnDepartures(true);
-    try {
-      console.log("Fetching S-Bahn departures for stop:", stopId);
+  const {
+    data: sBahnDeparturesResponse,
+    isLoading: isLoadingSBahnDepartures,
+    isError: isSBahnError,
+    dataUpdatedAt: sBahnUpdatedAt,
+  } = useQuery<DeparturesResponse>({
+    queryKey: ["transport-sbahn-departures", currentSBahnStop?.id],
+    queryFn: async () => {
+      if (!currentSBahnStop) throw new Error("no S-Bahn stop selected");
+      console.log("Fetching S-Bahn departures for stop:", currentSBahnStop.id);
       const data = (await fetchJson<DeparturesResponse>(
-        buildDeparturesApiPath(stopId, true),
+        buildDeparturesApiPath(currentSBahnStop.id, true),
       )) ?? { departures: [] };
-
-      // Check if data has the expected structure
       if (!data.departures || !Array.isArray(data.departures)) {
         throw new Error("Unexpected API response format");
       }
+      return data;
+    },
+    enabled: currentSBahnStop !== null,
+    refetchInterval: TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS,
+  });
 
-      // Filter to only show S-Bahn trains
-      const filteredDepartures = data.departures.filter(
-        (dep) => dep.line.product === "suburban",
-      );
-      setSBahnDepartures(filteredDepartures);
-      setSBahnError(null);
-    } catch (err) {
-      console.error("Failed to fetch S-Bahn departures:", err);
-      setSBahnError(
-        "Failed to load S-Bahn departures. Please try again later.",
-      );
-    } finally {
-      setIsLoadingSBahnDepartures(false);
-    }
-  }, []);
+  // Filter to only show S-Bahn trains.
+  const departures = useMemo(
+    () => departuresResponse?.departures ?? [],
+    [departuresResponse],
+  );
+  const sBahnDepartures = useMemo(
+    () =>
+      (sBahnDeparturesResponse?.departures ?? []).filter(
+        (dep: Departure) => dep.line.product === "suburban",
+      ),
+    [sBahnDeparturesResponse],
+  );
 
-  // Create a function to update all data
-  const updateAllData = useCallback(() => {
-    if (currentStop) {
-      fetchDepartures(currentStop.id);
-    }
-    if (currentSBahnStop) {
-      fetchSBahnDepartures(currentSBahnStop.id);
-    }
-    setLastUpdated(new Date());
-    console.log(
-      "Transportation data updated at",
-      new Date().toLocaleTimeString("de-DE", GERMAN_TIME_FORMAT_OPTIONS),
-    );
-  }, [currentStop, currentSBahnStop, fetchDepartures, fetchSBahnDepartures]);
+  // User-facing strings stay exactly as they were; only their source changed.
+  const departuresErrorMessage = isDeparturesError
+    ? "Problem beim Laden der Abfahrten. Bitte später erneut versuchen, oder Cédric kontaktieren."
+    : null;
+  const sBahnErrorMessage = isSBahnError
+    ? "Failed to load S-Bahn departures. Please try again later."
+    : null;
 
-  useEffect(() => {
-    if (nearbyStopsError) {
-      setError("Failed to load nearby stops. Please try again later.");
-      return;
-    }
+  const lastUpdatedDate = departuresUpdatedAt ?? sBahnUpdatedAt;
+  const lastUpdated = lastUpdatedDate ? new Date(lastUpdatedDate) : new Date();
 
-    if (nearbyStops.length === 0) {
-      return;
-    }
-
-    setCurrentStop((prev) =>
-      prev && nearbyStops.some((stop) => stop.id === prev.id)
-        ? prev
-        : nearbyStops[0],
-    );
-
-    const nearestSBahnStop = nearbyStops.find(
-      (stop) => stop.products.suburban === true,
-    );
-    if (nearestSBahnStop) {
-      setCurrentSBahnStop((prev) =>
-        prev?.id === nearestSBahnStop.id ? prev : nearestSBahnStop,
-      );
-      setSBahnError(null);
-    } else {
-      setCurrentSBahnStop(null);
-      setSBahnError("No S-Bahn stations found nearby.");
-    }
-  }, [nearbyStops, nearbyStopsError]);
-
-  useEffect(() => {
-    if (currentStop) {
-      fetchDepartures(currentStop.id);
-      setLastUpdated(new Date());
-    }
-  }, [currentStop, fetchDepartures]);
-
-  useEffect(() => {
-    if (currentSBahnStop) {
-      fetchSBahnDepartures(currentSBahnStop.id);
-      setLastUpdated(new Date());
-    }
-  }, [currentSBahnStop, fetchSBahnDepartures]);
-
-  // Refresh departures often enough to feel live without approaching
-  // the upstream API rate limits.
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      updateAllData();
-    }, TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS);
-
-    return () => clearInterval(intervalId);
-  }, [updateAllData]);
+  const isLoadingAnything =
+    isLoadingStops || isLoadingDepartures || isLoadingSBahnDepartures;
 
   // Format time to display only hours and minutes
   const formatTime = (timeString: string) => {
@@ -387,9 +349,7 @@ const Transportation = () => {
     <div className="bg-white backdrop-blur-md rounded-xl shadow-lg border border-white/20 p-5 mb-5 w-full transition-all duration-300">
       <h2 className="text-xl font-bold text-gray-800 border-b border-gray-200 pb-2 mb-4">
         Öffentliche Verkehrsmittel
-        {(isLoadingStops ||
-          isLoadingDepartures ||
-          isLoadingSBahnDepartures) && (
+        {isLoadingAnything && (
           <span className="ml-2 text-sm font-normal text-gray-500">
             (Ladevorgang...)
           </span>
@@ -403,7 +363,7 @@ const Transportation = () => {
           departures,
           currentStop,
           isLoadingDepartures,
-          error,
+          departuresErrorMessage ?? nearbyStopsErrorMessage,
           "Nächster Bahnhof",
         )}
 
@@ -412,7 +372,7 @@ const Transportation = () => {
           sBahnDepartures,
           currentSBahnStop,
           isLoadingSBahnDepartures,
-          sBahnError,
+          sBahnErrorMessage ?? missingSBahnStopMessage,
           "S-Bahn Station",
         )}
       </div>

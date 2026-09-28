@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useMemo } from "react";
 import { fetchJson } from "#/lib/api/http";
 import { TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS } from "#/lib/transport";
 
@@ -190,15 +190,6 @@ export function useWeather() {
 }
 
 export function useTransport() {
-  const [busStop, setBusStop] = useState<BvgStop | null>(null);
-  const [sBahnStop, setSBahnStop] = useState<BvgStop | null>(null);
-  const [busDepartures, setBusDepartures] = useState<BvgDeparture[]>([]);
-  const [sBahnDepartures, setSBahnDepartures] = useState<BvgDeparture[]>([]);
-  const [isBusLoading, setIsBusLoading] = useState(false);
-  const [isSBahnLoading, setIsSBahnLoading] = useState(false);
-  const [busError, setBusError] = useState<string | null>(null);
-  const [sBahnError, setSBahnError] = useState<string | null>(null);
-
   const {
     data: nearby,
     isPending: isNearbyPending,
@@ -218,143 +209,102 @@ export function useTransport() {
     refetchInterval: 30 * 60 * 1_000,
   });
 
+  // Derived from the nearby query instead of mirrored into state by an effect.
+  // The effect version also could not clear itself, so a stop that went away
+  // left the previous one selected until some later fetch replaced it.
+  const { busStop, sBahnStop } = useMemo(
+    () => resolveTransportStops(nearby ?? []),
+    [nearby],
+  );
+
+  const {
+    data: busDeparturesResponse,
+    isPending: isBusPending,
+    isError: isBusError,
+  } = useQuery<{ departures?: BvgDeparture[] }>({
+    queryKey: ["bvg-departures-bus", busStop?.id],
+    queryFn: async () => {
+      if (!busStop) throw new Error("no bus stop selected");
+      const url = buildDeparturesUrl(busStop.id, { suburbanOnly: false });
+      console.info("[transport] fetching departures", {
+        stopId: busStop.id,
+        product: "bus",
+        url,
+      });
+      const d = (await fetchJson<{ departures?: BvgDeparture[] }>(url)) ?? {};
+      console.info("[transport] departures loaded", {
+        stopId: busStop?.id,
+        product: "bus",
+        count: d.departures?.length ?? 0,
+      });
+      return d;
+    },
+    enabled: busStop !== null,
+    // Replaces a setInterval effect plus a second effect keyed on the stop.
+    refetchInterval: TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS,
+  });
+
+  const {
+    data: sBahnDeparturesResponse,
+    isPending: isSBahnPending,
+    isError: isSBahnError,
+  } = useQuery<{ departures?: BvgDeparture[] }>({
+    queryKey: ["bvg-departures-sbahn", sBahnStop?.id],
+    queryFn: async () => {
+      if (!sBahnStop) throw new Error("no S-Bahn stop selected");
+      const url = buildDeparturesUrl(sBahnStop.id, { suburbanOnly: true });
+      console.info("[transport] fetching departures", {
+        stopId: sBahnStop.id,
+        product: "suburban",
+        url,
+      });
+      const d = (await fetchJson<{ departures?: BvgDeparture[] }>(url)) ?? {};
+      console.info("[transport] departures loaded", {
+        stopId: sBahnStop?.id,
+        product: "suburban",
+        count: d.departures?.length ?? 0,
+      });
+      return d;
+    },
+    enabled: sBahnStop !== null,
+    refetchInterval: TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS,
+  });
+
+  const busDepartures = useMemo(
+    () =>
+      (busDeparturesResponse?.departures ?? []).filter(
+        (departure) => departure.line.product === "bus",
+      ),
+    [busDeparturesResponse],
+  );
+
+  const sBahnDepartures = sBahnDeparturesResponse?.departures ?? [];
+
+  // User-facing strings are unchanged; only their source moved off setState.
+  const busError = isBusError
+    ? "Abfahrten konnten nicht aktualisiert werden (bus)."
+    : null;
+  const sBahnError = isSBahnError
+    ? "Abfahrten konnten nicht aktualisiert werden (suburban)."
+    : null;
+
+  const isBusLoading = isBusPending;
+  const isSBahnLoading = isSBahnPending;
+
   useEffect(() => {
     if (nearbyStopsError) {
       console.error("[transport] nearby stops failed", nearbyStopsError);
     }
-
-    if (!nearby?.length) {
-      setBusStop(null);
-      setSBahnStop(null);
+    if (nearbyStopsError || !nearby?.length) {
       return;
     }
-
-    const { busStop: nearestBusStop, sBahnStop: nearestSBahnStop } =
-      resolveTransportStops(nearby);
-
-    setBusStop((prev) =>
-      nearestBusStop && prev?.id === nearestBusStop.id ? prev : nearestBusStop,
-    );
-    setSBahnStop((prev) =>
-      nearestSBahnStop && prev?.id === nearestSBahnStop.id
-        ? prev
-        : nearestSBahnStop,
-    );
     console.info("[transport] resolved nearest stops", {
-      busStopId: nearestBusStop?.id ?? null,
-      busStopName: nearestBusStop?.name ?? null,
-      sBahnStopId: nearestSBahnStop?.id ?? null,
-      sBahnStopName: nearestSBahnStop?.name ?? null,
+      busStopId: busStop?.id ?? null,
+      busStopName: busStop?.name ?? null,
+      sBahnStopId: sBahnStop?.id ?? null,
+      sBahnStopName: sBahnStop?.name ?? null,
     });
-  }, [nearby, nearbyStopsError]);
-
-  const fetchDeps = useCallback(
-    async (
-      stopId: string,
-      setDepartures: (departures: BvgDeparture[]) => void,
-      setLoading: (loading: boolean) => void,
-      options?: {
-        product?: string;
-        suburbanOnly?: boolean;
-      },
-    ) => {
-      setLoading(true);
-      try {
-        const url = buildDeparturesUrl(stopId, {
-          suburbanOnly: options?.suburbanOnly,
-        });
-        console.info("[transport] fetching departures", {
-          stopId,
-          product: options?.product ?? null,
-          url,
-        });
-        const d = (await fetchJson<{ departures?: BvgDeparture[] }>(url)) ?? {};
-        const departures = Array.isArray(d.departures) ? d.departures : [];
-        console.info("[transport] departures loaded", {
-          stopId,
-          product: options?.product ?? null,
-          count: departures.length,
-        });
-        setDepartures(
-          options?.product
-            ? departures.filter(
-                (departure: BvgDeparture) =>
-                  departure.line.product === options.product,
-              )
-            : departures,
-        );
-        if (options?.product === "bus") {
-          setBusError(null);
-        } else if (options?.product === "suburban") {
-          setSBahnError(null);
-        }
-      } catch (error) {
-        console.warn(
-          "Keeping previous departures after transport refresh error",
-          {
-            stopId,
-            product: options?.product ?? null,
-            error,
-          },
-        );
-        const message = `Abfahrten konnten nicht aktualisiert werden (${options?.product ?? "unknown"}).`;
-        if (options?.product === "bus") {
-          setBusError(message);
-        } else if (options?.product === "suburban") {
-          setSBahnError(message);
-        }
-      } finally {
-        setLoading(false);
-      }
-    },
-    [],
-  );
-
-  useEffect(() => {
-    if (!busStop?.id) return;
-    fetchDeps(
-      busStop.id,
-      (departures) =>
-        setBusDepartures(
-          departures.filter((departure) => departure.line.product === "bus"),
-        ),
-      setIsBusLoading,
-      { product: "bus" },
-    );
-    const iv = setInterval(
-      () =>
-        fetchDeps(
-          busStop.id,
-          (departures) =>
-            setBusDepartures(
-              departures.filter(
-                (departure) => departure.line.product === "bus",
-              ),
-            ),
-          setIsBusLoading,
-          { product: "bus" },
-        ),
-      TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS,
-    );
-    return () => clearInterval(iv);
-  }, [busStop, fetchDeps]);
-
-  useEffect(() => {
-    if (!sBahnStop?.id) return;
-    fetchDeps(sBahnStop.id, setSBahnDepartures, setIsSBahnLoading, {
-      product: "suburban",
-      suburbanOnly: true,
-    });
-    const iv = setInterval(
-      () =>
-        fetchDeps(sBahnStop.id, setSBahnDepartures, setIsSBahnLoading, {
-          product: "suburban",
-          suburbanOnly: true,
-        }),
-      TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS,
-    );
-    return () => clearInterval(iv);
-  }, [sBahnStop, fetchDeps]);
+  }, [nearby, nearbyStopsError, busStop, sBahnStop]);
 
   const bus: TransportStreamState = {
     stopName: busStop?.name ?? "",
