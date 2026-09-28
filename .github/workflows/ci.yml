@@ -8,12 +8,17 @@ on:
       - "pnpm-lock.yaml"
       - "pnpm-workspace.yaml"
       - "package.json"
+      - ".github/dependabot.yml"
       - ".github/workflows/ci.yml"
 
 jobs:
   changes:
     name: Detect changed areas
     runs-on: ubuntu-latest
+    # Skipped for dependabot[bot] so the expensive backend/frontend suites do not
+    # run on every dependency PR. The cost is that those suites never run for
+    # dependabot at all -- see the `lockfile` job below for the one check that
+    # must not be skipped along with them.
     if: github.event.pull_request.user.login != 'dependabot[bot]'
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
@@ -36,6 +41,39 @@ jobs:
               - 'pnpm-workspace.yaml'
               - 'package.json'
               - '.github/workflows/ci.yml'
+
+  # Cheapest possible signal, and the only one that catches a lockfile left out
+  # of sync with a manifest. Deliberately not gated on the `changes` job: that
+  # job is skipped for dependabot[bot], so gating here would skip the check
+  # that dependency PRs most need to pass.
+  #
+  # Kept separate from `frontend` so it stays fast -- no lint, no typecheck, no
+  # browser download -- and so a stale lockfile reports as its own failure
+  # instead of as an unrelated install error buried in a long job.
+  lockfile:
+    name: Lockfile
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v6
+        with:
+          version: 10.12.4
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: "24"
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Verify lockfile is in sync with the manifests
+        # Fails with ERR_PNPM_OUTDATED_LOCKFILE when a manifest and the lockfile
+        # disagree, which is what a Dependabot PR looks like if its job is
+        # pointed at a workspace subdirectory. Regenerate with `pnpm install`.
+        run: pnpm install --frozen-lockfile
 
   backend:
     name: Backend
