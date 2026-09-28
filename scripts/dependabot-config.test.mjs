@@ -47,17 +47,30 @@ test('the npm job directory actually contains the pnpm workspace files', () => {
   }
 });
 
-test('pnpm-workspace.yaml lists every package that holds a package.json', () => {
-  // If a second workspace package is added without being registered here,
-  // Dependabot keeps ignoring its dependencies.
-  const workspace = parse(readFileSync(join(repoRoot, 'pnpm-workspace.yaml'), 'utf8'));
-  assert.deepEqual(workspace.packages, ['Frontend']);
+test('every workspace package holds a package.json', () => {
+  // The other direction, and the one pnpm cannot catch: a package.json sitting
+  // outside pnpm-workspace.yaml's `packages` list. Dependabot would never open
+  // an update for it, and neither would this test if it only compared the
+  // workspace file against a literal.
+  const workspace = parse(
+    readFileSync(join(repoRoot, 'pnpm-workspace.yaml'), 'utf8'),
+  );
+  assert.ok(Array.isArray(workspace.packages) && workspace.packages.length > 0);
+
+  for (const pattern of workspace.packages) {
+    assert.ok(
+      existsSync(join(repoRoot, pattern, 'package.json')),
+      `workspace entry "${pattern}" has no package.json`,
+    );
+  }
 });
 
 test('no npm job is declared for a workspace subdirectory', () => {
   // Two npm jobs would let Dependabot open a second, subdirectory-scoped set of
   // PRs that reintroduce the stale-lockfile problem.
-  const npmJobs = dependabotConfig.updates.filter((update) => update['package-ecosystem'] === 'npm');
+  const npmJobs = dependabotConfig.updates.filter(
+    (update) => update['package-ecosystem'] === 'npm',
+  );
   assert.equal(npmJobs.length, 1);
 });
 
@@ -68,10 +81,15 @@ test('maven and github-actions jobs keep their own directories', () => {
   assert.equal(jobFor('github-actions').directory, '/');
 });
 
-test('every update job has the keys Dependabot requires', () => {
+test('every update job is scoped to a directory and a schedule', () => {
   for (const job of dependabotConfig.updates) {
     const ecosystem = job['package-ecosystem'];
-    assert.ok(job.directory || job.directories, `${ecosystem} needs directory or directories`);
+    // `directory` and `directories` are alternatives, not both required, so
+    // either one satisfies this.
+    assert.ok(
+      job.directory ?? job.directories,
+      `${ecosystem} needs a directory or directories`,
+    );
     assert.ok(job.schedule?.interval, `${ecosystem} needs schedule.interval`);
   }
 });
