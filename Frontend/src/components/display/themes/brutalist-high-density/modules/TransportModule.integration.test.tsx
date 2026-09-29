@@ -116,9 +116,13 @@ describe("brutalist transport module data states", () => {
       expect(urls.filter((url) => url.includes("/departures"))).toHaveLength(2);
     });
 
-    expect(
-      urls.find((url) => url.includes(`${S_BAHN_STOP.id}/departures`)),
-    ).toBeDefined();
+    const sBahnUrl = urls.find((url) =>
+      url.includes(`${S_BAHN_STOP.id}/departures`),
+    );
+    expect(sBahnUrl).toBeDefined();
+    // Without this, re-adding the no-op param would sail past this test and
+    // reintroduce the assumption that caused the bug in the first place.
+    expect(sBahnUrl).not.toContain("suburban=true");
     expect(
       urls.find((url) => url.includes(`${BUS_STOP.id}/departures`)),
     ).toBeDefined();
