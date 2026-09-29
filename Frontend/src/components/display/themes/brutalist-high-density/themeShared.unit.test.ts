@@ -3,6 +3,7 @@ import { TRANSPORT_DEPARTURES_REFRESH_INTERVAL_MS } from "#/lib/transport";
 import {
   buildDeparturesUrl,
   buildNearbyStopsUrl,
+  filterDeparturesByProduct,
   resolveTransportStops,
 } from "./themeShared";
 
@@ -33,14 +34,33 @@ describe("brutalist transport helpers", () => {
     );
   });
 
-  it("builds the proxied S-Bahn departures request", () => {
+  it("builds the proxied departures request", () => {
     expect(buildDeparturesUrl("sbahn-stop")).toContain(
       "/api/transport/stops/sbahn-stop/departures?",
     );
     expect(buildDeparturesUrl("sbahn-stop")).toContain("results=30");
     expect(buildDeparturesUrl("sbahn-stop")).toContain("duration=60");
-    expect(buildDeparturesUrl("sbahn-stop", { suburbanOnly: true })).toContain(
-      "suburban=true",
-    );
+  });
+
+  it("filters departures by product because BVG ignores the suburban param", () => {
+    // `S Lichterfelde West` serves both S1 and the M11, and the API returns both
+    // regardless of `suburban=true`. Without this filter the S-Bahn section
+    // renders bus lines with bus-coloured badges.
+    const departure = (name: string, product: string) => ({
+      tripId: `trip-${name}`,
+      direction: "S Oranienburg",
+      line: { name, product },
+      when: "2026-09-29T14:47:00+02:00",
+      plannedWhen: "2026-09-29T14:47:00+02:00",
+      delay: null,
+    });
+    const departures = [departure("S1", "suburban"), departure("M11", "bus")];
+
+    expect(
+      filterDeparturesByProduct(departures, "suburban").map((d) => d.line.name),
+    ).toEqual(["S1"]);
+    expect(
+      filterDeparturesByProduct(departures, "bus").map((d) => d.line.name),
+    ).toEqual(["M11"]);
   });
 });

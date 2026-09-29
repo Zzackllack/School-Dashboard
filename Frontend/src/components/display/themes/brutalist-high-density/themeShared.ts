@@ -61,21 +61,29 @@ export function resolveTransportStops(nearby: BvgStop[]) {
   };
 }
 
-export function buildDeparturesUrl(
-  stopId: string,
-  options?: {
-    suburbanOnly?: boolean;
-  },
-) {
+export function buildDeparturesUrl(stopId: string) {
   const params = new URLSearchParams({
     results: "30",
     duration: "60",
   });
-  if (options?.suburbanOnly) {
-    params.set("suburban", "true");
-  }
 
   return `/api/transport/stops/${stopId}/departures?${params.toString()}`;
+}
+
+/**
+ * Keeps only the departures of one BVG product.
+ *
+ * BVG happily serves buses out of an S-Bahn station (`S Lichterfelde West` also
+ * has the M11), and the `suburban=true` query parameter looks like it filters
+ * them out. It does not — the response is byte-for-byte identical with and
+ * without it, verified against the live API. Product filtering therefore has to
+ * happen here, otherwise the S-Bahn section renders bus lines with bus badges.
+ */
+export function filterDeparturesByProduct(
+  departures: BvgDeparture[],
+  product: BvgDeparture["line"]["product"],
+) {
+  return departures.filter((departure) => departure.line.product === product);
 }
 
 export function buildNearbyStopsUrl(latitude: number, longitude: number) {
@@ -245,7 +253,7 @@ export function useTransport() {
     queryKey: ["bvg-departures-bus", busStop?.id],
     queryFn: async () => {
       if (!busStop) throw new Error("no bus stop selected");
-      const url = buildDeparturesUrl(busStop.id, { suburbanOnly: false });
+      const url = buildDeparturesUrl(busStop.id);
       console.info("[transport] fetching departures", {
         stopId: busStop.id,
         product: "bus",
@@ -272,7 +280,7 @@ export function useTransport() {
     queryKey: ["bvg-departures-sbahn", sBahnStop?.id],
     queryFn: async () => {
       if (!sBahnStop) throw new Error("no S-Bahn stop selected");
-      const url = buildDeparturesUrl(sBahnStop.id, { suburbanOnly: true });
+      const url = buildDeparturesUrl(sBahnStop.id);
       console.info("[transport] fetching departures", {
         stopId: sBahnStop.id,
         product: "suburban",
@@ -292,13 +300,21 @@ export function useTransport() {
 
   const busDepartures = useMemo(
     () =>
-      (busDeparturesResponse?.departures ?? []).filter(
-        (departure) => departure.line.product === "bus",
-      ),
+      filterDeparturesByProduct(busDeparturesResponse?.departures ?? [], "bus"),
     [busDeparturesResponse],
   );
 
-  const sBahnDepartures = sBahnDeparturesResponse?.departures ?? [];
+  // Same reason as above, and the reason it is not optional: the S-Bahn stop is
+  // also a bus stop, so an unfiltered list shows M11 rows here in bus purple
+  // directly under the S-Bahn heading, looking like the bus list twice.
+  const sBahnDepartures = useMemo(
+    () =>
+      filterDeparturesByProduct(
+        sBahnDeparturesResponse?.departures ?? [],
+        "suburban",
+      ),
+    [sBahnDeparturesResponse],
+  );
 
   // User-facing strings are unchanged; only their source moved off setState.
   const busError = isBusError

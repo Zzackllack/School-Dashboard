@@ -95,7 +95,11 @@ describe("brutalist transport module data states", () => {
     expect(screen.queryByText("Lade Abfahrten…")).toBeNull();
   });
 
-  it("asks only the S-Bahn stop for suburban departures", async () => {
+  it("asks both stops for departures, without relying on a suburban query param", async () => {
+    // BVG's `suburban=true` is a no-op — the response is identical with and
+    // without it — so the URL is expected to be plain. If someone re-adds the
+    // param as the fix, these departures are still not filtered and the S-Bahn
+    // section fills up with bus lines again.
     const urls: string[] = [];
     vi.mocked(fetchJson).mockImplementation(async (url: string) => {
       urls.push(url);
@@ -112,16 +116,45 @@ describe("brutalist transport module data states", () => {
       expect(urls.filter((url) => url.includes("/departures"))).toHaveLength(2);
     });
 
-    const sBahnRequest = urls.find((url) =>
+    const sBahnUrl = urls.find((url) =>
       url.includes(`${S_BAHN_STOP.id}/departures`),
     );
-    const busRequest = urls.find((url) =>
-      url.includes(`${BUS_STOP.id}/departures`),
-    );
-    expect(sBahnRequest).toBeDefined();
-    expect(sBahnRequest).toContain("suburban=true");
-    expect(busRequest).toBeDefined();
-    expect(busRequest).not.toContain("suburban=true");
+    expect(sBahnUrl).toBeDefined();
+    // Without this, re-adding the no-op param would sail past this test and
+    // reintroduce the assumption that caused the bug in the first place.
+    expect(sBahnUrl).not.toContain("suburban=true");
+    expect(
+      urls.find((url) => url.includes(`${BUS_STOP.id}/departures`)),
+    ).toBeDefined();
+  });
+
+  it("keeps bus lines out of the S-Bahn section", async () => {
+    // The S-Bahn stop is also a bus stop, and BVG mixes both into one response.
+    // Unfiltered, the M11 shows up under the S-Bahn heading in bus purple —
+    // indistinguishable from the bus section directly above it.
+    vi.mocked(fetchJson).mockImplementation(async (url: string) => {
+      if (url.includes("/nearby")) return [BUS_STOP, S_BAHN_STOP];
+      if (url.includes(`${S_BAHN_STOP.id}/`))
+        return {
+          departures: [
+            sBahnDepartureIn(4),
+            departureIn(6, { direction: "S Schöneweide" }),
+          ],
+        };
+      if (url.includes(`${BUS_STOP.id}/`))
+        return { departures: [departureIn(2)] };
+      throw new Error(`unexpected request: ${url}`);
+    });
+
+    renderModule();
+
+    // The bus section keeps its M11...
+    expect(await screen.findByText("M11")).toBeDefined();
+    // ...and the S-Bahn section loaded, so the section below is settled rather
+    // than still empty.
+    expect(await screen.findByText("S 25")).toBeDefined();
+    // ...but the stray bus departure in the S-Bahn response is dropped.
+    expect(screen.queryByText("S Schöneweide")).toBeNull();
   });
 
   it("settles on the empty state when no stops are nearby", async () => {
