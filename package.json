@@ -29,7 +29,7 @@
     "dev:backend": "node ./scripts/maven-runner.mjs spring-boot:run"
   },
   "devDependencies": {
-    "concurrently": "^9.2.1",
+    "concurrently": "^10.0.5",
     "yaml": "^2.9.1"
   }
 }
