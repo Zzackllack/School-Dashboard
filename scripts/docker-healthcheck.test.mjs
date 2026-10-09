@@ -9,7 +9,11 @@ const run = promisify(execFile);
 const dockerfile = readFileSync(new URL('../Docker/frontend.Dockerfile', import.meta.url), 'utf8');
 // Execute the image's actual healthcheck against HTTP responses, so changing
 // Docker's command form cannot silently break quoting or runtime port handling.
-const command = JSON.parse(dockerfile.match(/^\s*CMD (\[.*\])$/m)[1]);
+const healthcheck = dockerfile
+  .replace(/\\\r?\n/g, ' ')
+  .match(/^HEALTHCHECK[ \t].*?\bCMD[ \t]+(\[.*\])[ \t]*$/m);
+assert.ok(healthcheck, 'Expected an exec-form CMD in the frontend Dockerfile HEALTHCHECK');
+const command = JSON.parse(healthcheck[1]);
 
 async function checkHealth(port) {
   return run(process.execPath, command.slice(1), {
