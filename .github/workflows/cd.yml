@@ -16,7 +16,7 @@ on:
 jobs:
   changes:
     name: Detect changed areas
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     if: github.actor != 'dependabot[bot]'
     outputs:
       backend: ${{ steps.filter.outputs.backend }}
@@ -44,7 +44,7 @@ jobs:
 
   publish:
     name: Build and publish images
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     needs: changes
     if: github.actor != 'dependabot[bot]' && (needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true')
     permissions:
@@ -75,11 +75,13 @@ jobs:
       - name: Select backend image tags
         if: needs.changes.outputs.backend == 'true'
         run: |
-          echo "BACKEND_IMAGE_TAGS<<EOF" >> $GITHUB_ENV
-          echo "${{ steps.meta-backend.outputs.tags }}" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-          echo "BACKEND_IMAGE_REF=$(printf '%s\n' "${{ steps.meta-backend.outputs.tags }}" | head -n 1)" >> $GITHUB_ENV
-          echo "BACKEND_CACHE_REF=$(printf '%s\n' "${{ steps.meta-backend.outputs.tags }}" | head -n 1 | cut -d: -f1):buildcache" >> $GITHUB_ENV
+          {
+            echo "BACKEND_IMAGE_TAGS<<EOF"
+            echo "${{ steps.meta-backend.outputs.tags }}"
+            echo "EOF"
+            echo "BACKEND_IMAGE_REF=$(printf '%s\n' "${{ steps.meta-backend.outputs.tags }}" | head -n 1)"
+            echo "BACKEND_CACHE_REF=$(printf '%s\n' "${{ steps.meta-backend.outputs.tags }}" | head -n 1 | cut -d: -f1):buildcache"
+          } >> "$GITHUB_ENV"
 
       - name: Lint backend Dockerfile
         if: needs.changes.outputs.backend == 'true'
@@ -143,11 +145,13 @@ jobs:
       - name: Select frontend image tags
         if: needs.changes.outputs.frontend == 'true'
         run: |
-          echo "FRONTEND_IMAGE_TAGS<<EOF" >> $GITHUB_ENV
-          echo "${{ steps.meta-frontend.outputs.tags }}" >> $GITHUB_ENV
-          echo "EOF" >> $GITHUB_ENV
-          echo "FRONTEND_IMAGE_REF=$(printf '%s\n' "${{ steps.meta-frontend.outputs.tags }}" | head -n 1)" >> $GITHUB_ENV
-          echo "FRONTEND_CACHE_REF=$(printf '%s\n' "${{ steps.meta-frontend.outputs.tags }}" | head -n 1 | cut -d: -f1):buildcache" >> $GITHUB_ENV
+          {
+            echo "FRONTEND_IMAGE_TAGS<<EOF"
+            echo "${{ steps.meta-frontend.outputs.tags }}"
+            echo "EOF"
+            echo "FRONTEND_IMAGE_REF=$(printf '%s\n' "${{ steps.meta-frontend.outputs.tags }}" | head -n 1)"
+            echo "FRONTEND_CACHE_REF=$(printf '%s\n' "${{ steps.meta-frontend.outputs.tags }}" | head -n 1 | cut -d: -f1):buildcache"
+          } >> "$GITHUB_ENV"
 
       - name: Lint frontend Dockerfile
         if: needs.changes.outputs.frontend == 'true'

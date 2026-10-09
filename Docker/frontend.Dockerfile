@@ -16,7 +16,7 @@ ENV NODE_ENV=production
 ENV HOST=0.0.0.0
 ENV PORT=3000
 
-RUN addgroup -S appgroup && adduser -S appuser -G appgroup
+RUN addgroup -S -g 10001 appgroup && adduser -S -u 10001 appuser -G appgroup
 # Remove package managers from runtime image; not needed to run the app and
 # avoids shipping vulnerable npm transitive dependencies.
 RUN rm -rf /usr/local/lib/node_modules/npm \
@@ -27,8 +27,8 @@ COPY --from=build --chown=appuser:appgroup /app/Frontend/.output ./.output
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=15s --retries=3 \
-  CMD node -e "fetch(`http://127.0.0.1:${process.env.PORT || 3000}`).then((response) => { if (!response.ok) process.exit(1); }).catch(() => process.exit(1))"
+  CMD ["node", "-e", "fetch(`http://127.0.0.1:${process.env.PORT || 3000}`).then((response) => { if (!response.ok) process.exit(1); }).catch(() => process.exit(1))"]
 
-USER appuser
+USER 10001:10001
 
 CMD ["node", ".output/server/index.mjs"]

@@ -27,9 +27,8 @@ RUN chmod +x /entrypoint.sh
 
 EXPOSE 8080
 
+# Database credentials are supplied at runtime by the deployment.
 ENV SPRING_DATASOURCE_URL=jdbc:postgresql://postgres:5432/school_dashboard \
-    SPRING_DATASOURCE_USERNAME=school_dashboard \
-    SPRING_DATASOURCE_PASSWORD=change-me \
     SPRING_FLYWAY_LOCATIONS=classpath:db/migration/postgresql \
     SPRING_PROFILES_ACTIVE=prod \
     SERVER_SERVLET_SESSION_COOKIE_SECURE=true \
