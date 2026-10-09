@@ -12,7 +12,7 @@ jobs:
   format:
     name: Apply formatting
     if: github.actor != 'github-actions[bot]' && github.actor != 'dependabot[bot]'
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout
         uses: actions/checkout@v7
