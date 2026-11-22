@@ -1,9 +1,9 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { execFileSync } from 'node:child_process';
-import { readFileSync } from 'node:fs';
+import { execSync } from 'node:child_process';
+import { existsSync, readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { dirname, join, resolve } from 'node:path';
+import { delimiter, dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const repoRoot = resolve(dirname(fileURLToPath(import.meta.url)), '..');
@@ -14,12 +14,16 @@ function packageManifest(specifier) {
   return JSON.parse(readFileSync(frontendRequire.resolve(specifier), 'utf8'));
 }
 
-function frontendBin(name) {
-  return join(frontendDir, 'node_modules', '.bin', name);
-}
-
 function binVersion(name) {
-  return execFileSync(frontendBin(name), ['--version'], { encoding: 'utf8' }).trim();
+  const binDir = join(frontendDir, 'node_modules', '.bin');
+  const shim = process.platform === 'win32' ? name + '.cmd' : name;
+  assert.ok(existsSync(join(binDir, shim)), 'Missing frontend binary: ' + shim);
+
+  return execSync(name + ' --version', {
+    cwd: frontendDir,
+    encoding: 'utf8',
+    env: { ...process.env, PATH: [binDir, process.env.PATH].join(delimiter) },
+  }).trim();
 }
 
 // TypeScript 7 ships only the native tsc and no compiler API. typescript-eslint
@@ -36,24 +40,18 @@ test('tsc runs TypeScript 7 while the compiler API resolves to TypeScript 6', ()
   const native = packageManifest('@typescript/native/package.json');
 
   assert.equal(api.name, '@typescript/typescript6');
-  assert.match(api.version, /^6\./);
+  assert.match(api.version, /^6\.0\./);
 
   assert.equal(native.name, 'typescript');
   assert.match(native.version, /^7\./);
 
   assert.match(binVersion('tsc'), /^Version 7\./);
-  assert.match(binVersion('tsc6'), /^Version 6\./);
+  assert.match(binVersion('tsc6'), /^Version 6\.0\./);
 });
 
-test('typescript-eslint resolves the TypeScript 6 API', () => {
-  // Typescript-eslint reads ts.version from the package behind its `typescript`
-  // peer, which is what @typescript/typescript6 re-exports.
-  const ts = frontendRequire('typescript');
-  assert.match(ts.version, /^6\./);
+test('typescript-eslint resolves the TypeScript 6.0 compiler API', () => {
+  const eslintRequire = createRequire(frontendRequire.resolve('typescript-eslint'));
+  const ts = eslintRequire('typescript');
 
-  const eslint = packageManifest('typescript-eslint/package.json');
-  assert.ok(
-    !eslint.peerDependencies.typescript.includes('7'),
-    'typescript-eslint still rejects TypeScript 7; this test can go once that changes',
-  );
+  assert.match(ts.version, /^6\.0\./);
 });
