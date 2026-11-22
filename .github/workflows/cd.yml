@@ -45,6 +45,9 @@ jobs:
   publish:
     name: Build and publish images
     runs-on: ubuntu-24.04
+    # Normal runs finish in under 5 minutes. Without this, a hung build sits on
+    # the runner until GitHub's 6-hour hard limit and reports as "cancelled".
+    timeout-minutes: 30
     needs: changes
     if: github.actor != 'dependabot[bot]' && (needs.changes.outputs.backend == 'true' || needs.changes.outputs.frontend == 'true')
     permissions:
@@ -96,7 +99,10 @@ jobs:
           context: .
           file: Docker/backend.Dockerfile
           push: true
-          platforms: linux/amd64,linux/arm64
+          # amd64 only on purpose: the arm64 half ran under QEMU and hung until
+          # the 6h job limit (see run 44941850686). Use ubuntu-24.04-arm in a
+          # matrix if ARM images are ever needed again.
+          platforms: linux/amd64
           tags: ${{ steps.meta-backend.outputs.tags }}
           labels: ${{ steps.meta-backend.outputs.labels }}
           cache-from: type=registry,ref=${{ env.BACKEND_CACHE_REF }}
@@ -166,7 +172,9 @@ jobs:
           context: .
           file: Docker/frontend.Dockerfile
           push: true
-          platforms: linux/amd64,linux/arm64
+          # amd64 only on purpose: the arm64 half ran under QEMU and hung in
+          # `tsc --noEmit` until the 6h job limit (see run 44941850686).
+          platforms: linux/amd64
           tags: ${{ steps.meta-frontend.outputs.tags }}
           labels: ${{ steps.meta-frontend.outputs.labels }}
           cache-from: type=registry,ref=${{ env.FRONTEND_CACHE_REF }}
